@@ -1,6 +1,6 @@
 {
   "lab": "moonshot",
-  "updated_at": "2026-09-07T03:30:00Z",
+  "updated_at": "2026-09-07T03:46:46Z",
   "releases": [
     {
       "id": "moonshot-kimi-k1.5",
@@ -14,7 +14,9 @@
         "url": "https://github.com/MoonshotAI/Kimi-k1.5",
         "title": "Kimi k1.5: Scaling Reinforcement Learning with LLMs",
         "quote": "Introducing Kimi k1.5 --- an o1-level multi-modal model",
-        "retrieved_at": "2026-09-07T03:30:00Z"
+        "retrieved_at": "2026-09-07T03:30:00Z",
+        "verified": true,
+        "verified_at": "2026-09-07T03:42:43Z"
       },
       "scores": [
         {
@@ -27,6 +29,8 @@
             "title": "Kimi k1.5: Scaling Reinforcement Learning with LLMs",
             "quote": "MATH-500 (EM) 90.6 90.0 - 94.8 96.2 AIME 2024 (Pass@1) 50.0 63.6 - 74.4 77.5 Codeforces (Percentile) 62 88 - 94 94 LiveCodeBench (Pass@1) 40.6 53.1 - 67.2 62.5",
             "retrieved_at": "2026-09-07T03:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T03:42:43Z",
             "note": "Table columns: QwQ-32B-Preview, OpenAI o1-mini, QVQ-72B-Preview, OpenAI o1, Kimi k1.5 (long-CoT)."
           }
         },
@@ -39,7 +43,9 @@
             "url": "https://arxiv.org/html/2501.12599v1",
             "title": "Kimi k1.5: Scaling Reinforcement Learning with LLMs",
             "quote": "MATH-500 (EM) 90.6 90.0 - 94.8 96.2 AIME 2024 (Pass@1) 50.0 63.6 - 74.4 77.5 Codeforces (Percentile) 62 88 - 94 94 LiveCodeBench (Pass@1) 40.6 53.1 - 67.2 62.5",
-            "retrieved_at": "2026-09-07T03:30:00Z"
+            "retrieved_at": "2026-09-07T03:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T03:42:43Z"
           }
         },
         {
@@ -51,7 +57,9 @@
             "url": "https://arxiv.org/html/2501.12599v1",
             "title": "Kimi k1.5: Scaling Reinforcement Learning with LLMs",
             "quote": "MATH-500 (EM) 90.6 90.0 - 94.8 96.2 AIME 2024 (Pass@1) 50.0 63.6 - 74.4 77.5 Codeforces (Percentile) 62 88 - 94 94 LiveCodeBench (Pass@1) 40.6 53.1 - 67.2 62.5",
-            "retrieved_at": "2026-09-07T03:30:00Z"
+            "retrieved_at": "2026-09-07T03:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T03:42:43Z"
           }
         }
       ]
@@ -69,6 +77,8 @@
         "title": "moonshotai/Kimi-K2-Instruct model card",
         "quote": "Kimi K2 is a state-of-the-art mixture-of-experts (MoE) language model with 32 billion activated parameters and 1 trillion total parameters.",
         "retrieved_at": "2026-09-07T03:30:00Z",
+        "verified": true,
+        "verified_at": "2026-09-07T03:42:43Z",
         "note": "Date is the Hugging Face repo creation date for Kimi-K2-Instruct; the README carries no separate dated announcement sentence."
       },
       "scores": [
@@ -82,6 +92,8 @@
             "title": "moonshotai/Kimi-K2-Instruct model card",
             "quote": "LiveCodeBench v6 (Aug 24 - May 25) Pass@1 53.7 46.9 37.0 48.5 47.4 44.7 44.7",
             "retrieved_at": "2026-09-07T03:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T03:42:43Z",
             "note": "Table columns: Kimi K2 Instruct, DeepSeek-V3-0324, Qwen3-235B-A22B (non-thinking), Claude Sonnet 4, Claude Opus 4, GPT-4.1, Gemini 2.5 Flash Preview."
           }
         },
@@ -94,7 +106,9 @@
             "url": "https://huggingface.co/moonshotai/Kimi-K2-Instruct",
             "title": "moonshotai/Kimi-K2-Instruct model card",
             "quote": "SWE-bench Verified (Agentless Coding) Single Patch w/o Test (Acc) 51.8 36.6 39.4 50.2 53.0 40.8 32.6 SWE-bench Verified (Agentic Coding) Single Attempt (Acc) 65.8 38.8",
-            "retrieved_at": "2026-09-07T03:30:00Z"
+            "retrieved_at": "2026-09-07T03:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T03:42:43Z"
           }
         },
         {
@@ -107,7 +121,9 @@
             "url": "https://huggingface.co/moonshotai/Kimi-K2-Instruct",
             "title": "moonshotai/Kimi-K2-Instruct model card",
             "quote": "Tau2 retail Avg@4 70.6 69.1 57.0 75.0 81.8 74.8 64.3 Tau2 airline Avg@4 56.5 39.0 26.5 55.5 60.0 54.5 42.5 Tau2 telecom Avg@4 65.8 32.5 22.1 45.2 57.0 38.6 16.9",
-            "retrieved_at": "2026-09-07T03:30:00Z"
+            "retrieved_at": "2026-09-07T03:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T03:42:43Z"
           }
         },
         {
@@ -119,7 +135,9 @@
             "url": "https://huggingface.co/moonshotai/Kimi-K2-Instruct",
             "title": "moonshotai/Kimi-K2-Instruct model card",
             "quote": "AIME 2025 Avg@64 49.5 46.7 24.7 * 33.1 * 33.9 * 37.0 46.6",
-            "retrieved_at": "2026-09-07T03:30:00Z"
+            "retrieved_at": "2026-09-07T03:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T03:42:43Z"
           }
         },
         {
@@ -131,7 +149,9 @@
             "url": "https://huggingface.co/moonshotai/Kimi-K2-Instruct",
             "title": "moonshotai/Kimi-K2-Instruct model card",
             "quote": "GPQA-Diamond Avg@8 75.1 68.4 * 62.9 * 70.0 * 74.9 * 66.3 68.2",
-            "retrieved_at": "2026-09-07T03:30:00Z"
+            "retrieved_at": "2026-09-07T03:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T03:42:43Z"
           }
         },
         {
@@ -142,7 +162,9 @@
             "url": "https://huggingface.co/moonshotai/Kimi-K2-Instruct",
             "title": "moonshotai/Kimi-K2-Instruct model card",
             "quote": "MMLU EM 89.5 89.4 87.0 91.5 92.9 90.4 90.1",
-            "retrieved_at": "2026-09-07T03:30:00Z"
+            "retrieved_at": "2026-09-07T03:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T03:42:43Z"
           }
         },
         {
@@ -153,7 +175,9 @@
             "url": "https://huggingface.co/moonshotai/Kimi-K2-Instruct",
             "title": "moonshotai/Kimi-K2-Instruct model card",
             "quote": "MMLU-Pro EM 81.1 81.2 * 77.3 83.7 86.6 81.8 79.4",
-            "retrieved_at": "2026-09-07T03:30:00Z"
+            "retrieved_at": "2026-09-07T03:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T03:42:43Z"
           }
         },
         {
@@ -165,7 +189,9 @@
             "url": "https://huggingface.co/moonshotai/Kimi-K2-Instruct",
             "title": "moonshotai/Kimi-K2-Instruct model card",
             "quote": "Humanity's Last Exam (Text Only) - 4.7 5.2 5.7 5.8 7.1 3.7 5.6",
-            "retrieved_at": "2026-09-07T03:30:00Z"
+            "retrieved_at": "2026-09-07T03:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T03:42:43Z"
           }
         }
       ]
@@ -182,7 +208,9 @@
         "url": "https://huggingface.co/moonshotai/Kimi-K2-Thinking",
         "title": "moonshotai/Kimi-K2-Thinking model card",
         "quote": "Kimi K2 Thinking is the latest, most capable version of open-source thinking model.",
-        "retrieved_at": "2026-09-07T03:30:00Z"
+        "retrieved_at": "2026-09-07T03:30:00Z",
+        "verified": true,
+        "verified_at": "2026-09-07T03:42:43Z"
       },
       "scores": [
         {
@@ -195,6 +223,8 @@
             "title": "moonshotai/Kimi-K2-Thinking model card",
             "quote": "**MMLU-Pro** | no tools | 84.6 | 87.1 | 87.5 | 81.9 | 85.0 |",
             "retrieved_at": "2026-09-07T03:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T03:46:46Z",
             "note": "Table columns: K2 Thinking, GPT-5 (High), Claude Sonnet 4.5 (Thinking), K2 0905, DeepSeek-V3.2."
           }
         },
@@ -207,7 +237,9 @@
             "url": "https://huggingface.co/moonshotai/Kimi-K2-Thinking",
             "title": "moonshotai/Kimi-K2-Thinking model card",
             "quote": "**AIME25** | no tools | 94.5 | 94.6 | 87.0 | 51.0 | 89.3 | 91.7 |",
-            "retrieved_at": "2026-09-07T03:30:00Z"
+            "retrieved_at": "2026-09-07T03:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T03:46:46Z"
           }
         },
         {
@@ -220,7 +252,9 @@
             "url": "https://huggingface.co/moonshotai/Kimi-K2-Thinking",
             "title": "moonshotai/Kimi-K2-Thinking model card",
             "quote": "**GPQA** | no tools | 84.5 | 85.7 | 83.4 | 74.2 | 79.9 | 87.5 |",
-            "retrieved_at": "2026-09-07T03:30:00Z"
+            "retrieved_at": "2026-09-07T03:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T03:46:46Z"
           }
         },
         {
@@ -232,7 +266,9 @@
             "url": "https://huggingface.co/moonshotai/Kimi-K2-Thinking",
             "title": "moonshotai/Kimi-K2-Thinking model card",
             "quote": "HLE (Text-only)** | no tools | 23.9 | 26.3 | 19.8* | 7.9 | 19.8 | 25.4 |",
-            "retrieved_at": "2026-09-07T03:30:00Z"
+            "retrieved_at": "2026-09-07T03:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T03:46:46Z"
           }
         },
         {
@@ -244,7 +280,9 @@
             "url": "https://huggingface.co/moonshotai/Kimi-K2-Thinking",
             "title": "moonshotai/Kimi-K2-Thinking model card",
             "quote": "LiveCodeBenchV6** | no tools | 83.1 | 87.0* | 64.0* | 56.1* | 74.1 |",
-            "retrieved_at": "2026-09-07T03:30:00Z"
+            "retrieved_at": "2026-09-07T03:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T03:46:46Z"
           }
         },
         {
@@ -256,7 +294,9 @@
             "url": "https://huggingface.co/moonshotai/Kimi-K2-Thinking",
             "title": "moonshotai/Kimi-K2-Thinking model card",
             "quote": "SWE-bench Verified** | w/ tools | 71.3 | 74.9 | 77.2 | 69.2 | 67.8 |",
-            "retrieved_at": "2026-09-07T03:30:00Z"
+            "retrieved_at": "2026-09-07T03:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T03:46:46Z"
           }
         }
       ]
@@ -273,7 +313,9 @@
         "url": "https://huggingface.co/moonshotai/Kimi-K2.5",
         "title": "moonshotai/Kimi-K2.5 model card",
         "quote": "Kimi K2.5 is an open-source, native multimodal agentic model built through continual pretraining on approximately 15 trillion mixed visual and text tokens atop Kimi-K2-Base.",
-        "retrieved_at": "2026-09-07T03:30:00Z"
+        "retrieved_at": "2026-09-07T03:30:00Z",
+        "verified": true,
+        "verified_at": "2026-09-07T03:42:43Z"
       },
       "scores": [
         {
@@ -286,6 +328,8 @@
             "title": "moonshotai/Kimi-K2.5 model card",
             "quote": "HLE-Full 30.1 34.5 30.8 37.5 25.1",
             "retrieved_at": "2026-09-07T03:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T03:42:43Z",
             "note": "Table columns: Kimi K2.5 (Thinking), GPT-5.2 (xhigh), Claude 4.5 Opus (Extended Thinking), Gemini 3 Pro (High Thinking), DeepSeek V3.2 (Thinking)."
           }
         },
@@ -298,7 +342,9 @@
             "url": "https://huggingface.co/moonshotai/Kimi-K2.5",
             "title": "moonshotai/Kimi-K2.5 model card",
             "quote": "AIME 2025 96.1 100 92.8 95.0 93.1",
-            "retrieved_at": "2026-09-07T03:30:00Z"
+            "retrieved_at": "2026-09-07T03:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T03:42:43Z"
           }
         },
         {
@@ -309,7 +355,9 @@
             "url": "https://huggingface.co/moonshotai/Kimi-K2.5",
             "title": "moonshotai/Kimi-K2.5 model card",
             "quote": "GPQA-Diamond 87.6 92.4 87.0 91.9 82.4",
-            "retrieved_at": "2026-09-07T03:30:00Z"
+            "retrieved_at": "2026-09-07T03:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T03:42:43Z"
           }
         },
         {
@@ -320,19 +368,23 @@
             "url": "https://huggingface.co/moonshotai/Kimi-K2.5",
             "title": "moonshotai/Kimi-K2.5 model card",
             "quote": "MMLU-Pro 87.1 86.7* 89.3* 90.1 85.0",
-            "retrieved_at": "2026-09-07T03:30:00Z"
+            "retrieved_at": "2026-09-07T03:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T03:42:43Z"
           }
         },
         {
           "benchmark": "livecodebench",
-          "value": 85.0,
+          "value": 85,
           "config": "v6",
           "reported_by": "official",
           "source": {
             "url": "https://huggingface.co/moonshotai/Kimi-K2.5",
             "title": "moonshotai/Kimi-K2.5 model card",
             "quote": "LiveCodeBench (v6) 85.0 - 82.2* 87.4* 83.3",
-            "retrieved_at": "2026-09-07T03:30:00Z"
+            "retrieved_at": "2026-09-07T03:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T03:42:43Z"
           }
         },
         {
@@ -343,7 +395,9 @@
             "url": "https://huggingface.co/moonshotai/Kimi-K2.5",
             "title": "moonshotai/Kimi-K2.5 model card",
             "quote": "SWE-Bench Verified 76.8 80.0 80.9 76.2",
-            "retrieved_at": "2026-09-07T03:30:00Z"
+            "retrieved_at": "2026-09-07T03:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T03:42:43Z"
           }
         },
         {
@@ -356,6 +410,8 @@
             "title": "moonshotai/Kimi-K2.5 model card",
             "quote": "Terminal Bench 2.0 50.8 54.0 59.3 54.2",
             "retrieved_at": "2026-09-07T03:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T03:42:43Z",
             "note": "Lab notes Terminal-Bench 2.0 was evaluated under non-thinking mode because their context-management strategy for thinking mode is incompatible with Terminus-2."
           }
         }
@@ -374,7 +430,8 @@
         "title": "Kimi K2.6 Tech Blog: Advancing Open-Source Coding",
         "quote": "We are open sourcing our latest model, Kimi K2.6, featuring state-of-the-art coding, long-horizon execution, and agent swarm capabilities. Kimi K2.6 is now available via Kimi.ai, the Kimi App, the API, and Kimi Code.",
         "retrieved_at": "2026-09-07T03:30:00Z",
-        "via": "r.jina.ai",
+        "verified": true,
+        "verified_at": "2026-09-07T03:42:43Z",
         "note": "Blog page carries no visible publish date; Apr 21, 2026 GA date corroborated by the Hugging Face repo creation date (Apr 14, 2026, matching the earlier 'Code Preview') and third-party coverage of the GA announcement."
       },
       "scores": [
@@ -388,6 +445,8 @@
             "title": "moonshotai/Kimi-K2.6 model card",
             "quote": "Terminal-Bench 2.0 (Terminus-2) 66.7 65.4* 65.4 68.5 50.8",
             "retrieved_at": "2026-09-07T03:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T03:42:43Z",
             "note": "Table columns: Kimi K2.6, GPT-5.4 (xhigh), Claude Opus 4.6 (max effort), Gemini 3.1 Pro (thinking high), Kimi K2.5."
           }
         },
@@ -399,7 +458,9 @@
             "url": "https://huggingface.co/moonshotai/Kimi-K2.6",
             "title": "moonshotai/Kimi-K2.6 model card",
             "quote": "SWE-Bench Verified 80.2 - 80.8 80.6 76.8",
-            "retrieved_at": "2026-09-07T03:30:00Z"
+            "retrieved_at": "2026-09-07T03:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T03:42:43Z"
           }
         },
         {
@@ -411,7 +472,9 @@
             "url": "https://huggingface.co/moonshotai/Kimi-K2.6",
             "title": "moonshotai/Kimi-K2.6 model card",
             "quote": "LiveCodeBench (v6) 89.6 - 88.8 91.7 85.0",
-            "retrieved_at": "2026-09-07T03:30:00Z"
+            "retrieved_at": "2026-09-07T03:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T03:42:43Z"
           }
         },
         {
@@ -423,7 +486,9 @@
             "url": "https://huggingface.co/moonshotai/Kimi-K2.6",
             "title": "moonshotai/Kimi-K2.6 model card",
             "quote": "HLE-Full 34.7 39.8 40.0 44.4 30.1",
-            "retrieved_at": "2026-09-07T03:30:00Z"
+            "retrieved_at": "2026-09-07T03:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T03:42:43Z"
           }
         },
         {
@@ -435,7 +500,9 @@
             "url": "https://huggingface.co/moonshotai/Kimi-K2.6",
             "title": "moonshotai/Kimi-K2.6 model card",
             "quote": "AIME 2026 96.4 99.2 96.7 98.3 95.8",
-            "retrieved_at": "2026-09-07T03:30:00Z"
+            "retrieved_at": "2026-09-07T03:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T03:42:43Z"
           }
         },
         {
@@ -446,7 +513,9 @@
             "url": "https://huggingface.co/moonshotai/Kimi-K2.6",
             "title": "moonshotai/Kimi-K2.6 model card",
             "quote": "GPQA-Diamond 90.5 92.8 91.3 94.3 87.6",
-            "retrieved_at": "2026-09-07T03:30:00Z"
+            "retrieved_at": "2026-09-07T03:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T03:42:43Z"
           }
         }
       ]
@@ -464,6 +533,8 @@
         "title": "moonshotai/Kimi-K3 model card",
         "quote": "Kimi K3 is an open-weight, native multimodal agentic model and our most capable model to date.",
         "retrieved_at": "2026-09-07T03:30:00Z",
+        "verified": true,
+        "verified_at": "2026-09-07T03:42:43Z",
         "note": "Moonshot announced K3 on Jul 16, 2026; open weights followed on Jul 27, 2026 (the date recorded here, per the project's rule of using public/usable availability)."
       },
       "scores": [
@@ -477,6 +548,8 @@
             "title": "moonshotai/Kimi-K3 model card",
             "quote": "GPQA Diamond 93.5 92.6 94.1 91.0 93.5 91.2",
             "retrieved_at": "2026-09-07T03:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T03:42:43Z",
             "note": "Table columns: Kimi K3 (max), Claude Fable 5 (max, w/ fallback), GPT-5.6 Sol (max), Claude Opus 4.8 (max), GPT-5.5 (xhigh), GLM-5.2 (max)."
           }
         },
@@ -490,6 +563,8 @@
             "title": "moonshotai/Kimi-K3 model card",
             "quote": "HLE-Full 43.5 / 56.0 53.3 / 63.0 44.5 / 58.0 49.8 / 57.9 41.4 / 52.2",
             "retrieved_at": "2026-09-07T03:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T03:42:43Z",
             "note": "Cell format is 'without tools / with tools'; 43.5 is the no-tools figure for Kimi K3."
           }
         }

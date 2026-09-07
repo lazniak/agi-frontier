@@ -1,6 +1,6 @@
 {
   "lab": "meta",
-  "updated_at": "2026-09-07T03:30:00Z",
+  "updated_at": "2026-09-07T03:46:46Z",
   "releases": [
     {
       "id": "meta-llama-1-65b",
@@ -15,6 +15,8 @@
         "title": "Introducing LLaMA: A foundational, 65-billion-parameter language model",
         "quote": "As part of Meta's commitment to open science, today we are publicly releasing LLaMA (Large Language Model Meta AI), a state-of-the-art foundational large language model designed to help researchers advance their work in this subfield of AI.",
         "retrieved_at": "2026-09-07T03:30:00Z",
+        "verified": true,
+        "verified_at": "2026-09-07T03:42:43Z",
         "via": "r.jina.ai"
       },
       "scores": [
@@ -27,7 +29,9 @@
             "url": "https://github.com/meta-llama/llama/blob/main/MODEL_CARD.md",
             "title": "Llama 2 Model Card (Meta, comparison table includes Llama 1 65B)",
             "quote": "|Llama 1|65B|30.7|70.7|60.5|68.6|30.8|63.4|43.5|47.6|",
-            "retrieved_at": "2026-09-07T03:30:00Z"
+            "retrieved_at": "2026-09-07T03:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T03:46:46Z"
           }
         }
       ],
@@ -46,6 +50,8 @@
         "title": "Meta and Microsoft Introduce the Next Generation of Llama",
         "quote": "We're now ready to open source the next version of Llama 2 and are making it available free of charge for research and commercial use.",
         "retrieved_at": "2026-09-07T03:30:00Z",
+        "verified": true,
+        "verified_at": "2026-09-07T03:42:43Z",
         "via": "r.jina.ai"
       },
       "scores": [
@@ -58,7 +64,9 @@
             "url": "https://github.com/meta-llama/llama/blob/main/MODEL_CARD.md",
             "title": "Llama 2 Model Card (Meta)",
             "quote": "|Llama 2|70B|**37.5**|**71.9**|**63.6**|**69.4**|**35.2**|**68.9**|**51.2**|**54.2**|",
-            "retrieved_at": "2026-09-07T03:30:00Z"
+            "retrieved_at": "2026-09-07T03:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T03:46:46Z"
           }
         }
       ]
@@ -76,19 +84,23 @@
         "title": "Introducing Meta Llama 3: The most capable openly available LLM to date",
         "quote": "Today, we're excited to share the first two models of the next generation of Llama, Meta Llama 3, available for broad use. This release features pretrained and instruction-fine-tuned language models with 8B and 70B parameters.",
         "retrieved_at": "2026-09-07T03:30:00Z",
+        "verified": false,
+        "verified_at": "2026-09-07T03:46:46Z",
         "via": "r.jina.ai"
       },
       "scores": [
         {
           "benchmark": "mmlu",
-          "value": 82.0,
+          "value": 82,
           "config": "5-shot, Instruct model",
           "reported_by": "official",
           "source": {
             "url": "https://github.com/meta-llama/llama-models/blob/main/models/llama3/MODEL_CARD.md",
             "title": "Llama 3 Model Card (Meta)",
             "quote": "MMLU (5-shot) | 68.4 | 34.1 | 47.8 | 82.0 | 52.9",
-            "retrieved_at": "2026-09-07T03:30:00Z"
+            "retrieved_at": "2026-09-07T03:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T03:46:46Z"
           }
         },
         {
@@ -101,7 +113,9 @@
             "url": "https://github.com/meta-llama/llama-models/blob/main/models/llama3/MODEL_CARD.md",
             "title": "Llama 3 Model Card (Meta)",
             "quote": "GPQA (0-shot) | 34.2 | 21.7 | 22.3 | 39.5 | 21.0",
-            "retrieved_at": "2026-09-07T03:30:00Z"
+            "retrieved_at": "2026-09-07T03:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T03:46:46Z"
           }
         },
         {
@@ -113,7 +127,9 @@
             "url": "https://github.com/meta-llama/llama-models/blob/main/models/llama3/MODEL_CARD.md",
             "title": "Llama 3 Model Card (Meta)",
             "quote": "HumanEval (0-shot) | 62.2 | 7.9 | 14.0 | 81.7 | 25.6",
-            "retrieved_at": "2026-09-07T03:30:00Z"
+            "retrieved_at": "2026-09-07T03:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T03:46:46Z"
           }
         },
         {
@@ -125,7 +141,9 @@
             "url": "https://github.com/meta-llama/llama-models/blob/main/models/llama3/MODEL_CARD.md",
             "title": "Llama 3 Model Card (Meta)",
             "quote": "MATH (4-shot, CoT) | 30.0 | 3.8 | 6.7 | 50.4 | 11.6",
-            "retrieved_at": "2026-09-07T03:30:00Z"
+            "retrieved_at": "2026-09-07T03:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T03:46:46Z"
           }
         }
       ]
@@ -143,6 +161,8 @@
         "title": "Introducing Llama 3.1: Our most capable models to date",
         "quote": "Llama 3.1 405B is the first openly available model that rivals the top AI models when it comes to state-of-the-art capabilities in general knowledge, steerability, math, tool use, and multilingual translation.",
         "retrieved_at": "2026-09-07T03:30:00Z",
+        "verified": false,
+        "verified_at": "2026-09-07T03:46:46Z",
         "via": "r.jina.ai"
       },
       "scores": [
@@ -155,7 +175,9 @@
             "url": "https://github.com/meta-llama/llama-models/blob/main/models/llama3_1/MODEL_CARD.md",
             "title": "Llama 3.1 Model Card (Meta)",
             "quote": "General | MMLU | 5 | macro_avg/acc | 68.5 | 69.4 | 82.0 | 83.6 | 87.3",
-            "retrieved_at": "2026-09-07T03:30:00Z"
+            "retrieved_at": "2026-09-07T03:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T03:46:46Z"
           }
         },
         {
@@ -168,19 +190,23 @@
             "url": "https://github.com/meta-llama/llama-models/blob/main/models/llama3_1/MODEL_CARD.md",
             "title": "Llama 3.1 Model Card (Meta)",
             "quote": "GPQA | 0 | em | 34.6 | 30.4 | 39.5 | 46.7 | 50.7",
-            "retrieved_at": "2026-09-07T03:30:00Z"
+            "retrieved_at": "2026-09-07T03:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T03:46:46Z"
           }
         },
         {
           "benchmark": "humaneval",
-          "value": 89.0,
+          "value": 89,
           "config": "0-shot, pass@1, Instruct model",
           "reported_by": "official",
           "source": {
             "url": "https://github.com/meta-llama/llama-models/blob/main/models/llama3_1/MODEL_CARD.md",
             "title": "Llama 3.1 Model Card (Meta)",
             "quote": "Code | HumanEval | 0 | pass@1 | 60.4 | 72.6 | 81.7 | 80.5 | 89.0",
-            "retrieved_at": "2026-09-07T03:30:00Z"
+            "retrieved_at": "2026-09-07T03:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T03:46:46Z"
           }
         },
         {
@@ -192,90 +218,12 @@
             "url": "https://github.com/meta-llama/llama-models/blob/main/models/llama3_1/MODEL_CARD.md",
             "title": "Llama 3.1 Model Card (Meta)",
             "quote": "MATH (CoT) | 0 | final_em | 29.1 | 51.9 | 51.0 | 68.0 | 73.8",
-            "retrieved_at": "2026-09-07T03:30:00Z"
+            "retrieved_at": "2026-09-07T03:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T03:46:46Z"
           }
         }
       ]
-    },
-    {
-      "id": "meta-llama-4-maverick",
-      "lab": "meta",
-      "name": "Llama 4 Maverick",
-      "family": "Llama",
-      "date": "2025-04-05",
-      "date_precision": "day",
-      "status": "released",
-      "announcement": {
-        "url": "https://ai.meta.com/blog/llama-4-multimodal-intelligence/",
-        "title": "The Llama 4 herd: The beginning of a new era of natively multimodal AI innovation",
-        "quote": "We're introducing Llama 4 Scout and Llama 4 Maverick, the first open-weight natively multimodal models with unprecedented context length support and our first built using a mixture-of-experts (MoE) architecture.",
-        "retrieved_at": "2026-09-07T03:30:00Z",
-        "via": "r.jina.ai"
-      },
-      "scores": [
-        {
-          "benchmark": "mmlu",
-          "value": 85.5,
-          "config": "5-shot, macro_avg/acc_char, pre-trained base model",
-          "note": "This is the base/pre-trained model's MMLU; the instruction-tuned model card reports MMLU-Pro instead of plain MMLU.",
-          "reported_by": "official",
-          "source": {
-            "url": "https://github.com/meta-llama/llama-models/blob/main/models/llama4/MODEL_CARD.md",
-            "title": "Llama 4 Model Card (Meta)",
-            "quote": "Reasoning & Knowledge | MMLU | 5 | macro_avg/acc_char | 79.3 | 85.2 | 79.6 | 85.5",
-            "retrieved_at": "2026-09-07T03:30:00Z"
-          }
-        },
-        {
-          "benchmark": "mmlu-pro",
-          "value": 80.5,
-          "config": "0-shot, macro_avg/acc, Instruct model",
-          "reported_by": "official",
-          "source": {
-            "url": "https://github.com/meta-llama/llama-models/blob/main/models/llama4/MODEL_CARD.md",
-            "title": "Llama 4 Model Card (Meta)",
-            "quote": "Reasoning & Knowledge | MMLU Pro | 0 | macro_avg/acc | 68.9 | 73.4 | 74.3 | 80.5",
-            "retrieved_at": "2026-09-07T03:30:00Z"
-          }
-        },
-        {
-          "benchmark": "gpqa-diamond",
-          "value": 69.8,
-          "config": "0-shot, accuracy, Instruct model",
-          "reported_by": "official",
-          "source": {
-            "url": "https://github.com/meta-llama/llama-models/blob/main/models/llama4/MODEL_CARD.md",
-            "title": "Llama 4 Model Card (Meta)",
-            "quote": "GPQA Diamond | 0 | accuracy | 50.5 | 49.0 | 57.2 | 69.8",
-            "retrieved_at": "2026-09-07T03:30:00Z"
-          }
-        },
-        {
-          "benchmark": "mmmu",
-          "value": 73.4,
-          "config": "0-shot, accuracy, Instruct model",
-          "reported_by": "official",
-          "source": {
-            "url": "https://github.com/meta-llama/llama-models/blob/main/models/llama4/MODEL_CARD.md",
-            "title": "Llama 4 Model Card (Meta)",
-            "quote": "Image Reasoning | MMMU | 0 | accuracy | No multimodal support | 69.4 | 73.4",
-            "retrieved_at": "2026-09-07T03:30:00Z"
-          }
-        },
-        {
-          "benchmark": "livecodebench",
-          "value": 43.4,
-          "config": "0-shot, pass@1, window 10/01/2024-02/01/2025, Instruct model",
-          "reported_by": "official",
-          "source": {
-            "url": "https://github.com/meta-llama/llama-models/blob/main/models/llama4/MODEL_CARD.md",
-            "title": "Llama 4 Model Card (Meta)",
-            "quote": "Code | LiveCodeBench\n(10/01/2024-02/01/2025) | 0 | pass@1 | 33.3 | 27.7 | 32.8 | 43.4",
-            "retrieved_at": "2026-09-07T03:30:00Z"
-          }
-        }
-      ],
-      "notes": "Llama 4 Scout (17B active, 16 experts) launched the same day but is a smaller tier; Maverick (17B active, 128 experts) is the flagship of the initial Llama 4 launch. A larger teacher model, Llama 4 Behemoth, was previewed but not released (see meta-llama-4-behemoth)."
     },
     {
       "id": "meta-llama-4-behemoth",
@@ -290,6 +238,8 @@
         "title": "The Llama 4 herd: The beginning of a new era of natively multimodal AI innovation",
         "quote": "We also trained a teacher model, Llama 4 Behemoth, that outperforms GPT-4.5, Claude Sonnet 3.7, and Gemini 2.0 Pro on STEM-focused benchmarks such as MATH-500 and GPQA Diamond.",
         "retrieved_at": "2026-09-07T03:30:00Z",
+        "verified": true,
+        "verified_at": "2026-09-07T03:42:43Z",
         "via": "r.jina.ai"
       },
       "sources": [
@@ -308,6 +258,98 @@
       "notes": "Previewed April 5, 2025 (~288B active / ~2T total params, still training) as the teacher model for Llama 4 Scout/Maverick, with no numeric scores published by Meta. Repeatedly delayed through 2025 (reported mid-training MoE-routing and chunked-attention issues); Meta never issued a formal cancellation, but by April 2026 had moved its frontier effort to the closed-weight Muse Spark under Meta Superintelligence Labs and Behemoth was never publicly released. Recorded here as cancelled/abandoned rather than released."
     },
     {
+      "id": "meta-llama-4-maverick",
+      "lab": "meta",
+      "name": "Llama 4 Maverick",
+      "family": "Llama",
+      "date": "2025-04-05",
+      "date_precision": "day",
+      "status": "released",
+      "announcement": {
+        "url": "https://ai.meta.com/blog/llama-4-multimodal-intelligence/",
+        "title": "The Llama 4 herd: The beginning of a new era of natively multimodal AI innovation",
+        "quote": "We're introducing Llama 4 Scout and Llama 4 Maverick, the first open-weight natively multimodal models with unprecedented context length support and our first built using a mixture-of-experts (MoE) architecture.",
+        "retrieved_at": "2026-09-07T03:30:00Z",
+        "verified": true,
+        "verified_at": "2026-09-07T03:42:43Z",
+        "via": "r.jina.ai"
+      },
+      "scores": [
+        {
+          "benchmark": "mmlu",
+          "value": 85.5,
+          "config": "5-shot, macro_avg/acc_char, pre-trained base model",
+          "note": "This is the base/pre-trained model's MMLU; the instruction-tuned model card reports MMLU-Pro instead of plain MMLU.",
+          "reported_by": "official",
+          "source": {
+            "url": "https://github.com/meta-llama/llama-models/blob/main/models/llama4/MODEL_CARD.md",
+            "title": "Llama 4 Model Card (Meta)",
+            "quote": "Reasoning & Knowledge | MMLU | 5 | macro_avg/acc_char | 79.3 | 85.2 | 79.6 | 85.5",
+            "retrieved_at": "2026-09-07T03:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T03:46:46Z"
+          }
+        },
+        {
+          "benchmark": "mmlu-pro",
+          "value": 80.5,
+          "config": "0-shot, macro_avg/acc, Instruct model",
+          "reported_by": "official",
+          "source": {
+            "url": "https://github.com/meta-llama/llama-models/blob/main/models/llama4/MODEL_CARD.md",
+            "title": "Llama 4 Model Card (Meta)",
+            "quote": "Reasoning & Knowledge | MMLU Pro | 0 | macro_avg/acc | 68.9 | 73.4 | 74.3 | 80.5",
+            "retrieved_at": "2026-09-07T03:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T03:46:46Z"
+          }
+        },
+        {
+          "benchmark": "gpqa-diamond",
+          "value": 69.8,
+          "config": "0-shot, accuracy, Instruct model",
+          "reported_by": "official",
+          "source": {
+            "url": "https://github.com/meta-llama/llama-models/blob/main/models/llama4/MODEL_CARD.md",
+            "title": "Llama 4 Model Card (Meta)",
+            "quote": "GPQA Diamond | 0 | accuracy | 50.5 | 49.0 | 57.2 | 69.8",
+            "retrieved_at": "2026-09-07T03:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T03:46:46Z"
+          }
+        },
+        {
+          "benchmark": "mmmu",
+          "value": 73.4,
+          "config": "0-shot, accuracy, Instruct model",
+          "reported_by": "official",
+          "source": {
+            "url": "https://github.com/meta-llama/llama-models/blob/main/models/llama4/MODEL_CARD.md",
+            "title": "Llama 4 Model Card (Meta)",
+            "quote": "Image Reasoning | MMMU | 0 | accuracy | No multimodal support | 69.4 | 73.4",
+            "retrieved_at": "2026-09-07T03:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T03:46:46Z"
+          }
+        },
+        {
+          "benchmark": "livecodebench",
+          "value": 43.4,
+          "config": "0-shot, pass@1, window 10/01/2024-02/01/2025, Instruct model",
+          "reported_by": "official",
+          "source": {
+            "url": "https://github.com/meta-llama/llama-models/blob/main/models/llama4/MODEL_CARD.md",
+            "title": "Llama 4 Model Card (Meta)",
+            "quote": "Code | LiveCodeBench\n(10/01/2024-02/01/2025) | 0 | pass@1 | 33.3 | 27.7 | 32.8 | 43.4",
+            "retrieved_at": "2026-09-07T03:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T03:46:46Z"
+          }
+        }
+      ],
+      "notes": "Llama 4 Scout (17B active, 16 experts) launched the same day but is a smaller tier; Maverick (17B active, 128 experts) is the flagship of the initial Llama 4 launch. A larger teacher model, Llama 4 Behemoth, was previewed but not released (see meta-llama-4-behemoth)."
+    },
+    {
       "id": "meta-muse-spark",
       "lab": "meta",
       "name": "Muse Spark",
@@ -320,6 +362,8 @@
         "title": "Introducing Muse Spark: Scaling Towards Personal Superintelligence",
         "quote": "Today, we're excited to introduce Muse Spark, the first in the Muse family of models developed by Meta Superintelligence Labs. Muse Spark is a natively multimodal reasoning model with support for tool-use, visual chain of thought, and multi-agent orchestration.",
         "retrieved_at": "2026-09-07T03:30:00Z",
+        "verified": true,
+        "verified_at": "2026-09-07T03:42:43Z",
         "via": "r.jina.ai"
       },
       "sources": [
@@ -341,6 +385,8 @@
             "title": "Introducing Muse Spark: Scaling Towards Personal Superintelligence",
             "quote": "Contemplating mode provides significant capability improvements in challenging tasks, achieving 58% in Humanity's Last Exam and 38% in FrontierScience Research.",
             "retrieved_at": "2026-09-07T03:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T03:42:43Z",
             "via": "r.jina.ai"
           }
         }

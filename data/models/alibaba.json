@@ -1,6 +1,6 @@
 {
   "lab": "alibaba",
-  "updated_at": "2026-09-07T03:30:00Z",
+  "updated_at": "2026-09-07T03:46:46Z",
   "releases": [
     {
       "id": "alibaba-qwen-72b",
@@ -15,7 +15,8 @@
         "title": "Introducing Qwen",
         "quote": "we now release Qwen-1.8B, Qwen-7B, Qwen-14B, and Qwen-72B.",
         "retrieved_at": "2026-09-07T03:30:00Z",
-        "via": "r.jina.ai",
+        "verified": true,
+        "verified_at": "2026-09-07T03:42:43Z",
         "note": "This retrospective post (published Jan 2024) is the clearest lab statement of the release; its own table lists Qwen-72B's release date as 23.11.30."
       },
       "scores": [
@@ -29,6 +30,8 @@
             "title": "Qwen/Qwen-72B model card",
             "quote": "| **Qwen-72B**       | **66.4** | **77.4** | **83.3** | **78.9** | **35.2** | **35.4**  | **52.2** | **67.7** | **62.5** | **87.6** | **83.6** |",
             "retrieved_at": "2026-09-07T03:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T03:46:46Z",
             "note": "Table columns: Avg, MMLU, C-Eval, GSM8K, MATH, HumanEval, MBPP, BBH, AGIEval, GaokaoBench, CMMLU."
           }
         },
@@ -41,7 +44,9 @@
             "url": "https://huggingface.co/Qwen/Qwen-72B",
             "title": "Qwen/Qwen-72B model card",
             "quote": "| **Qwen-72B**       | **66.4** | **77.4** | **83.3** | **78.9** | **35.2** | **35.4**  | **52.2** | **67.7** | **62.5** | **87.6** | **83.6** |",
-            "retrieved_at": "2026-09-07T03:30:00Z"
+            "retrieved_at": "2026-09-07T03:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T03:46:46Z"
           }
         },
         {
@@ -53,7 +58,9 @@
             "url": "https://huggingface.co/Qwen/Qwen-72B",
             "title": "Qwen/Qwen-72B model card",
             "quote": "| **Qwen-72B**       | **66.4** | **77.4** | **83.3** | **78.9** | **35.2** | **35.4**  | **52.2** | **67.7** | **62.5** | **87.6** | **83.6** |",
-            "retrieved_at": "2026-09-07T03:30:00Z"
+            "retrieved_at": "2026-09-07T03:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T03:46:46Z"
           }
         }
       ]
@@ -71,7 +78,8 @@
         "title": "Qwen1.5-110B: The First 100B+ Model of the Qwen1.5 Series",
         "quote": "Today, we release the first 100B+ model of the Qwen1.5 series, Qwen1.5-110B, which achieves comparable performance with Meta-Llama3-70B in the base model evaluation, and outstanding performance in the chat evaluation.",
         "retrieved_at": "2026-09-07T03:30:00Z",
-        "via": "r.jina.ai"
+        "verified": false,
+        "verified_at": "2026-09-07T03:46:46Z"
       },
       "scores": [
         {
@@ -84,7 +92,8 @@
             "title": "Qwen1.5-110B: The First 100B+ Model of the Qwen1.5 Series",
             "quote": "| MMLU | 80.4 | 77.5 | 79.5 | 77.8 |",
             "retrieved_at": "2026-09-07T03:30:00Z",
-            "via": "r.jina.ai",
+            "verified": true,
+            "verified_at": "2026-09-07T03:46:46Z",
             "note": "Table columns: Qwen1.5-110B, Qwen1.5-72B, Llama-3-70B, Mixtral-8x22B."
           }
         },
@@ -98,7 +107,8 @@
             "title": "Qwen1.5-110B: The First 100B+ Model of the Qwen1.5 Series",
             "quote": "| MATH | 49.6 | 34.1 | 41.0 | 41.7 |",
             "retrieved_at": "2026-09-07T03:30:00Z",
-            "via": "r.jina.ai"
+            "verified": true,
+            "verified_at": "2026-09-07T03:46:46Z"
           }
         },
         {
@@ -111,7 +121,8 @@
             "title": "Qwen1.5-110B: The First 100B+ Model of the Qwen1.5 Series",
             "quote": "| HumanEval | 52.4 | 41.5 | 45.7 | 45.1 |",
             "retrieved_at": "2026-09-07T03:30:00Z",
-            "via": "r.jina.ai"
+            "verified": true,
+            "verified_at": "2026-09-07T03:46:46Z"
           }
         }
       ]
@@ -128,7 +139,9 @@
         "url": "https://qwenlm.github.io/blog/qwen2/",
         "title": "Hello Qwen2",
         "quote": "After months of efforts, we are pleased to announce the evolution from Qwen1.5 to Qwen2.",
-        "retrieved_at": "2026-09-07T03:30:00Z"
+        "retrieved_at": "2026-09-07T03:30:00Z",
+        "verified": true,
+        "verified_at": "2026-09-07T03:42:43Z"
       },
       "scores": [
         {
@@ -141,6 +154,8 @@
             "title": "Hello Qwen2",
             "quote": "English MMLU 82.0 75.6 82.3",
             "retrieved_at": "2026-09-07T03:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T03:42:43Z",
             "note": "Table columns: Llama-3-70B-Instruct, Qwen1.5-72B-Chat, Qwen2-72B-Instruct."
           }
         },
@@ -153,19 +168,23 @@
             "url": "https://qwenlm.github.io/blog/qwen2/",
             "title": "Hello Qwen2",
             "quote": "MMLU-Pro 56.2 51.7 64.4",
-            "retrieved_at": "2026-09-07T03:30:00Z"
+            "retrieved_at": "2026-09-07T03:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T03:42:43Z"
           }
         },
         {
           "benchmark": "humaneval",
-          "value": 86.0,
+          "value": 86,
           "config": "Instruct",
           "reported_by": "official",
           "source": {
             "url": "https://qwenlm.github.io/blog/qwen2/",
             "title": "Hello Qwen2",
             "quote": "Coding HumanEval 81.7 71.3 86.0",
-            "retrieved_at": "2026-09-07T03:30:00Z"
+            "retrieved_at": "2026-09-07T03:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T03:42:43Z"
           }
         },
         {
@@ -177,7 +196,9 @@
             "url": "https://qwenlm.github.io/blog/qwen2/",
             "title": "Hello Qwen2",
             "quote": "MATH 50.4 42.5 59.7",
-            "retrieved_at": "2026-09-07T03:30:00Z"
+            "retrieved_at": "2026-09-07T03:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T03:42:43Z"
           }
         },
         {
@@ -190,7 +211,9 @@
             "url": "https://qwenlm.github.io/blog/qwen2/",
             "title": "Hello Qwen2",
             "quote": "GPQA 41.9 39.4 42.4",
-            "retrieved_at": "2026-09-07T03:30:00Z"
+            "retrieved_at": "2026-09-07T03:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T03:42:43Z"
           }
         }
       ]
@@ -208,7 +231,8 @@
         "title": "Qwen2.5: A Party of Foundation Models!",
         "quote": "Today, we are excited to introduce the latest addition to the Qwen family: Qwen2.5.",
         "retrieved_at": "2026-09-07T03:30:00Z",
-        "via": "r.jina.ai"
+        "verified": true,
+        "verified_at": "2026-09-07T03:42:43Z"
       },
       "scores": [
         {
@@ -221,6 +245,8 @@
             "title": "Qwen2.5 Technical Report, Table 6",
             "quote": "MMLU-Pro 66.4 73.3 64.4 71.1 72.5",
             "retrieved_at": "2026-09-07T03:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T03:42:43Z",
             "note": "Table 6 columns: Llama-3.1-70B, Llama-3.1-405B, Qwen2-72B, Qwen2.5-72B, Qwen2.5-Plus."
           }
         },
@@ -233,7 +259,9 @@
             "url": "https://arxiv.org/html/2412.15115v2",
             "title": "Qwen2.5 Technical Report, Table 6",
             "quote": "MATH 68.0 73.8 69.0 83.1 84.7",
-            "retrieved_at": "2026-09-07T03:30:00Z"
+            "retrieved_at": "2026-09-07T03:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T03:42:43Z"
           }
         },
         {
@@ -245,7 +273,9 @@
             "url": "https://arxiv.org/html/2412.15115v2",
             "title": "Qwen2.5 Technical Report, Table 6",
             "quote": "HumanEval 80.5 89.0 86.0 86.6 87.8",
-            "retrieved_at": "2026-09-07T03:30:00Z"
+            "retrieved_at": "2026-09-07T03:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T03:42:43Z"
           }
         },
         {
@@ -257,12 +287,14 @@
             "url": "https://arxiv.org/html/2412.15115v2",
             "title": "Qwen2.5 Technical Report, Table 6",
             "quote": "LiveCodeBench 32.1 41.6 32.2 55.5 51.4",
-            "retrieved_at": "2026-09-07T03:30:00Z"
+            "retrieved_at": "2026-09-07T03:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T03:42:43Z"
           }
         },
         {
           "benchmark": "gpqa-diamond",
-          "value": 49.0,
+          "value": 49,
           "config": "Instruct",
           "note": "Lab reports this simply as 'GPQA'; recorded as GPQA Diamond per standard practice, though the source does not use the word 'Diamond'.",
           "reported_by": "official",
@@ -270,7 +302,9 @@
             "url": "https://arxiv.org/html/2412.15115v2",
             "title": "Qwen2.5 Technical Report, Table 6",
             "quote": "GPQA 46.7 51.1 42.4 49.0 49.7",
-            "retrieved_at": "2026-09-07T03:30:00Z"
+            "retrieved_at": "2026-09-07T03:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T03:42:43Z"
           }
         }
       ]
@@ -288,7 +322,8 @@
         "title": "Qwen2.5-Max: Exploring the Intelligence of Large-scale MoE Model",
         "quote": "Today, we are excited to share the performance results of Qwen2.5-Max and announce the availability of its API through Alibaba Cloud.",
         "retrieved_at": "2026-09-07T03:30:00Z",
-        "via": "r.jina.ai"
+        "verified": true,
+        "verified_at": "2026-09-07T03:42:43Z"
       },
       "scores": [],
       "notes": "The launch post presents all benchmark comparisons (MMLU-Pro, LiveCodeBench, LiveBench, Arena-Hard, GPQA-Diamond) as chart images with no accompanying text table; no official numeric scores could be sourced within the research window. The lab's arXiv technical report (2412.15115) covers Qwen2.5 but predates and does not cover Qwen2.5-Max specifically."
@@ -306,7 +341,8 @@
         "title": "Qwen3: Think Deeper, Act Faster",
         "quote": "Today, we are excited to announce the release of Qwen3, the latest addition to the Qwen family of large language models. Our flagship model, Qwen3-235B-A22B, achieves competitive results in benchmark evaluations of coding, math, general capabilities, etc.",
         "retrieved_at": "2026-09-07T03:30:00Z",
-        "via": "r.jina.ai"
+        "verified": true,
+        "verified_at": "2026-09-07T03:42:43Z"
       },
       "scores": [
         {
@@ -318,7 +354,9 @@
             "url": "https://arxiv.org/html/2505.09388v1",
             "title": "Qwen3 Technical Report",
             "quote": "the flagship model Qwen3-235B-A22B achieves 85.7 on AIME’24 and 81.5 on AIME’25 ( AIME, 2025 ) , 70.7 on LiveCodeBench v5 ( Jain et al., 2024 ) , 2,056 on CodeForces, and 70.8 on BFCL v3 ( Yan et al., 2024 ) .",
-            "retrieved_at": "2026-09-07T03:30:00Z"
+            "retrieved_at": "2026-09-07T03:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T03:42:43Z"
           }
         },
         {
@@ -330,7 +368,9 @@
             "url": "https://arxiv.org/html/2505.09388v1",
             "title": "Qwen3 Technical Report",
             "quote": "the flagship model Qwen3-235B-A22B achieves 85.7 on AIME’24 and 81.5 on AIME’25 ( AIME, 2025 ) , 70.7 on LiveCodeBench v5 ( Jain et al., 2024 ) , 2,056 on CodeForces, and 70.8 on BFCL v3 ( Yan et al., 2024 ) .",
-            "retrieved_at": "2026-09-07T03:30:00Z"
+            "retrieved_at": "2026-09-07T03:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T03:42:43Z"
           }
         },
         {
@@ -343,6 +383,8 @@
             "title": "Qwen3 Technical Report, Table 11",
             "quote": "GPQA-Diamond 78.0 71.5 80.2 84.0 71.1",
             "retrieved_at": "2026-09-07T03:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T03:42:43Z",
             "note": "Table 11 (Qwen3-235B-A22B Thinking vs. reasoning baselines) columns: OpenAI-o1, DeepSeek-R1, Grok-3-Beta (Think), Gemini2.5-Pro, Qwen3-235B-A22B."
           }
         }
@@ -361,6 +403,8 @@
         "title": "Qwen3-Max: Just Scale it",
         "quote": "Following the release of the Qwen3-2507 series, we are thrilled to introduce Qwen3-Max — our largest and most capable model to date.",
         "retrieved_at": "2026-09-07T03:30:00Z",
+        "verified": true,
+        "verified_at": "2026-09-07T03:42:43Z",
         "via": "r.jina.ai",
         "note": "The blog page carries no visible publish date. Qwen3-Max-Preview went up Sep 5, 2025; contemporaneous press (Dataconomy, MarkTechPost) place this post's official/GA release on Sep 24, 2025, distinct from the preview."
       },
@@ -375,6 +419,8 @@
             "title": "Qwen3-Max: Just Scale it",
             "quote": "On SWE-Bench Verified, a benchmark focused on solving real-world coding challenges, Qwen3-Max-Instruct achieves an impressive score of 69.6, placing it firmly among the world's top-performing models.",
             "retrieved_at": "2026-09-07T03:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T03:42:43Z",
             "via": "r.jina.ai"
           }
         },
@@ -388,6 +434,8 @@
             "title": "Qwen3-Max: Just Scale it",
             "quote": "on Tau2-Bench — a rigorous evaluation of agent tool-calling proficiency — Qwen3-Max-Instruct delivers a breakthrough score of 74.8, surpassing both Claude Opus 4 and DeepSeek V3.1.",
             "retrieved_at": "2026-09-07T03:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T03:42:43Z",
             "via": "r.jina.ai"
           }
         }
@@ -406,6 +454,8 @@
         "title": "Qwen3.8-Max: A New Bar for Coding and Cowork",
         "quote": "Today, we are officially releasing Qwen 3.8-Max, the most capable model in the Qwen family to date.",
         "retrieved_at": "2026-09-07T03:30:00Z",
+        "verified": true,
+        "verified_at": "2026-09-07T03:46:46Z",
         "via": "r.jina.ai"
       },
       "sources": [
@@ -413,7 +463,9 @@
           "url": "https://huggingface.co/Qwen/Qwen3.8-2.4T-A95B",
           "title": "Qwen/Qwen3.8-2.4T-A95B model card",
           "quote": "For the first time, Qwen3.8 brings a Qwen-Max-class model to open release.",
-          "retrieved_at": "2026-09-07T03:30:00Z"
+          "retrieved_at": "2026-09-07T03:30:00Z",
+          "verified": true,
+          "verified_at": "2026-09-07T03:42:43Z"
         }
       ],
       "scores": [
@@ -426,6 +478,8 @@
             "title": "Qwen3.8-Max: A New Bar for Coding and Cowork",
             "quote": "| GPQA Diamond | 92.0 | 92.6 | 94.1 | 92.4 | 92.6 |",
             "retrieved_at": "2026-09-07T03:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T03:42:43Z",
             "via": "r.jina.ai",
             "note": "Table columns: Opus 4.8, Fable 5, GPT 5.6 Sol (max), Qwen3.7-Max, Qwen3.8-Max."
           }
@@ -440,6 +494,8 @@
             "title": "Qwen3.8-Max: A New Bar for Coding and Cowork",
             "quote": "| HLE | 45.7 | 53.3 | 47.2 | 41.4 | 43.6 |",
             "retrieved_at": "2026-09-07T03:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T03:42:43Z",
             "via": "r.jina.ai"
           }
         },
@@ -453,6 +509,8 @@
             "title": "Qwen3.8-Max: A New Bar for Coding and Cowork",
             "quote": "| MMMU-Pro | 75.6 | 81.2 | 80.5 | 83.0 | 79.0 | 82.3 |",
             "retrieved_at": "2026-09-07T03:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T03:42:43Z",
             "via": "r.jina.ai",
             "note": "Table columns: Opus4.8, Fable5, Gemini3.1-Pro, GPT5.6-Sol, Qwen3.7-Plus, Qwen3.8-Max."
           }
@@ -472,6 +530,8 @@
         "title": "Qwen/Qwen3.8-Flash-Next model card",
         "quote": "This experimental preview of the architecture that will underpin Qwen4 is built around a fundamental rethinking of how the core components of modern large language models (LLMs) interact at scale.",
         "retrieved_at": "2026-09-07T03:30:00Z",
+        "verified": true,
+        "verified_at": "2026-09-07T03:42:43Z",
         "note": "Date is the Hugging Face repo creation date for Qwen3.8-Flash-Next, the model card that names Qwen4."
       },
       "scores": [],

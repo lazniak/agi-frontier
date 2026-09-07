@@ -1,6 +1,6 @@
 {
   "lab": "xai",
-  "updated_at": "2026-09-07T07:45:00Z",
+  "updated_at": "2026-09-07T03:46:46Z",
   "releases": [
     {
       "id": "xai-grok-1",
@@ -15,7 +15,8 @@
         "title": "Announcing Grok",
         "quote": "We are offering a limited number of users in the United States to try out our Grok prototype and provide valuable feedback that will help us improve its capabilities before a wider release.",
         "retrieved_at": "2026-09-07T07:45:00Z",
-        "via": "r.jina.ai"
+        "verified": true,
+        "verified_at": "2026-09-07T03:42:43Z"
       },
       "sources": [
         {
@@ -23,14 +24,15 @@
           "title": "Open Release of Grok-1",
           "quote": "We are releasing the base model weights and network architecture of Grok-1, our large language model.",
           "retrieved_at": "2026-09-07T07:45:00Z",
-          "via": "r.jina.ai",
+          "verified": true,
+          "verified_at": "2026-09-07T03:42:43Z",
           "note": "Mar 17, 2024: the raw 314B-parameter base model checkpoint (pre-training concluded Oct 2023) was separately released as open weights under Apache 2.0 — the only Grok generation to get an open-weights release."
         }
       ],
       "scores": [
         {
           "benchmark": "mmlu",
-          "value": 73.0,
+          "value": 73,
           "config": "5-shot",
           "reported_by": "official",
           "source": {
@@ -38,7 +40,8 @@
             "title": "Announcing Grok",
             "quote": "Grok-1, a state-of-the-art language model that is significantly more powerful, achieving 63.2% on the HumanEval coding task and 73% on MMLU.",
             "retrieved_at": "2026-09-07T07:45:00Z",
-            "via": "r.jina.ai"
+            "verified": true,
+            "verified_at": "2026-09-07T03:42:43Z"
           }
         },
         {
@@ -51,7 +54,8 @@
             "title": "Announcing Grok",
             "quote": "Grok-1, a state-of-the-art language model that is significantly more powerful, achieving 63.2% on the HumanEval coding task and 73% on MMLU.",
             "retrieved_at": "2026-09-07T07:45:00Z",
-            "via": "r.jina.ai"
+            "verified": true,
+            "verified_at": "2026-09-07T03:42:43Z"
           }
         },
         {
@@ -64,7 +68,8 @@
             "title": "Announcing Grok",
             "quote": "| MATH | 15.7% 4-shot | 13.5% 4-shot | 16.0% 4-shot | 23.5% 4-shot | 23.9% 4-shot | 34.6% 4-shot | - | 42.5% 4-shot |",
             "retrieved_at": "2026-09-07T07:45:00Z",
-            "via": "r.jina.ai"
+            "verified": true,
+            "verified_at": "2026-09-07T03:46:46Z"
           }
         }
       ],
@@ -83,7 +88,8 @@
         "title": "Announcing Grok-1.5",
         "quote": "Introducing Grok-1.5, our latest model capable of long context understanding and advanced reasoning. Grok-1.5 will be available to our early testers and existing Grok users on the 𝕏 platform in the coming days.",
         "retrieved_at": "2026-09-07T07:45:00Z",
-        "via": "r.jina.ai"
+        "verified": true,
+        "verified_at": "2026-09-07T03:42:43Z"
       },
       "scores": [
         {
@@ -96,7 +102,8 @@
             "title": "Announcing Grok-1.5",
             "quote": "| MMLU | 73% 5-shot | 81.3% 5-shot | 81.2% 5-shot | 75% 5-shot | 79% 5-shot | 83.7% 5-shot | 86.4% 5-shot | 86.8 5-shot |",
             "retrieved_at": "2026-09-07T07:45:00Z",
-            "via": "r.jina.ai"
+            "verified": true,
+            "verified_at": "2026-09-07T03:46:46Z"
           }
         },
         {
@@ -109,7 +116,8 @@
             "title": "Announcing Grok-1.5",
             "quote": "it scored 74.1% on the HumanEval benchmark, which evaluates code generation and problem-solving abilities.",
             "retrieved_at": "2026-09-07T07:45:00Z",
-            "via": "r.jina.ai"
+            "verified": true,
+            "verified_at": "2026-09-07T03:42:43Z"
           }
         },
         {
@@ -122,7 +130,8 @@
             "title": "Announcing Grok-1.5",
             "quote": "Grok-1.5 achieved a 50.6% score on the MATH benchmark and a 90% score on the GSM8K benchmark",
             "retrieved_at": "2026-09-07T07:45:00Z",
-            "via": "r.jina.ai"
+            "verified": true,
+            "verified_at": "2026-09-07T03:42:43Z"
           }
         }
       ],
@@ -141,12 +150,13 @@
         "title": "Grok-2 Beta Release",
         "quote": "We are excited to release an early preview of Grok-2, a significant step forward from our previous model Grok-1.5, featuring frontier capabilities in chat, coding, and reasoning.",
         "retrieved_at": "2026-09-07T07:45:00Z",
-        "via": "r.jina.ai"
+        "verified": true,
+        "verified_at": "2026-09-07T03:42:43Z"
       },
       "scores": [
         {
           "benchmark": "gpqa-diamond",
-          "value": 56.0,
+          "value": 56,
           "config": "0-shot CoT",
           "reported_by": "official",
           "source": {
@@ -154,7 +164,8 @@
             "title": "Grok-2 Beta Release",
             "quote": "| GPQA |  | 35.9% | 51.0% | 56.0% | 48.0% | 50.4% | 46.2% | 51.1% | 53.6% | 59.6% |",
             "retrieved_at": "2026-09-07T07:45:00Z",
-            "via": "r.jina.ai"
+            "verified": true,
+            "verified_at": "2026-09-07T03:46:46Z"
           }
         },
         {
@@ -166,7 +177,8 @@
             "title": "Grok-2 Beta Release",
             "quote": "| MMLU |  | 81.3% | 86.2% | 87.5% | 86.5% | 85.7% | 85.9% | 88.6% | 88.7% | 88.3% |",
             "retrieved_at": "2026-09-07T07:45:00Z",
-            "via": "r.jina.ai"
+            "verified": true,
+            "verified_at": "2026-09-07T03:46:46Z"
           }
         },
         {
@@ -179,7 +191,8 @@
             "title": "Grok-2 Beta Release",
             "quote": "| MMLU-Pro |  | 51.0% | 72.0% | 75.5% | 63.7% | 68.5% | 69.0% | 73.3% | 72.6% | 76.1% |",
             "retrieved_at": "2026-09-07T07:45:00Z",
-            "via": "r.jina.ai"
+            "verified": true,
+            "verified_at": "2026-09-07T03:46:46Z"
           }
         },
         {
@@ -192,7 +205,8 @@
             "title": "Grok-2 Beta Release",
             "quote": "| MATH§ |  | 50.6% | 73.0% | 76.1% | 72.6% | 60.1% | 67.7% | 73.8% | 76.6% | 71.1% |",
             "retrieved_at": "2026-09-07T07:45:00Z",
-            "via": "r.jina.ai"
+            "verified": true,
+            "verified_at": "2026-09-07T03:46:46Z"
           }
         },
         {
@@ -205,7 +219,8 @@
             "title": "Grok-2 Beta Release",
             "quote": "| HumanEval¶ |  | 74.1% | 85.7% | 88.4% | 87.1% | 84.9% | 71.9% | 89.0% | 90.2% | 92.0% |",
             "retrieved_at": "2026-09-07T07:45:00Z",
-            "via": "r.jina.ai"
+            "verified": true,
+            "verified_at": "2026-09-07T03:46:46Z"
           }
         },
         {
@@ -218,7 +233,8 @@
             "title": "Grok-2 Beta Release",
             "quote": "| MMMU |  | 53.6% | 63.2% | 66.1% | 63.1% | 59.4% | 62.2% | 64.5% | 69.1% | 68.3% |",
             "retrieved_at": "2026-09-07T07:45:00Z",
-            "via": "r.jina.ai"
+            "verified": true,
+            "verified_at": "2026-09-07T03:46:46Z"
           }
         }
       ],
@@ -237,7 +253,8 @@
         "title": "Grok 3 Beta — The Age of Reasoning Agents",
         "quote": "We are pleased to introduce Grok 3, our most advanced model yet: blending strong reasoning with extensive pretraining knowledge.",
         "retrieved_at": "2026-09-07T07:45:00Z",
-        "via": "r.jina.ai"
+        "verified": true,
+        "verified_at": "2026-09-07T03:42:43Z"
       },
       "scores": [
         {
@@ -250,7 +267,8 @@
             "title": "Grok 3 Beta — The Age of Reasoning Agents",
             "quote": "Grok 3 (Think) also attained 84.6% on graduate-level expert reasoning (GPQA)",
             "retrieved_at": "2026-09-07T07:45:00Z",
-            "via": "r.jina.ai"
+            "verified": true,
+            "verified_at": "2026-09-07T03:42:43Z"
           }
         },
         {
@@ -264,7 +282,8 @@
             "title": "Grok 3 Beta — The Age of Reasoning Agents",
             "quote": "With our highest level of test-time compute (cons@64), Grok 3 (Think) achieved 93.3% on this competition.",
             "retrieved_at": "2026-09-07T07:45:00Z",
-            "via": "r.jina.ai"
+            "verified": true,
+            "verified_at": "2026-09-07T03:42:43Z"
           }
         },
         {
@@ -277,7 +296,8 @@
             "title": "Grok 3 Beta — The Age of Reasoning Agents",
             "quote": "and 79.4% on LiveCodeBench for code generation and problem-solving.",
             "retrieved_at": "2026-09-07T07:45:00Z",
-            "via": "r.jina.ai"
+            "verified": true,
+            "verified_at": "2026-09-07T03:42:43Z"
           }
         },
         {
@@ -290,7 +310,8 @@
             "title": "Grok 3 Beta — The Age of Reasoning Agents",
             "quote": "| MMLU-pro | 79.9% | 78.9% | 79.1% | 75.9% | 72.6% | 78.0% |",
             "retrieved_at": "2026-09-07T07:45:00Z",
-            "via": "r.jina.ai"
+            "verified": true,
+            "verified_at": "2026-09-07T03:46:46Z"
           }
         },
         {
@@ -303,7 +324,8 @@
             "title": "Grok 3 Beta — The Age of Reasoning Agents",
             "quote": "| MMMU | 73.2% | 69.4% | 72.7% | — | 69.1% | 70.4% |",
             "retrieved_at": "2026-09-07T07:45:00Z",
-            "via": "r.jina.ai"
+            "verified": true,
+            "verified_at": "2026-09-07T03:46:46Z"
           }
         }
       ],
@@ -322,7 +344,8 @@
         "title": "Grok 4",
         "quote": "Grok 4 is the most intelligent model in the world. It includes native tool use and real-time search integration, and is available now to SuperGrok and Premium+ subscribers, as well as through the xAI API.",
         "retrieved_at": "2026-09-07T07:45:00Z",
-        "via": "r.jina.ai",
+        "verified": true,
+        "verified_at": "2026-09-07T03:42:43Z",
         "note": "Quote is xAI's own summary of the grok-4 launch article as shown on the https://x.ai/news index; the dedicated article itself does not render a hero paragraph as extractable text."
       },
       "scores": [
@@ -335,7 +358,8 @@
             "title": "Grok 4",
             "quote": "setting a new state-of-the-art for closed models on ARC-AGI V2 with 15.9% (nearly double Opus's ~8.6%, +8pp over previous high).",
             "retrieved_at": "2026-09-07T07:45:00Z",
-            "via": "r.jina.ai"
+            "verified": true,
+            "verified_at": "2026-09-07T03:42:43Z"
           }
         }
       ],
@@ -354,10 +378,46 @@
         "title": "Grok 4.1",
         "quote": "Grok 4.1 is now available to all users on grok.com, 𝕏, and the iOS and Android apps.",
         "retrieved_at": "2026-09-07T07:45:00Z",
-        "via": "r.jina.ai"
+        "verified": true,
+        "verified_at": "2026-09-07T03:42:43Z"
       },
       "scores": [],
       "notes": "A personality/alignment-focused update to Grok 4 (creative writing, emotional intelligence, reduced hallucination rate), not a new pretraining/reasoning generation. Its own launch post reports only LMArena Elo, EQ-Bench3 and FActScore/hallucination-rate figures, none of which are in the tracked benchmark basket, so no scores are recorded for this release."
+    },
+    {
+      "id": "xai-grok-5",
+      "lab": "xai",
+      "name": "Grok 5",
+      "family": "Grok",
+      "date": "2026-01-01",
+      "date_precision": "quarter",
+      "status": "announced",
+      "expected_window": {
+        "start": "2026-01-01",
+        "end": "2026-03-31",
+        "source": {
+          "url": "https://www.theinformation.com/briefings/elon-musks-xai-delays-grok-5-release-next-year",
+          "title": "Elon Musk's xAI Delays Grok 5 Release to Next Year",
+          "quote": "XAI plans to release its next-generation Grok 5 artificial intelligence model in the first three months of next year, CEO Elon Musk said on Friday.",
+          "retrieved_at": "2026-09-07T07:45:00Z",
+          "verified": false,
+          "verified_at": "2026-09-07T03:46:46Z",
+          "via": "r.jina.ai",
+          "note": "Article body is paywalled; quote is taken from the page's own meta description / teaser text, which is present in the fetched HTML regardless of subscription status."
+        }
+      },
+      "announcement": {
+        "url": "https://www.theinformation.com/briefings/elon-musks-xai-delays-grok-5-release-next-year",
+        "title": "Elon Musk's xAI Delays Grok 5 Release to Next Year",
+        "quote": "XAI plans to release its next-generation Grok 5 artificial intelligence model in the first three months of next year, CEO Elon Musk said on Friday.",
+        "retrieved_at": "2026-09-07T07:45:00Z",
+        "verified": false,
+        "verified_at": "2026-09-07T03:46:46Z",
+        "via": "r.jina.ai",
+        "note": "Article body is paywalled; quote is taken from the page's own meta description / teaser text, which is present in the fetched HTML regardless of subscription status."
+      },
+      "scores": [],
+      "notes": "Reported by The Information (Theo Wayt, Nov 14, 2025): in an interview with investor Ron Baron, Musk said Grok 5 would ship 'in Q1' 2026 (6 trillion parameters, native video understanding), later than his earlier end-of-2025 target. That Q1 2026 window has since passed without a release; by mid-2026 xAI shipped intermediate models (Grok 4.5, Grok 4.6) instead, and public reporting as of Aug 2026 places Grok 5 training on the newer 'Colossus 2' cluster with no firm date — xAI has not published a revised official date, so expected_window above reflects only the original Nov 2025 statement and is now stale."
     },
     {
       "id": "xai-grok-4.5",
@@ -372,7 +432,8 @@
         "title": "Introducing Grok 4.5",
         "quote": "Today, we're launching Grok 4.5, SpaceXAI's smartest model built to excel at coding, agentic tasks, and knowledge work.",
         "retrieved_at": "2026-09-07T07:45:00Z",
-        "via": "r.jina.ai"
+        "verified": true,
+        "verified_at": "2026-09-07T03:42:43Z"
       },
       "scores": [
         {
@@ -385,7 +446,8 @@
             "title": "Introducing Grok 4.5",
             "quote": "SWE Bench Pro resolve rate: Fable (max) 80.4%, Opus 4.8 (max) 69.2%, Grok 4.5 64.7%, Opus 4.7 (max) 64.3%, GLM 5.2 62.1%, GPT 5.5 (xhigh) 58.6%.",
             "retrieved_at": "2026-09-07T07:45:00Z",
-            "via": "r.jina.ai"
+            "verified": true,
+            "verified_at": "2026-09-07T03:42:43Z"
           }
         }
       ],
@@ -404,39 +466,11 @@
         "title": "Introducing Grok 4.6",
         "quote": "Today we are releasing Grok 4.6. Grok 4.6 builds on Grok 4.5 with a particular focus on long-running agents and more ambitious interactive and visual work.",
         "retrieved_at": "2026-09-07T07:45:00Z",
-        "via": "r.jina.ai"
+        "verified": true,
+        "verified_at": "2026-09-07T03:42:43Z"
       },
       "scores": [],
       "notes": "Launch benchmarks (AA Intelligence Index, GDPVal-AA, CursorBench v3.2, DeepSWE v1.1, FrontierCode v1.1, APEX-Agents/APEX-SWE, Terminal-Bench v3.0, AA-Briefcase, Harvey LAB) are all third-party/aggregator evals not in this dataset's tracked benchmark basket (Terminal-Bench v3.0 is a newer, different-generation benchmark from the tracked 'Terminal-Bench 2.0'), so no scores are recorded for this release."
-    },
-    {
-      "id": "xai-grok-5",
-      "lab": "xai",
-      "name": "Grok 5",
-      "family": "Grok",
-      "date": "2026-01-01",
-      "date_precision": "quarter",
-      "status": "announced",
-      "expected_window": {
-        "start": "2026-01-01",
-        "end": "2026-03-31",
-        "source": {
-          "url": "https://www.theinformation.com/briefings/elon-musks-xai-delays-grok-5-release-next-year",
-          "title": "Elon Musk's xAI Delays Grok 5 Release to Next Year",
-          "quote": "XAI plans to release its next-generation Grok 5 artificial intelligence model in the first three months of next year, CEO Elon Musk said on Friday.",
-          "retrieved_at": "2026-09-07T07:45:00Z",
-          "note": "Article body is paywalled; quote is taken from the page's own meta description / teaser text, which is present in the fetched HTML regardless of subscription status."
-        }
-      },
-      "announcement": {
-        "url": "https://www.theinformation.com/briefings/elon-musks-xai-delays-grok-5-release-next-year",
-        "title": "Elon Musk's xAI Delays Grok 5 Release to Next Year",
-        "quote": "XAI plans to release its next-generation Grok 5 artificial intelligence model in the first three months of next year, CEO Elon Musk said on Friday.",
-        "retrieved_at": "2026-09-07T07:45:00Z",
-        "note": "Article body is paywalled; quote is taken from the page's own meta description / teaser text, which is present in the fetched HTML regardless of subscription status."
-      },
-      "scores": [],
-      "notes": "Reported by The Information (Theo Wayt, Nov 14, 2025): in an interview with investor Ron Baron, Musk said Grok 5 would ship 'in Q1' 2026 (6 trillion parameters, native video understanding), later than his earlier end-of-2025 target. That Q1 2026 window has since passed without a release; by mid-2026 xAI shipped intermediate models (Grok 4.5, Grok 4.6) instead, and public reporting as of Aug 2026 places Grok 5 training on the newer 'Colossus 2' cluster with no firm date — xAI has not published a revised official date, so expected_window above reflects only the original Nov 2025 statement and is now stale."
     }
   ]
 }

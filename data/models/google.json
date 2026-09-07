@@ -1,6 +1,6 @@
 {
   "lab": "google",
-  "updated_at": "2026-09-07T07:45:00Z",
+  "updated_at": "2026-09-07T03:46:46Z",
   "releases": [
     {
       "id": "google-palm-2",
@@ -15,7 +15,8 @@
         "title": "Introducing PaLM 2",
         "quote": "today we’re introducing PaLM 2, our next generation language model.",
         "retrieved_at": "2026-09-07T07:45:00Z",
-        "via": "r.jina.ai"
+        "verified": true,
+        "verified_at": "2026-09-07T03:42:43Z"
       },
       "scores": [
         {
@@ -28,7 +29,9 @@
             "url": "https://storage.googleapis.com/deepmind-media/gemini/gemini_1_report.pdf",
             "title": "Gemini: A Family of Highly Capable Multimodal Models",
             "quote": "78.4% 5-shot",
-            "retrieved_at": "2026-09-07T07:45:00Z"
+            "retrieved_at": "2026-09-07T07:45:00Z",
+            "verified": false,
+            "verified_at": "2026-09-07T03:46:46Z"
           }
         },
         {
@@ -41,7 +44,9 @@
             "url": "https://arxiv.org/pdf/2305.10403",
             "title": "PaLM 2 Technical Report",
             "quote": "MATH 50.3a 8.8 33.6 / 50.3 42.5 34.3 / 48.8 33.2 / 45.2",
-            "retrieved_at": "2026-09-07T07:45:00Z"
+            "retrieved_at": "2026-09-07T07:45:00Z",
+            "verified": false,
+            "verified_at": "2026-09-07T03:46:46Z"
           }
         }
       ],
@@ -60,7 +65,8 @@
         "title": "Bard becomes Gemini: Try Ultra 1.0 and a new mobile app today",
         "quote": "Today we’re launching Gemini Advanced — a new experience that gives you access to Ultra 1.0, our largest and most capable state-of-the-art AI model.",
         "retrieved_at": "2026-09-07T07:45:00Z",
-        "via": "r.jina.ai"
+        "verified": true,
+        "verified_at": "2026-09-07T03:42:43Z"
       },
       "sources": [
         {
@@ -68,14 +74,15 @@
           "title": "Introducing Gemini: our largest and most capable AI model",
           "quote": "Our first version, Gemini 1.0, is optimized for different sizes: Ultra, Pro and Nano.",
           "retrieved_at": "2026-09-07T07:45:00Z",
-          "via": "r.jina.ai",
+          "verified": true,
+          "verified_at": "2026-09-07T03:42:43Z",
           "note": "Original Dec 6, 2023 unveiling of the Gemini 1.0 family; Ultra itself was not yet publicly usable at that date (\"Gemini Ultra coming soon\")."
         }
       ],
       "scores": [
         {
           "benchmark": "mmlu",
-          "value": 90.0,
+          "value": 90,
           "config": "CoT@32, uncertainty-routed",
           "note": "Headline number from Google's own announcement. The technical report also lists a plain 5-shot figure of 83.7% for Ultra.",
           "reported_by": "official",
@@ -84,7 +91,8 @@
             "title": "Introducing Gemini: our largest and most capable AI model",
             "quote": "With a score of 90.0%, Gemini Ultra is the first model to outperform human experts on MMLU (massive multitask language understanding)",
             "retrieved_at": "2026-09-07T07:45:00Z",
-            "via": "r.jina.ai"
+            "verified": true,
+            "verified_at": "2026-09-07T03:42:43Z"
           }
         },
         {
@@ -96,7 +104,9 @@
             "url": "https://storage.googleapis.com/deepmind-media/gemini/gemini_1_report.pdf",
             "title": "Gemini: A Family of Highly Capable Multimodal Models",
             "quote": "instruction-tuned Gemini Ultra correctly implements 74.4% of problems",
-            "retrieved_at": "2026-09-07T07:45:00Z"
+            "retrieved_at": "2026-09-07T07:45:00Z",
+            "verified": false,
+            "verified_at": "2026-09-07T03:46:46Z"
           }
         },
         {
@@ -108,7 +118,9 @@
             "url": "https://storage.googleapis.com/deepmind-media/gemini/gemini_1_report.pdf",
             "title": "Gemini: A Family of Highly Capable Multimodal Models",
             "quote": "53.2% 4-shot",
-            "retrieved_at": "2026-09-07T07:45:00Z"
+            "retrieved_at": "2026-09-07T07:45:00Z",
+            "verified": false,
+            "verified_at": "2026-09-07T03:46:46Z"
           }
         },
         {
@@ -122,7 +134,8 @@
             "title": "Introducing Gemini: our largest and most capable AI model",
             "quote": "Gemini Ultra also achieves a state-of-the-art score of 59.4% on the new MMMU benchmark, which consists of multimodal tasks spanning different domains requiring deliberate reasoning.",
             "retrieved_at": "2026-09-07T07:45:00Z",
-            "via": "r.jina.ai"
+            "verified": true,
+            "verified_at": "2026-09-07T03:42:43Z"
           }
         }
       ],
@@ -141,7 +154,8 @@
         "title": "Gemini 1.5 Pro Now Available in 180+ Countries; with Native Audio Understanding, System Instructions, JSON Mode and more",
         "quote": "Today, we’re making Gemini 1.5 Pro available in 180+ countries via the Gemini API in public preview",
         "retrieved_at": "2026-09-07T07:45:00Z",
-        "via": "r.jina.ai"
+        "verified": true,
+        "verified_at": "2026-09-07T03:42:43Z"
       },
       "sources": [
         {
@@ -149,7 +163,8 @@
           "title": "Our next-generation model: Gemini 1.5",
           "quote": "we’re offering a limited preview of 1.5 Pro to developers and enterprise customers via AI Studio and Vertex AI",
           "retrieved_at": "2026-09-07T07:45:00Z",
-          "via": "r.jina.ai",
+          "verified": true,
+          "verified_at": "2026-09-07T03:42:43Z",
           "note": "Feb 15, 2024 announcement of 1.5 Pro; initially a private, waitlisted preview only."
         },
         {
@@ -157,7 +172,8 @@
           "title": "Get more done with Gemini: Try 1.5 Pro and more intelligent features",
           "quote": "Today we’re bringing Gemini 1.5 Pro, our cutting-edge model, to Gemini Advanced.",
           "retrieved_at": "2026-09-07T07:45:00Z",
-          "via": "r.jina.ai",
+          "verified": true,
+          "verified_at": "2026-09-07T03:42:43Z",
           "note": "May 14, 2024: 1.5 Pro added to the consumer Gemini Advanced product."
         }
       ],
@@ -171,7 +187,9 @@
             "url": "https://storage.googleapis.com/deepmind-media/gemini/gemini_v1_5_report.pdf",
             "title": "Gemini 1.5: Unlocking multimodal understanding across millions of tokens of context",
             "quote": "67.7 (+9.2) 46.2 (+4.7) 89.2 (+5.2) 85.9 (+4.0) 84.1 (+12.2)",
-            "retrieved_at": "2026-09-07T07:45:00Z"
+            "retrieved_at": "2026-09-07T07:45:00Z",
+            "verified": false,
+            "verified_at": "2026-09-07T03:46:46Z"
           }
         },
         {
@@ -183,7 +201,9 @@
             "url": "https://storage.googleapis.com/deepmind-media/gemini/gemini_v1_5_report.pdf",
             "title": "Gemini 1.5: Unlocking multimodal understanding across millions of tokens of context",
             "quote": "67.7 (+9.2) 46.2 (+4.7) 89.2 (+5.2) 85.9 (+4.0) 84.1 (+12.2)",
-            "retrieved_at": "2026-09-07T07:45:00Z"
+            "retrieved_at": "2026-09-07T07:45:00Z",
+            "verified": false,
+            "verified_at": "2026-09-07T03:46:46Z"
           }
         },
         {
@@ -195,7 +215,9 @@
             "url": "https://storage.googleapis.com/deepmind-media/gemini/gemini_v1_5_report.pdf",
             "title": "Gemini 1.5: Unlocking multimodal understanding across millions of tokens of context",
             "quote": "1.5 Pro’s performance on MATH (Hendrycks et al., 2021b) has improved from 58.5% to 67.7% while on GPQA (Rein et al., 2023) 1.5 Pro now scores 46.2% compared to 41.5% before.",
-            "retrieved_at": "2026-09-07T07:45:00Z"
+            "retrieved_at": "2026-09-07T07:45:00Z",
+            "verified": false,
+            "verified_at": "2026-09-07T03:46:46Z"
           }
         },
         {
@@ -207,7 +229,9 @@
             "url": "https://storage.googleapis.com/deepmind-media/gemini/gemini_v1_5_report.pdf",
             "title": "Gemini 1.5: Unlocking multimodal understanding across millions of tokens of context",
             "quote": "1.5 Pro’s performance on MATH (Hendrycks et al., 2021b) has improved from 58.5% to 67.7% while on GPQA (Rein et al., 2023) 1.5 Pro now scores 46.2% compared to 41.5% before.",
-            "retrieved_at": "2026-09-07T07:45:00Z"
+            "retrieved_at": "2026-09-07T07:45:00Z",
+            "verified": false,
+            "verified_at": "2026-09-07T03:46:46Z"
           }
         },
         {
@@ -219,7 +243,9 @@
             "url": "https://storage.googleapis.com/deepmind-media/gemini/gemini_v1_5_report.pdf",
             "title": "Gemini 1.5: Unlocking multimodal understanding across millions of tokens of context",
             "quote": "Gemini 1.5 Pro scores 62.2% on MMMU, improving over Gemini 1.0 Ultra.",
-            "retrieved_at": "2026-09-07T07:45:00Z"
+            "retrieved_at": "2026-09-07T07:45:00Z",
+            "verified": false,
+            "verified_at": "2026-09-07T03:46:46Z"
           }
         }
       ],
@@ -238,7 +264,8 @@
         "title": "Gemini 2.0 is now available to everyone",
         "quote": "We’re also releasing an experimental version of Gemini 2.0 Pro, our best model yet for coding performance and complex prompts.",
         "retrieved_at": "2026-09-07T07:45:00Z",
-        "via": "r.jina.ai"
+        "verified": true,
+        "verified_at": "2026-09-07T03:42:43Z"
       },
       "scores": [],
       "notes": "Released only as a free-standing 'Experimental' model (gemini-2.0-pro-exp-02-05) in Google AI Studio, Vertex AI and the Gemini app for Gemini Advanced users — never reached general availability and was superseded by Gemini 2.5 Pro about seven weeks later. Counted here as 'released' per project convention because it was publicly usable (no waitlist), not merely announced. Google did not publish a numeric academic-benchmark table alongside this launch (the post and companion Google for Developers post describe capability only qualitatively); no verifiable official score could be found for this specific checkpoint, so scores are left empty rather than guessed."
@@ -256,7 +283,8 @@
         "title": "Gemini 2.5: Our most intelligent AI model",
         "quote": "Today we’re introducing Gemini 2.5, our most intelligent AI model. Our first 2.5 release is an experimental version of 2.5 Pro",
         "retrieved_at": "2026-09-07T07:45:00Z",
-        "via": "r.jina.ai"
+        "verified": true,
+        "verified_at": "2026-09-07T03:42:43Z"
       },
       "sources": [
         {
@@ -277,19 +305,22 @@
             "title": "Gemini 2.5: Our most intelligent AI model",
             "quote": "It also scores a state-of-the-art 18.8% across models without tool use on Humanity’s Last Exam",
             "retrieved_at": "2026-09-07T07:45:00Z",
-            "via": "r.jina.ai"
+            "verified": true,
+            "verified_at": "2026-09-07T03:42:43Z"
           }
         },
         {
           "benchmark": "gpqa-diamond",
-          "value": 84.0,
+          "value": 84,
           "config": "single attempt (pass@1), Experimental 03-25",
           "reported_by": "official",
           "source": {
             "url": "https://storage.googleapis.com/deepmind-media/Model-Cards/Gemini-2-5-Pro-Model-Card.pdf",
             "title": "Gemini 2.5 Pro Model Card",
             "quote": "GPQA diamond single attempt (pass@1) 86.4% 83.0% 84.0% 83.3% 81.4% 75.4% 79.6% 80.2% 81.0%",
-            "retrieved_at": "2026-09-07T07:45:00Z"
+            "retrieved_at": "2026-09-07T07:45:00Z",
+            "verified": false,
+            "verified_at": "2026-09-07T03:46:46Z"
           }
         },
         {
@@ -301,7 +332,9 @@
             "url": "https://storage.googleapis.com/deepmind-media/Model-Cards/Gemini-2-5-Pro-Model-Card.pdf",
             "title": "Gemini 2.5 Pro Model Card",
             "quote": "AIME 2025 single attempt (pass@1) 88.0% 83.0% 86.7% 88.9% 92.7% 70.5% 75.5% 77.3% 87.5%",
-            "retrieved_at": "2026-09-07T07:45:00Z"
+            "retrieved_at": "2026-09-07T07:45:00Z",
+            "verified": false,
+            "verified_at": "2026-09-07T03:46:46Z"
           }
         },
         {
@@ -314,7 +347,8 @@
             "title": "Gemini 2.5: Our most intelligent AI model",
             "quote": "On SWE-Bench Verified, the industry standard for agentic code evals, Gemini 2.5 Pro scores 63.8% with a custom agent setup.",
             "retrieved_at": "2026-09-07T07:45:00Z",
-            "via": "r.jina.ai"
+            "verified": true,
+            "verified_at": "2026-09-07T03:42:43Z"
           }
         },
         {
@@ -326,7 +360,9 @@
             "url": "https://storage.googleapis.com/deepmind-media/Model-Cards/Gemini-2-5-Pro-Model-Card.pdf",
             "title": "Gemini 2.5 Pro Model Card",
             "quote": "MMMU single attempt (pass@1) 82.0% 79.6% 81.7% 82.9% 81.6% 74.4% 76.5% 76.0%",
-            "retrieved_at": "2026-09-07T07:45:00Z"
+            "retrieved_at": "2026-09-07T07:45:00Z",
+            "verified": false,
+            "verified_at": "2026-09-07T03:46:46Z"
           }
         },
         {
@@ -338,7 +374,9 @@
             "url": "https://storage.googleapis.com/deepmind-media/Model-Cards/Gemini-2-5-Pro-Model-Card.pdf",
             "title": "Gemini 2.5 Pro Model Card",
             "quote": "Code generation LiveCodeBench UI: 10/1/2024 - 2/1/2025 single attempt (pass@1) — 75.6% 70.4%",
-            "retrieved_at": "2026-09-07T07:45:00Z"
+            "retrieved_at": "2026-09-07T07:45:00Z",
+            "verified": false,
+            "verified_at": "2026-09-07T03:46:46Z"
           }
         }
       ],
@@ -357,14 +395,17 @@
         "title": "A new era of intelligence with Gemini 3",
         "quote": "Today we’re taking another big step on the path toward AGI and releasing Gemini 3.",
         "retrieved_at": "2026-09-07T07:45:00Z",
-        "via": "r.jina.ai"
+        "verified": true,
+        "verified_at": "2026-09-07T03:42:43Z"
       },
       "sources": [
         {
           "url": "https://storage.googleapis.com/deepmind-media/Model-Cards/Gemini-3-Pro-Model-Card.pdf",
           "title": "Gemini 3 Pro Model Card",
           "quote": "Model Release: November 2025",
-          "retrieved_at": "2026-09-07T07:45:00Z"
+          "retrieved_at": "2026-09-07T07:45:00Z",
+          "verified": false,
+          "verified_at": "2026-09-07T03:46:46Z"
         }
       ],
       "scores": [
@@ -378,7 +419,8 @@
             "title": "A new era of intelligence with Gemini 3",
             "quote": "It demonstrates PhD-level reasoning with top scores on Humanity’s Last Exam (37.5% without the usage of any tools) and GPQA Diamond (91.9%).",
             "retrieved_at": "2026-09-07T07:45:00Z",
-            "via": "r.jina.ai"
+            "verified": true,
+            "verified_at": "2026-09-07T03:42:43Z"
           }
         },
         {
@@ -390,7 +432,8 @@
             "title": "A new era of intelligence with Gemini 3",
             "quote": "It demonstrates PhD-level reasoning with top scores on Humanity’s Last Exam (37.5% without the usage of any tools) and GPQA Diamond (91.9%).",
             "retrieved_at": "2026-09-07T07:45:00Z",
-            "via": "r.jina.ai"
+            "verified": true,
+            "verified_at": "2026-09-07T03:42:43Z"
           }
         },
         {
@@ -403,7 +446,8 @@
             "title": "A new era of intelligence with Gemini 3",
             "quote": "Beyond text, Gemini 3 Pro redefines multimodal reasoning with 81% on MMMU-Pro and 87.6% on Video-MMMU.",
             "retrieved_at": "2026-09-07T07:45:00Z",
-            "via": "r.jina.ai"
+            "verified": true,
+            "verified_at": "2026-09-07T03:42:43Z"
           }
         },
         {
@@ -415,7 +459,8 @@
             "title": "A new era of intelligence with Gemini 3",
             "quote": "it greatly outperforms 2.5 Pro on SWE-bench Verified (76.2%), a benchmark that measures coding agents.",
             "retrieved_at": "2026-09-07T07:45:00Z",
-            "via": "r.jina.ai"
+            "verified": true,
+            "verified_at": "2026-09-07T03:42:43Z"
           }
         },
         {
@@ -427,7 +472,8 @@
             "title": "A new era of intelligence with Gemini 3",
             "quote": "It also scores 54.2% on Terminal-Bench 2.0, which tests a model’s tool use ability to operate a computer via terminal",
             "retrieved_at": "2026-09-07T07:45:00Z",
-            "via": "r.jina.ai"
+            "verified": true,
+            "verified_at": "2026-09-07T03:42:43Z"
           }
         }
       ],
@@ -446,7 +492,8 @@
         "title": "Gemini 3.1 Pro: A smarter model for your most complex tasks",
         "quote": "Today, we’re releasing the upgraded core intelligence that makes those breakthroughs possible: Gemini 3.1 Pro.",
         "retrieved_at": "2026-09-07T07:45:00Z",
-        "via": "r.jina.ai"
+        "verified": true,
+        "verified_at": "2026-09-07T03:42:43Z"
       },
       "sources": [
         {
@@ -467,7 +514,8 @@
             "title": "Gemini 3.1 Pro: A smarter model for your most complex tasks",
             "quote": "On ARC-AGI-2, a benchmark that evaluates a model’s ability to solve entirely new logic patterns, 3.1 Pro achieved a verified score of 77.1%.",
             "retrieved_at": "2026-09-07T07:45:00Z",
-            "via": "r.jina.ai"
+            "verified": true,
+            "verified_at": "2026-09-07T03:42:43Z"
           }
         }
       ],
@@ -486,7 +534,8 @@
         "title": "Google releases three new Gemini models — but no 3.5 Pro",
         "quote": "Google DeepMind product lead Logan Kilpatrick said Tuesday that the company is currently testing Gemini 3.5 Pro with partners and hopes to “land soon.”",
         "retrieved_at": "2026-09-07T07:45:00Z",
-        "via": "r.jina.ai"
+        "verified": true,
+        "verified_at": "2026-09-07T03:42:43Z"
       },
       "scores": [],
       "notes": "Teased at Google I/O (May 19, 2026) alongside the Gemini 3.5 Flash launch, with Google saying Pro was 'already being used internally' and would roll out 'next month'. As of this writing (Sep 7, 2026) it has missed at least three targets (June, mid-July, early August 2026); Bloomberg reported (Jul 16, 2026) that its coding performance was falling short of Google's internal goals. No model ID, pricing or firm launch date has been published, so no expected_window is recorded. Still unreleased and untested, hence no scores."
@@ -504,7 +553,8 @@
         "title": "Google releases three new Gemini models — but no 3.5 Pro",
         "quote": "He also noted that the team has started its most ambitious pre-training run yet for Gemini 4.",
         "retrieved_at": "2026-09-07T07:45:00Z",
-        "via": "r.jina.ai"
+        "verified": true,
+        "verified_at": "2026-09-07T03:42:43Z"
       },
       "scores": [],
       "notes": "Confirmed by Google DeepMind product lead Logan Kilpatrick (via X, reported by TechCrunch) on Jul 21, 2026: pre-training has begun, described by Sundar Pichai on the Q2 2026 earnings call (Jul 23) as needing to be 'significantly larger' than Gemini 3 to compete with rivals, with coding and autonomous agents named as priorities. 'Gemini 4' is the working/rumored name; no architecture, benchmark, price, access plan or release window has been disclosed, so date_precision is 'day' only for the announcement itself and no expected_window is recorded."

@@ -1,0 +1,813 @@
+{
+  "lab": "anthropic",
+  "updated_at": "2026-09-07T03:46:46Z",
+  "releases": [
+    {
+      "id": "anthropic-claude-2",
+      "lab": "anthropic",
+      "name": "Claude 2",
+      "family": "Claude",
+      "date": "2023-07-11",
+      "date_precision": "day",
+      "status": "released",
+      "announcement": {
+        "url": "https://www.anthropic.com/news/claude-2",
+        "title": "Claude 2",
+        "quote": "anyone in the US and UK can start using our beta chat experience today.",
+        "retrieved_at": "2026-09-07T05:00:00Z",
+        "verified": true,
+        "verified_at": "2026-09-07T03:46:46Z"
+      },
+      "sources": [
+        {
+          "url": "https://www-cdn.anthropic.com/bd2a28d2535bfb0494cc8e2a3bf135d2e7523226/Model-Card-Claude-2.pdf",
+          "title": "Model Card: Claude 2",
+          "retrieved_at": "2026-09-07T05:00:00Z"
+        }
+      ],
+      "scores": [
+        {
+          "benchmark": "mmlu",
+          "value": 78.5,
+          "config": "5-shot CoT",
+          "reported_by": "official",
+          "source": {
+            "url": "https://www-cdn.anthropic.com/bd2a28d2535bfb0494cc8e2a3bf135d2e7523226/Model-Card-Claude-2.pdf",
+            "title": "Model Card: Claude 2",
+            "quote": "MMLU(5-shotCoT) 73.4% 77.0% 78.5%",
+            "retrieved_at": "2026-09-07T05:00:00Z",
+            "verified": false,
+            "verified_at": "2026-09-07T03:46:46Z",
+            "note": "Model card table (Claude Instant / Claude 1.3 / Claude 2 columns); text extraction lost inter-word spaces. 78.5% is Claude 2's value."
+          }
+        },
+        {
+          "benchmark": "humaneval",
+          "value": 71.2,
+          "config": "0-shot, Codex P@1",
+          "reported_by": "official",
+          "source": {
+            "url": "https://www.anthropic.com/news/claude-2",
+            "quote": "Claude 2 scored a 71.2% up from 56.0% on the Codex HumanEval, a Python coding test.",
+            "retrieved_at": "2026-09-07T05:00:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T03:46:46Z"
+          }
+        }
+      ],
+      "notes": "First Claude model with public self-serve access (claude.ai beta, US/UK). GPQA and MMMU did not exist as public benchmarks yet at launch."
+    },
+    {
+      "id": "anthropic-claude-2.1",
+      "lab": "anthropic",
+      "name": "Claude 2.1",
+      "family": "Claude",
+      "date": "2023-11-21",
+      "date_precision": "day",
+      "status": "released",
+      "announcement": {
+        "url": "https://www.anthropic.com/news/claude-2-1",
+        "title": "Claude 2.1",
+        "quote": "Claude 2.1 is available now in our API, and is also powering our chat interface at claude.ai for both the free and Pro tiers.",
+        "retrieved_at": "2026-09-07T05:00:00Z",
+        "verified": true,
+        "verified_at": "2026-09-07T03:46:46Z"
+      },
+      "scores": [],
+      "notes": "Release focused on a 200K token context window, reduced hallucination rates, tool use, and system prompts rather than academic benchmarks. The companion model card PDF (ModelCardClaudev2_with_appendix_v1.pdf) is an appendix to the original Claude 2 card and repeats the same Claude 2 MMLU/HumanEval numbers rather than publishing new ones for 2.1, so no distinct score is recorded here."
+    },
+    {
+      "id": "anthropic-claude-3-opus",
+      "lab": "anthropic",
+      "name": "Claude 3 Opus",
+      "family": "Claude Opus",
+      "date": "2024-03-04",
+      "date_precision": "day",
+      "status": "released",
+      "announcement": {
+        "url": "https://www.anthropic.com/news/claude-3-family",
+        "title": "Introducing the next generation of Claude",
+        "quote": "Opus and Sonnet are available to use today in our API, which is now generally available, enabling developers to sign up and start using these models immediately.",
+        "retrieved_at": "2026-09-07T05:00:00Z",
+        "verified": true,
+        "verified_at": "2026-09-07T03:46:46Z"
+      },
+      "sources": [
+        {
+          "url": "https://www-cdn.anthropic.com/de8ba9b01c9ab7cbabf5c33b80b7bbc618857627/Model_Card_Claude_3.pdf",
+          "title": "The Claude 3 Model Family: Opus, Sonnet, Haiku",
+          "retrieved_at": "2026-09-07T05:00:00Z"
+        }
+      ],
+      "scores": [
+        {
+          "benchmark": "mmlu",
+          "value": 86.8,
+          "config": "5-shot",
+          "reported_by": "official",
+          "source": {
+            "url": "https://www-cdn.anthropic.com/de8ba9b01c9ab7cbabf5c33b80b7bbc618857627/Model_Card_Claude_3.pdf",
+            "title": "The Claude 3 Model Family: Opus, Sonnet, Haiku",
+            "quote": "MMLU 5-shot 86.8% 79.0% 75.2%",
+            "retrieved_at": "2026-09-07T05:00:00Z",
+            "verified": false,
+            "verified_at": "2026-09-07T03:46:46Z",
+            "note": "Table 1, columns Opus/Sonnet/Haiku; 86.8% is Opus's value."
+          }
+        },
+        {
+          "benchmark": "humaneval",
+          "value": 84.9,
+          "config": "0-shot",
+          "reported_by": "official",
+          "source": {
+            "url": "https://www-cdn.anthropic.com/de8ba9b01c9ab7cbabf5c33b80b7bbc618857627/Model_Card_Claude_3.pdf",
+            "title": "The Claude 3 Model Family: Opus, Sonnet, Haiku",
+            "quote": "0-shot 84.9% 73.0% 75.9%",
+            "retrieved_at": "2026-09-07T05:00:00Z",
+            "verified": false,
+            "verified_at": "2026-09-07T03:46:46Z",
+            "note": "Table 1 HumanEval row, columns Opus/Sonnet/Haiku; 84.9% is Opus's value."
+          }
+        },
+        {
+          "benchmark": "math",
+          "value": 60.1,
+          "config": "0-shot",
+          "reported_by": "official",
+          "source": {
+            "url": "https://www-cdn.anthropic.com/de8ba9b01c9ab7cbabf5c33b80b7bbc618857627/Model_Card_Claude_3.pdf",
+            "title": "The Claude 3 Model Family: Opus, Sonnet, Haiku",
+            "quote": "0-shot 60.1% 43.1% 38.9%",
+            "retrieved_at": "2026-09-07T05:00:00Z",
+            "verified": false,
+            "verified_at": "2026-09-07T03:46:46Z",
+            "note": "Table 1 MATH row (0-shot variant), columns Opus/Sonnet/Haiku; 60.1% is Opus's value. A 4-shot CoT variant is also reported at 61%."
+          }
+        },
+        {
+          "benchmark": "gpqa-diamond",
+          "value": 50.4,
+          "config": "0-shot CoT",
+          "reported_by": "official",
+          "source": {
+            "url": "https://www-cdn.anthropic.com/de8ba9b01c9ab7cbabf5c33b80b7bbc618857627/Model_Card_Claude_3.pdf",
+            "title": "The Claude 3 Model Family: Opus, Sonnet, Haiku",
+            "quote": "0-shotCoT 50.4% 40.4% 33.3%",
+            "retrieved_at": "2026-09-07T05:00:00Z",
+            "verified": false,
+            "verified_at": "2026-09-07T03:46:46Z",
+            "note": "Section 5.1 / Table 1 GPQA Diamond row, columns Opus/Sonnet/Haiku; 50.4% is Opus's value. With Maj@32 5-shot CoT, Opus scores 59.5%."
+          }
+        }
+      ],
+      "notes": "Model card PDF is the primary source for scores; the marketing announcement page renders its benchmark comparison as an image chart with no extractable text."
+    },
+    {
+      "id": "anthropic-claude-3.5-sonnet",
+      "lab": "anthropic",
+      "name": "Claude 3.5 Sonnet",
+      "family": "Claude Sonnet",
+      "date": "2024-06-20",
+      "date_precision": "day",
+      "status": "released",
+      "announcement": {
+        "url": "https://www.anthropic.com/news/claude-3-5-sonnet",
+        "title": "Introducing Claude 3.5 Sonnet",
+        "quote": "Today, we're launching Claude 3.5 Sonnet—our first release in the forthcoming Claude 3.5 model family.",
+        "retrieved_at": "2026-09-07T05:00:00Z",
+        "verified": true,
+        "verified_at": "2026-09-07T03:46:46Z"
+      },
+      "sources": [
+        {
+          "url": "https://www-cdn.anthropic.com/fed9cc193a14b84131812372d8d5857f8f304c52/Model_Card_Claude_3_Addendum.pdf",
+          "title": "Claude 3.5 Sonnet Model Card Addendum",
+          "retrieved_at": "2026-09-07T05:00:00Z"
+        }
+      ],
+      "scores": [
+        {
+          "benchmark": "gpqa-diamond",
+          "value": 59.4,
+          "config": "0-shot CoT",
+          "reported_by": "official",
+          "source": {
+            "url": "https://www-cdn.anthropic.com/fed9cc193a14b84131812372d8d5857f8f304c52/Model_Card_Claude_3_Addendum.pdf",
+            "title": "Claude 3.5 Sonnet Model Card Addendum",
+            "quote": "GPQA(Diamond) 0-shotCoT 59.4% 50.4% 40.4% 53.6% 48.0%",
+            "retrieved_at": "2026-09-07T05:00:00Z",
+            "verified": false,
+            "verified_at": "2026-09-07T03:46:46Z",
+            "note": "Table 1, columns Claude 3.5 Sonnet / Claude 3 Opus / Claude 3 Sonnet / GPT-4o / GPT-4T; 59.4% is 3.5 Sonnet's value."
+          }
+        },
+        {
+          "benchmark": "mmlu",
+          "value": 88.7,
+          "config": "5-shot",
+          "reported_by": "official",
+          "source": {
+            "url": "https://www-cdn.anthropic.com/fed9cc193a14b84131812372d8d5857f8f304c52/Model_Card_Claude_3_Addendum.pdf",
+            "title": "Claude 3.5 Sonnet Model Card Addendum",
+            "quote": "5-shot 88.7% 86.8% 78.3%",
+            "retrieved_at": "2026-09-07T05:00:00Z",
+            "verified": false,
+            "verified_at": "2026-09-07T03:46:46Z",
+            "note": "Table 1 MMLU 5-shot row; 88.7% is 3.5 Sonnet's value."
+          }
+        },
+        {
+          "benchmark": "math",
+          "value": 71.1,
+          "config": "0-shot CoT",
+          "reported_by": "official",
+          "source": {
+            "url": "https://www-cdn.anthropic.com/fed9cc193a14b84131812372d8d5857f8f304c52/Model_Card_Claude_3_Addendum.pdf",
+            "title": "Claude 3.5 Sonnet Model Card Addendum",
+            "quote": "MATH[10] 71.1% 60.1% 43.1% 76.6% 72.6%",
+            "retrieved_at": "2026-09-07T05:00:00Z",
+            "verified": false,
+            "verified_at": "2026-09-07T03:46:46Z",
+            "note": "Table 1 MATH row; 71.1% is 3.5 Sonnet's value."
+          }
+        },
+        {
+          "benchmark": "humaneval",
+          "value": 92,
+          "config": "0-shot",
+          "reported_by": "official",
+          "source": {
+            "url": "https://www-cdn.anthropic.com/fed9cc193a14b84131812372d8d5857f8f304c52/Model_Card_Claude_3_Addendum.pdf",
+            "title": "Claude 3.5 Sonnet Model Card Addendum",
+            "quote": "0-shot 92.0% 84.9% 73.0% 90.2% 87.1%",
+            "retrieved_at": "2026-09-07T05:00:00Z",
+            "verified": false,
+            "verified_at": "2026-09-07T03:46:46Z",
+            "note": "Table 1 HumanEval row; 92.0% is 3.5 Sonnet's value."
+          }
+        },
+        {
+          "benchmark": "mmmu",
+          "value": 68.3,
+          "config": "validation split, 0-shot CoT",
+          "reported_by": "official",
+          "source": {
+            "url": "https://www-cdn.anthropic.com/fed9cc193a14b84131812372d8d5857f8f304c52/Model_Card_Claude_3_Addendum.pdf",
+            "title": "Claude 3.5 Sonnet Model Card Addendum",
+            "quote": "MMMU[18](validation) 68.3% 59.4% 53.1% 69.1% 63.1%",
+            "retrieved_at": "2026-09-07T05:00:00Z",
+            "verified": false,
+            "verified_at": "2026-09-07T03:46:46Z",
+            "note": "Table 2, columns 3.5 Sonnet / Claude 3 Opus / Claude 3 Sonnet / GPT-4o / GPT-4T."
+          }
+        }
+      ],
+      "notes": "This is the original June 2024 Claude 3.5 Sonnet (model string claude-3-5-sonnet-20240620), the top tier at the time (Claude 3 Opus successor was not yet released). A later 'upgraded' Claude 3.5 Sonnet (October 2024, claude-3-5-sonnet-20241022) is treated as an incremental update, not a separate flagship entry."
+    },
+    {
+      "id": "anthropic-claude-3.7-sonnet",
+      "lab": "anthropic",
+      "name": "Claude 3.7 Sonnet",
+      "family": "Claude Sonnet",
+      "date": "2025-02-24",
+      "date_precision": "day",
+      "status": "released",
+      "announcement": {
+        "url": "https://www.anthropic.com/news/claude-3-7-sonnet",
+        "title": "Claude 3.7 Sonnet and Claude Code",
+        "quote": "Claude 3.7 Sonnet is now available on all Claude plans—including Free, Pro, Team, and Enterprise—as well as the Claude Developer Platform, Amazon Bedrock, and Google Cloud's Vertex AI.",
+        "retrieved_at": "2026-09-07T05:00:00Z",
+        "verified": true,
+        "verified_at": "2026-09-07T03:46:46Z"
+      },
+      "scores": [],
+      "notes": "The launch post states 'Claude 3.7 Sonnet achieves state-of-the-art performance on SWE-bench Verified' and shows comparison charts for SWE-bench Verified, TAU-bench and a broader benchmark table, but all of these are rendered as images with no extractable text, and the companion system card (anthropic.com/claude-3-7-sonnet-system-card) covers only safety evaluations, not the standard capability benchmarks. No verified numeric score could be sourced within the research budget for this release; left empty rather than guessed. Widely-reported third-party figures (e.g. ~70.3% SWE-bench Verified, ~86.4% MMLU) exist but were not confirmed against Anthropic's own text and are therefore omitted."
+    },
+    {
+      "id": "anthropic-claude-opus-4",
+      "lab": "anthropic",
+      "name": "Claude Opus 4",
+      "family": "Claude Opus",
+      "date": "2025-05-22",
+      "date_precision": "day",
+      "status": "released",
+      "announcement": {
+        "url": "https://www.anthropic.com/news/claude-4",
+        "title": "Introducing Claude 4",
+        "quote": "Both models are available on our API, Amazon Bedrock, and Google Cloud's Vertex AI.",
+        "retrieved_at": "2026-09-07T05:00:00Z",
+        "verified": true,
+        "verified_at": "2026-09-07T03:46:46Z"
+      },
+      "scores": [
+        {
+          "benchmark": "swe-bench-verified",
+          "value": 72.5,
+          "config": "pass@1, no parallel test-time compute, Claude Code as agent framework",
+          "reported_by": "official",
+          "source": {
+            "url": "https://www.anthropic.com/news/claude-4",
+            "quote": "leading on SWE-bench (72.5%) and Terminal-bench (43.2%)",
+            "retrieved_at": "2026-09-07T05:00:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T03:46:46Z"
+          }
+        },
+        {
+          "benchmark": "gpqa-diamond",
+          "value": 79.6,
+          "config": "no parallel test-time compute",
+          "note": "Table gives '79.6% / 83.3%'; the second figure benefits from parallel test-time compute (best-of-N via an internal scoring model), per the page's methodology footnote 5.",
+          "reported_by": "official",
+          "source": {
+            "url": "https://www.anthropic.com/news/claude-4",
+            "quote": "79.6% / 83.3%",
+            "retrieved_at": "2026-09-07T05:00:00Z",
+            "verified": false,
+            "verified_at": "2026-09-07T03:46:46Z"
+          }
+        },
+        {
+          "benchmark": "mmmu",
+          "value": 76.5,
+          "config": "validation split",
+          "reported_by": "official",
+          "source": {
+            "url": "https://www.anthropic.com/news/claude-4",
+            "quote": "76.5%",
+            "retrieved_at": "2026-09-07T05:00:00Z",
+            "verified": false,
+            "verified_at": "2026-09-07T03:46:46Z",
+            "note": "MMMU (validation) row of the benchmark table; Opus 4's column value."
+          }
+        },
+        {
+          "benchmark": "aime",
+          "value": 75.5,
+          "config": "AIME 2025, no parallel test-time compute",
+          "note": "Table gives '75.5% / 90.0%'; the second figure benefits from parallel test-time compute per methodology footnote 5.",
+          "reported_by": "official",
+          "source": {
+            "url": "https://www.anthropic.com/news/claude-4",
+            "quote": "75.5% / 90.0%",
+            "retrieved_at": "2026-09-07T05:00:00Z",
+            "verified": false,
+            "verified_at": "2026-09-07T03:46:46Z"
+          }
+        }
+      ],
+      "notes": "Launched alongside Claude Sonnet 4 at the 'Code with Claude' developer event; the API model snapshot id (claude-opus-4-20250514) carries an earlier internal date than the May 22, 2025 public launch, which is used here. TAU-bench figures reported on this page are for the original tau-bench, not the tau2-bench in this project's basket, so they are not recorded as tau2-bench scores."
+    },
+    {
+      "id": "anthropic-claude-opus-4.1",
+      "lab": "anthropic",
+      "name": "Claude Opus 4.1",
+      "family": "Claude Opus",
+      "date": "2025-08-05",
+      "date_precision": "day",
+      "status": "released",
+      "announcement": {
+        "url": "https://www.anthropic.com/news/claude-opus-4-1",
+        "title": "Claude Opus 4.1",
+        "quote": "Opus 4.1 is now available to paid Claude users and in Claude Code.",
+        "retrieved_at": "2026-09-07T05:00:00Z",
+        "verified": true,
+        "verified_at": "2026-09-07T03:46:46Z"
+      },
+      "scores": [
+        {
+          "benchmark": "swe-bench-verified",
+          "value": 74.5,
+          "reported_by": "official",
+          "source": {
+            "url": "https://www.anthropic.com/news/claude-opus-4-1",
+            "quote": "Opus 4.1 advances our state-of-the-art coding performance to 74.5% on SWE-bench Verified.",
+            "retrieved_at": "2026-09-07T05:00:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T03:46:46Z"
+          }
+        }
+      ],
+      "notes": "Date confirmed by the API model id claude-opus-4-1-20250805. A broader benchmark table comparing Opus 4.1 to prior models is shown only as an image on the launch page; no other text-extractable scores were found within budget."
+    },
+    {
+      "id": "anthropic-claude-opus-4.5",
+      "lab": "anthropic",
+      "name": "Claude Opus 4.5",
+      "family": "Claude Opus",
+      "date": "2025-11-24",
+      "date_precision": "day",
+      "status": "released",
+      "announcement": {
+        "url": "https://www.anthropic.com/news/claude-opus-4-5",
+        "title": "Introducing Claude Opus 4.5",
+        "quote": "Our newest model, Claude Opus 4.5, is available today.",
+        "retrieved_at": "2026-09-07T05:00:00Z",
+        "verified": true,
+        "verified_at": "2026-09-07T03:46:46Z"
+      },
+      "sources": [
+        {
+          "url": "https://www.anthropic.com/claude-opus-4-5-system-card",
+          "title": "Claude Opus 4.5 System Card",
+          "retrieved_at": "2026-09-07T05:00:00Z"
+        }
+      ],
+      "scores": [
+        {
+          "benchmark": "swe-bench-verified",
+          "value": 80.9,
+          "config": "no extended thinking",
+          "reported_by": "official",
+          "source": {
+            "url": "https://www.anthropic.com/claude-opus-4-5-system-card",
+            "title": "Claude Opus 4.5 System Card",
+            "quote": "SWE-bench 80.9%4 77.2% 74.5% 76.2% 76.3%",
+            "retrieved_at": "2026-09-07T05:00:00Z",
+            "verified": false,
+            "verified_at": "2026-09-07T03:46:46Z",
+            "note": "Table 2.3.A overview; footnote 4 = 'Without extended thinking'. With 64k thinking, Opus 4.5 scores 80.60% (Table 2.4.A)."
+          }
+        },
+        {
+          "benchmark": "terminal-bench-2",
+          "value": 59.27,
+          "config": "Terminal-Bench 2.0, Terminus-2 harness, 128k thinking budget",
+          "reported_by": "official",
+          "source": {
+            "url": "https://www.anthropic.com/claude-opus-4-5-system-card",
+            "title": "Claude Opus 4.5 System Card",
+            "quote": "With a 128k thinking budget, Claude Opus 4.5 achieved a score of 59.27%",
+            "retrieved_at": "2026-09-07T05:00:00Z",
+            "verified": false,
+            "verified_at": "2026-09-07T03:46:46Z"
+          }
+        },
+        {
+          "benchmark": "gpqa-diamond",
+          "value": 86.95,
+          "config": "extended thinking, 64k thinking budget, default effort high",
+          "reported_by": "official",
+          "source": {
+            "url": "https://www.anthropic.com/claude-opus-4-5-system-card",
+            "title": "Claude Opus 4.5 System Card",
+            "quote": "Claude Opus 4.5 achieved a score of 86.95% (averaged over 5 trials) on GPQA Diamond.",
+            "retrieved_at": "2026-09-07T05:00:00Z",
+            "verified": false,
+            "verified_at": "2026-09-07T03:46:46Z"
+          }
+        },
+        {
+          "benchmark": "mmmu",
+          "value": 80.72,
+          "config": "validation split, extended thinking 64k",
+          "reported_by": "official",
+          "source": {
+            "url": "https://www.anthropic.com/claude-opus-4-5-system-card",
+            "title": "Claude Opus 4.5 System Card",
+            "quote": "Claude Opus 4.5 achieved a score of 80.72% on MMMU.",
+            "retrieved_at": "2026-09-07T05:00:00Z",
+            "verified": false,
+            "verified_at": "2026-09-07T03:46:46Z"
+          }
+        },
+        {
+          "benchmark": "aime",
+          "value": 92.77,
+          "config": "AIME 2025, no tools, extended thinking 64k",
+          "note": "With access to Python tools, Anthropic reports 100%; contamination concerns are flagged for this figure in the system card.",
+          "reported_by": "official",
+          "source": {
+            "url": "https://www.anthropic.com/claude-opus-4-5-system-card",
+            "title": "Claude Opus 4.5 System Card",
+            "quote": "Claude Opus 4.5 achieved a score of 92.77% without tools, and 100% with access to python tools.",
+            "retrieved_at": "2026-09-07T05:00:00Z",
+            "verified": false,
+            "verified_at": "2026-09-07T03:46:46Z"
+          }
+        },
+        {
+          "benchmark": "arc-agi-2",
+          "value": 37.6,
+          "config": "ARC Prize verified set",
+          "reported_by": "official",
+          "source": {
+            "url": "https://www.anthropic.com/claude-opus-4-5-system-card",
+            "title": "Claude Opus 4.5 System Card",
+            "quote": "ARC-AGI-2 37.6% 13.6% — 31.1% 17.6%",
+            "retrieved_at": "2026-09-07T05:00:00Z",
+            "verified": false,
+            "verified_at": "2026-09-07T03:46:46Z",
+            "note": "Table 2.3.A overview row (Verified); 37.6% is Opus 4.5's value."
+          }
+        },
+        {
+          "benchmark": "tau2-bench",
+          "value": 91.63,
+          "config": "no extended thinking; unweighted mean of retail, telecom and corrected-airline domains",
+          "note": "Retail 88.9%, Telecom 98.2%, and a corrected Airline figure of 87.8% (the system card's originally-reported Airline score of 67.9% was later described by Anthropic as based on a flawed task version; 87.8% is Anthropic's own corrected figure, footnote 6).",
+          "reported_by": "official",
+          "source": {
+            "url": "https://www.anthropic.com/claude-opus-4-5-system-card",
+            "title": "Claude Opus 4.5 System Card",
+            "quote": "88.9%4 86.2% 86.8% 85.3%",
+            "retrieved_at": "2026-09-07T05:00:00Z",
+            "verified": false,
+            "verified_at": "2026-09-07T03:46:46Z"
+          }
+        }
+      ],
+      "notes": "The marketing announcement page (anthropic.com/news/claude-opus-4-5) shows its benchmark comparisons only as images; all scores here are sourced from the text of the Claude Opus 4.5 System Card PDF (served at anthropic.com/claude-opus-4-5-system-card), Table 2.3.A and the corresponding narrative sections 2.16-2.20."
+    },
+    {
+      "id": "anthropic-claude-opus-4.6",
+      "lab": "anthropic",
+      "name": "Claude Opus 4.6",
+      "family": "Claude Opus",
+      "date": "2026-02-05",
+      "date_precision": "day",
+      "status": "released",
+      "announcement": {
+        "url": "https://www.anthropic.com/news/claude-opus-4-6",
+        "title": "Claude Opus 4.6",
+        "quote": "Claude Opus 4.6 is available today on claude.ai, our API, and all major cloud platforms.",
+        "retrieved_at": "2026-09-07T05:00:00Z",
+        "verified": true,
+        "verified_at": "2026-09-07T03:46:46Z"
+      },
+      "sources": [
+        {
+          "url": "https://www.anthropic.com/claude-opus-4-6-system-card",
+          "title": "Claude Opus 4.6 System Card",
+          "retrieved_at": "2026-09-07T05:00:00Z"
+        }
+      ],
+      "scores": [
+        {
+          "benchmark": "swe-bench-verified",
+          "value": 80.8,
+          "config": "adaptive thinking, max effort, averaged over 25 trials",
+          "reported_by": "official",
+          "source": {
+            "url": "https://www.anthropic.com/claude-opus-4-6-system-card",
+            "title": "Claude Opus 4.6 System Card",
+            "quote": "SWE-bench 80.8% 80.9% 77.2% 76.2% 80.0%",
+            "retrieved_at": "2026-09-07T05:00:00Z",
+            "verified": false,
+            "verified_at": "2026-09-07T03:46:46Z",
+            "note": "Table 2.3.A, columns Opus 4.6 / Opus 4.5 / Sonnet 4.5 / Gemini 3 Pro / GPT-5.2; 80.8% is Opus 4.6's value."
+          }
+        },
+        {
+          "benchmark": "terminal-bench-2",
+          "value": 65.4,
+          "config": "adaptive thinking, max effort",
+          "reported_by": "official",
+          "source": {
+            "url": "https://www.anthropic.com/claude-opus-4-6-system-card",
+            "title": "Claude Opus 4.6 System Card",
+            "quote": "Terminal-Bench 65.4% 59.8% 51.0% 56.2% 64.7%",
+            "retrieved_at": "2026-09-07T05:00:00Z",
+            "verified": false,
+            "verified_at": "2026-09-07T03:46:46Z",
+            "note": "Table 2.3.A Terminal-Bench 2.0 row; 65.4% is Opus 4.6's value."
+          }
+        },
+        {
+          "benchmark": "gpqa-diamond",
+          "value": 91.3,
+          "config": "adaptive thinking, max effort",
+          "reported_by": "official",
+          "source": {
+            "url": "https://www.anthropic.com/claude-opus-4-6-system-card",
+            "title": "Claude Opus 4.6 System Card",
+            "quote": "GPQA Diamond 91.3% 87.0% 83.40% 91.9% 93.2%",
+            "retrieved_at": "2026-09-07T05:00:00Z",
+            "verified": false,
+            "verified_at": "2026-09-07T03:46:46Z",
+            "note": "Table 2.3.A; 91.3% is Opus 4.6's value."
+          }
+        },
+        {
+          "benchmark": "mmmu",
+          "value": 73.9,
+          "config": "MMMU-Pro, no tools",
+          "reported_by": "official",
+          "source": {
+            "url": "https://www.anthropic.com/claude-opus-4-6-system-card",
+            "title": "Claude Opus 4.6 System Card",
+            "quote": "MMMU-Pro (no tools) 73.9% 70.6% 63.4% 81% 79.5%",
+            "retrieved_at": "2026-09-07T05:00:00Z",
+            "verified": false,
+            "verified_at": "2026-09-07T03:46:46Z"
+          }
+        },
+        {
+          "benchmark": "arc-agi-2",
+          "value": 68.8,
+          "config": "ARC Prize verified set, deep thinking",
+          "reported_by": "official",
+          "source": {
+            "url": "https://www.anthropic.com/claude-opus-4-6-system-card",
+            "title": "Claude Opus 4.6 System Card",
+            "quote": "ARC-AGI-2 68.8% 37.6% 13.6% 45.1% 54.2%",
+            "retrieved_at": "2026-09-07T05:00:00Z",
+            "verified": false,
+            "verified_at": "2026-09-07T03:46:46Z"
+          }
+        },
+        {
+          "benchmark": "tau2-bench",
+          "value": 95.6,
+          "config": "unweighted mean of retail and telecom domains (airline not reported for this release)",
+          "note": "Retail 91.9%, Telecom 99.3%; average of the two domains reported.",
+          "reported_by": "official",
+          "source": {
+            "url": "https://www.anthropic.com/claude-opus-4-6-system-card",
+            "title": "Claude Opus 4.6 System Card",
+            "quote": "91.9% 88.9% 86.2% 85.3% 82.0%",
+            "retrieved_at": "2026-09-07T05:00:00Z",
+            "verified": false,
+            "verified_at": "2026-09-07T03:46:46Z"
+          }
+        }
+      ],
+      "notes": "First Opus model with a 1M-token context window (beta). Launch date corroborated by CNBC (https://www.cnbc.com/2026/02/05/anthropic-claude-opus-4-6-vibe-working.html); the system card itself only states 'February 2026'."
+    },
+    {
+      "id": "anthropic-claude-opus-4.8",
+      "lab": "anthropic",
+      "name": "Claude Opus 4.8",
+      "family": "Claude Opus",
+      "date": "2026-05-28",
+      "date_precision": "day",
+      "status": "released",
+      "announcement": {
+        "url": "https://www.anthropic.com/news/claude-opus-4-8",
+        "title": "Introducing Claude Opus 4.8",
+        "quote": "Claude Opus 4.8 is available everywhere today.",
+        "retrieved_at": "2026-09-07T05:00:00Z",
+        "verified": true,
+        "verified_at": "2026-09-07T03:46:46Z"
+      },
+      "sources": [
+        {
+          "url": "https://www.anthropic.com/claude-opus-4-8-system-card",
+          "title": "Claude Opus 4.8 System Card",
+          "retrieved_at": "2026-09-07T05:00:00Z"
+        }
+      ],
+      "scores": [
+        {
+          "benchmark": "swe-bench-verified",
+          "value": 88.6,
+          "reported_by": "official",
+          "source": {
+            "url": "https://www.anthropic.com/claude-opus-4-8-system-card",
+            "title": "Claude Opus 4.8 System Card",
+            "quote": "SWE-bench Verified 88.6 87.6 - 80.6",
+            "retrieved_at": "2026-09-07T05:00:00Z",
+            "verified": false,
+            "verified_at": "2026-09-07T03:46:46Z",
+            "note": "Table 8.1 (Evaluation summary), columns Opus 4.8 / Opus 4.7 / GPT-5.5 / Gemini 3.1 Pro; 88.6 is Opus 4.8's value."
+          }
+        },
+        {
+          "benchmark": "gpqa-diamond",
+          "value": 93.6,
+          "reported_by": "official",
+          "source": {
+            "url": "https://www.anthropic.com/claude-opus-4-8-system-card",
+            "title": "Claude Opus 4.8 System Card",
+            "quote": "GPQA Diamond 93.6 94.2 - 94.3",
+            "retrieved_at": "2026-09-07T05:00:00Z",
+            "verified": false,
+            "verified_at": "2026-09-07T03:46:46Z"
+          }
+        },
+        {
+          "benchmark": "hle",
+          "value": 49.8,
+          "config": "no tools",
+          "reported_by": "official",
+          "source": {
+            "url": "https://www.anthropic.com/claude-opus-4-8-system-card",
+            "title": "Claude Opus 4.8 System Card",
+            "quote": "No tools 49.8 46.9 41.4 44.4",
+            "retrieved_at": "2026-09-07T05:00:00Z",
+            "verified": false,
+            "verified_at": "2026-09-07T03:46:46Z",
+            "note": "Table 8.1 Humanity's Last Exam row (no-tools variant)."
+          }
+        }
+      ],
+      "notes": "System card title page date (May 28, 2026) is exact, dated the same day as the launch post. Anthropic's own Table 8.1 note: 'Changes to the Opus 4.7 BrowseComp/OSWorld scores' imply Opus 4.7 existed as an immediate predecessor (reported ~April 2026 per press, e.g. technology.org); Opus 4.7 is not recorded as its own release in this file given its very short 41-day lifespan and the research time budget for this pass. This system card switches to Terminal-Bench 2.1 (not 2.0), so no terminal-bench-2 score is recorded here to avoid mixing incompatible benchmark versions."
+    },
+    {
+      "id": "anthropic-claude-fable-5",
+      "lab": "anthropic",
+      "name": "Claude Fable 5",
+      "family": "Claude Fable",
+      "date": "2026-06-09",
+      "date_precision": "day",
+      "status": "released",
+      "announcement": {
+        "url": "https://www.anthropic.com/news/claude-fable-5-mythos-5",
+        "title": "Claude Fable 5 and Claude Mythos 5",
+        "quote": "Claude Fable 5 is available everywhere today. Claude Mythos 5 is restricted to Glasswing partners (with cyber safeguards lifted) and soon to select biology researchers (with biology and chemistry safeguards lifted) only, until our broader trusted access program is available.",
+        "retrieved_at": "2026-09-07T05:00:00Z",
+        "verified": true,
+        "verified_at": "2026-09-07T03:46:46Z"
+      },
+      "sources": [
+        {
+          "url": "https://www.anthropic.com/claude-fable-5-system-card",
+          "title": "System Card: Claude Fable 5 & Claude Mythos 5",
+          "retrieved_at": "2026-09-07T05:00:00Z"
+        },
+        {
+          "url": "https://www.anthropic.com/news/redeploying-fable-5",
+          "title": "Redeploying Claude Fable 5",
+          "retrieved_at": "2026-09-07T05:00:00Z",
+          "via": "r.jina.ai"
+        }
+      ],
+      "scores": [
+        {
+          "benchmark": "swe-bench-verified",
+          "value": 95,
+          "config": "adaptive thinking, max effort",
+          "reported_by": "official",
+          "source": {
+            "url": "https://www.anthropic.com/claude-fable-5-system-card",
+            "title": "System Card: Claude Fable 5 & Claude Mythos 5",
+            "quote": "SWE-bench Verified 95.5 95 93.9 88.6 - 80.6",
+            "retrieved_at": "2026-09-07T05:00:00Z",
+            "verified": false,
+            "verified_at": "2026-09-07T03:46:46Z",
+            "note": "Table 8.1.A, columns Mythos 5 / Fable 5 / Mythos Preview / Opus 4.8 / GPT-5.2 / Gemini 3.1 Pro; 95 is Fable 5's value (Mythos 5 itself scores 95.5)."
+          }
+        }
+      ],
+      "notes": "Anthropic describes Fable 5 and Mythos 5 as 'the same underlying model' (redeploying-fable-5 post): Fable 5 ships with production safeguards for cybersecurity/biology-chemistry/distillation topics that fall back to Claude Opus 4.8, while Mythos 5 has those safeguards lifted and is restricted to vetted Project Glasswing partners (not a public release, so not recorded as its own entry here). On June 12, 2026 the US government briefly applied export controls to both models, suspending access; access was restored June 30-July 1, 2026 (see the 'Redeploying Claude Fable 5' source). This generation's system card treats GPQA Diamond as saturated and stopped reporting it for Fable 5 specifically (Mythos 5 alone is given at 94.1%, 'averaged over 5 trials'); MMLU/MATH/HumanEval/MMMU are no longer reported for either model, and Terminal-Bench has moved to version 2.1 (not this basket's 2.0), so none of those appear as scores here. Family is recorded as 'Claude Fable' per this project's lineage-fork convention, even though the Opus line (Claude Opus 4.8, and subsequently a further 'Claude Opus 5', per the Fable 5.1 system card's comparison table) continued in parallel rather than being replaced."
+    },
+    {
+      "id": "anthropic-claude-fable-5.1",
+      "lab": "anthropic",
+      "name": "Claude Fable 5.1",
+      "family": "Claude Fable",
+      "date": "2026-09-01",
+      "date_precision": "day",
+      "status": "released",
+      "announcement": {
+        "url": "https://www.anthropic.com/claude-fable-and-mythos-5-1",
+        "title": "Introducing Claude Fable 5.1 and Claude Mythos 5.1",
+        "quote": "Claude Fable 5.1 is available today on all platforms, including Amazon Web Services, Google Cloud, and Microsoft Azure.",
+        "retrieved_at": "2026-09-07T05:00:00Z",
+        "verified": true,
+        "verified_at": "2026-09-07T03:46:46Z"
+      },
+      "sources": [
+        {
+          "url": "https://www-cdn.anthropic.com/0339e6a7c5c7b87f5c07798616dc32c215d14235/Claude%20Fable%205.1%20%26%20Claude%20Mythos%205.1%20System%20Card.pdf",
+          "title": "System Card: Claude Fable 5.1 & Claude Mythos 5.1",
+          "retrieved_at": "2026-09-07T05:00:00Z"
+        }
+      ],
+      "scores": [
+        {
+          "benchmark": "arc-agi-2",
+          "value": 90,
+          "config": "ARC Prize verified set",
+          "reported_by": "official",
+          "source": {
+            "url": "https://www-cdn.anthropic.com/0339e6a7c5c7b87f5c07798616dc32c215d14235/Claude%20Fable%205.1%20%26%20Claude%20Mythos%205.1%20System%20Card.pdf",
+            "title": "System Card: Claude Fable 5.1 & Claude Mythos 5.1",
+            "quote": "ARC-AGI-2 90.0% 89.2% 90.42% 92.5%",
+            "retrieved_at": "2026-09-07T05:00:00Z",
+            "verified": false,
+            "verified_at": "2026-09-07T03:46:46Z",
+            "note": "Table 8.1.A, columns Fable 5.1/Mythos 5.1 (shared) / Fable 5/Mythos 5 (previous gen) / Claude Opus 5 / GPT-5.6 Sol; 90.0% is Fable 5.1's (and Mythos 5.1's) value."
+          }
+        },
+        {
+          "benchmark": "hle",
+          "value": 60.9,
+          "config": "no tools",
+          "reported_by": "official",
+          "source": {
+            "url": "https://www-cdn.anthropic.com/0339e6a7c5c7b87f5c07798616dc32c215d14235/Claude%20Fable%205.1%20%26%20Claude%20Mythos%205.1%20System%20Card.pdf",
+            "title": "System Card: Claude Fable 5.1 & Claude Mythos 5.1",
+            "quote": "No tools 60.9% 57.8% 56.6% -",
+            "retrieved_at": "2026-09-07T05:00:00Z",
+            "verified": false,
+            "verified_at": "2026-09-07T03:46:46Z",
+            "note": "Table 8.1.A Humanity's Last Exam row, no-tools variant."
+          }
+        }
+      ],
+      "notes": "Unlike the 5.0 generation, Anthropic's Table 8.1.A for this release reports a single shared column for 'Claude Fable 5.1/Mythos 5.1' (the two are explicitly 'the same model, but with different levels of safeguards'), so scores above apply to both; Mythos 5.1 is therefore not recorded as a separate entry. Mythos 5.1 remains restricted to vetted cyberdefense/life-sciences partners via trusted access programs (not public). The same comparison table lists a 'Claude Opus 5' column (system card dated July 24, 2026 per public reporting), confirming the Opus numbered line continued past 4.8 in parallel with the Fable/Mythos lineage; it is not separately researched/recorded in this file given the time budget for this pass. GPQA Diamond, MMLU, MATH and HumanEval are no longer reported by Anthropic for this generation (GPQA was declared saturated as of the Fable 5/Mythos 5 system card); Terminal-Bench has moved to versions 4.0 and 'Science 0.1', neither comparable to this basket's Terminal-Bench 2.0, so no terminal-bench-2 score is recorded."
+    }
+  ]
+}
