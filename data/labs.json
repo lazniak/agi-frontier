@@ -21,7 +21,8 @@
     "flagship_hints": [
       "^GPT-\\d",
       "^o\\d",
-      "GPT-\\d+(\\.\\d+)?(?!.*(mini|nano))"
+      "GPT-\\d+(\\.\\d+)?(?!.*(mini|nano))",
+      "^OpenAI o\\d"
     ]
   },
   {
@@ -45,7 +46,8 @@
     ],
     "flagship_hints": [
       "Claude (Opus|Fable|Mythos)",
-      "Claude \\d(\\.\\d)? Opus"
+      "Claude \\d(\\.\\d)? Opus",
+      "^Claude (1\\.3|2|2\\.1|3\\.5 Sonnet|3\\.7 Sonnet)$"
     ]
   },
   {
@@ -74,7 +76,9 @@
     ],
     "flagship_hints": [
       "Gemini \\d(\\.\\d)? (Pro|Ultra)",
-      "Gemini \\d(\\.\\d)? Deep Think"
+      "Gemini \\d(\\.\\d)? Deep Think",
+      "^PaLM \\d",
+      "^Gemini \\d(\\.\\d)?$"
     ]
   },
   {
@@ -97,7 +101,8 @@
       }
     ],
     "flagship_hints": [
-      "Grok \\d(\\.\\d)?(?!.*(mini|fast))"
+      "Grok \\d(\\.\\d)?(?!.*(mini|fast))",
+      "^Grok-\\d(\\.\\d)?$"
     ]
   },
   {
@@ -146,7 +151,8 @@
     ],
     "flagship_hints": [
       "DeepSeek-V\\d",
-      "DeepSeek-R\\d"
+      "DeepSeek-R\\d",
+      "^DeepSeek LLM"
     ]
   },
   {
@@ -175,7 +181,8 @@
     ],
     "flagship_hints": [
       "Qwen\\d(\\.\\d)?-?(Max|Plus)?",
-      "Qwen \\d(\\.\\d)? Max"
+      "Qwen \\d(\\.\\d)? Max",
+      "^Qwen-\\d+B$"
     ]
   },
   {
@@ -198,7 +205,8 @@
       }
     ],
     "flagship_hints": [
-      "Kimi K\\d(\\.\\d)?"
+      "Kimi K\\d(\\.\\d)?",
+      "^Kimi Chat$"
     ]
   },
   {
@@ -251,7 +259,10 @@
     "flagship_hints": [
       "Mistral Large \\d",
       "Mistral Medium \\d",
-      "Magistral"
+      "Magistral",
+      "^Mistral 7B$",
+      "^Mixtral",
+      "^Mistral Large$"
     ]
   }
 ]
