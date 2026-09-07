@@ -232,13 +232,20 @@ constants in the code.
 #### 6.1 Cadence
 
 For each lab, the gaps in days between consecutive flagship launches (same-day launches merged)
-are modelled as log-normal. A cross-lab prior (mean and population standard deviation of the
-log-gaps pooled over every lab) is shrunk into each lab with w = 2 pseudo-observations:
+are modelled as log-normal. Labs speed up: a gap observed in 2020 says less about 2026 than a
+gap observed last year, so every gap is weighted by its recency, w_i = 0.5^(age_i / 730 d),
+where age is measured from the later launch of the pair. With n_eff = (Σw)² / Σw² (Kish's
+effective sample size), a cross-lab prior (weighted mean and population standard deviation of
+the log-gaps pooled over every lab) is shrunk into each lab with w = 2 pseudo-observations:
 
-    μ_lab = (n · mean(log x) + w · μ_prior) / (n + w)
-    σ_lab = √((n · var(log x) + w · σ_prior²) / (n + w))
+    μ_lab = (n_eff · mean_w(log x) + w · μ_prior) / (n_eff + w)
+    σ_lab = √((n_eff · var_w(log x) + w · σ_prior²) / (n_eff + w))
 
-A lab with one release inherits the prior; a lab with none gets no forecast.
+A lab with one release inherits the prior; a lab with none gets no forecast. Because labs
+accelerate, a pooled **drift** of log-gaps over time (a recency-weighted ridge regression across
+every lab) moves each lab's μ to the forecast date, clamped to ±1 in log-days. Finally every
+window is **stretched about its median** by the conformal scale s of §7: the q-quantile becomes
+m · (q / m)^s with m the conditional median, so s widens the circle without moving its centre.
 
 #### 6.2 The shrinking circle
 
@@ -247,7 +254,9 @@ law T | T > t₀. Its q-th quantile is F⁻¹(F(t₀) + q·(1 − F(t₀))). On 
 on the conditional **median** and its diameter is the **16th–84th percentile window** on the time
 axis. As t₀ grows the mass below t₀ is cut away, so the window narrows: the closer a launch, the
 smaller the circle. This is not a drawing convention; it is a property of the conditional law, and
-a unit test asserts that the window is non-increasing in t₀ for fixed (μ, σ). When a lab announces
+a unit test asserts that the window is non-increasing in t₀ over the lab's typical cadence. Once
+a lab is overdue by its own history the heavy tail of the log-normal takes over and the window
+opens again — the model becomes honestly less sure, and the circle grows. When a lab announces
 a launch window, that window replaces the statistical band (the circle collapses to it, drawn in
 grey) and the chain continues from its midpoint.
 
@@ -283,10 +292,16 @@ published next to the predictions:
 - For each lab the k = 1 prediction made at D is compared with the lab's first flagship launched
   after D: error in days (actual − median), whether the actual fell inside the 68 % and the
   90 % windows, and the error in θ between the predicted and the eventually fitted ability.
-- The report gives n, coverage at 68 % and 90 % (a calibrated forecast hits about 0.68 and
-  0.90), mean and median absolute error, bias, θ error, a per-lab table, and a **calibration
-  curve**: for each nominal quantile q ∈ {0.1, …, 0.9}, the share of actual launches that fell
-  before the q-quantile date. Perfect calibration is the diagonal.
+- The report gives n (rows with both a prediction and an outcome; rows where the lab had no
+  history yet are counted apart as unforecastable), coverage at 68 % and 90 % (a calibrated
+  forecast hits about 0.68 and 0.90), mean and median absolute error, bias, θ error, a per-lab
+  table, and a **calibration curve**: for each nominal quantile q ∈ {0.1, …, 0.9}, the share of
+  actual launches that fell before the q-quantile date. Perfect calibration is the diagonal.
+- **Conformal scale.** The backtest is not only a report card; it closes the loop. The stretch s
+  of §6.1 is chosen on the grid 1.0, 1.1, …, 3.0 to minimise |coverage₆₈ − 0.68| +
+  |coverage₉₀ − 0.90| over the whole replay, and the chosen value is published with the report.
+  Every window on the chart is therefore as wide as the model's own track record says it must
+  be — no wider, no narrower — while its centre stays the model's honest median.
 
 On the chart, dragging the NOW rule into the past replays exactly this: the forecast as it would
 have been made on that day, and the launches that then happened, joined by a hairline coloured
