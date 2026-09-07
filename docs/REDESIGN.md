@@ -565,3 +565,50 @@ Contract edits (types, schema, `index.html` containers `[data-legend-dock]`, `[d
 task: `bun run typecheck && bun run test && bun run validate` from the root, plus
 `bun run --filter @agi/web build` for web tasks; T41/T42 also run the Playwright shots
 (`C:\Users\lazni\AppData\Local\Temp\agi-shots\chart2.mjs`) and look at the PNGs.
+
+### 12.8 Traffic-scaled research cadence (T47 — worker + deploy + web panel; runs after T40–T45)
+
+User request (2026-09-07 evening): "research as often as people actually visit — weekly by
+default, daily once we have 10 visitors a day, graded nicely."
+
+- **Signal.** The web container's nginx writes an access log with the real client address
+  (`$http_x_forwarded_for`, set by the host nginx) to a named volume `weblogs` that the worker
+  mounts read-write at `/logs`. A *visit* is a `GET /latest.json` (one per page load; verified: the 30-s
+  progress refresh in `web/src/ui/progress.ts` repaints from memory and fetches nothing). The worker ingests
+  the log every loop iteration (`worker/src/traffic.ts`): per UTC day it keeps a set of
+  `sha256(ip + ':' + day)` truncated to 12 hex chars — **no raw addresses are stored** — for the
+  last 14 days in the run state (`traffic.days: { date, unique }[]` once a day is closed; the open
+  day keeps its hash set), then **truncates** the log (nginx opens it `O_APPEND`, so truncation is
+  safe; this is the copytruncate pattern). Bots are excluded by user-agent (`bot|crawl|spider|
+  curl|wget|python-requests|Go-http|HeadlessChrome`).
+- **Cadence.** `visitorsPerDay` = mean of the last 7 closed days (or fewer while young). Tiers:
+
+  | visitors / day | research every | tier id |
+  |---|---|---|
+  | < 3 | 7 d (default) | `weekly` |
+  | 3 – 9 | 3 d | `often` |
+  | 10 – 29 | 24 h | `daily` |
+  | 30 – 99 | 12 h | `twice-daily` |
+  | ≥ 100 | 6 h | `hourly-ish` |
+
+  Hysteresis: a tier steps up as soon as the average qualifies, steps down only after two
+  consecutive days below the band (so a quiet weekend does not flip it). `shouldBackfill`/
+  `shouldArena` in `loop.ts` take the interval from the cadence instead of the fixed week; the
+  first run after deploy still happens immediately (null stamps). A monthly cost guard
+  `RESEARCH_MONTHLY_USD` (default 60) computed from `usage_total` month-to-date forces `weekly`
+  and flags `cadence.capped = true` when exceeded.
+- **Contract** (`WorkerState.researcher.cadence`, optional): `{ tier, interval_hours,
+  visitors_per_day, days_measured, capped, next_research_at }`; `WorkerState.traffic` is not
+  published beyond that summary (privacy).
+- **Web.** Researcher panel: "Research cadence — every 24 h · 14 visitors/day (7-day mean) ·
+  daily tier" + a second thin progress line for the next research run under the poll bar (the
+  header bar keeps the hourly poll). Method copy: one sentence that visits are counted as daily
+  unique hashed addresses from the server log, no analytics script, no cookies.
+- **Deploy.** `deploy/web-nginx.conf`: `log_format traffic '$http_x_forwarded_for|$time_iso8601|
+  $request_method|$uri|$status|$http_user_agent'; access_log /var/log/nginx/traffic.log traffic;`
+  (only for `/latest.json` if the conf has a location for it, else global). `docker-compose.yml`:
+  volume `weblogs:/var/log/nginx` on web, `weblogs:/logs` on worker, top-level `volumes: weblogs:`.
+  `.env.example`: `RESEARCH_MONTHLY_USD=60`, `TRAFFIC_LOG=/logs/traffic.log`.
+- **Tests.** Parser (forwarded-for with several addresses takes the first; bots dropped; day
+  boundaries UTC), tier mapping with hysteresis, monthly cap, truncation after ingest (temp file),
+  loop gate uses the cadence.
