@@ -2,7 +2,7 @@
  * Release-date forecast per lab + capability fan. See docs/METHODOLOGY.md §4.
  * Pure functions, no I/O. API frozen; implementation: shared-math task.
  */
-import type { ISODate, LabId, ModelRelease } from './types';
+import type { ISODate, LabId, ModelRelease, ModelTier } from './types';
 import type { IndexFit, ModelIndex } from './frontier-index';
 import { indexFromTheta, thetaFromIndex } from './frontier-index';
 import { addDays, dateToDayNumber, dayNumberToDate, daysBetween } from './timeline';
@@ -21,12 +21,20 @@ export interface ForecastOptions {
   asOf: ISODate;
   /** Pseudo-observations pulling a lab's (μ, σ) toward the cross-lab prior (default 2). */
   priorWeight?: number;
-  /** Horizon in days for chained predictions (default 1095 = 3 years). */
-  horizonDays?: number;
-  /** Max chained predicted releases per lab (default 5). */
-  maxReleases?: number;
+  /**
+   * Horizon in days for chained predictions. Default: unbounded — the chain runs until
+   * `maxReleases` predictions exist (REDESIGN §4). When given, it caps the chain as before.
+   */
+  horizonDays?: number | undefined;
+  /** Max chained predicted releases per lab (default 5, hard cap 24). */
+  maxReleases?: number | undefined;
   /** Number of most recent releases used for the capability trend (default 5, min 2). */
-  trendPoints?: number;
+  trendPoints?: number | undefined;
+  /**
+   * Which lineup tiers drive the cadence, the anchor release and the capability trend
+   * (REDESIGN §3/§4: flagship only by default — the forecast cadence is a flagship cadence).
+   */
+  tierFilter?: ModelTier[] | undefined;
 }
 
 /** Log-normal parameters of inter-release intervals in days. */
@@ -48,6 +56,9 @@ export interface PredictedRelease {
   /** Expected ability (logit) and index at medianDate. */
   theta: number;
   index: number;
+  /** θ behind `indexLow` / `indexHigh` — the un-clamped capability band (REDESIGN §4). */
+  thetaLow: number;
+  thetaHigh: number;
   /** 10th / 90th percentile of index at medianDate. */
   indexLow: number;
   indexHigh: number;
@@ -96,10 +107,19 @@ export interface FanPoint {
   low: number;
   mid: number;
   high: number;
+  /**
+   * The θ values behind `low` / `mid` / `high` (un-clamped, REDESIGN §4). Optional because
+   * `stages.frontierFan` (T30) also emits FanPoints and fills them on its own schedule;
+   * `capabilityFan` always sets them.
+   */
+  theta?: number | undefined;
+  thetaLow?: number | undefined;
+  thetaHigh?: number | undefined;
 }
 
 /** z for the 90th percentile — the constant published in METHODOLOGY §4. */
-const Z90 = 1.2816;
+export const Z90 = 1.2816;
+
 /** Below this remaining probability mass the lab is "overdue" and the conditional law degenerates. */
 const OVERDUE_EPS = 1e-9;
 /** Offsets are clamped to a century so a pathological σ can never produce an invalid Date. */
@@ -142,11 +162,13 @@ export function lognormalConditionalProb(mu: number, sigma: number, t0: number, 
   return clamp((lognormalCdf(mu, sigma, t0 + horizon) - f0) / (1 - f0), 0, 1);
 }
 
-/** Distinct release dates of a lab, ascending. Same-day launches count as one event. */
-function eventDates(releases: ModelRelease[], lab: LabId, asOf: ISODate): ISODate[] {
+/** Distinct release dates of a lab, ascending, restricted to tiers. Same-day launches count as one event. */
+function eventDates(releases: ModelRelease[], lab: LabId, asOf: ISODate, tiers: Set<ModelTier>): ISODate[] {
   const dates = new Set<ISODate>();
   for (const r of releases) {
-    if (r.lab === lab && r.status === 'released' && r.date <= asOf) dates.add(r.date);
+    if (r.lab === lab && r.status === 'released' && r.date <= asOf && tiers.has(r.tier ?? 'flagship')) {
+      dates.add(r.date);
+    }
   }
   return [...dates].sort();
 }
@@ -161,14 +183,24 @@ function intervalsOf(dates: ISODate[]): number[] {
   return out;
 }
 
-/** Pooled prior over all labs' log-intervals (released flagships, date <= asOf). */
-export function cadencePrior(releases: ModelRelease[], asOf: ISODate): CadencePrior {
+/**
+ * Pooled prior over all labs' log-intervals (released flagships by default, date <= asOf).
+ * `tiers` restricts which lineup tiers feed the prior (default `['flagship']`, REDESIGN §3).
+ */
+export function cadencePrior(
+  releases: ModelRelease[],
+  asOf: ISODate,
+  tiers: ModelTier[] = ['flagship'],
+): CadencePrior {
+  const tierSet = new Set<ModelTier>(tiers);
   const labs = new Set<LabId>();
-  for (const r of releases) if (r.status === 'released' && r.date <= asOf) labs.add(r.lab);
+  for (const r of releases) {
+    if (r.status === 'released' && r.date <= asOf && tierSet.has(r.tier ?? 'flagship')) labs.add(r.lab);
+  }
 
   const logs: number[] = [];
   for (const lab of labs) {
-    for (const d of intervalsOf(eventDates(releases, lab, asOf))) logs.push(Math.log(d));
+    for (const d of intervalsOf(eventDates(releases, lab, asOf, tierSet))) logs.push(Math.log(d));
   }
   if (logs.length === 0) return { mu: DEFAULT_PRIOR_MU, sigma: DEFAULT_PRIOR_SIGMA, n: 0 };
   return {
@@ -229,6 +261,17 @@ function buildTrend(points: ModelIndex[], globalSigma: number): CapabilityTrend 
   return { slopePerDay, intercept, residualSigma, slopeSe, n };
 }
 
+/** Default cap on chained predicted releases (REDESIGN §4). */
+export const MAX_RELEASES_CAP = 24;
+
+/**
+ * Timing-window width of a prediction in days: `p84 − p16` of the conditional log-normal
+ * (REDESIGN §4 — the circle drawn on the chart shrinks as this shrinks).
+ */
+export function windowDaysOf(pred: PredictedRelease): number {
+  return Math.max(0, daysBetween(pred.p16Date, pred.p84Date));
+}
+
 export function forecastLab(
   lab: LabId,
   releases: ModelRelease[],
@@ -238,12 +281,15 @@ export function forecastLab(
 ): LabForecast {
   const asOf = opts.asOf;
   const priorWeight = opts.priorWeight ?? 2;
-  const horizonDays = opts.horizonDays ?? 1095;
-  const maxReleases = opts.maxReleases ?? 5;
+  const maxReleases = Math.min(Math.max(1, opts.maxReleases ?? 5), MAX_RELEASES_CAP);
   const trendPoints = Math.max(2, opts.trendPoints ?? 5);
+  const tiers = new Set<ModelTier>(opts.tierFilter ?? ['flagship']);
 
+  const tierOfRelease = (r: ModelRelease): ModelTier => r.tier ?? 'flagship';
   const labReleased = releases
-    .filter((r) => r.lab === lab && r.status === 'released' && r.date <= asOf)
+    .filter(
+      (r) => r.lab === lab && r.status === 'released' && r.date <= asOf && tiers.has(tierOfRelease(r)),
+    )
     .slice()
     .sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : a.id.localeCompare(b.id)));
 
@@ -264,7 +310,7 @@ export function forecastLab(
   }
 
   // --- cadence -----------------------------------------------------------------------
-  const intervalsDays = intervalsOf(eventDates(releases, lab, asOf));
+  const intervalsDays = intervalsOf(eventDates(releases, lab, asOf, tiers));
   const n = intervalsDays.length;
   const logs = intervalsDays.map(Math.log);
   const meanLog = n > 0 ? mean(logs) : 0;
@@ -309,13 +355,16 @@ export function forecastLab(
   const thetaFloor = thetaFromIndex(Math.max(0.5, lastIndex - 5));
 
   const capabilityAt = (date: ISODate) => {
-    if (!trend) return { theta: 0, index: 0, indexLow: 0, indexHigh: 0 };
+    if (!trend) return { theta: 0, thetaLow: 0, thetaHigh: 0, index: 0, indexLow: 0, indexHigh: 0 };
     const theta = clamp(trend.intercept + trend.slopePerDay * dateToDayNumber(date), thetaFloor, thetaCeiling);
     const dd = Math.max(0, daysBetween(lastRel.date, date));
-    const half = Z90 * (trend.residualSigma + trend.slopeSe * dd);
+    // Variance adds in quadrature (REDESIGN §4): σ²_res + (se_b·Δt)².
+    const half = Z90 * Math.sqrt(trend.residualSigma ** 2 + (trend.slopeSe * dd) ** 2);
     return {
       theta,
       index: indexFromTheta(theta),
+      thetaLow: theta - half,
+      thetaHigh: theta + half,
       indexLow: indexFromTheta(theta - half),
       indexHigh: indexFromTheta(theta + half),
     };
@@ -323,7 +372,9 @@ export function forecastLab(
 
   // --- predicted releases ---------------------------------------------------------------
   const next: PredictedRelease[] = [];
-  const withinHorizon = (date: ISODate) => daysBetween(asOf, date) <= horizonDays;
+  const horizonDays = opts.horizonDays;
+  const withinHorizon = (date: ISODate) =>
+    horizonDays === undefined || daysBetween(asOf, date) <= horizonDays;
 
   // An announced model with a future expected_window replaces the statistical k = 1.
   let announced: ModelRelease | undefined;
@@ -425,13 +476,16 @@ export function forecastLab(
 }
 
 export function forecastAll(labIds: LabId[], releases: ModelRelease[], fit: IndexFit, opts: ForecastOptions): LabForecast[] {
-  const prior = cadencePrior(releases, opts.asOf);
+  const tiers = opts.tierFilter ?? ['flagship'];
+  const prior = cadencePrior(releases, opts.asOf, tiers);
   return labIds.map((lab) => forecastLab(lab, releases, fit, prior, opts));
 }
 
 /**
  * Sample the lab's extrapolated capability band from `asOf` to `toDate` every `stepDays`.
- * Band widens with distance: ±(residualSigma + slopeSe·Δt) mapped through σ.
+ * The central θ keeps the forecast ceiling/floor clamps; the band is un-clamped (the index
+ * conversion saturates by itself) and widens in quadrature (REDESIGN §4):
+ * `half = Z90 · √(σ²_res + (se_b·Δt)²)`.
  */
 export function capabilityFan(
   forecast: LabForecast,
@@ -454,12 +508,15 @@ export function capabilityFan(
     const date = dayNumberToDate(d);
     const theta = clamp(trend.intercept + trend.slopePerDay * d, thetaFloor, thetaCeiling);
     const dd = Math.max(0, daysBetween(last.date, date));
-    const half = Z90 * (trend.residualSigma + trend.slopeSe * dd);
+    const half = Z90 * Math.sqrt(trend.residualSigma ** 2 + (trend.slopeSe * dd) ** 2);
     out.push({
       date,
       low: indexFromTheta(theta - half),
       mid: indexFromTheta(theta),
       high: indexFromTheta(theta + half),
+      theta,
+      thetaLow: theta - half,
+      thetaHigh: theta + half,
     });
   }
   return out;

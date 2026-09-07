@@ -1,4 +1,4 @@
-import type { ISODate, LabId, ModelRelease, ReleaseStatus } from './types';
+import type { ISODate, LabId, ModelRelease, ModelTier, ReleaseStatus } from './types';
 import type { IndexFit, ModelIndex } from './frontier-index';
 import { frontierLine } from './frontier-index';
 
@@ -53,10 +53,20 @@ export function releasesAsOf(
     .sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : a.id.localeCompare(b.id)));
 }
 
-/** Latest released flagship per lab as of `asOf`. */
-export function latestPerLab(releases: ModelRelease[], asOf: ISODate): Map<LabId, ModelRelease> {
+/**
+ * Latest released model per lab as of `asOf`, within the given tiers (default flagship only,
+ * REDESIGN §3 — a newer `small` release must not pose as the lab's current flagship).
+ */
+export function latestPerLab(
+  releases: ModelRelease[],
+  asOf: ISODate,
+  tiers: ModelTier[] = ['flagship'],
+): Map<LabId, ModelRelease> {
+  const set = new Set<ModelTier>(tiers);
   const out = new Map<LabId, ModelRelease>();
-  for (const r of releasesAsOf(releases, asOf)) out.set(r.lab, r); // sorted ascending → last write wins
+  for (const r of releasesAsOf(releases, asOf)) {
+    if (set.has(r.tier ?? 'flagship')) out.set(r.lab, r); // sorted ascending → last write wins
+  }
   return out;
 }
 
@@ -87,11 +97,17 @@ export function leadershipStripes(fit: IndexFit): LeadershipStripe[] {
 
 /**
  * Current flagships (latest released per lab as of `asOf`) with their index, sorted descending.
- * Labs without a fitted model are omitted. Implemented by the shared-math task.
+ * `opts.tiers` restricts which lineup tiers may represent a lab (default flagship only —
+ * REDESIGN §3). Labs without a fitted model are omitted.
  */
-export function rankCurrentFlagships(fit: IndexFit, releases: ModelRelease[], asOf: ISODate): ModelIndex[] {
+export function rankCurrentFlagships(
+  fit: IndexFit,
+  releases: ModelRelease[],
+  asOf: ISODate,
+  opts?: { tiers?: ModelTier[] | undefined },
+): ModelIndex[] {
   const out: ModelIndex[] = [];
-  for (const r of latestPerLab(releases, asOf).values()) {
+  for (const r of latestPerLab(releases, asOf, opts?.tiers).values()) {
     const m = fit.models[r.id];
     if (m) out.push(m); // labs whose flagship has no official index score are omitted
   }

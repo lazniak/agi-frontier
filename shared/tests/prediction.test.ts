@@ -377,3 +377,139 @@ describe('forecastAll', () => {
     expect(all[0]!.next.map((p) => p.medianDate)).toEqual(single.next.map((p) => p.medianDate));
   });
 });
+
+/* ------------------------------------------------------------------ T31 additions */
+
+import { MAX_RELEASES_CAP, windowDaysOf, Z90 } from '../src/prediction';
+
+/** A release with an explicit tier (the fixture builder has no tier option). */
+function tiered(id: string, tier: 'mid' | 'small', day: number): ModelRelease {
+  return {
+    ...release(id, 'openai', addDays('2024-01-01', day), [score('a', 68), score('b', 60)]),
+    tier,
+  };
+}
+
+describe('forecastLab — tier filter', () => {
+  test('mid/small releases are excluded from cadence, anchor and trend by default', () => {
+    const releases = fixture([tiered('openai-s', 'small', 280), tiered('openai-m', 'mid', 290)]);
+    const fit = fitOf(releases);
+    const prior = cadencePrior(releases, ASOF);
+
+    const f = forecastLab('openai', releases, fit, prior, { asOf: ASOF });
+    expect(f.intervalsDays).toEqual([100, 100, 100]);
+    expect(f.lastRelease!.release_id).toBe('openai-m3');
+
+    // The tier models are later than m3 but must not move the anchor or the trend.
+    const g = forecastLab('openai', fixture(), fit, prior, { asOf: ASOF });
+    expect(g.mu).toBe(f.mu);
+    expect(g.elapsedDays).toBe(f.elapsedDays);
+    expect(f.trend!.n).toBe(g.trend!.n);
+
+    // An explicit tier filter including mid/small brings them back in. Chronology:
+    // m0(0) m1(100) m2(200) small(280) mid(290) m3(300) — hence [100,100,80,10,10],
+    // and the anchor is still m3, the latest release of the widest filter.
+    const wide = forecastLab('openai', releases, fit, prior, {
+      asOf: ASOF,
+      tierFilter: ['flagship', 'mid', 'small'],
+    });
+    expect(wide.intervalsDays).toEqual([100, 100, 80, 10, 10]);
+    expect(wide.lastRelease!.release_id).toBe('openai-m3');
+  });
+
+  test('cadencePrior gains the same tier default', () => {
+    const releases = fixture([tiered('openai-s', 'small', 280)]);
+    const flagshipOnly = cadencePrior(releases, ASOF);
+    const allTiers = cadencePrior(releases, ASOF, ['flagship', 'small']);
+    expect(allTiers.n).toBe(flagshipOnly.n + 1);
+    expect(flagshipOnly.n).toBe(5);
+  });
+});
+
+describe('forecastLab — unbounded horizon', () => {
+  const releases = fixture();
+  const fit = fitOf(releases);
+  const prior = cadencePrior(releases, ASOF);
+
+  test('no horizonDays gives exactly maxReleases predictions', () => {
+    expect(forecastLab('openai', releases, fit, prior, { asOf: ASOF }).next).toHaveLength(5);
+    expect(
+      forecastLab('openai', releases, fit, prior, { asOf: ASOF, maxReleases: 9 }).next,
+    ).toHaveLength(9);
+  });
+
+  test('maxReleases above the hard cap is clamped to 24', () => {
+    expect(
+      forecastLab('openai', releases, fit, prior, { asOf: ASOF, maxReleases: 100 }).next,
+    ).toHaveLength(MAX_RELEASES_CAP);
+    expect(MAX_RELEASES_CAP).toBe(24);
+  });
+
+  test('a given horizonDays still stops the chain early', () => {
+    const f = forecastLab('openai', releases, fit, prior, { asOf: ASOF, horizonDays: 250 });
+    expect(f.next.length).toBeGreaterThan(0);
+    for (const p of f.next) expect(daysBetween(ASOF, p.medianDate)).toBeLessThanOrEqual(250);
+  });
+});
+
+describe('conditional window shrink (REDESIGN §4 unit test)', () => {
+  test('p84 - p16 of T | T > t0 is non-increasing over a grid of elapsed days', () => {
+    // mu = ln 90, sigma = 0.3: verified shrinking range (the extreme log-normal tail
+    // eventually re-widens the law, which is outside the grid the chart can reach).
+    const mu = Math.log(90);
+    const sigma = 0.3;
+    let prev = Number.POSITIVE_INFINITY;
+    for (let t0 = 0; t0 <= 180; t0 += 15) {
+      const p16 = lognormalConditionalQuantile(mu, sigma, t0, 0.16);
+      const p84 = lognormalConditionalQuantile(mu, sigma, t0, 0.84);
+      const w = p84 - p16;
+      expect(w).toBeLessThanOrEqual(prev + 1e-12);
+      prev = w;
+    }
+  });
+
+  test('windowDaysOf reads p84 - p16 off a prediction', () => {
+    const releases = fixture();
+    const fit = fitOf(releases);
+    const prior = cadencePrior(releases, ASOF);
+    const f = forecastLab('openai', releases, fit, prior, { asOf: ASOF });
+    for (const p of f.next) {
+      expect(windowDaysOf(p)).toBe(daysBetween(p.p16Date, p.p84Date));
+    }
+  });
+});
+
+describe('capabilityFan — quadrature width and theta fields', () => {
+  test('fan half-width is Z90 * sqrt(sigma_res^2 + (slopeSe*dd)^2) at one point', () => {
+    const releases = fixture();
+    const fit = fitOf(releases);
+    const prior = cadencePrior(releases, ASOF);
+    const f = forecastLab('openai', releases, fit, prior, { asOf: ASOF });
+    const trend = f.trend!;
+    const toDate = addDays(ASOF, 300);
+    const fan = capabilityFan(f, { asOf: ASOF, toDate, stepDays: 300 });
+    const point = fan[fan.length - 1]!;
+
+    const dd = daysBetween(f.lastRelease!.date, toDate);
+    const expectedHalf = Z90 * Math.sqrt(trend.residualSigma ** 2 + (trend.slopeSe * dd) ** 2);
+    expect(point.thetaHigh! - point.theta!).toBeCloseTo(expectedHalf, 12);
+    expect(point.theta! - point.thetaLow!).toBeCloseTo(expectedHalf, 12);
+    expect(point.thetaHigh!).toBeGreaterThan(point.theta!);
+    expect(point.thetaLow!).toBeLessThan(point.theta!);
+  });
+
+  test('predicted releases carry thetaLow/thetaHigh consistent with the index band', () => {
+    const releases = fixture();
+    const fit = fitOf(releases);
+    const prior = cadencePrior(releases, ASOF);
+    const f = forecastLab('openai', releases, fit, prior, { asOf: ASOF, maxReleases: 3 });
+    for (const p of f.next) {
+      expect(typeof p.thetaLow).toBe('number');
+      expect(typeof p.thetaHigh).toBe('number');
+      expect(p.thetaLow!).toBeLessThan(p.theta);
+      expect(p.thetaHigh!).toBeGreaterThan(p.theta);
+      expect(p.indexLow).toBeLessThanOrEqual(p.index);
+      expect(p.indexHigh).toBeGreaterThanOrEqual(p.index);
+    }
+  });
+});

@@ -13,6 +13,7 @@ import {
 } from '../src/timeline';
 import { fitFrontierIndex, frontierLine } from '../src/frontier-index';
 import { benchmark, release, score } from './test-helpers';
+import type { ModelRelease } from '../src/types';
 
 const BMS = [benchmark('a'), benchmark('b'), benchmark('c')];
 
@@ -113,5 +114,39 @@ describe('releasesAsOf / latestPerLab', () => {
     expect(latest.get('openai')!.id).toBe('openai-b');
     expect(latest.get('anthropic')!.id).toBe('anthropic-a');
     expect(latest.has('meta')).toBe(false);
+  });
+});
+
+/* ------------------------------------------------------------------ T31 additions */
+
+describe('latestPerLab — tier awareness', () => {
+  // openai-new is a flagship; openai-small is newer but a small tier model.
+  const releases = [
+    release('openai-new', 'openai', '2025-01-01', [score('a', 60), score('b', 50), score('c', 45)]),
+    release('openai-small', 'openai', '2025-02-01', [score('a', 30), score('b', 25), score('c', 20)]),
+    release('anthropic-1', 'anthropic', '2024-11-01', [score('a', 80), score('b', 70), score('c', 65)]),
+  ];
+  // Give the small model its tier without tripping exactOptionalPropertyTypes in the builder.
+  (releases[1] as ModelRelease).tier = 'small';
+  const fit = fitFrontierIndex(releases, BMS);
+
+  test('a newer small release does not pose as the flagship', () => {
+    const latest = latestPerLab(releases, '2025-03-01');
+    expect(latest.get('openai')!.id).toBe('openai-new');
+  });
+
+  test('an explicit tier list brings the small model back', () => {
+    const latest = latestPerLab(releases, '2025-03-01', ['flagship', 'small']);
+    expect(latest.get('openai')!.id).toBe('openai-small');
+  });
+
+  test('rankCurrentFlagships ignores the small model by default', () => {
+    const rows = rankCurrentFlagships(fit, releases, '2025-03-01');
+    expect(rows.map((r) => r.release_id)).toEqual(['anthropic-1', 'openai-new']);
+  });
+
+  test('rankCurrentFlagships accepts a tiers override', () => {
+    const rows = rankCurrentFlagships(fit, releases, '2025-03-01', { tiers: ['small'] });
+    expect(rows.map((r) => r.release_id)).toEqual(['openai-small']);
   });
 });
