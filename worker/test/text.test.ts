@@ -200,3 +200,14 @@ describe('sha256 / truncate', () => {
     expect(cut.endsWith('[...truncated]')).toBe(true);
   });
 });
+
+describe('quoteMatches — alphanumeric pass', () => {
+  test('matches a markdown table row against a plain-text rendering of the same table', () => {
+    const page = 'Benchmark GPT-4 Claude 3 Opus Gemini Ultra MMLU 86.4% 86.8% 83.7% GPQA 35.7% 50.4% 47.9%';
+    expect(quoteMatches(page, '| MMLU | 86.4% | 86.8% | 83.7% |')).toBe(true);
+    expect(quoteMatches(page, '| GPQA | 35.7% | 50.4% | 47.9% |')).toBe(true);
+  });
+  test('does not match short alphanumeric runs', () => {
+    expect(quoteMatches('score 81.3 and 86.2 elsewhere', '| X | 81.3% |')).toBe(false);
+  });
+});

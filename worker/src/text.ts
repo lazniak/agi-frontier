@@ -68,10 +68,10 @@ export function stripLinkDecoration(s: string): string {
 /**
  * True when `quote` occurs in `pageText` after normalisation.
  *
- * Three passes, cheapest first: exact (normalised), thousands-separators removed, and — for
- * quotes long enough that a collision is implausible — spaces removed as well (HTML-to-text
- * extraction frequently inserts or drops a space inside a sentence). All three run a second
- * time on both sides with Markdown link syntax and "(opens in a new window)" stripped out.
+ * Four passes, cheapest first: exact (normalised), thousands-separators removed, spaces removed
+ * (for quotes ≥ 12 chars), and letters+digits only (for quotes with ≥ 16 alphanumerics — table
+ * rows and chart payloads rendered differently by another extractor). All run a second time on
+ * both sides with Markdown link syntax and "(opens in a new window)" stripped out.
  */
 export function quoteMatches(pageText: string, quote: string | undefined | null): boolean {
   const quoteNorm = normaliseForMatch(quote ?? '');
@@ -90,7 +90,16 @@ function contains(page: string, quote: string): boolean {
   const page2 = stripNumberCommas(page);
   const quote2 = stripNumberCommas(quote);
   if (page2.includes(quote2)) return true;
-  return quote.length >= 12 && stripSpaces(page2).includes(stripSpaces(quote2));
+  if (quote.length >= 12 && stripSpaces(page2).includes(stripSpaces(quote2))) return true;
+  // Fourth pass: letters and digits only. Markdown table rows ("| MMLU | 81.3% | 86.2% |") and
+  // chart-payload quotes survive a different renderer of the same page only in this form.
+  // Requires a long enough alphanumeric run so that a collision is implausible.
+  const quote3 = alnumOnly(quote2);
+  return quote3.length >= 16 && alnumOnly(page2).includes(quote3);
+}
+
+function alnumOnly(s: string): string {
+  return s.replace(/[^a-z0-9.]/g, "");
 }
 
 /** Number spellings we accept as "the quote contains the value". */
