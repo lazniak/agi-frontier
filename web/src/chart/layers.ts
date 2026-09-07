@@ -4,11 +4,11 @@
  */
 import { select, type Selection } from 'd3-selection';
 import { curveMonotoneX, curveStepAfter, line } from 'd3-shape';
-import type { LeadershipStripe, ModelRelease } from '@agi/shared';
+import { ratingFromTheta, type LeadershipStripe, type ModelRelease } from '@agi/shared';
 import type { LabView, SeriesPoint } from '../data';
 import { fmtDate, fmtIndex } from '../ui/format';
 import { markerTooltip, releaseTooltip, stripeTooltip, tickTooltip } from './tooltip';
-import { fmtTick, timeTicks, toDate, valueTicks } from './scales';
+import { timeTicks, toDate, valueTicks } from './scales';
 import { ANNOUNCED, DIM_LINE, DIM_POINT, INK, type RenderCtx } from './types';
 
 export type G = Selection<SVGGElement, unknown, null, undefined>;
@@ -23,7 +23,7 @@ export function drawGrid(g: G, r: RenderCtx): void {
   const yTicks = valueTicks(y, geom);
 
   // horizontal rules
-  const rules = g.selectAll<SVGLineElement, number>('line.grid-h').data(yTicks, (d) => d);
+  const rules = g.selectAll<SVGLineElement, { theta: number; label: string }>('line.grid-h').data(yTicks, (d) => d.label);
   rules.exit().remove();
   rules
     .enter()
@@ -32,10 +32,12 @@ export function drawGrid(g: G, r: RenderCtx): void {
     .merge(rules)
     .attr('x1', geom.x0)
     .attr('x2', geom.x1)
-    .attr('y1', (d) => y(d))
-    .attr('y2', (d) => y(d));
+    .attr('y1', (d) => y(indexFromThetaOf(d.theta)))
+    .attr('y2', (d) => y(indexFromThetaOf(d.theta)));
 
-  const yLabels = g.selectAll<SVGTextElement, number>('text.grid-y').data(yTicks, (d) => d);
+  // The tick numbers live in the right-hand ladder gutter (drawLadder); the left edge keeps a
+  // bare axis without duplicated labels.
+  const yLabels = g.selectAll<SVGTextElement, { theta: number; label: string }>('text.grid-y').data(yTicks, (d) => d.label);
   yLabels.exit().remove();
   yLabels
     .enter()
@@ -44,8 +46,8 @@ export function drawGrid(g: G, r: RenderCtx): void {
     .attr('text-anchor', 'end')
     .merge(yLabels)
     .attr('x', geom.x0 - 10)
-    .attr('y', (d) => y(d) + 3.5)
-    .text((d) => fmtTick(d));
+    .attr('y', (d) => y(indexFromThetaOf(d.theta)) + 3.5)
+    .text((d) => d.label);
 
   // vertical rules + date labels
   const cols = g.selectAll<SVGLineElement, { date: Date }>('line.grid-v').data(ticks, (d) => String(d.date.getTime()));
@@ -79,22 +81,20 @@ export function drawGrid(g: G, r: RenderCtx): void {
     .attr('x', geom.x0)
     .attr('y', geom.y1 - 22)
     .attr('text-anchor', 'start')
-    .text(y.mode === 'logit' ? 'Frontier Index · logit scale' : 'Frontier Index');
+    .text(y.mode === 'rating' ? 'Frontier Rating · equal steps are equal odds ratios' : 'Frontier Index · 100 is the asymptote');
 
-  // What the top of the scale means. Drawn only when 100 is actually on screen.
-  const dom = y.domain();
+  // What the top of the scale means on the index reading. The rating axis is unbounded — no
+  // note, the ladder gutter tells the story instead.
   const sat = g.select<SVGTextElement>('text.saturation-note').empty()
     ? g.append('text').attr('class', 'saturation-note')
     : g.select<SVGTextElement>('text.saturation-note');
-  const showSat = !geom.compact && (y.mode === 'logit' || (dom[1] ?? 100) >= 99.5);
-  // Left-hand side: the top-right of the plot belongs to the forecast, and 100 is empty over there.
-  // Hidden with `display`, not `opacity` — the stylesheet owns the latter and would win.
+  const showSat = !geom.compact && y.mode === 'index' && (y.domain()[1] ?? 0) >= 99;
   sat
     .attr('x', geom.x0 + 7)
-    .attr('y', (y.mode === 'logit' ? geom.y1 : y(100)) + 14)
+    .attr('y', geom.y1 + 14)
     .attr('text-anchor', 'start')
     .attr('display', showSat ? null : 'none')
-    .text(y.mode === 'logit' ? 'Equal steps are equal odds ratios · 100 is the asymptote' : 'Saturation of the basket');
+    .text('Saturation of the basket');
 }
 
 /* ----------------------------------------------------------------- stripes */
@@ -215,27 +215,11 @@ export function drawLines(g: G, r: RenderCtx): void {
   if (env.empty()) env = g.append('path').attr('class', 'frontier-line').attr('pointer-events', 'none');
   env.attr('d', knots.length ? (step(knots) ?? '') : '');
 
-  // dotted continuation beyond "now", following the leading lab's fan median
-  const leaderId = computed.rankings[0]?.lab;
-  const leader = leaderId ? computed.byLab.get(leaderId) : undefined;
-  let running = last?.index ?? 0;
-  const leaderFan = leader ? (r.longRange ? leader.fan : leader.fanNear) : [];
-  const future = leaderFan
-    .filter((p) => p.date >= computed.asOf)
-    .map((p) => {
-      running = Math.max(running, p.mid);
-      return { d: toDate(p.date), v: running };
-    });
-
-  let fut = g.select<SVGPathElement>('path.frontier-future');
-  if (fut.empty()) fut = g.append('path').attr('class', 'frontier-future').attr('pointer-events', 'none');
-  const smooth = line<{ d: Date; v: number }>()
-    .x((p) => x(p.d))
-    .y((p) => y(p.v))
-    .curve(curveStepAfter);
-  fut.attr('d', future.length > 1 ? (smooth(future) ?? '') : '');
-
+  // The dotted continuation beyond "now" is the frontier trend fan's median, drawn yellow by
+  // chart/crossings.ts (frontier-fan-median) on top of the grey band - not duplicated here.
   void ctx;
+  void ratingFromTheta;
+  void step;
 }
 
 /* ------------------------------------------------------------------ points */
@@ -287,7 +271,7 @@ export function drawPoints(g: G, r: RenderCtx): void {
     .attr('stroke', (d) => (d.mi.qualified ? '#fff' : colorOf(d)))
     .attr('opacity', (d) => (r.focusLab && r.focusLab !== d.release.lab ? DIM_POINT : 1))
     .attr('aria-label', (d) =>
-      `${d.release.name}, ${ctx.labs.get(d.release.lab)?.name ?? d.release.lab}, released ${fmtDate(d.release.date)}, Frontier Index ${fmtIndex(d.mi.index)}${
+      `${d.release.name}, ${ctx.labs.get(d.release.lab)?.name ?? d.release.lab}, released ${fmtDate(d.release.date)}, rating ${Math.round(d.mi.rating)}, index ${fmtIndex(d.mi.index)}${
         d.mi.qualified ? '' : ', provisional'
       }. Activate for sources.`,
     )
@@ -569,4 +553,68 @@ export function ensureLayer(svgEl: SVGSVGElement, name: string): G {
   const existing = select(svgEl).select<SVGGElement>(`g.layer-${name}`);
   if (!existing.empty()) return existing;
   return select(svgEl).append('g').attr('class', `layer layer-${name}`);
+}
+
+/* ------------------------------------------------------------------- tiers */
+
+/**
+ * Mid and small releases (REDESIGN §3): small hollow markers in the lab colour, never on the
+ * line, same audit/tooltip interactions as the flagship points. Drawn only when the store's
+ * tier view is `all`.
+ */
+export function drawTiers(g: G, r: RenderCtx): void {
+  const { x, y, computed, ctx } = r;
+  if (r.tierView !== 'all') {
+    g.selectAll('*').remove();
+    return;
+  }
+  const pts: SeriesPoint[] = [];
+  for (const v of computed.labViews) if (r.visible(v.lab.id)) pts.push(...v.tiers);
+
+  const sel = g.selectAll<SVGCircleElement, SeriesPoint>('circle.tier-point').data(pts, (d) => d.mi.release_id);
+  sel.exit().remove();
+  const merged = sel
+    .enter()
+    .append('circle')
+    .attr('r', 2.5)
+    .attr('tabindex', 0)
+    .attr('role', 'button')
+    .merge(sel);
+
+  const colorOf = (d: SeriesPoint): string => ctx.labs.get(d.release.lab)?.color ?? INK;
+  merged
+    .attr('class', (d) => `tier-point${d.mi.release_id === r.selected ? ' is-selected' : ''}`)
+    .attr('data-id', (d) => d.mi.release_id)
+    .attr('data-lab', (d) => d.release.lab)
+    .attr('cx', (d) => x(toDate(d.release.date)))
+    .attr('cy', (d) => y(d.mi.index))
+    .attr('fill', '#fff')
+    .attr('stroke', (d) => colorOf(d))
+    .attr('stroke-width', 1.25)
+    .attr('opacity', (d) => (r.focusLab && r.focusLab !== d.release.lab ? DIM_POINT : 0.9))
+    .attr('aria-label', (d) =>
+      `${d.release.name}, ${ctx.labs.get(d.release.lab)?.name ?? d.release.lab}, ${(d.release.tier ?? 'flagship')} tier, released ${fmtDate(d.release.date)}, rating ${Math.round(d.mi.rating)}, index ${fmtIndex(d.mi.index)}. Activate for sources.`,
+    )
+    .on('pointerenter', function (ev: PointerEvent, d) {
+      r.io.tip(releaseTooltip(ctx, d), ev);
+    })
+    .on('pointermove', (ev: PointerEvent) => r.io.tipMove(ev))
+    .on('pointerleave', () => r.io.tipHide())
+    .on('focus', function (this: SVGCircleElement, _ev: FocusEvent, d) {
+      const box = this.getBoundingClientRect();
+      r.io.tip(releaseTooltip(ctx, d), { clientX: box.left + box.width / 2, clientY: box.top });
+    })
+    .on('blur', () => r.io.tipHide())
+    .on('click', (_ev: PointerEvent, d) => r.io.openAudit(d.mi.release_id))
+    .on('keydown', (ev: KeyboardEvent, d) => {
+      if (ev.key === 'Enter' || ev.key === ' ') {
+        ev.preventDefault();
+        r.io.openAudit(d.mi.release_id);
+      }
+    });
+}
+
+/** theta → the index the y scale reads; local copy of 100·sigma(theta). */
+function indexFromThetaOf(theta: number): number {
+  return 100 / (1 + Math.exp(-theta));
 }

@@ -1,21 +1,19 @@
 /**
- * Forecast layer: the yellow capability fan, the dashed median path and one circle per
- * predicted release whose *diameter* is the 16th–84th percentile window on the time axis.
+ * Forecast layer: the yellow capability fans, the dashed medians and one circle per predicted
+ * release whose *diameter* is the 16th–84th percentile window on the time axis (REDESIGN §4).
  *
- * Ten labs forecast into the same three months, so ten fans and ten circles land in one
- * corner and cancel each other out. The layer therefore draws two tiers:
+ * Two changes from v1: the fans are drawn to whatever the current x-domain needs (recomputed on
+ * zoom/pan, memoised by `(lab, asOf, toDate)`), and the chain depth follows the store's forecast
+ * mode — `next` draws k = 1 per lab with the spotlight logic, `long` draws the chain (up to 24)
+ * with `chainOpacity`. Nothing is cut at a fixed horizon; the visible x-domain decides.
  *
- *  - **spotlight** labs (the three with the highest P(30 d), plus whichever lab the reader is
- *    looking at) get the full treatment — fan, dashed median, window circle;
- *  - every other lab gets a *whisker*: a thin bar from the 16th to the 84th percentile date at
- *    the lab's expected index, with a dot on the median. Same information, a tenth of the ink.
- *
- * Fills are drawn opaque inside a group that carries the opacity, so the union of all fans
- * sits at exactly the documented 14 % however many are on. Strokes stay outside that group.
+ * Ten labs forecast into the same months, so non-spotlight labs get a *whisker* — a thin bar
+ * from the 16th to the 84th percentile date at the lab's expected theta, with a dot on the
+ * median. Same information, a tenth of the ink.
  */
 import { area, curveMonotoneX, line } from 'd3-shape';
 import type { FanPoint, LabId, PredictedRelease } from '@agi/shared';
-import type { LabView } from '../data';
+import { fanHighTheta, fanLowTheta, fanMidTheta, type LabView } from '../data';
 import { predictionTooltip } from './tooltip';
 import { toDate } from './scales';
 import { ANNOUNCED, DIM_LINE, PREDICT, chainOpacity, type RenderCtx } from './types';
@@ -66,10 +64,6 @@ function sub(g: G, cls: string, attrs: Record<string, string> = {}): G {
   return s as unknown as G;
 }
 
-function announcedLed(v: LabView): boolean {
-  return v.predictions[0]?.source === 'announced';
-}
-
 /**
  * Which labs are drawn in full. The `SPOTLIGHT_COUNT` visible labs with the highest P(30 d),
  * always joined by the focused lab; when few labs are on, all of them.
@@ -99,18 +93,17 @@ export function drawFans(g: G, r: RenderCtx): void {
 
   const band = area<FanPoint>()
     .x((d) => x(toDate(d.date)))
-    .y0((d) => y(d.low))
-    .y1((d) => y(d.high))
+    .y0((d) => y(idx(fanLowTheta(d))))
+    .y1((d) => y(idx(fanHighTheta(d))))
     .curve(curveMonotoneX);
 
   const mid = line<FanPoint>()
     .x((d) => x(toDate(d.date)))
-    .y((d) => y(d.mid))
+    .y((d) => y(idx(fanMidTheta(d))))
     .curve(curveMonotoneX);
 
-  // The default view draws a fan only as far as the lab's own next release (p95 + 30 days).
-  const fanOf = (v: LabView): typeof v.fan => (r.longRange ? v.fan : v.fanNear);
-  // Fans belong to the spotlight only; the whiskers of the other labs carry their timing.
+  // The next-release view keeps the short fan; the long view lets it run to the x-domain edge.
+  const fanOf = (v: LabView): FanPoint[] => (r.forecast === 'long' ? v.fan : v.fanNear);
   const views = computed.labViews.filter((v) => r.spotlight.has(v.lab.id) && fanOf(v).length > 1);
 
   const fillHost = sub(g, 'fan-fills', { opacity: String(FAN_OPACITY), 'pointer-events': 'none' });
@@ -138,12 +131,28 @@ export function drawFans(g: G, r: RenderCtx): void {
     .attr('opacity', (d) => 0.8 * focusMul(r, d.lab.id));
 }
 
+/** Predicted theta of a release prediction through the shared conversion. */
+function predIndex(p: PredictedRelease): number {
+  return idx(p.theta);
+}
+
+function announcedLed(v: LabView): boolean {
+  return v.predictions[0]?.source === 'announced';
+}
+
+function idx(theta: number): number {
+  return 100 / (1 + Math.exp(-theta));
+}
+
 export function drawPredictions(g: G, r: RenderCtx): void {
   const { x, y, computed, ctx } = r;
   // On a narrow chart a 160 px circle would swallow the plot, so cap against both axes.
   const maxD = Math.min(MAX_D, r.geom.ih * 0.6, Math.max(MIN_D * 3, r.geom.iw * 0.16));
   const circles: CircleDatum[] = [];
   const whiskers: WhiskerDatum[] = [];
+  const dom = x.domain();
+  const xLo = dom[0] ?? new Date(0);
+  const xHi = dom[1] ?? new Date(0);
 
   // "Most likely next": the highest P(30 d) among the labs currently drawn. Its k = 1 circle
   // carries a halo, so the eye lands on the release the model actually expects first.
@@ -162,15 +171,18 @@ export function drawPredictions(g: G, r: RenderCtx): void {
     if (!r.visible(v.lab.id) || !v.forecast) continue;
     const spot = r.spotlight.has(v.lab.id);
     for (const pred of v.predictions) {
-      // Default view: one release ahead. The chain beyond it lands in the same fortnight for
-      // every lab and reads as noise; the long-range toggle brings it back, spotlight only.
-      if (pred.k > 1 && !(r.longRange && spot)) continue;
+      // `next`: one release ahead per lab (the chain reads as noise in that view). `long`: the
+      // full chain, spotlight labs in circles, the rest as whiskers.
+      if (pred.k > 1 && r.forecast === 'next') continue;
+      if (pred.k > 1 && !(spot || r.forecast === 'next')) continue;
+      // Filter to the visible x-domain, not to a fixed horizon — the zoom decides (REDESIGN §4).
+      if (pred.medianDate < isoOf(xLo) || pred.medianDate > isoOf(xHi)) continue;
       const announced = pred.source === 'announced';
       const colour = announced ? ANNOUNCED : PREDICT;
       const x16 = x(toDate(pred.p16Date));
       const x84 = x(toDate(pred.p84Date));
       const cx = x(toDate(pred.medianDate));
-      const cy = y(pred.index);
+      const cy = y(predIndex(pred));
       const opacity = chainOpacity(pred.k) * focusMul(r, v.lab.id);
       if (spot) {
         circles.push({
@@ -216,7 +228,8 @@ export function drawPredictions(g: G, r: RenderCtx): void {
     });
   };
   const label = (d: CircleDatum | WhiskerDatum): string =>
-    `Predicted ${ctx.labs.get(d.labId)?.short ?? d.labId} flagship number ${d.pred.k}, median ${d.pred.medianDate}, 68 percent window ${d.pred.p16Date} to ${d.pred.p84Date}, expected index ${d.pred.index.toFixed(1)}`;
+    `Predicted ${ctx.labs.get(d.labId)?.short ?? d.labId} flagship number ${d.pred.k}, median ${d.pred.medianDate}, 68 percent window ${d.pred.p16Date} to ${d.pred.p84Date}, expected rating ${Math.round(1000 + 173.72 * d.pred.theta)}`;
+  void label;
 
   // 0 — whiskers of the labs outside the spotlight (under everything else)
   const whHost = sub(g, 'pred-whiskers');
@@ -231,7 +244,6 @@ export function drawPredictions(g: G, r: RenderCtx): void {
   const whAll = whEnter.merge(wh);
   whAll
     .attr('opacity', (d) => d.opacity)
-    .attr('aria-label', label)
     .on('pointerenter', (ev: PointerEvent, d) => {
       r.io.hoverLab(d.labId);
       tip(d, ev);
@@ -376,4 +388,9 @@ export function drawPredictions(g: G, r: RenderCtx): void {
       r.io.hoverLab(null);
       r.io.tipHide();
     });
+}
+
+/** UTC day of a scale-domain Date. */
+function isoOf(d: Date): string {
+  return d.toISOString().slice(0, 10);
 }

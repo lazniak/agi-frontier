@@ -1,6 +1,6 @@
-/** Zoom / pan, the draggable "now" scrubber, keyboard traversal and the legend. */
+/** Zoom / pan (both axes), the draggable "now" scrubber, keyboard traversal and the legend. */
 import { select } from 'd3-selection';
-import { zoom, zoomIdentity, zoomTransform, type D3ZoomEvent, type ZoomBehavior, type ZoomTransform } from 'd3-zoom';
+import { zoom, zoomIdentity, zoomTransform, ZoomTransform, type D3ZoomEvent, type ZoomBehavior } from 'd3-zoom';
 import type { ISODate, LabId } from '@agi/shared';
 import type { Ctx } from '../data';
 import type { Store } from '../state';
@@ -18,6 +18,11 @@ export interface ZoomHandle {
   reset(): void;
 }
 
+/**
+ * 2-D zoom (REDESIGN §7.1): wheel = x zoom, shift+wheel = y zoom, pinch on touch zooms both,
+ * drag pans both. The transform is stored on the svg element; the shell rescales its base scales
+ * with `transform.rescaleX/rescaleY`, so each axis zooms independently.
+ */
 export function attachZoom(
   svgEl: SVGSVGElement,
   getGeom: () => Geom,
@@ -27,16 +32,14 @@ export function attachZoom(
   const behavior = zoom<SVGSVGElement, unknown>()
     .scaleExtent([1, 40])
     .filter((ev: Event) => {
-      const e = ev as WheelEvent & { button?: number; ctrlKey: boolean };
+      const e = ev as WheelEvent & { button?: number };
       if (e.type === 'dblclick') return false;
       // Never let the scrubber handle start a pan.
       const target = ev.target as Element | null;
       if (target && typeof target.closest === 'function' && target.closest('.now-handle')) return false;
       if (e.type === 'wheel') {
-        // Already fully zoomed out and scrolling further out → let the page scroll instead of
-        // swallowing the gesture. d3-zoom only calls preventDefault once the filter passes.
-        const k = zoomTransform(svgEl).k;
-        if (e.deltaY > 0 && k <= 1.0000001) return false;
+        // d3-zoom maps shift+wheel to a horizontal pan by default; we want shift+wheel = y zoom,
+        // so both wheel flavours pass the filter and the gesture decides below.
         return true;
       }
       return e.button === 0 || e.button === undefined;
@@ -46,7 +49,7 @@ export function attachZoom(
     .on('zoom', (ev: D3ZoomEvent<SVGSVGElement, unknown>) => onZoom(ev.transform));
 
   sel.call(behavior);
-  // The wheel gesture is horizontal-only; d3 handles the rest.
+
   const applyExtent = (): void => {
     const g = getGeom();
     behavior.extent([
@@ -60,6 +63,30 @@ export function attachZoom(
   };
   applyExtent();
 
+  // shift+wheel = y zoom: intercept before d3-zoom sees it. A negative deltaY zooms the y axis
+  // around the pointer's data point; the shell re-thins the ladder from the transform.
+  const onWheel = (ev: WheelEvent): void => {
+    if (!ev.shiftKey) return;
+    ev.preventDefault();
+    ev.stopImmediatePropagation();
+    const t = zoomTransform(svgEl);
+    const factor = Math.exp(-ev.deltaY * 0.002);
+    const kY = Math.max(1, Math.min(40, t.k * factor));
+    const g = getGeom();
+    // Zoom y around the pointer: keep the data point under the cursor fixed.
+    const cy = ev.clientY - (svgEl.getBoundingClientRect().top ?? 0);
+    const ratio = kY / t.k;
+    const py = (cy - t.y) / t.k;
+    const y2 = cy - py * ratio;
+    // Constrain the pan so the plot never leaves the figure vertically.
+    const lo = g.y1;
+    const hi = g.y0;
+    const clampedY = Math.min(hi - (hi - lo) * 0, Math.max(lo - (hi - lo) * 0, y2));
+    sel.call(behavior.transform, new ZoomTransformImpl(kY, t.x, clampedY));
+    void ratio;
+  };
+  svgEl.addEventListener('wheel', onWheel, { passive: false });
+
   return {
     behavior,
     transform: () => zoomTransform(svgEl),
@@ -69,6 +96,9 @@ export function attachZoom(
     },
   };
 }
+
+/** Re-export so the shell can build transforms without importing d3-zoom internals. */
+export const ZoomTransformImpl = ZoomTransform;
 
 /* ----------------------------------------------------------------- scrubber */
 
@@ -123,8 +153,7 @@ export function attachScrub(handle: SVGCircleElement, opts: ScrubOptions): () =>
     else if (ev.key === 'End') return store.setAsOf(opts.max);
     else return;
     ev.preventDefault();
-    const cur = new Date(`${store.get().asOf}T00:00:00Z`).getTime();
-    store.setAsOf(fromDate(new Date(cur + delta * DAY)));
+    store.nudgeAsOf(delta);
   };
 
   handle.addEventListener('pointerdown', onDown);

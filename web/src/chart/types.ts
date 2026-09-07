@@ -17,6 +17,8 @@ export interface Interactions {
   /** Focus a lab (legend hover, forecast hover); null clears it. */
   hoverLab(id: LabId | null): void;
   openAudit(id: string): void;
+  /** Highlight a ladder row (hovering the ladder or a level); null clears it. Optional. */
+  hoverLevel?(id: string | null): void;
 }
 
 export interface RenderCtx {
@@ -41,8 +43,12 @@ export interface RenderCtx {
   spotlight: ReadonlySet<LabId>;
   visible: (lab: LabId) => boolean;
   reduced: boolean;
-  /** "Long-range forecast (3 years)": full chained chain + the 3-year right edge. */
-  longRange: boolean;
+  /** Forecast depth: `next` = one release ahead, `long` = the full chain. */
+  forecast: 'next' | 'long';
+  /** Family bands on/off. */
+  bands: boolean;
+  /** Which tiers get markers: flagship only, or mid/small too. */
+  tierView: 'flagship' | 'all';
   /** Id of the soft-glow SVG filter defined by the chart shell. */
   glowId: string;
   io: Interactions;

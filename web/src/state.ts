@@ -2,11 +2,18 @@
  * App state: the scrubbed `asOf` date, lab filters, the selected release (audit drawer)
  * and the chart's own view flags. Deliberately tiny — one store, typed channels, no framework.
  */
-import type { ISODate, LabId } from '@agi/shared';
+import { addDays, type ISODate, type LabId } from '@agi/shared';
 
 export type Channel = 'asOf' | 'filters' | 'selection' | 'hover' | 'view';
 
-export type YMode = 'logit' | 'linear';
+/** Y axis labelling: both modes are linear in θ — only the tick labels differ. */
+export type YMode = 'rating' | 'index';
+/** Left edge of the chart: `story` = from the first release (2018), `recent` = 2023→. */
+export type RangeMode = 'story' | 'recent';
+/** Forecast depth: `next` = one release ahead per lab, `long` = the full chain (up to 24). */
+export type ForecastMode = 'next' | 'long';
+/** `all` also draws mid/small releases as small markers on the chart. */
+export type TierView = 'flagship' | 'all';
 
 export interface StateShape {
   /** Everything on the page is computed as of this date. */
@@ -25,17 +32,18 @@ export interface StateShape {
   hover: string | null;
   /** Lab under the pointer in the legend — focuses that lab on the chart. */
   hoverLab: LabId | null;
-  /** Y axis: linear in latent ability θ (logit) or in the 0–100 index. */
+  /** Y axis labels: Frontier Rating (default) or the bounded Frontier Index. */
   yMode: YMode;
-  /** Left edge of the chart: the first release (true) or the start of the modern basket era, 2023 (false). */
-  fullHistory: boolean;
+  /** Left edge of the chart: the first release (`story`) or 2023 (`recent`). */
+  range: RangeMode;
+  /** Forecast depth: one release ahead (`next`) or the full chain (`long`). */
+  forecast: ForecastMode;
   /** "Fit to data" y-axis toggle. */
   fitY: boolean;
-  /**
-   * "Long-range forecast (3 years)": the full chained forecast and the 3-year right edge.
-   * Off by default — see `chart/forecast.ts` for what the default view draws instead.
-   */
-  longRange: boolean;
+  /** Family bands under the lab lines. */
+  bands: boolean;
+  /** Which tiers get markers on the chart. */
+  tierView: TierView;
 }
 
 type Listener = (channels: Set<Channel>) => void;
@@ -47,7 +55,8 @@ export class Store {
   private frame = 0;
 
   constructor(
-    init: Pick<StateShape, 'asOf' | 'today' | 'minDate'> & { longRange?: boolean; yMode?: YMode; fullHistory?: boolean },
+    init: Pick<StateShape, 'asOf' | 'today' | 'minDate'> &
+      Partial<Pick<StateShape, 'yMode' | 'range' | 'forecast' | 'bands' | 'tierView'>>,
   ) {
     this.state = {
       ...init,
@@ -56,10 +65,14 @@ export class Store {
       selected: null,
       hover: null,
       hoverLab: null,
-      yMode: init.yMode ?? 'logit',
-      fullHistory: init.fullHistory ?? true,
+      // The pre-redesign page passes 'logit' — normalise anything unknown to the new default
+      // so the transient old main.ts cannot put the axis in a dead mode (T34 rewrites main.ts).
+      yMode: init.yMode === 'index' || init.yMode === 'rating' ? init.yMode : 'rating',
+      range: init.range ?? 'story',
+      forecast: init.forecast ?? 'next',
       fitY: false,
-      longRange: init.longRange ?? false,
+      bands: init.bands ?? true,
+      tierView: init.tierView ?? 'flagship',
     };
   }
 
@@ -100,11 +113,20 @@ export class Store {
     });
   }
 
+  private clamp(date: ISODate): ISODate {
+    return date < this.state.minDate ? this.state.minDate : date > this.state.today ? this.state.today : date;
+  }
+
   setAsOf(date: ISODate): void {
-    const clamped = date < this.state.minDate ? this.state.minDate : date > this.state.today ? this.state.today : date;
+    const clamped = this.clamp(date);
     if (clamped === this.state.asOf) return;
     this.state.asOf = clamped;
     this.emit('asOf');
+  }
+
+  /** Move the scrubber by a signed number of days, clamped — the ◀ ▶ buttons. */
+  nudgeAsOf(days: number): void {
+    this.setAsOf(addDays(this.state.asOf, Math.round(days)));
   }
 
   backToToday(): void {
@@ -152,15 +174,21 @@ export class Store {
     this.emit('hover');
   }
 
-  setFullHistory(on: boolean): void {
-    if (this.state.fullHistory === on) return;
-    this.state.fullHistory = on;
-    this.emit('view');
-  }
-
   setYMode(mode: YMode): void {
     if (this.state.yMode === mode) return;
     this.state.yMode = mode;
+    this.emit('view');
+  }
+
+  setRange(mode: RangeMode): void {
+    if (this.state.range === mode) return;
+    this.state.range = mode;
+    this.emit('view');
+  }
+
+  setForecast(mode: ForecastMode): void {
+    if (this.state.forecast === mode) return;
+    this.state.forecast = mode;
     this.emit('view');
   }
 
@@ -170,9 +198,15 @@ export class Store {
     this.emit('view');
   }
 
-  setLongRange(on: boolean): void {
-    if (this.state.longRange === on) return;
-    this.state.longRange = on;
+  setBands(on: boolean): void {
+    if (this.state.bands === on) return;
+    this.state.bands = on;
+    this.emit('view');
+  }
+
+  setTierView(view: TierView): void {
+    if (this.state.tierView === view) return;
+    this.state.tierView = view;
     this.emit('view');
   }
 }

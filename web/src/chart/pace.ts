@@ -6,9 +6,9 @@
  * like it is flattening out near the top, but that is the sigmoid, not the models: in latent
  * ability the steps are as large as ever. The bars make that visible without a formula.
  */
-import type { FrontierGain } from '@agi/shared';
+import { ratingFromTheta, type FrontierGain, type PaceRegime } from '@agi/shared';
 import { fmtDate } from '../ui/format';
-import { paceTooltip } from './tooltip';
+import { paceTooltip, eraTooltip } from './tooltip';
 import { toDate } from './scales';
 import { INK, type RenderCtx } from './types';
 import type { G } from './layers';
@@ -17,6 +17,14 @@ import type { G } from './layers';
 export interface PaceScale {
   maxGain: number;
 }
+
+/** Regime → grey step: darker = faster. */
+const ERA_GREYS: Record<PaceRegime, string> = {
+  dormant: '#f2f2f2',
+  climb: '#e2e2e2',
+  acceleration: '#cfcfcf',
+  takeoff: '#b9b9b9',
+};
 
 export function drawPace(g: G, r: RenderCtx, scale: PaceScale): void {
   const { geom, x, computed } = r;
@@ -33,6 +41,58 @@ export function drawPace(g: G, r: RenderCtx, scale: PaceScale): void {
   let base = g.select<SVGLineElement>('line.pace-base');
   if (base.empty()) base = g.append('line').attr('class', 'pace-base').attr('pointer-events', 'none');
   base.attr('x1', geom.x0).attr('x2', geom.x1).attr('y1', bottom).attr('y2', bottom);
+
+  // era shading behind the bars: one rounded rect per pace regime (REDESIGN §2.3)
+  const eras = computed.eras;
+  const eraSel = g.selectAll<SVGRectElement, (typeof eras)[number]>('rect.pace-era').data(eras, (d) => d.start);
+  eraSel.exit().remove();
+  const eraEnter = eraSel
+    .enter()
+    .append('rect')
+    .attr('class', 'pace-era')
+    .attr('y', top)
+    .attr('rx', 2)
+    .attr('tabindex', 0)
+    .attr('role', 'img');
+  eraEnter
+    .merge(eraSel)
+    .attr('x', (d) => Math.max(geom.x0, Math.min(x(toDate(d.start)), x(toDate(d.end ?? computed.asOf)))))
+    .attr('width', (d) => {
+      const a = Math.max(geom.x0, Math.min(x(toDate(d.start)), x(toDate(d.end ?? computed.asOf))));
+      const b = Math.min(geom.x1, Math.max(x(toDate(d.start)), x(toDate(d.end ?? computed.asOf))));
+      return Math.max(0, b - a);
+    })
+    .attr('height', Math.max(0, geom.paceH - 2))
+    .attr('fill', (d) => ERA_GREYS[d.regime])
+    .attr('aria-label', (d) => `${d.regime} era: mean ${d.meanPace.toFixed(1)} logits per year`)
+    .on('pointerenter', (ev: PointerEvent, d) => r.io.tip(eraTooltip(d), ev))
+    .on('pointermove', (ev: PointerEvent) => r.io.tipMove(ev))
+    .on('pointerleave', () => r.io.tipHide())
+    .on('focus', function (this: SVGRectElement, _ev: FocusEvent, d) {
+      const box = this.getBoundingClientRect();
+      r.io.tip(eraTooltip(d), { clientX: box.left + box.width / 2, clientY: box.top });
+    })
+    .on('blur', () => r.io.tipHide());
+
+  // the projected era: a hatched tail after the scrubbed date, regime of the current trend
+  const proj = computed.projectedEra;
+  let tail = g.select<SVGRectElement>('rect.pace-projected');
+  if (!proj) {
+    tail.remove();
+  } else {
+    if (tail.empty()) tail = g.append('rect').attr('class', 'pace-projected').attr('pointer-events', 'none');
+    const from = x(toDate(computed.asOf));
+    tail
+      .attr('x', Math.min(geom.x1, Math.max(geom.x0, from)))
+      .attr('y', top)
+      .attr('width', Math.max(0, Math.min(geom.x1, geom.x1) - Math.min(geom.x1, Math.max(geom.x0, from))))
+      .attr('height', Math.max(0, geom.paceH - 2))
+      .attr('fill', ERA_GREYS[proj])
+      .attr('fill-opacity', 0.5)
+      .attr('stroke', '#9a9a9a')
+      .attr('stroke-width', 0.75)
+      .attr('stroke-dasharray', '3 3');
+  }
 
   // caption, top-left — same voice as the axis title
   let cap = g.select<SVGTextElement>('text.pace-title');

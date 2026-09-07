@@ -1,5 +1,6 @@
 /** Geometry, scales and the editorial tick ladders for the frontier chart. */
 import { scaleLinear, scaleTime, type ScaleTime } from 'd3-scale';
+import { ratingFromTheta, thetaFromRating } from '@agi/shared';
 import { indexFromTheta, thetaFromIndex, type ISODate } from '@agi/shared';
 
 export interface Margins {
@@ -32,17 +33,20 @@ export interface Geom {
 export type XScale = ScaleTime<number, number>;
 
 /**
- * The y axis is either linear in the 0–100 index or linear in the latent ability θ (logit scale).
- * Both take and return *index* units, so every layer draws with `y(index)` regardless of mode;
- * only the spacing of the ticks tells them apart.
+ * The y axis is linear in the latent ability theta either way — only the *labels* differ:
+ * `rating` reads the unbounded Frontier Rating (1000 + 173.72·theta), `index` reads the bounded
+ * Frontier Index (100·sigma(theta)). Both take and return *index* units at the edges of the
+ * domain for backwards compatibility, but the domain itself is carried in theta via `makeY`.
  */
-export type YMode = 'logit' | 'linear';
+export type YMode = 'rating' | 'index';
 
 export interface YScale {
   (index: number): number;
   invert(px: number): number;
   /** Domain in index units. */
   domain(): [number, number];
+  /** Domain in latent theta — the axis' native units. */
+  thetaDomain(): [number, number];
   range(): [number, number];
   mode: YMode;
 }
@@ -56,15 +60,19 @@ const PACE_H = 54;
 const PACE_H_COMPACT = 40;
 /** Gap between the x-axis labels / leadership stripe and the pace strip. */
 const PACE_GAP = 44;
+/** Right-hand gutter: the level ladder lives here (REDESIGN §7.1). */
+export const GUTTER_RIGHT = 144;
+export const GUTTER_RIGHT_COMPACT = 84;
 
 export function geometry(width: number, height: number): Geom {
   const compact = width < 720;
   const endLabels = width >= END_LABEL_MIN_WIDTH;
   const paceH = height < 360 ? 0 : compact ? PACE_H_COMPACT : PACE_H;
+  const gutter = compact ? GUTTER_RIGHT_COMPACT : GUTTER_RIGHT;
   const m: Margins = {
-    // The "Frontier Index" caption sits above the plot, clear of the 100 tick and the scrubber.
+    // The "Frontier Rating" caption sits above the plot, clear of the top tick and the scrubber.
     top: compact ? 32 : 38,
-    right: endLabels ? (compact ? 76 : 96) : 20,
+    right: Math.max(endLabels ? (compact ? 76 : 96) : 20, gutter),
     bottom: (compact ? 58 : 66) + (paceH ? paceH + PACE_GAP - (compact ? 12 : 8) : 0),
     left: compact ? 38 : 54,
   };
@@ -101,33 +109,29 @@ export function makeX(domain: [Date, Date], geom: Geom): XScale {
   return scaleTime().domain(domain).range([geom.x0, geom.x1]);
 }
 
-/** Index values are clipped to the same band as the fit (0.5–99.5) before taking the logit. */
+/**
+ * The y scale: linear in theta, unbounded. It is constructed from a theta domain and converts
+ * index values to pixels through the logit, so every layer can keep drawing with `y(index)`.
+ * Nothing here clamps to [0, 100] — the rating axis has no ceiling.
+ */
+export function makeY(domain: [number, number], geom: Geom, mode: YMode): YScale {
+  void mode; // the pixel mapping is identical; only the tick labels differ
+  const lin = scaleLinear().domain(domain).range([geom.y0, geom.y1]).clamp(false);
+  const y = ((v: number) => lin(thetaFromIndex(clampIndex(v)))) as YScale;
+  y.invert = (px) => indexFromTheta(lin.invert(px));
+  y.domain = () => [indexFromTheta(domain[0]), indexFromTheta(domain[1])];
+  y.thetaDomain = () => [domain[0], domain[1]];
+  y.range = () => [geom.y0, geom.y1];
+  y.mode = mode;
+  return y;
+}
+
+/** Index values are clipped to the same band as the fit before taking the logit. */
 const LOGIT_LO = 0.5;
 const LOGIT_HI = 99.5;
 
 function clampIndex(v: number): number {
   return v < LOGIT_LO ? LOGIT_LO : v > LOGIT_HI ? LOGIT_HI : v;
-}
-
-export function makeY(domain: [number, number], geom: Geom, mode: YMode): YScale {
-  if (mode === 'linear') {
-    const lin = scaleLinear().domain(domain).range([geom.y0, geom.y1]).clamp(false);
-    const y = ((v: number) => lin(v)) as YScale;
-    y.invert = (px) => lin.invert(px);
-    y.domain = () => [domain[0], domain[1]];
-    y.range = () => [geom.y0, geom.y1];
-    y.mode = 'linear';
-    return y;
-  }
-  const lo = thetaFromIndex(clampIndex(domain[0]));
-  const hi = thetaFromIndex(clampIndex(domain[1]));
-  const lin = scaleLinear().domain([lo, hi]).range([geom.y0, geom.y1]).clamp(false);
-  const y = ((v: number) => lin(thetaFromIndex(clampIndex(v)))) as YScale;
-  y.invert = (px) => indexFromTheta(lin.invert(px));
-  y.domain = () => [domain[0], domain[1]];
-  y.range = () => [geom.y0, geom.y1];
-  y.mode = 'logit';
-  return y;
 }
 
 /* ------------------------------------------------------------------- ticks */
@@ -233,45 +237,84 @@ function thin(ticks: TimeTick[], x: XScale, maxTicks: number): TimeTick[] {
 }
 
 /**
- * The logit ladder, in the order ticks are *admitted*: the round numbers first, the tails last.
- * A tick is kept only when it sits at least `minPx` from every tick already kept, so a short
- * chart shows 10 · 50 · 90 · 99 and a tall one fills in 20 · 80 · 95 · 98 between them.
+ * Round rating steps the axis admits, coarsest first: the ladder generator walks them and keeps
+ * a step only when it clears the pixel budget, so zooming in refines 200 → 100 → 50 naturally.
  */
-const LOGIT_LADDER = [50, 90, 10, 99, 1, 80, 20, 95, 5, 70, 30, 98, 2, 60, 40, 99.5, 0.5];
+export const RATING_LADDER = [1000, 500, 400, 200, 100, 50, 25, 10, 5, 2, 1];
 
-export function valueTicks(y: YScale, geom: Geom): number[] {
-  const [lo, hi] = y.domain();
-  if (y.mode === 'linear') {
-    if (lo === 0 && hi === 100) return [0, 20, 40, 60, 80, 100];
-    return scaleLinear().domain([lo, hi]).ticks(geom.compact ? 4 : 6);
-  }
-  const minPx = geom.compact ? 30 : 26;
-  const kept: number[] = [];
-  for (const v of LOGIT_LADDER) {
-    if (v < lo - 1e-9 || v > hi + 1e-9) continue;
-    const px = y(v);
-    if (kept.every((k) => Math.abs(y(k) - px) >= minPx)) kept.push(v);
-  }
-  return kept.sort((a, b) => a - b);
+/** Round index steps for the bounded reading, coarsest first. */
+export const INDEX_LADDER = [10, 5, 2, 1, 0.5, 0.2, 0.1, 0.05, 0.02, 0.01];
+
+export interface ValueTick {
+  /** Position in theta (the axis' native units). */
+  theta: number;
+  /** The label exactly as drawn (rating or index). */
+  label: string;
 }
 
-/** Tick label: whole numbers in the body, one decimal only where the ladder needs it. */
-export function fmtTick(v: number): string {
-  return Number.isInteger(v) ? String(v) : v.toFixed(1);
+/** `93.1` — trim trailing zeros so ladder steps like 0.5 read clean. */
+export function fmtTickLabel(v: number): string {
+  return Number.isInteger(v) ? String(v) : String(Number(v.toFixed(2)));
 }
 
 /**
- * Nice, stable bounds so "fit to data" never lands on ragged numbers. In logit mode the rounding
- * happens in θ (quarter-logit steps), which is what "nice" means on that axis.
+ * The y-axis ladder for either labelling. Walks the round-step ladder from coarse to fine and
+ * keeps a step when it clears `minPx` from everything already kept — the same admission rule as
+ * the old logit ladder, now in native units and unbounded in both directions.
  */
-export function niceExtent([lo, hi]: [number, number], mode: YMode = 'linear'): [number, number] {
-  if (!(hi > lo)) return mode === 'logit' ? [2, 99] : [0, 100];
-  if (mode === 'logit') {
-    const step = 0.25;
-    const tl = Math.floor(thetaFromIndex(clampIndex(lo)) / step) * step;
-    const th = Math.ceil(thetaFromIndex(clampIndex(hi)) / step) * step;
-    return [Math.max(LOGIT_LO, indexFromTheta(tl)), Math.min(LOGIT_HI, indexFromTheta(th))];
+export function valueTicks(y: YScale, geom: Geom): ValueTick[] {
+  const [tLo, tHi] = y.thetaDomain();
+  if (!(tHi > tLo)) return [];
+  const ladder = y.mode === 'rating' ? RATING_LADDER : INDEX_LADDER;
+  const minPx = geom.compact ? 30 : 26;
+  const yOf = y.mode === 'rating' ? ratingFromTheta : indexFromTheta;
+  const thetaOf = y.mode === 'rating' ? thetaFromRating : thetaFromIndex;
+  const kept: ValueTick[] = [];
+  const pxOf = (theta: number): number => y(indexFromTheta(theta));
+
+  for (const step of ladder) {
+    const lo = Math.ceil(yOf(tLo) / step - 1e-9) * step;
+    const hi = Math.floor(yOf(tHi) / step + 1e-9) * step;
+    if (!(hi >= lo)) continue;
+    const count = Math.round((hi - lo) / step) + 1;
+    if (count > 4000) continue; // pathological zoom, the finer steps will take over
+    for (let i = 0; i < count; i++) {
+      const value = lo + i * step;
+      const theta = thetaOf(value);
+      const px = pxOf(theta);
+      if (kept.some((k) => Math.abs(pxOf(k.theta) - px) < minPx)) continue;
+      kept.push({ theta, label: fmtTickLabel(value) });
+    }
+    if (kept.length > 1) {
+      kept.sort((a, b) => a.theta - b.theta);
+      // Already filling the axis at a coarse step — stop refining.
+      const densest = kept.slice(1).every((k, i) => pxOf(k.theta) - pxOf(kept[i]!.theta) >= minPx * 2.2);
+      if (densest && kept.length >= (geom.compact ? 4 : 6)) break;
+    }
   }
-  const step = hi - lo > 40 ? 10 : hi - lo > 16 ? 5 : 2;
-  return [Math.max(0, Math.floor(lo / step) * step), Math.min(100, Math.ceil(hi / step) * step)];
+  return kept.sort((a, b) => a.theta - b.theta);
+}
+
+/**
+ * Nice, stable theta bounds so "fit to data" and the resting domain never land on ragged numbers.
+ * Rounding happens in theta (quarter-logit steps) — "nice" on this axis — and nothing is clamped
+ * to [0, 100]: the rating axis is unbounded above.
+ */
+export function niceThetaExtent([lo, hi]: [number, number]): [number, number] {
+  if (!(hi > lo)) return [-1, 4];
+  const step = 0.25;
+  return [Math.floor(lo / step) * step, Math.ceil(hi / step) * step];
+}
+
+/* -------------------------------------------------------------- legacy API */
+
+/**
+ * @deprecated index-domain variant kept for the panels; the chart uses `niceThetaExtent`.
+ */
+export function niceExtent([lo, hi]: [number, number]): [number, number] {
+  if (!(hi > lo)) return [2, 99];
+  const step = 0.25;
+  const tl = Math.floor(thetaFromIndex(clampIndex(lo)) / step) * step;
+  const th = Math.ceil(thetaFromIndex(clampIndex(hi)) / step) * step;
+  return [indexFromTheta(tl), indexFromTheta(th)];
 }

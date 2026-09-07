@@ -2,57 +2,80 @@
  * Load `/latest.json` and derive everything the page shows.
  *
  * All of the maths lives in `@agi/shared` (the same code the worker uses) — this module only
- * arranges its output into the shapes the chart and the panels want, and memoises per `asOf`
- * so dragging the time scrubber stays cheap.
+ * arranges its output into the shapes the chart and the panels want, and memoises per
+ * `(asOf, forecast mode)` so dragging the time scrubber stays cheap.
+ *
+ * The y axis is linear in the latent ability theta (log-odds) and *unbounded*; the Frontier
+ * Rating (`1000 + (400 / ln 10)·theta`) and the bounded Frontier Index (`100·sigma(theta)`) are
+ * two labellings of the same scale, so every fan, level and crossing here is expressed in theta
+ * (or index) exactly as the shared maths returns it.
  */
 import type {
-  Bundle,
+  BacktestReport,
+  BacktestRow,
+  BandPoint,
   Benchmark,
+  Bundle,
+  Crossing,
+  Era,
   FanPoint,
   FrontierGain,
   FrontierPace,
   FrontierPoint,
+  FrontierTrend,
   IndexFit,
   ISODate,
   Lab,
   LabForecast,
   LabId,
   LeadershipStripe,
+  Level,
   ModelIndex,
   ModelRelease,
+  PaceRegime,
   PredictedRelease,
 } from '@agi/shared';
 import {
   addDays,
-  cadencePrior,
+  backtestAsOf,
+  benchmarkLevels,
   capabilityFan,
   fitFrontierIndex,
   forecastAll,
-  indexFromTheta,
-  thetaFromIndex,
+  frontierCrossings,
+  frontierFan,
   frontierGains,
   frontierLine,
   frontierPace,
+  frontierTrend,
   frontierVelocity,
+  indexFromTheta,
   latestPerLab,
   leadershipStripes,
+  lineupBand,
+  paceEras,
+  projectedEra as projectedEraOf,
   rankCurrentFlagships,
   releasesAsOf,
+  thetaFromIndex,
   todayISO,
 } from '@agi/shared';
+import type { ForecastMode } from './state';
 
-/** Left edge of the "recent" view (the modern basket era); the right edge depends on the long-range toggle. */
+/** Left edge of the "recent" view (the modern basket era). */
 export const CHART_START_RECENT: ISODate = '2023-01-01';
-/** Room left of the first release in the full-history view. */
+/** Room left of the first release in the story view. */
 export const CHART_HISTORY_PAD_DAYS = 120;
-/** Default right edge: today + 12 months. Only the next release per lab fits in it. */
-export const CHART_FUTURE_DAYS = 365;
-/** "Long-range forecast (3 years)" right edge, matching the chained-forecast horizon. */
-export const CHART_FUTURE_DAYS_LONG = 1095;
-/** Chained forecasts are cut at 3 years, matching METHODOLOGY §4. */
-export const FORECAST_HORIZON_DAYS = 1095;
+/** The resting right edge: today + 3 years. The zoom can go far beyond it. */
+export const CHART_FUTURE_DAYS = 1095;
 /** How far past the k = 1 p95 date a lab's near-term fan is drawn. */
 export const FAN_TAIL_DAYS = 30;
+/** Minimum forecast length: the fans never stop closer than this to `asOf`. */
+export const FAN_MIN_DAYS = 400;
+/** Long-chain cap (REDESIGN §4). */
+export const FORECAST_MAX_RELEASES = 24;
+/** Small chain kept in the "next" view so the whiskers can hint at what follows. */
+export const NEXT_MAX_RELEASES = 3;
 
 export interface Ctx {
   bundle: Bundle;
@@ -65,14 +88,16 @@ export interface Ctx {
   today: ISODate;
   /** First release date in the dataset (scrubber lower bound is derived from it). */
   firstDate: ISODate;
-  /** Left edge of the full-history view: a little before the first release. */
+  /** Left edge of the story view: a little before the first release. */
   chartStart: ISODate;
-  /** Right edge of the long-range view (today + 3 years); also clips the chained predictions. */
+  /** Right edge of the resting view (today + 3 years); the zoom can go far beyond it. */
   chartEnd: ISODate;
-  /** Right edge of the default view (today + 12 months). */
-  chartEndNear: ISODate;
+  /** True when the loaded bundle contains releases produced by the OpenRouter researcher. */
+  researched: boolean;
   /** True when the loaded bundle is the synthetic development fixture. */
   synthetic: boolean;
+  /** Lazy memo of the full-horizon fit (all releases, asOf = today) — the backtest's `todayFit`. */
+  readonly fullFit: () => IndexFit;
 }
 
 export interface SeriesPoint {
@@ -82,26 +107,31 @@ export interface SeriesPoint {
 
 export interface LabView {
   lab: Lab;
+  /** Released *flagships* with a fit entry — the only things on the lab line. */
   points: SeriesPoint[];
   /**
    * The subset of `points` that qualifies for the index (METHODOLOGY §3). The lab line is drawn
    * through these and only these, so a provisional release can never bend the trend downwards.
    */
   qualified: SeriesPoint[];
+  /** Released mid/small models with a fit entry — hollow markers, never on the line. */
+  tiers: SeriesPoint[];
   forecast: LabForecast | null;
-  /** Capability fan out to the 3-year horizon — the long-range view. */
+  /** Capability fan out to the resting right edge — the long view. */
   fan: FanPoint[];
-  /** Capability fan trimmed to the k = 1 p95 date + 30 days — the default view. */
+  /** Capability fan trimmed to the k = 1 p95 date + 30 days — the next-release view. */
   fanNear: FanPoint[];
-  /** Predicted releases clipped to the chart's right edge. */
+  /** Predicted releases (chain length follows the forecast mode). */
   predictions: PredictedRelease[];
   /** Non-released markers already known at `asOf`. */
   markers: ModelRelease[];
   /**
-   * Released flagships with no score on any index benchmark (GPT-1, the first Kimi…). They have
+   * Released models with no score on any index benchmark (GPT-1, the first Kimi…). They have
    * no height on the chart, so they are drawn as ticks on the timeline instead of vanishing.
    */
   unscored: ModelRelease[];
+  /** The lab's family band: flagship theta on top, smallest current tier below (REDESIGN §3). */
+  band: BandPoint[];
   last: SeriesPoint | null;
   /** Last *qualified* release — where the lab line actually ends. */
   lastQualified: SeriesPoint | null;
@@ -127,6 +157,8 @@ export interface Computed {
   gains: FrontierGain[];
   stripes: LeadershipStripe[];
   rankings: ModelIndex[];
+  /** Same, across every tier — the rankings panel's tier filter (REDESIGN §3). */
+  rankingsAll: ModelIndex[];
   labViews: LabView[];
   byLab: Map<LabId, LabView>;
   /**
@@ -140,8 +172,28 @@ export interface Computed {
    */
   topProvisional: SeriesPoint | null;
   nextUp: NextUp | null;
-  /** Index range actually occupied by visible data — used by "fit to data". */
+  /** Index range actually occupied by visible data — used by the panels. */
   extent: [number, number];
+  /** The y-axis ladder of levels, ascending in theta (REDESIGN §2.1). */
+  levels: Level[];
+  /** OLS trend of the frontier's theta over the trailing year, ending at `asOf`. */
+  trend: FrontierTrend | null;
+  /** The frontier trend fan out to `fanEnd` — the grey/yellow continuation (REDESIGN §4). */
+  frontierFan: FanPoint[];
+  /** Past and predicted crossings of the levels (REDESIGN §2.2). */
+  crossings: Crossing[];
+  /** Pace regimes over time (REDESIGN §2.3). */
+  eras: Era[];
+  /** Regime of the current trend slope, open-ended. */
+  projectedEra: PaceRegime | null;
+  /** Family band per lab (REDESIGN §3). */
+  bands: Map<LabId, BandPoint[]>;
+  backtest: {
+    /** The worker-computed whole-history report, when the bundle carries one. */
+    report: BacktestReport | null;
+    /** Live rows recomputed at the scrubbed date — non-null only while scrubbed. */
+    rows: BacktestRow[] | null;
+  };
 }
 
 const EMPTY_FIT: IndexFit = {
@@ -181,26 +233,38 @@ export function makeCtx(bundle: Bundle): Ctx {
     today,
     firstDate,
     chartStart: minDate(addDays(firstDate, -CHART_HISTORY_PAD_DAYS), CHART_START_RECENT),
-    chartEnd: addDays(today, CHART_FUTURE_DAYS_LONG),
-    chartEndNear: addDays(today, CHART_FUTURE_DAYS),
+    chartEnd: addDays(today, CHART_FUTURE_DAYS),
+    researched: bundle.releases.some((r) => r.origin === 'researcher'),
     synthetic: bundle.releases.some((r) => (r.notes ?? '').includes('SYNTHETIC FIXTURE')),
+    fullFit: memoFn(() => fitFrontierIndex(bundle.releases, bundle.benchmarks, {})),
+  };
+}
+
+/** Zero-arg lazy memo: computes on first call, returns the same instance afterwards. */
+function memoFn<T>(fn: () => T): () => T {
+  let cache: { v: T } | null = null;
+  return () => {
+    if (cache === null) cache = { v: fn() };
+    return cache.v;
   };
 }
 
 /* ------------------------------------------------------------------ compute */
 
-const cache = new Map<ISODate, Computed>();
+const cache = new Map<string, Computed>();
 const CACHE_MAX = 90;
 
-export function compute(ctx: Ctx, asOf: ISODate): Computed {
-  const hit = cache.get(asOf);
+/** `Computed` depends on `asOf` and on how deep the forecast chain is asked to go. */
+export function compute(ctx: Ctx, asOf: ISODate, opts: { forecast?: ForecastMode } = {}): Computed {
+  const key = `${asOf}|${opts.forecast ?? 'next'}`;
+  const hit = cache.get(key);
   if (hit) return hit;
-  const out = computeUncached(ctx, asOf);
+  const out = computeUncached(ctx, asOf, opts.forecast ?? 'next');
   if (cache.size >= CACHE_MAX) {
     const oldest = cache.keys().next();
     if (!oldest.done) cache.delete(oldest.value);
   }
-  cache.set(asOf, out);
+  cache.set(key, out);
   return out;
 }
 
@@ -208,7 +272,7 @@ export function clearComputeCache(): void {
   cache.clear();
 }
 
-function computeUncached(ctx: Ctx, asOf: ISODate): Computed {
+function computeUncached(ctx: Ctx, asOf: ISODate, forecastMode: ForecastMode): Computed {
   const { bundle } = ctx;
   const empty = emptyComputed(ctx, asOf);
   try {
@@ -219,24 +283,38 @@ function computeUncached(ctx: Ctx, asOf: ISODate): Computed {
     const gains = frontierGains(frontier, asOf, 3);
     const stripes = leadershipStripes(fit);
     const rankings = rankCurrentFlagships(fit, bundle.releases, asOf);
+    // Every tier, for the rankings panel's tier filter (REDESIGN section 3).
+    const rankingsAll = rankCurrentFlagships(fit, bundle.releases, asOf, { tiers: ['flagship', 'mid', 'small'] });
 
-    const fanEnd = minDate(addDays(asOf, FORECAST_HORIZON_DAYS), maxDate(ctx.chartEnd, addDays(asOf, 200)));
-    const prior = cadencePrior(bundle.releases, asOf);
-    void prior; // forecastAll re-derives the prior internally; kept for readability of the pipeline.
+    // The fans never stop: the resting edge is today + 3 years, and the chart asks for more
+    // (up to its zoomed x-domain edge) as the reader zooms out.
+    const fanEnd = maxDate(ctx.chartEnd, addDays(asOf, FAN_MIN_DAYS));
+    // forecastAll re-derives the cadence prior internally; the call is kept only for readability.
+    void bundle;
 
     const forecasts = new Map<LabId, LabForecast>();
-    for (const f of forecastAll(ctx.labList.map((l) => l.id), bundle.releases, fit, { asOf })) {
+    // The conformal σ scale comes from the worker's backtest (REDESIGN §5): every window drawn
+    // here is as wide as the model's own track record says it must be. 1 until a backtest exists.
+    const sigmaScale = ctx.bundle.backtest?.sigmaScale ?? 1;
+    for (const f of forecastAll(ctx.labList.map((l) => l.id), bundle.releases, fit, {
+      asOf,
+      maxReleases: forecastMode === 'long' ? FORECAST_MAX_RELEASES : NEXT_MAX_RELEASES,
+      tierFilter: ['flagship'],
+      sigmaScale,
+    })) {
       forecasts.set(f.lab, f);
     }
 
     const released = releasesAsOf(bundle.releases, asOf);
     const seriesByLab = new Map<LabId, SeriesPoint[]>();
+    const tiersByLab = new Map<LabId, SeriesPoint[]>();
     for (const r of released) {
       const mi = fit.models[r.id];
       if (!mi) continue; // released but no official index score yet → not plottable
-      const arr = seriesByLab.get(r.lab);
-      if (arr) arr.push({ release: r, mi });
-      else seriesByLab.set(r.lab, [{ release: r, mi }]);
+      const target = (r.tier ?? 'flagship') === 'flagship' ? seriesByLab : tiersByLab;
+      const acc = target.get(r.lab);
+      if (acc) acc.push({ release: r, mi });
+      else target.set(r.lab, [{ release: r, mi }]);
     }
 
     const unscoredByLab = new Map<LabId, ModelRelease[]>();
@@ -256,6 +334,13 @@ function computeUncached(ctx: Ctx, asOf: ISODate): Computed {
       else markersByLab.set(r.lab, [r]);
     }
 
+    const levels = benchmarkLevels(fit, ctx.indexBenchmarks);
+    const trend = frontierTrend(frontier, asOf);
+    const fFan = frontierFan(frontier, asOf, { toDate: fanEnd, stepDays: 7 });
+    const crossings = frontierCrossings(frontier, levels, asOf);
+    const eras = paceEras(frontier, asOf);
+    const projected = projectedEraOf(trend);
+
     const labViews: LabView[] = [];
     for (const lab of ctx.labList) {
       const points = seriesByLab.get(lab.id) ?? [];
@@ -263,31 +348,50 @@ function computeUncached(ctx: Ctx, asOf: ISODate): Computed {
       const forecast = forecasts.get(lab.id) ?? null;
       const hasFan = Boolean(forecast?.lastRelease) && points.length > 0;
       const fan = hasFan && forecast ? fanTo(forecast, asOf, fanEnd) : [];
-      // The default view stops one release ahead: a fan drawn to the 3-year horizon for ten labs
-      // merges into a single yellow block that hides everything under it.
+      // The next-release view stops one release ahead: a fan drawn to the 3-year horizon for ten
+      // labs merges into a single yellow block that hides everything under it.
       const nearEnd = nearFanEnd(forecast, asOf, fanEnd);
       const fanNear = hasFan && forecast ? fanTo(forecast, asOf, nearEnd) : [];
-      const predictions = (forecast?.next ?? []).filter((p) => p.medianDate <= ctx.chartEnd);
       labViews.push({
         lab,
         points,
         qualified,
+        tiers: tiersByLab.get(lab.id) ?? [],
         forecast,
         fan,
         fanNear,
-        predictions,
+        // No date filter here — the chart keeps whatever falls inside the visible x-domain.
+        predictions: forecast?.next ?? [],
         markers: markersByLab.get(lab.id) ?? [],
         unscored: unscoredByLab.get(lab.id) ?? [],
+        band: lineupBand(fit, bundle.releases, lab.id, { asOf }),
         last: points.length ? points[points.length - 1]! : null,
         lastQualified: qualified.length ? qualified[qualified.length - 1]! : null,
       });
     }
+
+    const bands = new Map(labViews.map((v) => [v.lab.id, v.band]));
 
     const byLab = new Map(labViews.map((v) => [v.lab.id, v]));
     // The headline number is the frontier, not the best current flagship: `frontierLine` already
     // filters to qualified models, so a provisional release can never become the lead.
     const top = seriesPoint(ctx, fit, frontier[frontier.length - 1]?.release_id);
     const topProvisional = seriesPoint(ctx, fit, bestProvisionalId(fit));
+
+    // The worker may have shipped a whole-history backtest in the bundle (REDESIGN §5); while
+    // the page is scrubbed, the k = 1 rows are replayed live at the scrubbed date.
+    const backtest = {
+      report: ctx.bundle.backtest ?? null,
+      rows:
+        asOf < ctx.today
+          ? backtestAsOf(bundle.releases, bundle.benchmarks, ctx.labList.map((l) => l.id), asOf, {
+              // The full-horizon fit knows the θ of releases *after* asOf — the scrubbed fit
+              // cannot see them and would null out every `actual.theta`.
+              todayFit: ctx.fullFit(),
+              sigmaScale: ctx.bundle.backtest?.sigmaScale ?? 1,
+            }).rows
+          : null,
+    };
 
     return {
       ok: true,
@@ -301,12 +405,21 @@ function computeUncached(ctx: Ctx, asOf: ISODate): Computed {
       gains,
       stripes,
       rankings,
+      rankingsAll,
       labViews,
       byLab,
       top,
       topProvisional,
       nextUp: pickNextUp(ctx, labViews, asOf),
       extent: extentOfViews(labViews),
+      levels,
+      trend,
+      frontierFan: fFan,
+      crossings,
+      eras,
+      projectedEra: projected,
+      bands,
+      backtest,
     };
   } catch (err) {
     return { ...empty, ok: false, error: (err as Error).message };
@@ -316,9 +429,10 @@ function computeUncached(ctx: Ctx, asOf: ISODate): Computed {
 /**
  * Sample a lab's capability band from `asOf` to `end`, always landing exactly on `end` —
  * `capabilityFan` steps in whole weeks, so the last sample can otherwise fall up to six days
- * short and the trimmed fans would end on a ragged edge.
+ * short and the trimmed fans would end on a ragged edge. Exported so the chart can re-ask for a
+ * fan that reaches its current x-domain edge (REDESIGN §4: no fixed horizon).
  */
-function fanTo(forecast: LabForecast, asOf: ISODate, end: ISODate): FanPoint[] {
+export function fanTo(forecast: LabForecast, asOf: ISODate, end: ISODate): FanPoint[] {
   if (end < asOf) return [];
   const pts = capabilityFan(forecast, { asOf, toDate: end, stepDays: 7 });
   const last = pts[pts.length - 1];
@@ -329,8 +443,8 @@ function fanTo(forecast: LabForecast, asOf: ISODate, end: ISODate): FanPoint[] {
   return pts;
 }
 
-/** Where the default (non-long-range) fan stops: the k = 1 p95 date plus a short tail. */
-function nearFanEnd(forecast: LabForecast | null, asOf: ISODate, hardEnd: ISODate): ISODate {
+/** Where the next-release fan stops: the k = 1 p95 date plus a short tail. */
+export function nearFanEnd(forecast: LabForecast | null, asOf: ISODate, hardEnd: ISODate): ISODate {
   const first = forecast?.next.find((p) => p.k === 1) ?? forecast?.next[0];
   if (!first) return minDate(addDays(asOf, 120), hardEnd);
   return minDate(addDays(first.p95Date, FAN_TAIL_DAYS), hardEnd);
@@ -341,12 +455,14 @@ function emptyComputed(ctx: Ctx, asOf: ISODate): Computed {
     lab,
     points: [],
     qualified: [],
+    tiers: [],
     forecast: null,
     fan: [],
     fanNear: [],
     predictions: [],
     markers: [],
     unscored: [],
+    band: [],
     last: null,
     lastQualified: null,
   }));
@@ -362,12 +478,21 @@ function emptyComputed(ctx: Ctx, asOf: ISODate): Computed {
     gains: [],
     stripes: [],
     rankings: [],
+    rankingsAll: [],
     labViews,
     byLab: new Map(labViews.map((v) => [v.lab.id, v])),
     top: null,
     topProvisional: null,
     nextUp: null,
     extent: [0, 100],
+    levels: [],
+    trend: null,
+    frontierFan: [],
+    crossings: [],
+    eras: [],
+    projectedEra: null,
+    bands: new Map(),
+    backtest: { report: ctx.bundle.backtest ?? null, rows: null },
   };
 }
 
@@ -402,20 +527,16 @@ function pickNextUp(ctx: Ctx, views: LabView[], asOf: ISODate): NextUp | null {
 }
 
 /**
- * Index range occupied by these lab views, padded. Exported so "fit to data" can honour the
- * legend — and the long-range toggle, since the two views draw different fans.
+ * Index range occupied by these lab views, padded. Kept for the panels; the chart itself works
+ * in theta — see `thetaExtent`.
  */
-export function extentOfViews(views: LabView[], longRange = false): [number, number] {
+export function extentOfViews(views: LabView[]): [number, number] {
   let lo = Number.POSITIVE_INFINITY;
   let hi = Number.NEGATIVE_INFINITY;
   for (const v of views) {
     for (const p of v.points) {
       lo = Math.min(lo, p.mi.indexLow);
       hi = Math.max(hi, p.mi.indexHigh);
-    }
-    for (const f of longRange ? v.fan : v.fanNear) {
-      lo = Math.min(lo, f.low);
-      hi = Math.max(hi, f.high);
     }
   }
   if (!Number.isFinite(lo) || !Number.isFinite(hi)) return [0, 100];
@@ -424,26 +545,63 @@ export function extentOfViews(views: LabView[], longRange = false): [number, num
 }
 
 /**
- * The resting range of the logit axis: from the lowest *point* to the highest fan edge. Unlike
- * `extentOfViews` it ignores the error bars — a provisional release fitted from one score has a
- * ± that reaches the floor of the scale and would leave the bottom third of the chart empty.
- * Padded by a fixed amount of latent ability rather than a fraction of the index.
+ * The resting range of the y axis in latent theta — unbounded above, unlike the old index extent.
+ * From the lowest *point* to the highest fan edge (the lab fans at the requested depth, plus any
+ * extra fans, e.g. the frontier trend fan). Provisional single-score error bars are ignored, or
+ * they would reach the floor and leave the chart two-thirds empty.
  */
-export function restingLogitExtent(views: LabView[], longRange = false): [number, number] {
+export function thetaExtent(
+  views: LabView[],
+  opts: { fanMode?: 'near' | 'long'; withTiers?: boolean; extra?: FanPoint[] } = {},
+): [number, number] {
   let lo = Number.POSITIVE_INFINITY;
   let hi = Number.NEGATIVE_INFINITY;
+  const key = opts.fanMode === 'long' ? 'fan' : 'fanNear';
   for (const v of views) {
     for (const p of v.points) {
-      lo = Math.min(lo, p.mi.index);
-      hi = Math.max(hi, p.mi.index);
+      lo = Math.min(lo, p.mi.theta);
+      hi = Math.max(hi, p.mi.theta);
     }
-    for (const f of longRange ? v.fan : v.fanNear) hi = Math.max(hi, f.high);
+    if (opts.withTiers) {
+      for (const p of v.tiers) {
+        lo = Math.min(lo, p.mi.theta);
+        hi = Math.max(hi, p.mi.theta);
+      }
+    }
+    for (const f of v[key]) {
+      hi = Math.max(hi, fanHighTheta(f));
+      lo = Math.min(lo, fanLowTheta(f));
+    }
   }
-  if (!Number.isFinite(lo) || !Number.isFinite(hi)) return [2, 99];
-  const clamp = (v: number): number => Math.min(99.5, Math.max(0.5, v));
-  const tl = thetaFromIndex(clamp(lo)) - 0.45;
-  const th = thetaFromIndex(clamp(hi)) + 0.15;
-  return [clamp(indexFromTheta(tl)), clamp(indexFromTheta(th))];
+  for (const f of opts.extra ?? []) {
+    hi = Math.max(hi, fanHighTheta(f));
+    lo = Math.min(lo, fanLowTheta(f));
+  }
+  if (!Number.isFinite(lo) || !Number.isFinite(hi)) return [thetaFromIndex(2), thetaFromIndex(99)];
+  return [lo - 0.45, hi + 0.15];
+}
+
+/**
+ * Fan edges in theta — FanPoint carries the un-clamped values natively (REDESIGN §4).
+ */
+export function fanLowTheta(f: FanPoint): number {
+  const t = (f as Partial<Record<'thetaLow', number>>).thetaLow;
+  return typeof t === 'number' ? t : thetaFromIndex(f.low);
+}
+
+export function fanMidTheta(f: FanPoint): number {
+  const t = (f as Partial<Record<'theta', number>>).theta;
+  return typeof t === 'number' ? t : thetaFromIndex(f.mid);
+}
+
+export function fanHighTheta(f: FanPoint): number {
+  const t = (f as Partial<Record<'thetaHigh', number>>).thetaHigh;
+  return typeof t === 'number' ? t : thetaFromIndex(f.high);
+}
+
+/** Predicted-release theta — `theta` exists today; the TODO(T31) alias documents the intent. */
+export function predTheta(p: PredictedRelease): number {
+  return p.theta;
 }
 
 /**
@@ -485,3 +643,6 @@ export function sourceCount(release: ModelRelease): number {
   for (const s of release.scores) urls.add(s.source.url);
   return urls.size;
 }
+
+/** Index of a theta value — kept for anything that still speaks index. */
+export { indexFromTheta };

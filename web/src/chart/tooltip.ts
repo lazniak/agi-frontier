@@ -1,5 +1,5 @@
 /** The floating tooltip: one element, HTML built per hovered thing. */
-import { addDays, type FrontierGain, type LeadershipStripe, type ModelRelease, type PredictedRelease } from '@agi/shared';
+import { addDays, ratingFromTheta, type FrontierGain, type LeadershipStripe, type ModelRelease, type PredictedRelease } from '@agi/shared';
 import type { Ctx, SeriesPoint } from '../data';
 import { qs } from '../dom';
 import {
@@ -79,8 +79,9 @@ export function releaseTooltip(ctx: Ctx, p: SeriesPoint): string {
     : `<p class="tt-note">Provisional — only ${p.mi.n} of ${total} index benchmarks reported; off the lab line, and not used for the frontier or trend</p>`;
   return (
     head(lab?.color ?? '#111', p.release.name, `${lab?.name ?? p.release.lab} · ${fmtDatePrecision(p.release.date, p.release.date_precision)}`) +
-    `<p class="tt-big">${fmtIndex(p.mi.index)}<small>± ${p.mi.se.toFixed(2)} θ</small></p>` +
+    `<p class="tt-big">R ${Math.round(p.mi.rating).toLocaleString('en-US')}<small>index ${fmtIndex(p.mi.index)}</small></p>` +
     rows([
+      ['Rating range', `${Math.round(p.mi.rating - 173.72 * p.mi.se)} ${EN_DASH} ${Math.round(p.mi.rating + 173.72 * p.mi.se)}`],
       ['Index range', `${fmtIndex(p.mi.indexLow)} ${EN_DASH} ${fmtIndex(p.mi.indexHigh)}`],
       ['Coverage', `${p.mi.n} / ${total} benchmarks`],
       ['Date precision', esc(precisionLabel(p.release.date_precision))],
@@ -127,6 +128,7 @@ export function predictionTooltip(ctx: Ctx, labId: string, pred: PredictedReleas
       ['90% window', `${esc(fmtDate(pred.p05Date))} ${EN_DASH} ${esc(fmtDate(pred.p95Date))}`],
       ['P(30 days)', fmtPercent(p30)],
       ['P(90 days)', fmtPercent(p90)],
+      ['Expected rating', `${Math.round(ratingFromTheta(pred.thetaLow ?? pred.theta))} ${EN_DASH} ${Math.round(ratingFromTheta(pred.thetaHigh ?? pred.theta))}`],
       ['Expected index', `${fmtIndex(pred.indexLow)} ${EN_DASH} ${fmtIndex(pred.indexHigh)}`],
     ]) +
     `<p class="tt-hint">Circle diameter = the 68% window</p>`
@@ -146,6 +148,20 @@ export function tickTooltip(ctx: Ctx, r: ModelRelease): string {
 function quarterLabel(iso: string): string {
   const q = Math.floor((Number(iso.slice(5, 7)) - 1) / 3) + 1;
   return `Q${q} ${iso.slice(0, 4)}`;
+}
+
+/** One shaded era of the pace strip. */
+export function eraTooltip(d: { start: string; end: string | null; regime: string; meanPace: number; maxPace: number }): string {
+  return (
+    head('#9a9a9a', `${d.regime[0]?.toUpperCase() ?? ''}${d.regime.slice(1)}`, 'Pace era') +
+    `<p class="tt-big">${d.meanPace.toFixed(1)}<small>logits / yr mean</small></p>` +
+    rows([
+      ['Peak pace', `${d.maxPace.toFixed(1)} logits / yr`],
+      ['From', esc(fmtDate(d.start))],
+      ['Until', d.end ? esc(fmtDate(d.end)) : 'still ' + esc(d.regime)],
+    ]) +
+    `<p class="tt-note">Dormant below 0.5 logits/yr, climb below 1.5, acceleration below 3, takeoff above.</p>`
+  );
 }
 
 /** One bar of the pace strip. */
