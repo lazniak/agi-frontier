@@ -1,7 +1,7 @@
 /** The three live stats above the chart, plus the header "as of" stamp. */
 import type { Computed, Ctx } from '../data';
 import { clear, el, maybe, qs } from '../dom';
-import { EN_DASH, esc, fmtDate, fmtIndex, fmtPercent, fmtTimestamp, pluralise } from './format';
+import { EN_DASH, esc, fmtDate, fmtIndex, fmtPercent, fmtRating, fmtRatingSe, fmtTimestamp, pluralise } from './format';
 
 export function renderStamp(ctx: Ctx): void {
   const stamp = maybe('[data-generated]');
@@ -25,7 +25,7 @@ export function renderStats(ctx: Ctx, c: Computed): void {
   // The first stat's label has to follow the scrubber, or it claims "today" while showing 2025.
   const idxLabel = idx.parentElement?.querySelector('.stat__label');
   if (idxLabel) {
-    idxLabel.textContent = c.asOf === ctx.today ? 'Frontier Index today' : `Frontier Index on ${fmtDate(c.asOf)}`;
+    idxLabel.textContent = c.asOf === ctx.today ? 'Frontier Rating today' : `Frontier Rating on ${fmtDate(c.asOf)}`;
   }
   const idxMeta = qs('[data-stat="index-meta"]');
   const vel = qs('[data-stat="velocity"]');
@@ -37,10 +37,12 @@ export function renderStats(ctx: Ctx, c: Computed): void {
   // builds from qualified models only, so this number can never come from a provisional release.
   if (c.top) {
     const lab = ctx.labs.get(c.top.release.lab);
-    value(idx, fmtIndex(c.top.mi.index));
+    // The rating leads (unbounded, REDESIGN §1.2); the bounded index stays as the second reading.
+    value(idx, fmtRating(c.top.mi.rating));
     idxMeta.innerHTML =
       `<span class="stat__lab" style="color:${esc(lab?.color ?? '#111')}"><span class="stat__dot"></span></span>` +
-      `<b>${esc(c.top.release.name)}</b> · ${esc(lab?.name ?? c.top.release.lab)} · released ${esc(fmtDate(c.top.release.date))}`;
+      `<b>${esc(c.top.release.name)}</b> · ${esc(lab?.name ?? c.top.release.lab)} · index <b>${fmtIndex(c.top.mi.index)}</b> · ` +
+      `${esc(fmtRatingSe(c.top.mi.se))} · released ${esc(fmtDate(c.top.release.date))}`;
   } else {
     value(idx, EN_DASH);
     idxMeta.textContent = c.topProvisional
@@ -98,7 +100,7 @@ function renderProvisionalFootnote(idx: HTMLElement, c: Computed): void {
 
   const foot = el('p', { class: 'stat__foot' });
   foot.innerHTML =
-    `Provisional: <b>${esc(p.release.name)}</b> shows <b>${fmtIndex(p.mi.index)}</b> on ` +
+    `Provisional: <b>${esc(p.release.name)}</b> shows <b>${esc(fmtRating(p.mi.rating))}</b> on ` +
     `${pluralise(p.mi.n, 'benchmark')}`;
   host.append(foot);
 }

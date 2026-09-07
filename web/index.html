@@ -6,7 +6,7 @@
     <title>AGI Frontier — the living chart of flagship AI</title>
     <meta
       name="description"
-      content="Every flagship LLM on one never-ending chart, scored on a fixed basket of official benchmarks, with a calibrated forecast of when each lab ships next. Every number links to a primary source."
+      content="Every flagship LLM on one never-ending chart, scored on a fixed basket of official benchmarks with the unbounded Frontier Rating, plus a calibrated forecast of when each lab ships next. Every number links to a primary source."
     />
     <meta name="theme-color" content="#ffffff" />
     <meta name="color-scheme" content="light" />
@@ -19,7 +19,7 @@
     <meta property="og:title" content="AGI Frontier — the living chart of flagship AI" />
     <meta
       property="og:description"
-      content="One index for every frontier model, fitted from the labs' own benchmark numbers — plus a calibrated forecast of the next release."
+      content="One unbounded rating for every frontier model, fitted from the labs' own benchmark numbers — plus a calibrated forecast of the next release."
     />
     <meta property="og:image" content="https://agi.pablogfx.com/og.png" />
     <meta property="og:image:type" content="image/svg+xml" />
@@ -31,7 +31,7 @@
     <meta name="twitter:title" content="AGI Frontier — the living chart of flagship AI" />
     <meta
       name="twitter:description"
-      content="One index for every frontier model, fitted from the labs' own benchmark numbers — plus a calibrated forecast of the next release."
+      content="One unbounded rating for every frontier model, fitted from the labs' own benchmark numbers — plus a calibrated forecast of the next release."
     />
     <meta name="twitter:image" content="https://agi.pablogfx.com/og.png" />
 
@@ -55,21 +55,35 @@
           <span class="wordmark__text">AGI Frontier</span>
         </a>
 
-        <p class="site-header__stamp" data-generated>
-          <span class="dot" aria-hidden="true"></span>
-          <span data-generated-text>loading…</span>
-        </p>
+        <div class="site-header__meta">
+          <p class="site-header__stamp" data-generated>
+            <span class="dot" aria-hidden="true"></span>
+            <span data-generated-text>loading…</span>
+          </p>
+          <div class="progress" data-progress data-state="unknown">
+            <span class="progress__label">Research schedule unknown</span>
+            <span class="progress__track" aria-hidden="true"><span class="progress__fill"></span></span>
+          </div>
+        </div>
 
         <nav class="site-nav" aria-label="Sections">
           <a href="#chart">Chart</a>
+          <span aria-hidden="true">·</span>
+          <a href="#stages">Stages</a>
           <span aria-hidden="true">·</span>
           <a href="#watch">Release watch</a>
           <span aria-hidden="true">·</span>
           <a href="#rankings">Rankings</a>
           <span aria-hidden="true">·</span>
+          <a href="#researcher">Researcher</a>
+          <span aria-hidden="true">·</span>
           <a href="#method">Method</a>
           <span aria-hidden="true">·</span>
           <a href="#data">Data</a>
+          <span aria-hidden="true">·</span>
+          <a href="/paper.html">Paper</a>
+          <span aria-hidden="true">·</span>
+          <button type="button" class="site-nav__link" data-tour-open>Tour</button>
         </nav>
       </div>
     </header>
@@ -79,21 +93,23 @@
       <section class="section section--intro" id="intro" aria-labelledby="intro-h">
         <div class="shell">
           <h1 id="intro-h" class="lede">
-            Every flagship model, one index, and an honest guess at what comes next.
+            Every flagship model, one rating, and an honest guess at what comes next.
           </h1>
           <p class="intro-copy">
             Labs publish benchmark scores in a different mix every time, so raw percentages are not
-            comparable. AGI Frontier fits a single 0–100 <strong>Frontier&nbsp;Index</strong> per model
-            from the numbers each lab reported itself — not an average, but the latent ability of a
-            Rasch model, drawn on a logit axis so a step from 90 to 97 is as large as one from 50 to 80.
-            It then models each lab's release cadence to forecast when — and how capable — the next
-            flagship will be. Everything on this page is recomputed in your browser from one auditable
-            file, back to the first GPT.
+            comparable — and they run out, because every benchmark eventually saturates. AGI Frontier
+            fits one unbounded <strong>Frontier&nbsp;Rating</strong> per model from the numbers each lab
+            reported itself: not an average, but the latent ability of a Rasch model, where 400 points
+            is ten times the odds of solving an average item of the basket. The bounded
+            <strong>Frontier&nbsp;Index</strong> (0–100) is the same scale read differently. On top of it
+            sit levels and their crossing dates, the pace eras, and a release forecast per lab whose
+            window is as wide as its own back-tested track record says it must be. Everything on this
+            page is recomputed in your browser from one auditable file, back to the first GPT.
           </p>
 
           <div class="statbar" data-stats>
             <article class="stat">
-              <h2 class="stat__label">Frontier Index today</h2>
+              <h2 class="stat__label">Frontier Rating today</h2>
               <p class="stat__value" data-stat="index"><span class="stat__skeleton"></span></p>
               <p class="stat__meta" data-stat="index-meta">&nbsp;</p>
             </article>
@@ -115,37 +131,12 @@
       <section class="section section--chart" id="chart" aria-labelledby="chart-h">
         <div class="shell chart-head">
           <h2 id="chart-h" class="section-title">The frontier</h2>
-          <div class="chart-tools">
-            <button
-              type="button"
-              class="pill pill--toggle"
-              data-full-history
-              aria-pressed="true"
-              title="Start the chart at the first release (GPT-1, 2018) instead of 2023"
-            >
-              Full history
-            </button>
-            <button
-              type="button"
-              class="pill pill--toggle"
-              data-long-range
-              aria-pressed="false"
-              title="Show every chained prediction out to the three-year horizon"
-            >
-              Long-range forecast (3 years)
-            </button>
-            <button
-              type="button"
-              class="pill pill--toggle"
-              data-y-scale
-              aria-pressed="true"
-              title="Y axis linear in latent ability (log-odds): equal steps are equal odds ratios, so progress near the top is not squashed"
-            >
-              Logit scale
-            </button>
-            <button type="button" class="pill" data-fit aria-pressed="false">Fit to data</button>
-            <button type="button" class="pill" data-reset-zoom>Reset zoom</button>
-            <button type="button" class="pill pill--accent" data-today hidden>Back to today</button>
+        </div>
+
+        <div class="shell">
+          <div class="controlbar" data-controlbar aria-label="Chart controls">
+            <div class="controlbar__grab" aria-hidden="true"></div>
+            <div class="controlbar__inner" data-controlbar-inner></div>
           </div>
         </div>
 
@@ -154,9 +145,10 @@
             <div class="chart-status" data-chart-status role="status">Loading the frontier…</div>
           </div>
           <figcaption class="visually-hidden">
-            Frontier Index of every flagship model over time, per lab, on a logit axis, with yellow
-            forecast fans and release-window circles for predicted releases, and a strip of the
-            frontier's quarterly gain underneath. A table of the same data is under Rankings.
+            Frontier Rating of every flagship model over time, per lab, with family bands, the level
+            ladder on the right, yellow forecast fans and release-window circles for predicted
+            releases, and a strip of the frontier's quarterly gain underneath. A table of the same
+            data is under Rankings.
           </figcaption>
         </figure>
 
@@ -188,17 +180,30 @@
             <span class="key__sep" aria-hidden="true">·</span>
             <span class="key__swatch key__swatch--provisional" aria-hidden="true"></span> provisional (fewer than 3 index benchmarks)
             <span class="key__sep" aria-hidden="true">·</span>
+            <span class="key__swatch key__swatch--tier" aria-hidden="true"></span> mid / small tier (Tiers · All)
+            <span class="key__sep" aria-hidden="true">·</span>
+            <span class="key__swatch key__swatch--band" aria-hidden="true"></span> family band — flagship down to the lab's smallest current tier
+            <span class="key__sep" aria-hidden="true">·</span>
             <span class="key__swatch key__swatch--announced" aria-hidden="true"></span> announced
             <span class="key__sep" aria-hidden="true">·</span>
             <span class="key__swatch key__swatch--rumored" aria-hidden="true"></span> rumored
             <span class="key__sep" aria-hidden="true">·</span>
             <span class="key__swatch key__swatch--fan" aria-hidden="true"></span> forecast fan (10th–90th pct)
             <span class="key__sep" aria-hidden="true">·</span>
+            <span class="key__swatch key__swatch--frontierfan" aria-hidden="true"></span> frontier trend fan — the running maximum continued
+            <span class="key__sep" aria-hidden="true">·</span>
             <span class="key__swatch key__swatch--circle" aria-hidden="true"></span> circle diameter = 68 % release window (3 most likely labs, or the one you point at)
             <span class="key__sep" aria-hidden="true">·</span>
             <span class="key__swatch key__swatch--whisker" aria-hidden="true"></span> same window as a whisker (other labs)
             <span class="key__sep" aria-hidden="true">·</span>
+            <span class="key__swatch key__swatch--ladder" aria-hidden="true"></span> ladder level — human baseline, saturation, generation ceiling
+            <span class="key__sep" aria-hidden="true">·</span>
+            <span class="key__swatch key__swatch--crossing" aria-hidden="true"></span> predicted crossing of a level
+            <span class="key__sep" aria-hidden="true">·</span>
             <span class="key__swatch key__swatch--frontier" aria-hidden="true"></span> running maximum
+            <span class="key__sep" aria-hidden="true">·</span>
+            <span class="key__swatch key__swatch--bt68" aria-hidden="true"></span><span class="key__swatch key__swatch--bt90" aria-hidden="true"></span><span class="key__swatch key__swatch--btmiss" aria-hidden="true"></span>
+            backtest hairline — inside 68 %, inside 90 %, missed (while scrubbed)
             <span class="key__sep" aria-hidden="true">·</span>
             <span class="key__swatch key__swatch--tick" aria-hidden="true"></span> released, no basket score (timeline only)
             <span class="key__sep" aria-hidden="true">·</span>
@@ -207,7 +212,34 @@
         </div>
       </section>
 
-      <!-- 3 · Release watch ---------------------------------------------- -->
+      <!-- 3 · Backtest (only while the scrubber is off today) ------------- -->
+      <section class="section section--backtest" id="backtest" aria-labelledby="backtest-h" hidden>
+        <div class="shell">
+          <h2 id="backtest-h" class="section-title" data-backtest-title>How the forecast did</h2>
+          <p class="section-note">
+            The scrubber is in the past, so the forecast made on that date can be scored against what
+            actually shipped. Green means the release landed inside the 68 % window, amber inside 90 %,
+            red outside it.
+          </p>
+          <div data-backtest></div>
+        </div>
+      </section>
+
+      <!-- 4 · Stages ------------------------------------------------------ -->
+      <section class="section" id="stages" aria-labelledby="stages-h">
+        <div class="shell">
+          <h2 id="stages-h" class="section-title">Stages</h2>
+          <p class="section-note">
+            One column of time, read downwards: the levels the frontier has not reached yet with their
+            windows, then NOW and the pace it is travelling at, then the eras behind it and the levels
+            it has already passed. Every level is fitted from the benchmark difficulties — none of it is
+            written by hand.
+          </p>
+          <ol class="stages" data-stages></ol>
+        </div>
+      </section>
+
+      <!-- 5 · Release watch ---------------------------------------------- -->
       <section class="section" id="watch" aria-labelledby="watch-h">
         <div class="shell">
           <h2 id="watch-h" class="section-title">Release watch</h2>
@@ -219,26 +251,30 @@
         </div>
       </section>
 
-      <!-- 4 · Rankings ---------------------------------------------------- -->
+      <!-- 6 · Rankings ---------------------------------------------------- -->
       <section class="section" id="rankings" aria-labelledby="rankings-h">
         <div class="shell">
-          <h2 id="rankings-h" class="section-title">Current flagships</h2>
-          <p class="section-note">
-            The newest released flagship per lab, ranked by Frontier Index. Coverage is how many of
-            the index benchmarks the lab reported. Select a row to open its audit.
+          <div class="section-head">
+            <h2 id="rankings-h" class="section-title">Rankings</h2>
+            <div class="cgroup cgroup--inline">
+              <span class="cgroup__label" id="rankings-tier-label">Tiers</span>
+              <div class="seg" data-rankings-tiers role="radiogroup" aria-labelledby="rankings-tier-label"></div>
+            </div>
+          </div>
+          <p class="section-note" data-rankings-note>
+            The newest released flagship per lab, ranked by Frontier Rating. Select a row to open its audit.
           </p>
           <div class="table-wrap">
             <table class="rank-table" data-rankings>
-              <caption class="visually-hidden">Current flagship models ranked by Frontier Index</caption>
+              <caption class="visually-hidden">Current models ranked by Frontier Rating</caption>
               <thead>
                 <tr>
                   <th scope="col" class="num">#</th>
                   <th scope="col">Model</th>
-                  <th scope="col">Released</th>
+                  <th scope="col" class="num">Rating</th>
                   <th scope="col" class="num">Index</th>
-                  <th scope="col" class="num">Coverage</th>
-                  <th scope="col">Benchmarks</th>
-                  <th scope="col" class="num">Sources</th>
+                  <th scope="col">Benchmarks used</th>
+                  <th scope="col">Released</th>
                 </tr>
               </thead>
               <tbody></tbody>
@@ -247,7 +283,7 @@
         </div>
       </section>
 
-      <!-- 5 · What changed ------------------------------------------------ -->
+      <!-- 7 · What changed ------------------------------------------------ -->
       <section class="section" id="feed" aria-labelledby="changes-h">
         <div class="shell">
           <h2 id="changes-h" class="section-title">What changed</h2>
@@ -256,31 +292,45 @@
         </div>
       </section>
 
-      <!-- 6 · Method + data ----------------------------------------------- -->
+      <!-- 8 · Researcher --------------------------------------------------- -->
+      <section class="section" id="researcher" aria-labelledby="researcher-h">
+        <div class="shell">
+          <h2 id="researcher-h" class="section-title">Researcher</h2>
+          <p class="section-note">
+            The published dataset is produced by an automated researcher through OpenRouter, and it is
+            only promoted once it reproduces the frozen, human-curated gold set closely enough. Its
+            schedule, its evaluation and its budget are published here for the same reason every score
+            carries a quote.
+          </p>
+          <div class="researcher" data-researcher></div>
+        </div>
+      </section>
+
+      <!-- 9 · Method + data ----------------------------------------------- -->
       <section class="section section--method" aria-labelledby="method-h">
         <div class="shell method-grid">
           <div id="method">
             <h2 id="method-h" class="section-title">Method</h2>
             <p class="method-copy">
-              A flagship is the most capable tier a lab offers at launch; mini, flash and lite tiers
-              are excluded. Only numbers a lab published itself count as official, and every score
-              carries a URL and a verbatim quote that a worker re-checks. Averaging raw percentages
-              would reward a model for reporting only easy benchmarks, so instead a one-parameter
-              logistic (Rasch) model is fitted jointly over every official score:
+              A flagship is the most capable tier a lab offers at launch; mid and small tiers are
+              recorded too, feed the fit and the family bands, but never the frontier line. Only numbers
+              a lab published itself count as official, and every score carries a URL and a verbatim
+              quote that a worker re-checks. Averaging raw percentages would reward a model for
+              reporting only easy benchmarks, so instead a one-parameter logistic (Rasch) model is
+              fitted jointly over every official score:
               <em>logit(score) = θ<sub>model</sub> − δ<sub>benchmark</sub></em>. The
-              <strong>Frontier Index</strong> is 100·σ(θ) — the score a model would be expected to get
-              on a benchmark of average difficulty in the basket — so it is comparable even when two
-              models reported different subsets. A <strong>hollow marker</strong> — matched by a
-              "provisional" badge in the rankings and the release watch — means the release reported
-              fewer than three index benchmarks, so its index rests on too little evidence to form
-              the frontier line or feed a lab's trend, and it is listed after the qualified
-              flagships. Release timing comes from a log-normal fit of each
-              lab's inter-release intervals, shrunk toward the cross-lab prior so a lab with two
-              releases does not get absurd certainty. The yellow circle is centred on the median
-              predicted date and its diameter is the 16th–84th percentile window; the fan is the
-              10th–90th percentile of extrapolated capability. Scrubbing back in time re-runs the
-              whole fit as of that date, which is how you check whether the forecast would have
-              called what actually happened.
+              <strong>Frontier Rating</strong> is 1000 + 173.72·θ — unbounded, so a saturating basket
+              cannot flatten it; the <strong>Frontier Index</strong> is 100·σ(θ), the score a model would
+              be expected to get on a benchmark of average difficulty. A <strong>hollow marker</strong> —
+              matched by a "provisional" badge in the rankings and the release watch — means the release
+              reported fewer than three index benchmarks, so its rating rests on too little evidence to
+              form the frontier line. Release timing comes from a log-normal fit of each lab's
+              inter-release intervals, shrunk toward the cross-lab prior, and widened by the σ scale the
+              backtest earned. Scrubbing back in time re-runs the whole fit as of that date, which is how
+              you check whether the forecast would have called what actually happened.
+            </p>
+            <p>
+              <a class="link-out" href="/paper.html">Read the paper — the standard in full</a>
             </p>
             <p>
               <a
@@ -320,11 +370,17 @@
     <footer class="site-footer">
       <div class="shell">
         <p>
-          AGI Frontier · <a href="https://agi.pablogfx.com">agi.pablogfx.com</a> · data CC BY 4.0 ·
-          code MIT
+          AGI Frontier · <a href="https://agi.pablogfx.com">agi.pablogfx.com</a> ·
+          <a href="/paper.html">paper</a> · data CC BY 4.0 · code MIT
         </p>
       </div>
     </footer>
+
+    <!-- Mobile: the control bar becomes a bottom sheet ------------------- -->
+    <div class="controls-scrim" data-controls-scrim hidden></div>
+    <button type="button" class="controls-fab" data-controls-fab aria-expanded="false" aria-controls="chart">
+      Controls
+    </button>
 
     <!-- Audit drawer (desktop side panel / mobile bottom sheet) ----------- -->
     <div class="drawer-scrim" data-drawer-scrim hidden></div>

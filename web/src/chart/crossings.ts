@@ -127,10 +127,12 @@ export function drawCrossings(g: G, r: RenderCtx): void {
     .select<SVGTextElement>('text.crossing-label')
     .attr('x', (d) => Math.min(d.rd + 5, Math.max(0, geom.x1 - d.cx - 4)))
     .attr('y', 3.5)
-    .text((d) => {
-      if (!labelled.has(d.key)) return '';
+    .text((d) => (labelled.has(d.key) ? shortLevel(d.crossing, r.ctx.benchmarks) : ''))
+    // The label lives inside the plot: drop it when it would run into the gutter (the ladder
+    // names the same level at the same height there anyway).
+    .each(function (d) {
       const room = geom.x1 - d.cx - d.rd - 8;
-      return room > 30 ? shortLevel(d.crossing, r.ctx.benchmarks) : '';
+      if (room < 30 || this.getComputedTextLength() > room) this.textContent = '';
     });
 
   // Past: small ink ticks on the frontier line, only the ones inside the window.

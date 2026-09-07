@@ -2,13 +2,17 @@
  * AGI Frontier — entry point.
  *
  * Load one JSON bundle, compute everything with `@agi/shared`, render the chart and the panels,
- * and keep them in sync with the time scrubber.
+ * and keep them in sync with the time scrubber and the control bar. The store has two channels
+ * that matter here: `asOf` (recompute the world) and `view` (the same world, drawn differently)
+ * — both end in `renderAll`, which is cheap because `compute` memoises per (asOf, forecast).
  */
 import '@fontsource-variable/jost';
 import './styles/base.css';
 import './styles/layout.css';
 import './styles/chart.css';
 import './styles/ui.css';
+import './styles/controls.css';
+import './styles/panels.css';
 
 import { easeCubicInOut } from 'd3-ease';
 import { addDays, daysBetween } from '@agi/shared';
@@ -19,74 +23,25 @@ import { Tooltip } from './chart/tooltip';
 import { buildLegend } from './chart/interaction';
 import type { Interactions } from './chart/types';
 import { compute, loadBundle, makeCtx, type Computed, type Ctx } from './data';
-import { announce, maybe, prefersReducedMotion, qs } from './dom';
-import { Store, type YMode } from './state';
+import { announce, maybe, prefersReducedMotion, qs, qsa } from './dom';
+import { Store } from './state';
+import { renderBacktest } from './ui/backtest';
 import { renderChanges } from './ui/changes';
+import { createControlBar } from './ui/controls';
 import { Drawer } from './ui/drawer';
 import { fmtDate } from './ui/format';
 import { renderNotice, renderStamp, renderStats, renderWorkerHealth } from './ui/intro';
 import { initParallax } from './ui/parallax';
-import { renderRankings } from './ui/rankings';
+import { readView, writeView } from './ui/persist';
+import { initProgress } from './ui/progress';
+import { initRankingsFilter, renderRankings } from './ui/rankings';
+import { renderResearcher } from './ui/researcher';
+import { attachShortcuts, createShortcutSheet } from './ui/shortcuts';
+import { renderStages } from './ui/stages';
+import { createTour, maybeAutoStart } from './ui/tour';
 import { renderWatch } from './ui/watch';
 
 const status = maybe('[data-chart-status]');
-
-/** The long-range choice sticks between visits. Private-mode storage throws — never fatally. */
-const LONG_RANGE_KEY = 'agi:long-range';
-
-function readLongRange(): boolean {
-  try {
-    return localStorage.getItem(LONG_RANGE_KEY) === '1';
-  } catch {
-    return false;
-  }
-}
-
-function writeLongRange(on: boolean): void {
-  try {
-    localStorage.setItem(LONG_RANGE_KEY, on ? '1' : '0');
-  } catch {
-    /* storage unavailable — the toggle simply does not persist */
-  }
-}
-
-/** Full history (since the first GPT) is the default; "0" means the 2023-onwards view. */
-const FULL_HISTORY_KEY = 'agi:full-history';
-
-function readFullHistory(): boolean {
-  try {
-    return localStorage.getItem(FULL_HISTORY_KEY) !== '0';
-  } catch {
-    return true;
-  }
-}
-
-function writeFullHistory(on: boolean): void {
-  try {
-    localStorage.setItem(FULL_HISTORY_KEY, on ? '1' : '0');
-  } catch {
-    /* storage unavailable */
-  }
-}
-
-/** The y-axis choice sticks too. Anything but "linear" means the default, the logit axis. */
-const Y_SCALE_KEY = 'agi:y-scale';
-
-function readYMode(): YMode {
-  try {
-    return localStorage.getItem(Y_SCALE_KEY) === 'linear' ? 'linear' : 'logit';
-  } catch {
-    return 'logit';
-  }
-}
-
-function writeYMode(mode: YMode): void {
-  try {
-    localStorage.setItem(Y_SCALE_KEY, mode);
-  } catch {
-    /* storage unavailable */
-  }
-}
 
 function fail(message: string): void {
   if (status) {
@@ -110,16 +65,32 @@ async function boot(): Promise<void> {
     return;
   }
 
+  const view = readView();
   const store = new Store({
     asOf: ctx.today,
     today: ctx.today,
     minDate: minScrub(ctx),
-    longRange: readLongRange(),
-    yMode: readYMode(),
-    fullHistory: readFullHistory(),
+    yMode: view.yMode,
+    range: view.range,
+    forecast: view.forecast,
+    bands: view.bands,
+    tierView: view.tierView,
   });
   const tooltip = new Tooltip();
   const drawer = new Drawer(ctx, store);
+
+  /**
+   * Hovering a rung of the chart's ladder — or a row of the Stages column — marks the matching
+   * row on the other side. Neither side owns the state, so it lives here as one class toggle.
+   */
+  let hoveredLevel: string | null = null;
+  const hoverLevel = (id: string | null): void => {
+    if (hoveredLevel === id) return;
+    hoveredLevel = id;
+    for (const node of qsa<HTMLElement>('[data-level-id]')) {
+      node.classList.toggle('is-level-hover', id !== null && node.dataset.levelId === id);
+    }
+  };
 
   const io: Interactions = {
     tip: (html, at) => tooltip.show(html, at.clientX, at.clientY),
@@ -128,6 +99,7 @@ async function boot(): Promise<void> {
     hoverRelease: (id) => store.setHover(id),
     hoverLab: (id) => store.setHoverLab(id),
     openAudit: (id) => store.select(id),
+    hoverLevel,
   };
 
   const canvas = qs('[data-chart-canvas]');
@@ -136,12 +108,14 @@ async function boot(): Promise<void> {
   renderStamp(ctx);
   renderWorkerHealth(ctx);
   renderChanges(ctx);
+  renderResearcher(ctx);
   buildLegend(ctx, store);
+  initRankingsFilter(store);
+  initProgress(ctx);
 
   /* ----------------------------------------------------------- scrubber UI */
   const scrub = qs<HTMLInputElement>('#scrub');
   const scrubOut = qs('[data-scrub-value]');
-  const todayBtn = qs<HTMLButtonElement>('[data-today]');
   const span = Math.max(1, daysBetween(store.get().minDate, ctx.today));
   scrub.min = '0';
   scrub.max = String(span);
@@ -150,58 +124,6 @@ async function boot(): Promise<void> {
     stopTween();
     store.setAsOf(addDays(store.get().minDate, Number(scrub.value)));
   });
-
-  /* ------------------------------------------------------------- controls */
-  const longBtn = qs<HTMLButtonElement>('[data-long-range]');
-  longBtn.setAttribute('aria-pressed', String(store.get().longRange));
-  longBtn.addEventListener('click', () => {
-    const on = longBtn.getAttribute('aria-pressed') !== 'true';
-    longBtn.setAttribute('aria-pressed', String(on));
-    store.setLongRange(on);
-    writeLongRange(on);
-    announce(
-      on
-        ? 'Long-range forecast on — every chained prediction out to three years'
-        : 'Long-range forecast off — only the next release per lab',
-    );
-  });
-
-  const histBtn = qs<HTMLButtonElement>('[data-full-history]');
-  histBtn.setAttribute('aria-pressed', String(store.get().fullHistory));
-  histBtn.addEventListener('click', () => {
-    const on = histBtn.getAttribute('aria-pressed') !== 'true';
-    histBtn.setAttribute('aria-pressed', String(on));
-    store.setFullHistory(on);
-    writeFullHistory(on);
-    announce(on ? 'Full history — from the first release' : 'Recent view — from 2023');
-  });
-
-  const yBtn = qs<HTMLButtonElement>('[data-y-scale]');
-  yBtn.setAttribute('aria-pressed', String(store.get().yMode === 'logit'));
-  yBtn.addEventListener('click', () => {
-    const mode: YMode = yBtn.getAttribute('aria-pressed') === 'true' ? 'linear' : 'logit';
-    yBtn.setAttribute('aria-pressed', String(mode === 'logit'));
-    store.setYMode(mode);
-    writeYMode(mode);
-    announce(
-      mode === 'logit'
-        ? 'Logit axis — linear in latent ability, equal steps are equal odds ratios'
-        : 'Linear axis — the 0 to 100 index as is',
-    );
-  });
-
-  const fitBtn = qs<HTMLButtonElement>('[data-fit]');
-  fitBtn.addEventListener('click', () => {
-    const on = fitBtn.getAttribute('aria-pressed') !== 'true';
-    fitBtn.setAttribute('aria-pressed', String(on));
-    store.setFitY(on);
-    announce(on ? 'Y axis fitted to the visible data' : 'Y axis reset to its default range');
-  });
-  qs<HTMLButtonElement>('[data-reset-zoom]').addEventListener('click', () => {
-    chart.resetZoom();
-    announce('Zoom reset');
-  });
-  todayBtn.addEventListener('click', () => tweenAsOf(store.get().asOf, ctx.today));
 
   /* ------------------------------------------------- asOf tween (smooth UX) */
   let tween = 0;
@@ -225,39 +147,90 @@ async function boot(): Promise<void> {
     tween = requestAnimationFrame(step);
   }
 
+  /* ------------------------------------------------------ controls + keys */
+  const sheet = createShortcutSheet();
+  const controls = createControlBar({
+    ctx,
+    store,
+    fit: () => {
+      store.setFitY(true);
+      chart.fitView();
+    },
+    reset: () => {
+      store.setFitY(false);
+      chart.resetZoom();
+    },
+    backToToday: () => tweenAsOf(store.get().asOf, ctx.today),
+    help: () => sheet.open(),
+  });
+
+  attachShortcuts({
+    store,
+    sheet,
+    fit: () => {
+      store.setFitY(true);
+      chart.fitView();
+    },
+    reset: () => {
+      store.setFitY(false);
+      chart.resetZoom();
+    },
+    zoom: (k) => chart.zoomBy(k, k),
+  });
+
+  /* ---------------------------------------------------------------- tour */
+  const tour = createTour();
+  maybe<HTMLButtonElement>('[data-tour-open]')?.addEventListener('click', () => tour.start());
+
   /* --------------------------------------------------------------- render */
   let last: Computed | null = null;
 
   function renderAll(): void {
-    const asOf = store.get().asOf;
-    const c = compute(ctx, asOf);
+    const st = store.get();
+    const c = compute(ctx, st.asOf, { forecast: st.forecast });
     last = c;
 
     if (status) status.hidden = true;
     chart.render(c);
     renderStats(ctx, c);
     renderNotice(ctx, c);
+    renderStages(ctx, c, { onSelect: (id) => store.select(id), hoverLevel });
+    renderBacktest(ctx, c);
     renderWatch(ctx, c, (id) => store.select(id));
-    renderRankings(ctx, c, (id) => store.select(id));
+    renderRankings(ctx, c, store, (id) => store.select(id));
     drawer.sync(c);
+    controls.sync();
 
-    const scrubbed = asOf !== ctx.today;
-    todayBtn.hidden = !scrubbed;
-    scrubOut.textContent = scrubbed ? fmtDate(asOf) : 'today';
-    scrub.value = String(daysBetween(store.get().minDate, asOf));
-    scrub.setAttribute('aria-valuetext', scrubbed ? fmtDate(asOf) : `today, ${fmtDate(asOf)}`);
+    const scrubbed = st.asOf !== ctx.today;
+    scrubOut.textContent = scrubbed ? fmtDate(st.asOf) : 'today';
+    scrub.value = String(daysBetween(st.minDate, st.asOf));
+    scrub.setAttribute('aria-valuetext', scrubbed ? fmtDate(st.asOf) : `today, ${fmtDate(st.asOf)}`);
     document.documentElement.dataset.scrubbed = String(scrubbed);
   }
 
   store.subscribe((channels) => {
-    if (channels.has('asOf')) renderAll();
+    if (channels.has('view')) {
+      const st = store.get();
+      writeView({
+        yMode: st.yMode,
+        range: st.range,
+        forecast: st.forecast,
+        bands: st.bands,
+        tierView: st.tierView,
+      });
+    }
+    if (channels.has('asOf') || channels.has('view')) renderAll();
     else if (channels.has('selection') && last) drawer.sync(last);
   });
 
   renderAll();
+  announce('The frontier is loaded. Press question mark for keyboard shortcuts.');
 
   /* -------------------------------------------------------------- parallax */
   initParallax(chart.layers, canvas);
+
+  // The tour points at circles and rungs the chart has to have drawn first.
+  maybeAutoStart(tour);
 }
 
 void boot();

@@ -81,7 +81,15 @@ export function drawGrid(g: G, r: RenderCtx): void {
     .attr('x', geom.x0)
     .attr('y', geom.y1 - 22)
     .attr('text-anchor', 'start')
-    .text(y.mode === 'rating' ? 'Frontier Rating · equal steps are equal odds ratios' : 'Frontier Index · 100 is the asymptote');
+    .text(
+      geom.compact
+        ? y.mode === 'rating'
+          ? 'Frontier Rating · equal steps, equal odds'
+          : 'Frontier Index · 100 is the asymptote'
+        : y.mode === 'rating'
+          ? 'Frontier Rating · equal steps are equal odds ratios'
+          : 'Frontier Index · 100 is the asymptote',
+    );
 
   // What the top of the scale means on the index reading. The rating axis is unbounded — no
   // note, the ladder gutter tells the story instead.

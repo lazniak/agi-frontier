@@ -130,6 +130,12 @@ button {
   color: inherit;
 }
 
+/* `hidden` must win over a component's own `display` (a `.cbtn` is `inline-flex`, and the UA's
+   `[hidden] { display: none }` loses to any class selector). */
+[hidden] {
+  display: none !important;
+}
+
 :focus-visible {
   outline: 2px solid var(--ink-1);
   outline-offset: 2px;

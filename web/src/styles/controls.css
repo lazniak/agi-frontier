@@ -1,0 +1,632 @@
+/* AGI Frontier — the control bar, the header progress bar, the shortcut sheet and the tour. */
+
+/* ------------------------------------------------------- header: meta column */
+.site-header__meta {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  justify-content: center;
+}
+
+/* The stamp is a column item here, so `layout.css`'s narrow-screen `order: 3; flex-basis: 100%`
+   (written for the stamp as a direct header child) must not apply — it would put the countdown
+   above the "as of" line and stretch the stamp's height. */
+.site-header__meta .site-header__stamp {
+  order: 0;
+  flex: 0 0 auto;
+  flex-basis: auto;
+}
+
+.site-nav a,
+.site-nav__link {
+  white-space: nowrap;
+}
+
+.site-nav__link {
+  appearance: none;
+  border: 0;
+  background: none;
+  padding: 4px 2px;
+  font: inherit;
+  font-size: inherit;
+  letter-spacing: inherit;
+  color: var(--ink-2);
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+.site-nav__link:hover {
+  color: var(--ink-1);
+  border-bottom-color: var(--ink-1);
+}
+
+/* -------------------------------------------------------------- progress bar */
+.progress {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  max-width: 320px;
+}
+
+.progress__label {
+  font-size: 11px;
+  font-weight: 300;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.progress__track {
+  position: relative;
+  display: block;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--hair);
+  overflow: hidden;
+}
+
+.progress__fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 0;
+  border-radius: 2px;
+  background: var(--predict);
+  transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.progress[data-state='unknown'] .progress__fill {
+  background: var(--hair-strong);
+}
+
+.progress[data-state='overdue'] .progress__label {
+  color: var(--announced-ink);
+}
+
+.progress[data-state='overdue'] .progress__fill {
+  background: var(--announced);
+}
+
+/* Running: an indeterminate shimmer rather than a lie about the remaining time. */
+.progress[data-state='running'] .progress__fill {
+  width: 100% !important;
+  background: linear-gradient(
+    90deg,
+    rgba(245, 196, 0, 0.15) 0%,
+    var(--predict) 40%,
+    var(--predict) 60%,
+    rgba(245, 196, 0, 0.15) 100%
+  );
+  background-size: 220% 100%;
+  animation: progress-shimmer 1.6s linear infinite;
+}
+
+@keyframes progress-shimmer {
+  from {
+    background-position: 140% 0;
+  }
+  to {
+    background-position: -60% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .progress__fill {
+    transition: none;
+    animation: none !important;
+  }
+}
+
+/* ------------------------------------------------------------- control bar */
+.controlbar {
+  border: 1px solid var(--hair-soft);
+  border-radius: var(--radius);
+  background: var(--paper);
+  box-shadow: var(--shadow-1);
+  padding: 12px 16px;
+  margin-bottom: 6px;
+}
+
+.controlbar__grab {
+  display: none;
+}
+
+.controlbar__inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 10px clamp(12px, 1.8vw, 24px);
+}
+
+.cgroup {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+
+.cgroup--now {
+  margin-left: auto;
+}
+
+.cgroup--help {
+  align-self: flex-end;
+}
+
+.cgroup--inline {
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+}
+
+.cgroup__label {
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  white-space: nowrap;
+}
+
+.cgroup__row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ------------------------------------------------------- segmented control */
+.seg {
+  display: inline-flex;
+  align-items: stretch;
+  padding: 2px;
+  gap: 2px;
+  border: 1px solid var(--hair);
+  border-radius: 999px;
+  background: var(--paper-2);
+}
+
+.seg__btn {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  padding: 6px 13px;
+  font-size: 12px;
+  font-weight: 300;
+  letter-spacing: 0.04em;
+  color: var(--ink-3);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.16s ease, background 0.16s ease, box-shadow 0.16s ease;
+}
+
+.seg__btn:hover {
+  color: var(--ink-1);
+}
+
+.seg__btn[aria-checked='true'] {
+  background: var(--paper);
+  color: var(--ink-1);
+  font-weight: 500;
+  box-shadow: var(--shadow-1);
+}
+
+.seg__key {
+  font-family: var(--font);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  border: 1px solid var(--hair);
+  border-radius: 4px;
+  padding: 0 3px;
+  line-height: 1.5;
+  opacity: 0;
+  transition: opacity 0.16s ease;
+}
+
+.seg:hover .seg__key,
+.seg:focus-within .seg__key,
+.cbtn:hover .seg__key,
+.cbtn:focus-visible .seg__key {
+  opacity: 1;
+}
+
+/* ------------------------------------------------------------ plain buttons */
+.cbtn {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--hair);
+  border-radius: 999px;
+  background: var(--paper);
+  padding: 7px 14px;
+  font-size: 12px;
+  font-weight: 300;
+  letter-spacing: 0.05em;
+  color: var(--ink-2);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.16s ease, border-color 0.16s ease, background 0.16s ease;
+}
+
+.cbtn:hover {
+  color: var(--ink-1);
+  border-color: var(--hair-strong);
+}
+
+.cbtn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.cbtn--icon {
+  padding: 7px 11px;
+  font-size: 11px;
+}
+
+.cbtn--round {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  justify-content: center;
+  font-size: 14px;
+}
+
+.cbtn--quiet {
+  border-color: transparent;
+  color: var(--ink-3);
+}
+
+.cbtn--accent {
+  border-color: var(--predict);
+  color: var(--predict-ink);
+  background: linear-gradient(var(--predict-tint), var(--predict-tint)), var(--paper);
+}
+
+.cbtn--date {
+  font-variant-numeric: tabular-nums;
+  min-width: 10ch;
+  justify-content: center;
+  color: var(--ink-1);
+}
+
+.controlbar.is-scrubbed .cbtn--date {
+  border-color: var(--ink-1);
+}
+
+.cbtn--dateinput {
+  font-variant-numeric: tabular-nums;
+  padding: 6px 10px;
+  color: var(--ink-1);
+}
+
+.cbtn--dateinput[hidden] {
+  display: none;
+}
+
+/* --------------------------------------------------- mobile: a bottom sheet */
+.controls-fab {
+  display: none;
+  position: fixed;
+  z-index: 38;
+  left: 50%;
+  bottom: max(14px, env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  appearance: none;
+  border: 1px solid var(--ink-1);
+  border-radius: 999px;
+  background: var(--ink-1);
+  color: var(--ink-inv);
+  padding: 12px 22px;
+  min-height: 44px;
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  box-shadow: var(--shadow-2);
+  cursor: pointer;
+}
+
+.controls-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 38;
+  background: rgba(17, 17, 17, 0.16);
+  backdrop-filter: blur(2px);
+}
+
+.controls-scrim[hidden] {
+  display: none;
+}
+
+@media (max-width: 720px) {
+  .controls-fab {
+    display: block;
+  }
+
+  /* Room under the last line so the floating button never rests on top of the footer. */
+  .site-footer {
+    padding-bottom: 96px;
+  }
+
+  .controlbar {
+    position: fixed;
+    z-index: 39;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin: 0;
+    max-height: 82dvh;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    border-radius: 22px 22px 0 0;
+    border: 0;
+    border-top: 1px solid var(--hair);
+    box-shadow: var(--shadow-3);
+    padding: 6px 18px calc(22px + env(safe-area-inset-bottom));
+    transform: translate3d(0, 100%, 0);
+    visibility: hidden;
+    transition: transform 0.36s cubic-bezier(0.22, 1, 0.36, 1), visibility 0.36s;
+  }
+
+  .controlbar.is-open {
+    transform: translate3d(0, 0, 0);
+    visibility: visible;
+  }
+
+  .controlbar__grab {
+    display: block;
+    width: 38px;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--hair-strong);
+    margin: 10px auto 12px;
+  }
+
+  .controlbar__inner {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+  }
+
+  .cgroup--now,
+  .cgroup--help {
+    margin-left: 0;
+    align-self: stretch;
+  }
+
+  .seg {
+    width: 100%;
+  }
+
+  .seg__btn {
+    flex: 1 1 0;
+    justify-content: center;
+    min-height: 44px;
+  }
+
+  .cbtn {
+    min-height: 44px;
+  }
+
+  .cgroup__row {
+    flex-wrap: wrap;
+  }
+
+  .cbtn--date {
+    flex: 1 1 auto;
+  }
+
+  .seg__key {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .controlbar {
+    transition: none;
+  }
+}
+
+/* ------------------------------------------------------- the shortcut sheet */
+.sheet {
+  border: 1px solid var(--hair);
+  border-radius: var(--radius);
+  background: var(--paper);
+  box-shadow: var(--shadow-3);
+  color: var(--ink-1);
+  padding: 22px 26px 24px;
+  width: min(460px, calc(100vw - 32px));
+  font-family: var(--font);
+}
+
+.sheet::backdrop {
+  background: rgba(17, 17, 17, 0.2);
+  backdrop-filter: blur(2px);
+}
+
+.sheet__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.sheet__title {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+
+.sheet__close {
+  appearance: none;
+  border: 1px solid var(--hair);
+  border-radius: 50%;
+  background: var(--paper);
+  width: 28px;
+  height: 28px;
+  line-height: 1;
+  font-size: 17px;
+  color: var(--ink-2);
+  cursor: pointer;
+}
+
+.sheet__close:hover {
+  color: var(--ink-1);
+  border-color: var(--ink-1);
+}
+
+.sheet__list {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 9px 18px;
+  align-items: baseline;
+  margin: 0;
+}
+
+.sheet__list dt {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+.sheet__list dd {
+  margin: 0;
+  font-size: 13.5px;
+  color: var(--ink-2);
+}
+
+.sheet__list kbd {
+  font-family: var(--font);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  border: 1px solid var(--hair-strong);
+  border-bottom-width: 2px;
+  border-radius: 5px;
+  padding: 1px 6px;
+  color: var(--ink-1);
+  background: var(--paper-2);
+}
+
+.sheet__plus {
+  font-size: 11px;
+  color: var(--ink-3);
+}
+
+.sheet__foot {
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid var(--hair-soft);
+  font-size: 12.5px;
+  color: var(--ink-3);
+  line-height: 1.6;
+}
+
+/* ------------------------------------------------------------------- tour */
+.tour {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+}
+
+.tour[hidden] {
+  display: none;
+}
+
+.tour__scrim {
+  position: absolute;
+  inset: 0;
+  background: rgba(17, 17, 17, 0.28);
+  backdrop-filter: blur(1.5px);
+}
+
+.tour__ring {
+  position: absolute;
+  border: 1.5px solid var(--predict);
+  border-radius: 14px;
+  box-shadow: 0 0 0 9999px rgba(17, 17, 17, 0.001), 0 10px 40px -12px rgba(17, 17, 17, 0.5);
+  background: rgba(255, 255, 255, 0.06);
+  pointer-events: none;
+  transition: all 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.tour__card {
+  position: absolute;
+  background: var(--paper);
+  border: 1px solid var(--hair);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-3);
+  padding: 18px 20px 16px;
+  transition: top 0.32s cubic-bezier(0.22, 1, 0.36, 1), left 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.tour__step {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-bottom: 8px;
+}
+
+.tour__title {
+  font-size: 20px;
+  font-weight: 300;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  margin-bottom: 8px;
+}
+
+.tour__body {
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--ink-2);
+}
+
+.tour__actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.tour__actions .cbtn--quiet {
+  margin-right: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tour__ring,
+  .tour__card {
+    transition: none;
+  }
+}
+
+/* ------------------------------------------------------------ section head */
+.section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+
+.section-head .section-title {
+  margin-bottom: 0;
+}

@@ -6,14 +6,24 @@
 import type { LayerName } from '../chart';
 import { el, prefersReducedMotion } from '../dom';
 
-/** Per-layer amplitude in px — grid barely moves, labels move most. */
+/**
+ * Per-layer amplitude in px — grid barely moves, labels move most. Every `LayerName` the chart
+ * shell declares must appear here (the compiler enforces it), so a new layer cannot silently
+ * stay pinned while the stack around it drifts.
+ */
 const DEPTH: Record<LayerName, number> = {
   grid: 2,
+  ladder: 1,
   stripes: 3,
+  bands: 2,
+  frontierFan: 2,
   fans: 4,
   lines: 6,
   points: 6,
+  tiers: 3,
   markers: 5,
+  crossings: 4,
+  backtest: 4,
   labels: 8,
   pace: 2,
   overlay: 1,

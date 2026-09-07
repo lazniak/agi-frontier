@@ -1,4 +1,5 @@
 /** Formatting helpers. English, en-dash for ranges, no emoji (see CLAUDE.md § Style). */
+import { RATING_PER_LOGIT } from '@agi/shared';
 import type { DatePrecision, ISODate, ISOTimestamp } from '@agi/shared';
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -68,6 +69,59 @@ export function fmtAgo(ts: ISOTimestamp, now = Date.now()): string {
 
 export function fmtNumber(v: number, digits = 1): string {
   return v.toFixed(digits);
+}
+
+/** Thin space between thousands — `1 305`, never `1,305` (the site is English but metric). */
+const THIN = ' ';
+
+/** `1 305` — the house format for a Frontier Rating. */
+export function fmtRating(v: number): string {
+  const n = Math.round(v);
+  const sign = n < 0 ? '−' : '';
+  const digits = String(Math.abs(n));
+  let out = '';
+  for (let i = 0; i < digits.length; i++) {
+    if (i > 0 && (digits.length - i) % 3 === 0) out += THIN;
+    out += digits[i];
+  }
+  return sign + out;
+}
+
+/** `± 34` — the rating half-width of one standard error (REDESIGN §1.2: 173.72 · se). */
+export function fmtRatingSe(se: number): string {
+  return `± ${Math.round(se * RATING_PER_LOGIT)}`;
+}
+
+/** `+42 d` / `−17 d` / en-dash when there is nothing to report. */
+export function fmtSignedDays(days: number | null): string {
+  if (days === null || !Number.isFinite(days)) return EN_DASH;
+  const d = Math.round(days);
+  if (d === 0) return '0 d';
+  return `${d > 0 ? '+' : '−'}${Math.abs(d)} d`;
+}
+
+/** `42 min` / `3 h 10 min` / `2 d 4 h` — a countdown, never negative. */
+export function fmtDuration(ms: number): string {
+  const mins = Math.max(0, Math.round(ms / 60000));
+  if (mins < 60) return `${mins} min`;
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) {
+    const rest = mins % 60;
+    return rest ? `${hours} h ${rest} min` : `${hours} h`;
+  }
+  const days = Math.floor(hours / 24);
+  const rest = hours % 24;
+  return rest ? `${days} d ${rest} h` : `${days} d`;
+}
+
+/** `Mar 2028` for a level crossing, `Q2 2028` once the window is wider than a year. */
+export function fmtMonthRange(a: ISODate, b: ISODate): string {
+  return `${fmtMonth(a)} ${EN_DASH} ${fmtMonth(b)}`;
+}
+
+/** Pace regimes read as prose in the Stages panel. */
+export function regimeLabel(regime: string): string {
+  return regime.charAt(0).toUpperCase() + regime.slice(1);
 }
 
 /** `86.4` — the house format for an index value. */

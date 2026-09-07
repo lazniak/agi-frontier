@@ -1,0 +1,317 @@
+/* AGI Frontier — /paper.html: a reading column, a sticky table of contents, and print styles. */
+
+.paper-shell {
+  display: grid;
+  grid-template-columns: minmax(0, 220px) minmax(0, 1fr);
+  gap: clamp(28px, 5vw, 72px);
+  padding-block: clamp(40px, 6vw, 84px) clamp(48px, 8vw, 110px);
+  align-items: start;
+}
+
+/* ------------------------------------------------------------------- toc */
+.paper-toc {
+  position: sticky;
+  top: 86px;
+  max-height: calc(100dvh - 120px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+}
+
+.paper-toc ol {
+  display: grid;
+  gap: 2px;
+  border-left: 1px solid var(--hair);
+  padding-left: 14px;
+}
+
+.paper-toc a {
+  display: block;
+  font-size: 12.5px;
+  line-height: 1.4;
+  color: var(--ink-3);
+  text-decoration: none;
+  padding: 3px 0;
+  transition: color 0.16s ease;
+}
+
+.paper-toc a:hover {
+  color: var(--ink-1);
+}
+
+.paper-toc a[aria-current='true'] {
+  color: var(--ink-1);
+  font-weight: 500;
+}
+
+.paper-toc__sub a {
+  padding-left: 12px;
+  font-size: 12px;
+  color: #8b8b8b;
+}
+
+.paper-toc__foot {
+  margin-top: 20px;
+}
+
+/* -------------------------------------------------------- reading column */
+.paper {
+  max-width: 72ch;
+  min-width: 0;
+  font-size: 16.5px;
+  line-height: 1.75;
+  color: var(--ink-2);
+  overflow-wrap: break-word;
+}
+
+.paper__loading {
+  color: var(--ink-3);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-size: 12px;
+}
+
+.paper h1 {
+  font-size: clamp(32px, 5vw, 54px);
+  font-weight: 200;
+  line-height: 1.07;
+  letter-spacing: -0.03em;
+  color: var(--ink-1);
+  margin-bottom: 14px;
+  text-wrap: balance;
+}
+
+.paper h2 {
+  font-size: clamp(19px, 2.4vw, 24px);
+  font-weight: 300;
+  line-height: 1.3;
+  letter-spacing: -0.015em;
+  color: var(--ink-1);
+  margin: 8px 0 26px;
+  max-width: 46ch;
+}
+
+.paper h3 {
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--ink-1);
+  margin: 46px 0 12px;
+  scroll-margin-top: 90px;
+}
+
+.paper h2 {
+  scroll-margin-top: 90px;
+}
+
+.paper h4 {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--ink-1);
+  margin: 28px 0 8px;
+}
+
+.paper p {
+  margin-bottom: 18px;
+}
+
+.paper strong {
+  color: var(--ink-1);
+  font-weight: 600;
+}
+
+.paper em {
+  font-style: italic;
+  font-weight: 300;
+}
+
+.paper a {
+  color: var(--ink-1);
+  text-decoration-color: var(--predict);
+  text-decoration-thickness: 1.5px;
+}
+
+.paper ul,
+.paper ol {
+  margin: 0 0 20px;
+  padding-left: 22px;
+  list-style: disc;
+}
+
+.paper ol {
+  list-style: decimal;
+}
+
+.paper li {
+  margin-bottom: 7px;
+}
+
+.paper li::marker {
+  color: var(--ink-3);
+}
+
+.paper hr {
+  border: 0;
+  border-top: 1px solid var(--hair);
+  margin: 40px 0;
+}
+
+.paper blockquote {
+  margin: 0 0 20px;
+  padding-left: 16px;
+  border-left: 2px solid var(--predict);
+  color: var(--ink-2);
+}
+
+.paper code {
+  font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+  font-size: 0.86em;
+  background: rgba(17, 17, 17, 0.05);
+  border-radius: 4px;
+  padding: 1px 5px;
+}
+
+.paper pre {
+  max-width: 100%;
+  margin: 0 0 22px;
+  padding: 16px 18px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--hair-soft);
+  background: var(--paper-2);
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.paper pre code {
+  background: none;
+  padding: 0;
+  font-size: 13px;
+}
+
+/* Wide tables scroll inside their own box; the page never scrolls sideways. */
+.paper__table {
+  overflow-x: auto;
+  max-width: 100%;
+  margin: 0 0 24px;
+  border: 1px solid var(--hair-soft);
+  border-radius: var(--radius-sm);
+  background: var(--paper);
+}
+
+.paper table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13.5px;
+  min-width: 380px;
+}
+
+.paper th {
+  text-align: left;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--hair);
+  white-space: nowrap;
+}
+
+.paper td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--hair-soft);
+  color: var(--ink-2);
+  vertical-align: top;
+}
+
+.paper tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+@media (max-width: 900px) {
+  /* `minmax(0, …)`, never `1fr`: a bare `1fr` takes the table's min-width as the column's floor
+     and the whole page grows sideways on a phone. */
+  .paper-shell {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .paper-toc {
+    position: static;
+    max-height: none;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--hair);
+  }
+  .paper-toc ol {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 14px;
+    border-left: 0;
+    padding-left: 0;
+  }
+  .paper-toc__sub {
+    display: none;
+  }
+}
+
+/* ------------------------------------------------------------------ print */
+@media print {
+  .site-header,
+  .site-footer,
+  .paper-toc,
+  .page-glow,
+  .skip-link {
+    display: none !important;
+  }
+
+  .paper-shell {
+    display: block;
+    max-width: none;
+    padding: 0;
+  }
+
+  .paper {
+    max-width: none;
+    font-size: 10.5pt;
+    line-height: 1.5;
+    color: #000;
+  }
+
+  .paper h1,
+  .paper h2,
+  .paper h3,
+  .paper h4,
+  .paper strong {
+    color: #000;
+  }
+
+  .paper h3,
+  .paper h4 {
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+
+  .paper p,
+  .paper li,
+  .paper table {
+    break-inside: avoid-page;
+  }
+
+  .paper a {
+    color: #000;
+    text-decoration: underline;
+  }
+
+  .paper__table {
+    overflow: visible;
+    border-color: #999;
+  }
+
+  .paper table {
+    min-width: 0;
+  }
+
+  @page {
+    margin: 18mm 16mm;
+  }
+}

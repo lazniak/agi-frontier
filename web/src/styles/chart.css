@@ -705,6 +705,65 @@
   border-bottom: 1px solid var(--hair);
 }
 
+/* --- redesign layers: tiers, family bands, the ladder, crossings, backtest --- */
+
+.key__swatch--tier {
+  width: 7px;
+  height: 7px;
+  background: #fff;
+  border: 1px solid var(--ink-2);
+  transform: rotate(45deg) translateY(-1px);
+}
+
+.key__swatch--band {
+  width: 20px;
+  height: 11px;
+  border-radius: 2px;
+  background: rgba(17, 17, 17, 0.1);
+  border-top: 1px solid var(--ink-2);
+}
+
+.key__swatch--frontierfan {
+  width: 20px;
+  height: 9px;
+  border-radius: 2px;
+  background: linear-gradient(to right, rgba(17, 17, 17, 0.14), rgba(245, 196, 0, 0.22));
+}
+
+.key__swatch--ladder {
+  width: 20px;
+  height: 0;
+  border-top: 1px dashed var(--hair-strong);
+  transform: translateY(-2px);
+}
+
+.key__swatch--crossing {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 1px solid var(--ink-1);
+  background: rgba(245, 196, 0, 0.28);
+}
+
+.key__swatch--bt68,
+.key__swatch--bt90,
+.key__swatch--btmiss {
+  width: 13px;
+  height: 0;
+  border-top: 1.5px solid #10a37f;
+  transform: translateY(-2px);
+  margin-right: 2px;
+}
+
+.key__swatch--bt90 {
+  border-top-color: var(--predict);
+}
+
+.key__swatch--btmiss {
+  border-top-color: #be2e2e;
+  margin-right: 5px;
+}
+
 /* --------------------------------------------------------------- tooltip */
 .tooltip {
   position: fixed;
@@ -830,4 +889,31 @@
   .wordmark__mark {
     transition: none !important;
   }
+}
+
+/* Level ladder labels in the right gutter (chart/ladder.ts fits them to the gutter by measurement). */
+.level-label {
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  fill: var(--ink-3);
+  cursor: default;
+}
+.level-label--generation,
+.level-label--ceiling {
+  fill: var(--ink-2);
+}
+@media (max-width: 719px) {
+  .level-label {
+    font-size: 9.5px;
+  }
+}
+
+/* Label beside a predicted crossing circle (chart/crossings.ts drops it when it would hit the gutter). */
+.crossing-label {
+  font-size: 10.5px;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  fill: var(--ink-2);
+  pointer-events: none;
 }

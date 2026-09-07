@@ -61,8 +61,8 @@ const PACE_H_COMPACT = 40;
 /** Gap between the x-axis labels / leadership stripe and the pace strip. */
 const PACE_GAP = 44;
 /** Right-hand gutter: the level ladder lives here (REDESIGN §7.1). */
-export const GUTTER_RIGHT = 144;
-export const GUTTER_RIGHT_COMPACT = 84;
+export const GUTTER_RIGHT = 150;
+export const GUTTER_RIGHT_COMPACT = 100;
 
 export function geometry(width: number, height: number): Geom {
   const compact = width < 720;

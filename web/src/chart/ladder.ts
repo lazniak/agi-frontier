@@ -77,16 +77,20 @@ export function drawLadder(g: G, r: RenderCtx, yTicks: ValueTick[]): void {
     .attr('tabindex', 0)
     .attr('role', 'img');
   const merged = entered.merge(labels as never);
-  // The gutter is ~120 px desktop / 72 px mobile: truncate with an ellipsis — the tooltip and
-  // the aria-label carry the full text (Jost 10.5 px averages ~6 px per glyph).
-  // Fits the gutter (scales.ts GUTTER_RIGHT*) at Jost 10.5 px ≈ 6.2 px per glyph.
-  const maxChars = Math.floor((compact ? 76 : 134) / 6.2);
+  // The label must end before the host's edge (the chart is full-bleed, so on a phone that edge
+  // is the viewport): measure the rendered text instead of guessing a glyph width, fall back
+  // from the full label to the short one, and only then trim with an ellipsis. The tooltip and
+  // the aria-label carry the full text.
+  const maxW = Math.max(24, geom.width - gutterX - 14);
   merged
     .attr('x', gutterX)
     .attr('y', (d) => y(indexAt(d)) + 3.5)
-    .text((d) => {
-      const full = compact || d.label.length > maxChars ? shortLabel(d, r.ctx.benchmarks) : d.label;
-      return full.length > maxChars ? `${full.slice(0, Math.max(4, maxChars - 1))}…` : full;
+    .each(function (d) {
+      // Benchmark first, so an ellipsis eats the suffix and never the name.
+      const candidates = compact
+        ? [compactLabel(d, r.ctx.benchmarks), nameOnly(d, r.ctx.benchmarks)]
+        : [nameFirstLabel(d, r.ctx.benchmarks)];
+      fitText(this, candidates, maxW);
     })
     .attr('aria-label', (d) => `${d.label}, rating ${Math.round(d.rating)}`)
     .on('pointerenter', function (ev: PointerEvent, d) {
@@ -119,6 +123,58 @@ function indexFromThetaOf(theta: number): number {
 }
 
 /** Mobile: drop the prose, keep the essence. */
+/**
+ * Set the first candidate that fits `maxW` px, else the last one trimmed with an ellipsis.
+ * `getComputedTextLength` is 0 while the SVG is not rendered — then the first candidate stays.
+ */
+function fitText(el: SVGTextElement, candidates: string[], maxW: number): void {
+  for (const c of candidates) {
+    el.textContent = c;
+    if (el.getComputedTextLength() <= maxW) return;
+  }
+  let t = candidates[candidates.length - 1] ?? '';
+  while (t.length > 3 && el.getComputedTextLength() > maxW) {
+    t = t.slice(0, -1);
+    el.textContent = `${t.trimEnd()}…`;
+  }
+}
+
+/** Desktop fallback: "<benchmark> saturated" — the benchmark survives an ellipsis. */
+export function nameFirstLabel(lv: Level, benchmarks?: Map<string, { short: string }>): string {
+  const name = lv.benchmark ? (benchmarks?.get(lv.benchmark)?.short ?? lv.benchmark) : '';
+  switch (lv.kind) {
+    case 'ceiling':
+      return 'Basket ceiling';
+    case 'generation':
+      return lv.generation === undefined ? 'Basket saturated' : `Gen ${lv.generation} saturated`;
+    case 'human':
+      return `${name} · human`;
+    default:
+      return `${name} saturated`;
+  }
+}
+
+/** Last resort on a phone: the bare benchmark name (the rung style says which kind it is). */
+function nameOnly(lv: Level, benchmarks?: Map<string, { short: string }>): string {
+  const name = lv.benchmark ? (benchmarks?.get(lv.benchmark)?.short ?? lv.benchmark) : '';
+  return name || compactLabel(lv, benchmarks);
+}
+
+/** Phone ladder label: the dashed rung already says "level", so just name it. */
+export function compactLabel(lv: Level, benchmarks?: Map<string, { short: string }>): string {
+  const name = lv.benchmark ? (benchmarks?.get(lv.benchmark)?.short ?? lv.benchmark) : '';
+  switch (lv.kind) {
+    case 'ceiling':
+      return 'Ceiling';
+    case 'generation':
+      return lv.generation === undefined ? 'Saturated' : `Gen ${lv.generation}`;
+    case 'human':
+      return `${name} · human`;
+    default:
+      return name;
+  }
+}
+
 /** Compact ladder label: benchmark short names, never ids. */
 export function shortLabel(lv: Level, benchmarks?: Map<string, { short: string }>): string {
   const name = lv.benchmark ? (benchmarks?.get(lv.benchmark)?.short ?? lv.benchmark) : '';
