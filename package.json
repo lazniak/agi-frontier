@@ -1,0 +1,19 @@
+{
+  "name": "agi-frontier",
+  "private": true,
+  "version": "0.1.0",
+  "description": "AGI Frontier — the living chart of flagship LLM capability, with calibrated release-date prediction. https://agi.pablogfx.com",
+  "license": "MIT",
+  "workspaces": ["shared", "worker", "web"],
+  "scripts": {
+    "typecheck": "bun run --filter '*' typecheck",
+    "test": "bun run --filter '*' test",
+    "lint": "bun run --filter '*' lint",
+    "build": "bun run --filter shared build && bun run --filter worker build && bun run --filter web build",
+    "validate": "bun run --filter worker validate",
+    "bundle": "bun run --filter worker bundle"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.0"
+  }
+}

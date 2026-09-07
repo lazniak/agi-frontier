@@ -1,0 +1,35 @@
+{
+  "lab": "anthropic",
+  "updated_at": "2026-09-07T04:00:00Z",
+  "releases": [
+    {
+      "id": "anthropic-claude-opus-4.5",
+      "lab": "anthropic",
+      "name": "Claude Opus 4.5",
+      "family": "Claude Opus",
+      "date": "2025-11-24",
+      "date_precision": "day",
+      "status": "released",
+      "announcement": {
+        "url": "https://www.anthropic.com/news/claude-opus-4-5",
+        "title": "Introducing Claude Opus 4.5",
+        "quote": "Claude Opus 4.5 is available today",
+        "retrieved_at": "2026-09-07T04:00:00Z"
+      },
+      "scores": [
+        {
+          "benchmark": "swe-bench-verified",
+          "value": 80.9,
+          "config": "default scaffold, no parallel test-time compute",
+          "reported_by": "official",
+          "source": {
+            "url": "https://www.anthropic.com/news/claude-opus-4-5",
+            "quote": "80.9% on SWE-bench Verified",
+            "retrieved_at": "2026-09-07T04:00:00Z"
+          }
+        }
+      ],
+      "notes": "Example record. Real files must not contain this entry."
+    }
+  ]
+}

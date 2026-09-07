@@ -1,0 +1,26 @@
+{
+  "name": "@agi/worker",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "lint": "tsc --noEmit -p tsconfig.json",
+    "test": "bun test",
+    "build": "tsc -p tsconfig.build.json",
+    "validate": "bun run src/cli.ts validate",
+    "bundle": "bun run src/cli.ts bundle",
+    "verify": "bun run src/cli.ts verify",
+    "poll": "bun run src/cli.ts poll",
+    "loop": "bun run src/cli.ts loop"
+  },
+  "dependencies": {
+    "@agi/shared": "workspace:*",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.1.0",
+    "@types/node": "^22.0.0",
+    "typescript": "^5.6.0"
+  }
+}
