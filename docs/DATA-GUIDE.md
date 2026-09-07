@@ -12,7 +12,7 @@
    - `retrieved_at`: UTC timestamp when you looked, e.g. `2026-09-07T04:00:00Z`.
 3. Append a row to `data/history/changes.jsonl`:
    `{"at":"…Z","actor":"manual","lab":"openai","release_id":"openai-gpt-5.1","kind":"release_added","summary":"GPT-5.1 launch post","source_url":"…"}`
-4. `bun run validate` must pass. `bun run --filter worker verify --lab openai` re-fetches
+4. `bun run validate` must pass. `bun run --filter @agi/worker verify --lab openai` re-fetches
    your sources and marks quotes verified.
 5. Open a PR with title `data(<lab>): <what>`.
 

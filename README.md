@@ -34,7 +34,7 @@ docs/     methodology and data guide
 ```bash
 bun install
 bun run validate && bun run bundle
-bun run --filter web dev
+bun run --filter @agi/web dev
 ```
 
 ## Contribute a release or a score

@@ -7,10 +7,22 @@
     "color_note": "Historic ChatGPT/OpenAI brand green (#10A37F). The current wordmark is black; green is kept so the line stays legible next to xAI.",
     "website": "https://openai.com",
     "sources": [
-      { "label": "News RSS", "url": "https://openai.com/news/rss.xml", "kind": "rss" },
-      { "label": "News", "url": "https://openai.com/news/", "kind": "html" }
+      {
+        "label": "News RSS",
+        "url": "https://openai.com/news/rss.xml",
+        "kind": "rss"
+      },
+      {
+        "label": "News",
+        "url": "https://openai.com/news/",
+        "kind": "html"
+      }
     ],
-    "flagship_hints": ["^GPT-\\d", "^o\\d", "GPT-\\d+(\\.\\d+)?(?!.*(mini|nano))"]
+    "flagship_hints": [
+      "^GPT-\\d",
+      "^o\\d",
+      "GPT-\\d+(\\.\\d+)?(?!.*(mini|nano))"
+    ]
   },
   {
     "id": "anthropic",
@@ -20,10 +32,21 @@
     "color_note": "Anthropic/Claude terracotta (#D97757), official brand colour.",
     "website": "https://www.anthropic.com",
     "sources": [
-      { "label": "News", "url": "https://www.anthropic.com/news", "kind": "html" },
-      { "label": "Model overview (docs)", "url": "https://docs.anthropic.com/en/docs/about-claude/models/overview", "kind": "html" }
+      {
+        "label": "News",
+        "url": "https://www.anthropic.com/news",
+        "kind": "html"
+      },
+      {
+        "label": "Model overview (docs)",
+        "url": "https://docs.anthropic.com/en/docs/about-claude/models/overview",
+        "kind": "html"
+      }
     ],
-    "flagship_hints": ["Claude (Opus|Fable|Mythos)", "Claude \\d(\\.\\d)? Opus"]
+    "flagship_hints": [
+      "Claude (Opus|Fable|Mythos)",
+      "Claude \\d(\\.\\d)? Opus"
+    ]
   },
   {
     "id": "google",
@@ -33,11 +56,26 @@
     "color_note": "Gemini brand-gradient purple (#9168C0). The four-colour Google palette cannot represent a single line.",
     "website": "https://deepmind.google",
     "sources": [
-      { "label": "Google Keyword blog — Gemini RSS", "url": "https://blog.google/products-and-platforms/products/gemini/rss/", "kind": "rss" },
-      { "label": "DeepMind blog", "url": "https://deepmind.google/blog/", "kind": "html" },
-      { "label": "Gemini models docs", "url": "https://ai.google.dev/gemini-api/docs/models", "kind": "html" }
+      {
+        "label": "Google Keyword blog — Gemini RSS",
+        "url": "https://blog.google/products-and-platforms/products/gemini/rss/",
+        "kind": "rss"
+      },
+      {
+        "label": "DeepMind blog",
+        "url": "https://deepmind.google/blog/",
+        "kind": "html"
+      },
+      {
+        "label": "Gemini models docs",
+        "url": "https://ai.google.dev/gemini-api/docs/models",
+        "kind": "html"
+      }
     ],
-    "flagship_hints": ["Gemini \\d(\\.\\d)? (Pro|Ultra)", "Gemini \\d(\\.\\d)? Deep Think"]
+    "flagship_hints": [
+      "Gemini \\d(\\.\\d)? (Pro|Ultra)",
+      "Gemini \\d(\\.\\d)? Deep Think"
+    ]
   },
   {
     "id": "xai",
@@ -47,10 +85,20 @@
     "color_note": "xAI/Grok brand is monochrome black; used as-is.",
     "website": "https://x.ai",
     "sources": [
-      { "label": "News", "url": "https://x.ai/news", "kind": "html" },
-      { "label": "API models docs", "url": "https://docs.x.ai/docs/models", "kind": "html" }
+      {
+        "label": "News",
+        "url": "https://x.ai/news",
+        "kind": "html"
+      },
+      {
+        "label": "API models docs",
+        "url": "https://docs.x.ai/docs/models",
+        "kind": "html"
+      }
     ],
-    "flagship_hints": ["Grok \\d(\\.\\d)?(?!.*(mini|fast))"]
+    "flagship_hints": [
+      "Grok \\d(\\.\\d)?(?!.*(mini|fast))"
+    ]
   },
   {
     "id": "meta",
@@ -60,11 +108,22 @@
     "color_note": "Meta brand blue (#0866FF), official.",
     "website": "https://ai.meta.com",
     "sources": [
-      { "label": "Meta AI blog RSS", "url": "https://ai.meta.com/blog/rss/", "kind": "rss" },
-      { "label": "Meta AI blog", "url": "https://ai.meta.com/blog/", "kind": "html" },
-      { "label": "Hugging Face org", "url": "https://huggingface.co/api/models?author=meta-llama&sort=lastModified&limit=20", "kind": "hf-org" }
+      {
+        "label": "Meta AI blog",
+        "url": "https://ai.meta.com/blog/",
+        "kind": "html"
+      },
+      {
+        "label": "Hugging Face org",
+        "url": "https://huggingface.co/api/models?author=meta-llama&sort=lastModified&limit=20",
+        "kind": "hf-org"
+      }
     ],
-    "flagship_hints": ["Llama \\d", "Muse Spark", "Meta Superintelligence"]
+    "flagship_hints": [
+      "Llama \\d",
+      "Muse Spark",
+      "Meta Superintelligence"
+    ]
   },
   {
     "id": "deepseek",
@@ -74,10 +133,21 @@
     "color_note": "DeepSeek whale-logo blue (#4D6BFE), official.",
     "website": "https://www.deepseek.com",
     "sources": [
-      { "label": "API news", "url": "https://api-docs.deepseek.com/news/", "kind": "html" },
-      { "label": "Hugging Face org", "url": "https://huggingface.co/api/models?author=deepseek-ai&sort=lastModified&limit=20", "kind": "hf-org" }
+      {
+        "label": "API news",
+        "url": "https://api-docs.deepseek.com/news/",
+        "kind": "html"
+      },
+      {
+        "label": "Hugging Face org",
+        "url": "https://huggingface.co/api/models?author=deepseek-ai&sort=lastModified&limit=20",
+        "kind": "hf-org"
+      }
     ],
-    "flagship_hints": ["DeepSeek-V\\d", "DeepSeek-R\\d"]
+    "flagship_hints": [
+      "DeepSeek-V\\d",
+      "DeepSeek-R\\d"
+    ]
   },
   {
     "id": "alibaba",
@@ -87,11 +157,26 @@
     "color_note": "Alibaba Cloud orange (#FF6A00), official corporate colour; Qwen purple would collide with Gemini.",
     "website": "https://qwen.ai",
     "sources": [
-      { "label": "Qwen blog", "url": "https://qwenlm.github.io/blog/", "kind": "html" },
-      { "label": "Alibaba Cloud press room", "url": "https://www.alibabacloud.com/en/press-room", "kind": "html" },
-      { "label": "Hugging Face org", "url": "https://huggingface.co/api/models?author=Qwen&sort=lastModified&limit=20", "kind": "hf-org" }
+      {
+        "label": "Qwen blog",
+        "url": "https://qwenlm.github.io/blog/",
+        "kind": "html"
+      },
+      {
+        "label": "Alibaba Cloud press room",
+        "url": "https://www.alibabacloud.com/en/press-room",
+        "kind": "html"
+      },
+      {
+        "label": "Hugging Face org",
+        "url": "https://huggingface.co/api/models?author=Qwen&sort=lastModified&limit=20",
+        "kind": "hf-org"
+      }
     ],
-    "flagship_hints": ["Qwen\\d(\\.\\d)?-?(Max|Plus)?", "Qwen \\d(\\.\\d)? Max"]
+    "flagship_hints": [
+      "Qwen\\d(\\.\\d)?-?(Max|Plus)?",
+      "Qwen \\d(\\.\\d)? Max"
+    ]
   },
   {
     "id": "moonshot",
@@ -101,10 +186,20 @@
     "color_note": "Approximate: Moonshot/Kimi brand is monochrome; cyan chosen for separation from the blues and greens.",
     "website": "https://www.moonshot.ai",
     "sources": [
-      { "label": "Moonshot site", "url": "https://www.moonshot.ai/", "kind": "html" },
-      { "label": "Hugging Face org", "url": "https://huggingface.co/api/models?author=moonshotai&sort=lastModified&limit=20", "kind": "hf-org" }
+      {
+        "label": "Moonshot site",
+        "url": "https://www.moonshot.ai/",
+        "kind": "html"
+      },
+      {
+        "label": "Hugging Face org",
+        "url": "https://huggingface.co/api/models?author=moonshotai&sort=lastModified&limit=20",
+        "kind": "hf-org"
+      }
     ],
-    "flagship_hints": ["Kimi K\\d(\\.\\d)?"]
+    "flagship_hints": [
+      "Kimi K\\d(\\.\\d)?"
+    ]
   },
   {
     "id": "zhipu",
@@ -114,11 +209,25 @@
     "color_note": "Approximate: Z.ai brand is monochrome; magenta chosen for separation.",
     "website": "https://z.ai",
     "sources": [
-      { "label": "Z.ai blog", "url": "https://z.ai/blog", "kind": "html" },
-      { "label": "Release notes", "url": "https://docs.z.ai/release-notes", "kind": "html" },
-      { "label": "Hugging Face org", "url": "https://huggingface.co/api/models?author=zai-org&sort=lastModified&limit=20", "kind": "hf-org" }
+      {
+        "label": "Z.ai release notes (new releases)",
+        "url": "https://docs.z.ai/release-notes/new-released",
+        "kind": "html"
+      },
+      {
+        "label": "Release notes",
+        "url": "https://docs.z.ai/release-notes",
+        "kind": "html"
+      },
+      {
+        "label": "Hugging Face org",
+        "url": "https://huggingface.co/api/models?author=zai-org&sort=lastModified&limit=20",
+        "kind": "hf-org"
+      }
     ],
-    "flagship_hints": ["GLM-\\d(\\.\\d)?(?!.*(Air|Flash))"]
+    "flagship_hints": [
+      "GLM-\\d(\\.\\d)?(?!.*(Air|Flash))"
+    ]
   },
   {
     "id": "mistral",
@@ -128,9 +237,21 @@
     "color_note": "Red end of the Mistral yellow–orange–red gradient (#E10500); yellow and orange are reserved for predictions and Qwen.",
     "website": "https://mistral.ai",
     "sources": [
-      { "label": "News", "url": "https://mistral.ai/news", "kind": "html" },
-      { "label": "Hugging Face org", "url": "https://huggingface.co/api/models?author=mistralai&sort=lastModified&limit=20", "kind": "hf-org" }
+      {
+        "label": "News",
+        "url": "https://mistral.ai/news",
+        "kind": "html"
+      },
+      {
+        "label": "Hugging Face org",
+        "url": "https://huggingface.co/api/models?author=mistralai&sort=lastModified&limit=20",
+        "kind": "hf-org"
+      }
     ],
-    "flagship_hints": ["Mistral Large \\d", "Mistral Medium \\d", "Magistral"]
+    "flagship_hints": [
+      "Mistral Large \\d",
+      "Mistral Medium \\d",
+      "Magistral"
+    ]
   }
 ]

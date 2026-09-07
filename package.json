@@ -9,9 +9,9 @@
     "typecheck": "bun run --filter '*' typecheck",
     "test": "bun run --filter '*' test",
     "lint": "bun run --filter '*' lint",
-    "build": "bun run --filter shared build && bun run --filter worker build && bun run --filter web build",
-    "validate": "bun run --filter worker validate",
-    "bundle": "bun run --filter worker bundle"
+    "build": "bun run --filter @agi/shared build && bun run --filter @agi/worker build && bun run --filter @agi/web build",
+    "validate": "bun run --filter @agi/worker validate",
+    "bundle": "bun run --filter @agi/worker bundle"
   },
   "devDependencies": {
     "typescript": "^5.6.0"

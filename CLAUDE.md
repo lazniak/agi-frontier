@@ -40,8 +40,8 @@ bun install
 bun run typecheck && bun run test
 bun run validate          # zod-validate all data files + cross-references
 bun run bundle            # build data/public/latest.json
-bun run --filter web dev  # local site at http://localhost:5173
-bun run --filter worker verify   # re-fetch sources, check quotes
+bun run --filter @agi/web dev  # local site at http://localhost:5173
+bun run --filter @agi/worker verify   # re-fetch sources, check quotes
 ```
 
 ## Style
