@@ -1,0 +1,37 @@
+name: agi-frontier
+
+services:
+  web:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile.web
+    container_name: agi-frontier-web
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3040:80"
+    volumes:
+      # live data bundle written by the worker; nginx serves it at /latest.json
+      - ../data/public:/data/public:ro
+    depends_on:
+      - worker
+
+  worker:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile.worker
+    container_name: agi-frontier-worker
+    restart: unless-stopped
+    env_file:
+      - ../.env
+    environment:
+      GIT_PUSH: "1"
+      DATA_DIR: /repo/data
+      STATE_DIR: /repo/worker/.state
+      GIT_SSH_COMMAND: ssh -i /root/.ssh/id_ed25519 -o StrictHostKeyChecking=accept-new
+      LOOP_INTERVAL_MINUTES: "60"
+    volumes:
+      # the whole checkout: the worker edits data/ and commits into the host repo
+      - ..:/repo
+      - /root/.ssh/agi_frontier_deploy:/root/.ssh/id_ed25519:ro
+    working_dir: /repo
+    command: ["bun", "run", "worker/src/cli.ts", "loop"]

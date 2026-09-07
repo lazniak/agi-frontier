@@ -1,0 +1,12 @@
+# Hourly worker. The repo is bind-mounted at /repo so data commits land in the host checkout.
+FROM oven/bun:1-alpine
+RUN apk add --no-cache git openssh-client ca-certificates \
+ && git config --global --add safe.directory /repo \
+ && git config --global user.name "agi-frontier bot" \
+ && git config --global user.email "bot@agi.pablogfx.com" \
+ && git config --global pull.rebase true
+WORKDIR /repo
+COPY deploy/worker-entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+ENTRYPOINT ["/entrypoint.sh"]
+CMD ["bun", "run", "worker/src/cli.ts", "loop"]
