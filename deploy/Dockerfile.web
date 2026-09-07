@@ -8,6 +8,7 @@ COPY web/package.json web/
 RUN bun install --frozen-lockfile
 COPY shared shared
 COPY web web
+COPY docs docs
 RUN cd web && bun run build
 
 FROM nginx:1.27-alpine
