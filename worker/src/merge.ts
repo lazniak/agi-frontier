@@ -11,6 +11,7 @@ import type {
   ISOTimestamp,
   LabFile,
   ModelRelease,
+  ModelTier,
   ReleaseStatus,
   Score,
   Source,
@@ -29,6 +30,10 @@ export interface MergeContext {
   /** `r.jina.ai` when the page had to be read through the fallback proxy. */
   via?: string;
   actor?: ChangeEvent['actor'];
+  /** Lineup tier of the incoming releases (REDESIGN §3). */
+  tier?: ModelRelease['tier'];
+  /** Dataset origin of the incoming releases (REDESIGN §6): `researcher` writes `'researcher'`. */
+  origin?: ModelRelease['origin'];
 }
 
 export interface MergeResult {
@@ -60,6 +65,11 @@ export function mergeReleases(file: LabFile, incoming: NormalisedRelease[], ctx:
       const id = uniqueId(file.lab, rel.name, usedIds);
       if (!id) { notes.push(`skipped "${rel.name}": cannot build a valid id`); continue; }
       const created = buildRelease(id, file.lab, rel, ctx);
+      // New release: the resolved tier when defined (hint-derived `flagship` is fine here —
+      // it matches the unset default and cannot demote anything).
+      if (rel.tier) created.tier = rel.tier;
+      else if (ctx.tier) created.tier = ctx.tier;
+      if (ctx.origin) created.origin = ctx.origin;
       usedIds.add(id);
       byName.set(key, releases.length);
       releases.push(created);
@@ -116,6 +126,17 @@ export function mergeReleases(file: LabFile, incoming: NormalisedRelease[], ctx:
     if (touched && !hasSource(target, ctx.sourceUrl)) {
       target.sources = [...(target.sources ?? []), buildSource(ctx, rel.announcement_quote)];
     }
+
+    // 5. a tier the seed never recorded is filled in once and never flipped afterwards — and
+    // only from an EXPLICIT `mid`/`small` extraction. A hint-derived `flagship` must not tag
+    // an untiered release (it would be indistinguishable from a real tier), and nothing may
+    // demote an existing flagship to `mid`.
+    if (!target.tier && (rel.tier === 'mid' || rel.tier === 'small')) {
+      target.tier = rel.tier;
+      touched = true;
+      notes.push(`${target.id}: tier ${rel.tier}`);
+      changes.push(change(ctx.now, actor, file.lab, target.id, 'release_updated', `tier ${rel.tier}`, ctx.sourceUrl));
+    }
   }
 
   const changed = changes.length > 0;
@@ -138,7 +159,8 @@ function hasSource(rel: ModelRelease, url: string): boolean {
   return (rel.sources ?? []).some((s) => s.url === url);
 }
 
-function uniqueId(lab: string, name: string, used: Set<string>): string | null {
+/** `<lab>-<slug>`, deduplicated against `used` with `-2`, `-3`, … suffixes. */
+export function uniqueId(lab: string, name: string, used: Set<string>): string | null {
   const base = releaseId(lab, name);
   if (!isValidReleaseId(base)) return null;
   if (!used.has(base)) return base;

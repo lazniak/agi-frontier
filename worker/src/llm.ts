@@ -7,11 +7,15 @@
  *    substring of the page we fetched. Nothing an LLM says reaches `data/` on trust alone.
  */
 import { z } from 'zod';
-import type { Benchmark, DatePrecision, ISODate, Lab, ReleaseStatus } from '@agi/shared';
+import type { Benchmark, DatePrecision, ISODate, Lab, ModelTier, ReleaseStatus } from '@agi/shared';
 import { quoteContainsValue, quoteMatches, truncate } from './text';
 
 export const MAX_PAGE_CHARS = 60_000;
 export const MAX_QUOTE_CHARS = 300;
+
+/** Raw tier the model answers with; `unknown` is resolved by `validateExtraction`. */
+export const RAW_TIERS = ['flagship', 'mid', 'small', 'unknown'] as const;
+export type RawTier = (typeof RAW_TIERS)[number];
 
 export const ExtractedScoreSchema = z.object({
   benchmark: z.string(),
@@ -26,6 +30,9 @@ export const ExtractedReleaseSchema = z.object({
   status: z.enum(['released', 'announced', 'rumored']),
   date: z.string().nullable(),
   date_precision: z.enum(['day', 'month', 'quarter', 'year', 'unknown']),
+  // `catch` keeps old / malformed responses parsing: a missing or nonsense tier degrades to
+  // `unknown`, which validateExtraction resolves from the lab's flagship hints.
+  tier: z.enum(RAW_TIERS).catch('unknown'),
   announcement_quote: z.string(),
   scores: z.array(ExtractedScoreSchema),
   notes: z.string().nullable(),
@@ -50,13 +57,20 @@ export const EXTRACTION_JSON_SCHEMA = {
         items: {
           type: 'object',
           additionalProperties: false,
-          required: ['name', 'family', 'status', 'date', 'date_precision', 'announcement_quote', 'scores', 'notes'],
+          required: ['name', 'family', 'status', 'date', 'date_precision', 'tier', 'announcement_quote', 'scores', 'notes'],
           properties: {
             name: { type: 'string', description: 'Model name exactly as the lab writes it, e.g. "GPT-5.1".' },
             family: { type: 'string', description: 'Lineage, e.g. "GPT", "Claude Opus", "Gemini Pro".' },
             status: { type: 'string', enum: ['released', 'announced', 'rumored'] },
             date: { type: ['string', 'null'], description: 'YYYY-MM-DD or YYYY-MM, null if the page gives none.' },
             date_precision: { type: 'string', enum: ['day', 'month', 'quarter', 'year', 'unknown'] },
+            tier: {
+              type: 'string',
+              enum: [...RAW_TIERS],
+              description:
+                'flagship = the lab\'s largest/best model of this generation; mid = Sonnet/Flash/mini-class; ' +
+                'small = Haiku/Flash-Lite/nano-class; unknown when the page gives no size signal.',
+            },
             announcement_quote: {
               type: 'string',
               description: 'Verbatim sentence from the page (<=300 chars) proving the status and date.',
@@ -69,7 +83,11 @@ export const EXTRACTION_JSON_SCHEMA = {
                 required: ['benchmark', 'value', 'config', 'quote'],
                 properties: {
                   benchmark: { type: 'string', description: 'One of the benchmark ids given in the prompt.' },
-                  value: { type: 'number', description: 'Percentage 0-100 as reported.' },
+                  value: {
+                    type: 'number',
+                    description:
+                      'Exactly as printed: a percentage 0-100 for percentage benchmarks, the Elo rating itself for Elo benchmarks.',
+                  },
                   config: { type: ['string', 'null'], description: 'Evaluation configuration as written on the page.' },
                   quote: { type: 'string', description: 'Verbatim snippet (<=300 chars) containing this number.' },
                 },
@@ -108,9 +126,15 @@ export function buildSystemPrompt(): string {
 }
 
 export function buildUserPrompt(input: PromptInput): string {
-  const benchmarkLines = input.benchmarks.map(
-    (b) => `- ${b.id} — ${b.name}${b.short && b.short !== b.name ? ` (${b.short})` : ''}; preferred config: ${b.preferred_config}`,
-  );
+  // Community benchmarks (LMArena) are maintainer-only (user decision 2026-09-07): a lab page
+  // never reports them officially, so they are not even offered in the basket.
+  const benchmarkLines = input.benchmarks
+    .filter((b) => b.community !== true)
+    .map((b) =>
+      `- ${b.id} — ${b.name}${b.short && b.short !== b.name ? ` (${b.short})` : ''}; unit: ${
+        b.unit === 'elo' ? `Elo rating (~1200 typical, reference ${b.elo_reference ?? 'n/a'})` : 'percentage 0-100'
+      }${b.preferred_config ? `; preferred config: ${b.preferred_config}` : ''}${b.description ? `; ${b.description}` : ''}`,
+    );
   return [
     `LAB: ${input.lab.name} (id: ${input.lab.id}, site: ${input.lab.website})`,
     `TODAY: ${input.today}`,
@@ -120,6 +144,13 @@ export function buildUserPrompt(input: PromptInput): string {
     'FLAGSHIP DEFINITION',
     FLAGSHIP_DEFINITION,
     '',
+    'TIER RULES (fill `tier` for every release)',
+    '- "flagship": the lab\'s largest / best model of that generation (GPT-5, Claude Opus, Gemini Pro, Grok, Mistral Large).',
+    '- "mid": mid-size workhorse tier (Claude Sonnet, Gemini Flash, GPT mini-class, Qwen Plus, GLM Air).',
+    '- "small": smallest tier (Claude Haiku, Gemini Flash-Lite, nano-class, small open-weight models).',
+    '- "unknown": the page gives no size signal. We will resolve it from the model name.',
+    '',
+    'SCORE RULES FOR ELO BENCHMARKS: `value` is the Elo rating exactly as printed (e.g. 1450), not a percentage.',
     'AVAILABILITY RULES (decide `status` from the page wording only)',
     '- status "released": the model is publicly usable NOW — wording like "available today", ' +
       '"is now available", "rolling out to", "now in the API", "generally available", "you can try it today".',
@@ -132,7 +163,7 @@ export function buildUserPrompt(input: PromptInput): string {
     ...benchmarkLines,
     '',
     'SCORE RULES',
-    '- `value` is a percentage 0-100 exactly as printed (80.9, not 0.809).',
+    '- For percentage benchmarks `value` is exactly as printed (80.9, not 0.809). For Elo benchmarks it is the rating number itself.',
     '- `config` is the evaluation configuration as written on the page (e.g. "no tools", "extended thinking", ' +
       '"AIME 2025", "pass@1"); null when the page states none.',
     '- Only scores for the model being released, reported by the lab on this page.',
@@ -168,6 +199,8 @@ export interface NormalisedRelease {
   status: ReleaseStatus;
   date: ISODate;
   date_precision: DatePrecision;
+  /** Set only when known explicitly (or hint-matched); unset = flagship by contract. */
+  tier?: ModelTier | undefined;
   announcement_quote: string;
   scores: NormalisedScore[];
   notes?: string;
@@ -190,6 +223,37 @@ export interface ValidateExtractionOptions {
   forceStatus?: ReleaseStatus;
   /** Drop all scores (press pages never carry official numbers). */
   dropScores?: boolean;
+  /** Range check per benchmark unit; required for scores (defaults kept for backward compat). */
+  benchmarks?: Benchmark[];
+  /** Regexes from the lab's `flagship_hints` — an `unknown` tier matching one resolves to flagship. */
+  flagshipHints?: RegExp[];
+}
+
+/**
+ * Resolve the model's raw tier answer. Explicit tiers pass through. `unknown` (or nonsense)
+ * maps to `flagship` only when the name matches one of the lab's flagship hints; otherwise it
+ * resolves to `undefined` — leave unset, because unset = flagship by contract and a wrong `mid`
+ * would demote a real flagship.
+ */
+export function resolveTier(raw: string | null | undefined, name: string, hints: RegExp[]): ModelTier | undefined {
+  if (raw === 'flagship' || raw === 'mid' || raw === 'small') return raw;
+  const n = name.toLowerCase();
+  const hinted = hints.some((re) => { try { return re.test(n); } catch { return false; } });
+  return hinted ? 'flagship' : undefined;
+}
+
+/** True when the score sits inside its benchmark's declared range (unit-aware). */
+export function scoreInRange(
+  benchmark: string,
+  value: number,
+  benchmarks: Benchmark[] | undefined,
+  benchmarkIds: Set<string>,
+): boolean {
+  if (!Number.isFinite(value)) return false;
+  const b = benchmarks?.find((x) => x.id === benchmark);
+  if (b) return value >= b.min && value <= b.max;
+  // No unit table available: fall back to the historical 0-100 percentage range.
+  return benchmarkIds.has(benchmark) && value >= 0 && value <= 100;
 }
 
 const PRECISION_RANK: Record<DatePrecision, number> = { unknown: 0, year: 1, quarter: 2, month: 3, day: 4 };
@@ -227,6 +291,7 @@ export function validateExtraction(
     const scores: NormalisedScore[] = [];
     const seenScoreKeys = new Set<string>();
     if (!opts.dropScores) {
+      const community = new Set((opts.benchmarks ?? []).filter((b) => b.community === true).map((b) => b.id));
       for (const s of raw.scores) {
         const benchmark = s.benchmark.trim();
         const sq = s.quote.trim();
@@ -234,7 +299,13 @@ export function validateExtraction(
           dropped.push({ kind: 'score', name, benchmark, reason: 'benchmark not in basket' });
           continue;
         }
-        if (!Number.isFinite(s.value) || s.value < 0 || s.value > 100) {
+        // LMArena and friends: maintainer-only provenance (user decision) — a lab post saying
+        // "tops LMArena at 1462" must never become an `official` score.
+        if (community.has(benchmark)) {
+          dropped.push({ kind: 'score', name, benchmark, reason: 'community benchmark — maintainer only' });
+          continue;
+        }
+        if (!scoreInRange(benchmark, s.value, opts.benchmarks, opts.benchmarkIds)) {
           dropped.push({ kind: 'score', name, benchmark, reason: `value out of range (${s.value})` });
           continue;
         }
@@ -270,6 +341,7 @@ export function validateExtraction(
       status,
       date: resolved.date,
       date_precision: resolved.precision,
+      tier: resolveTier(raw.tier, name, opts.flagshipHints ?? []),
       announcement_quote: quote,
       scores,
     };
@@ -303,6 +375,174 @@ function resolveDate(
 
 /* ------------------------------------------------------------------ OpenRouter client */
 
+/** HTTP statuses worth another attempt (rate limits + transient upstream failures). */
+export const RETRYABLE_STATUSES = new Set([429, 500, 502, 503, 504]);
+
+export const RETRY_BASE_DELAY_MS = 2_000;
+export const RETRY_MAX_DELAY_MS = 60_000;
+/** ±25 % jitter around the computed delay. */
+export const RETRY_JITTER_FRACTION = 0.25;
+
+export interface RetryOptions {
+  attempt: number;
+  /** `Retry-After` header value in milliseconds (already parsed), when the server sent one. */
+  retryAfterMs?: number | null;
+  random?: () => number;
+  baseMs?: number;
+  maxMs?: number;
+}
+
+/**
+ * Pure backoff schedule: `base * 2^attempt`, capped, ±25 % jitter; a `Retry-After` larger than
+ * the computed delay wins. Deterministic for a given `random`.
+ */
+export function retryDelayMs(attempt: number, retryAfterMs: number | null = null, random: () => number = Math.random, baseMs: number = RETRY_BASE_DELAY_MS, maxMs: number = RETRY_MAX_DELAY_MS): number {
+  const exponential = Math.min(baseMs * Math.pow(2, Math.max(0, attempt)), maxMs);
+  const jitter = 1 + (2 * random() - 1) * RETRY_JITTER_FRACTION;
+  const backoff = exponential * jitter;
+  return Math.round(Math.max(retryAfterMs ?? 0, Math.min(backoff, maxMs * (1 + RETRY_JITTER_FRACTION))));
+}
+
+/**
+ * `withRetry`: run `fn`, retrying on retryable {@link OpenRouterError} statuses (429/5xx) and on
+ * any thrown/aborted network error, up to `maxAttempts` tries in total. A non-retryable
+ * `OpenRouterError` (401/402/400 …) rethrows immediately — retrying an auth error only burns
+ * time. Sleeps the computed delay between attempts; rethrows the last error when exhausted.
+ */
+export async function withRetry<T>(
+  fn: (attempt: number) => Promise<T>,
+  opts: {
+    maxAttempts?: number;
+    sleepImpl?: (ms: number) => Promise<void>;
+    random?: () => number;
+    onRetry?: (attempt: number, delayMs: number, error: unknown) => void;
+  } = {},
+): Promise<T> {
+  const maxAttempts = Math.max(1, opts.maxAttempts ?? 6);
+  const sleep = opts.sleepImpl ?? ((ms: number) => new Promise<void>((r) => setTimeout(r, ms)));
+  let lastError: unknown;
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    try {
+      return await fn(attempt);
+    } catch (e) {
+      lastError = e;
+      // A hard HTTP error (401, 402, 400, …) will not get better by waiting.
+      if (e instanceof OpenRouterError && !RETRYABLE_STATUSES.has(e.status)) throw e;
+      if (attempt === maxAttempts - 1) break;
+      const retryAfterMs = e instanceof OpenRouterError ? parseRetryAfter(e.retryAfter) : null;
+      const delay = retryDelayMs(attempt, retryAfterMs, opts.random);
+      opts.onRetry?.(attempt, delay, e);
+      await sleep(delay);
+    }
+  }
+  throw lastError;
+}
+
+/**
+ * `Retry-After` header value in seconds (`120`) or as an HTTP-date; null when absent/unparseable.
+ */
+export function parseRetryAfter(raw: string | null | undefined): number | null {
+  if (!raw) return null;
+  const trimmed = raw.trim();
+  if (/^\d+$/.test(trimmed)) return Number.parseInt(trimmed, 10) * 1000;
+  const t = Date.parse(trimmed);
+  return Number.isFinite(t) ? Math.max(0, t - Date.now()) : null;
+}
+
+/**
+ * Counting semaphore bounding concurrent in-flight async work (RESEARCH_CONCURRENCY).
+ */
+export class Semaphore {
+  private inFlight = 0;
+  private readonly waiters: (() => void)[] = [];
+
+  constructor(private readonly limit: number) {
+    if (!Number.isFinite(limit) || limit < 1) throw new Error(`Semaphore limit must be >= 1, got ${limit}`);
+  }
+
+  get pending(): number {
+    return this.inFlight;
+  }
+
+  get waiting(): number {
+    return this.waiters.length;
+  }
+
+  async acquire(): Promise<() => void> {
+    if (this.inFlight < this.limit) {
+      this.inFlight++;
+      return () => this.release();
+    }
+    await new Promise<void>((resolve) => this.waiters.push(resolve));
+    // `release()` handed its slot straight to this waiter (see below) — the count already
+    // accounts for us, so there is nothing to increment here.
+    return () => this.release();
+  }
+
+  /** Run `fn` holding one slot; the slot is released even when `fn` throws. */
+  async run<T>(fn: () => Promise<T>): Promise<T> {
+    const release = await this.acquire();
+    try {
+      return await fn();
+    } finally {
+      release();
+    }
+  }
+
+  private release(): void {
+    const next = this.waiters.shift();
+    if (next) {
+      // Transfer the slot to the waiter instead of decrement+re-increment: between those two
+      // steps another acquire() could slip in and push `pending` past the limit.
+      next();
+      return;
+    }
+    this.inFlight = Math.max(0, this.inFlight - 1);
+  }
+}
+
+/** USD price per 1M tokens, in and out. */
+export interface ModelPrice {
+  inPerM: number;
+  outPerM: number;
+  /** Flat surcharge per call — the `:online` web-search plugin. */
+  perCall?: number;
+}
+
+/** Known prices; everything unknown is free (0) so an estimate never overstates. */
+export const PRICE_TABLE: Record<string, ModelPrice> = {
+  'google/gemini-3.1-flash-lite': { inPerM: 0.25, outPerM: 1.0 },
+  'google/gemini-3.1-flash-lite:online': { inPerM: 0.25, outPerM: 1.0, perCall: 0.02 },
+};
+
+export interface PriceOverrides {
+  /** USD per 1M input tokens (OPENROUTER_PRICE_IN). */
+  inPerM?: number;
+  /** USD per 1M output tokens (OPENROUTER_PRICE_OUT). */
+  outPerM?: number;
+}
+
+export function priceFor(model: string, overrides: PriceOverrides = {}): ModelPrice {
+  const known = PRICE_TABLE[model] ?? { inPerM: 0, outPerM: 0 };
+  const price: ModelPrice = {
+    inPerM: overrides.inPerM ?? known.inPerM,
+    outPerM: overrides.outPerM ?? known.outPerM,
+  };
+  if (known.perCall !== undefined) price.perCall = known.perCall;
+  return price;
+}
+
+export function estimateUsd(price: ModelPrice, tokensIn: number, tokensOut: number): number {
+  return (tokensIn / 1_000_000) * price.inPerM + (tokensOut / 1_000_000) * price.outPerM + (price.perCall ?? 0);
+}
+
+export interface UsageStats {
+  calls: number;
+  tokens_in: number;
+  tokens_out: number;
+  usd_estimate: number;
+}
+
 export interface OpenRouterOptions {
   apiKey: string;
   baseUrl: string;
@@ -310,6 +550,15 @@ export interface OpenRouterOptions {
   title: string;
   timeoutMs?: number;
   fetchImpl?: typeof fetch;
+  /** Max concurrent in-flight requests (RESEARCH_CONCURRENCY). Default 2. */
+  concurrency?: number;
+  /** Retries per request. Default 6. */
+  maxAttempts?: number;
+  sleepImpl?: (ms: number) => Promise<void>;
+  random?: () => number;
+  priceOverrides?: PriceOverrides;
+  /** Warn log for retries (status only). */
+  log?: import('./log').Logger;
 }
 
 export interface ChatJsonRequest {
@@ -326,10 +575,17 @@ export interface ChatJsonResult {
   content: string;
   /** True when the model rejected `json_schema` and we fell back to `json_object`. */
   usedJsonObjectFallback: boolean;
+  /** Tokens billed for this call, when the response carried usage. */
+  usage?: { tokens_in: number; tokens_out: number };
 }
 
 export class OpenRouterError extends Error {
-  constructor(message: string, readonly status: number, readonly body: string) {
+  constructor(
+    message: string,
+    readonly status: number,
+    readonly body: string,
+    readonly retryAfter: string | null = null,
+  ) {
     super(message);
     this.name = 'OpenRouterError';
   }
@@ -337,9 +593,26 @@ export class OpenRouterError extends Error {
 
 export class OpenRouterClient {
   private readonly fetchImpl: typeof fetch;
+  /** Read-only access for callers that want to bound their own work with the same limit. */
+  readonly semaphore: Semaphore;
+  private readonly maxAttempts: number;
+  private readonly sleepImpl: (ms: number) => Promise<void>;
+  private readonly random: () => number;
+  private readonly totals: UsageStats = { calls: 0, tokens_in: 0, tokens_out: 0, usd_estimate: 0 };
+  private readonly prices: PriceOverrides;
 
   constructor(private readonly opts: OpenRouterOptions) {
     this.fetchImpl = opts.fetchImpl ?? globalThis.fetch;
+    this.semaphore = new Semaphore(opts.concurrency ?? 2);
+    this.maxAttempts = opts.maxAttempts ?? 6;
+    this.sleepImpl = opts.sleepImpl ?? ((ms: number) => new Promise<void>((r) => setTimeout(r, ms)));
+    this.random = opts.random ?? Math.random;
+    this.prices = opts.priceOverrides ?? {};
+  }
+
+  /** Running totals for the run — a copy, so callers cannot mutate the client's books. */
+  stats(): UsageStats {
+    return { ...this.totals };
   }
 
   private headers(): Record<string, string> {
@@ -368,15 +641,58 @@ export class OpenRouterClient {
     const schemaFormat = req.jsonSchema
       ? { type: 'json_schema' as const, json_schema: req.jsonSchema }
       : { type: 'json_object' as const };
+    const result = await this.semaphore.run(() =>
+      withRetry(
+        () => this.attemptPost(req, schemaFormat),
+        {
+          maxAttempts: this.maxAttempts,
+          sleepImpl: this.sleepImpl,
+          random: this.random,
+          onRetry: (attempt, delayMs, error) => {
+            // Status only, never the body — bodies can echo prompt content.
+            const status = error instanceof OpenRouterError ? error.status : undefined;
+            this.opts.log?.warn('openrouter retry', { attempt, delay_ms: delayMs, ...(status !== undefined ? { status } : {}) });
+          },
+        },
+      ),
+    );
+    // Every completed call counts, even when the response carried no usage block.
+    this.totals.calls++;
+    if (result.usage) {
+      this.totals.tokens_in += result.usage.tokens_in;
+      this.totals.tokens_out += result.usage.tokens_out;
+      this.totals.usd_estimate += estimateUsd(priceFor(req.model, this.prices), result.usage.tokens_in, result.usage.tokens_out);
+    }
+    return result;
+  }
+
+  private async attemptPost(
+    req: ChatJsonRequest,
+    schemaFormat: { type: 'json_schema' | 'json_object'; json_schema?: typeof EXTRACTION_JSON_SCHEMA },
+  ): Promise<ChatJsonResult> {
     try {
       const content = await this.post(req, schemaFormat);
-      return { json: parseJsonContent(content), content, usedJsonObjectFallback: false };
+      return this.finish(req, content, false);
     } catch (e) {
       if (!req.jsonSchema || !isSchemaRejection(e)) throw e;
       const content = await this.post(req, { type: 'json_object' as const });
-      return { json: parseJsonContent(content), content, usedJsonObjectFallback: true };
+      return this.finish(req, content, true);
     }
   }
+
+  /** Parse the content, pull the usage `post()` stashed, and book it on this call's result. */
+  private finish(_req: ChatJsonRequest, content: string, usedJsonObjectFallback: boolean): ChatJsonResult {
+    const usage = this.lastCallUsage ?? undefined;
+    this.lastCallUsage = null;
+    return {
+      json: parseJsonContent(content),
+      content,
+      usedJsonObjectFallback,
+      ...(usage ? { usage } : {}),
+    };
+  }
+
+  private lastCallUsage: { tokens_in: number; tokens_out: number } | null = null;
 
   private async post(req: ChatJsonRequest, responseFormat: unknown): Promise<string> {
     const res = await this.fetchImpl(`${this.opts.baseUrl}/chat/completions`, {
@@ -395,9 +711,12 @@ export class OpenRouterClient {
       }),
     });
     const text = await res.text();
-    if (!res.ok) throw new OpenRouterError(`chat/completions ${res.status}`, res.status, text);
+    if (!res.ok) {
+      throw new OpenRouterError(`chat/completions ${res.status}`, res.status, text, res.headers.get('retry-after'));
+    }
     let body: {
       choices?: { message?: { content?: unknown } }[];
+      usage?: { prompt_tokens?: unknown; completion_tokens?: unknown };
       error?: { message?: string; code?: number };
     };
     try {
@@ -410,6 +729,9 @@ export class OpenRouterClient {
     if (typeof content !== 'string' || !content.trim()) {
       throw new OpenRouterError('chat/completions returned no content', res.status, text);
     }
+    const pin = typeof body.usage?.prompt_tokens === 'number' ? body.usage.prompt_tokens : 0;
+    const pout = typeof body.usage?.completion_tokens === 'number' ? body.usage.completion_tokens : 0;
+    this.lastCallUsage = pin || pout ? { tokens_in: pin, tokens_out: pout } : null;
     return content;
   }
 }

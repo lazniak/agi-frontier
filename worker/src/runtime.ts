@@ -43,6 +43,16 @@ export function createRuntime(overrides: RuntimeOverrides = {}): Runtime {
         baseUrl: config.openRouterBaseUrl,
         referer: config.siteUrl,
         title: config.siteTitle,
+        concurrency: config.researchConcurrency,
+        log,
+        ...(config.openRouterPriceIn !== null || config.openRouterPriceOut !== null
+          ? {
+              priceOverrides: {
+                ...(config.openRouterPriceIn !== null ? { inPerM: config.openRouterPriceIn } : {}),
+                ...(config.openRouterPriceOut !== null ? { outPerM: config.openRouterPriceOut } : {}),
+              },
+            }
+          : {}),
         ...(overrides.fetchImpl ? { fetchImpl: overrides.fetchImpl } : {}),
       })
     : null;

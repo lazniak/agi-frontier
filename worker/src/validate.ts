@@ -12,6 +12,7 @@ import {
   ChangeEventSchema,
   LabFileSchema,
   LabSchema,
+  findOutOfRangeScores,
   findUnknownBenchmarks,
   type LabFile,
 } from '@agi/shared';
@@ -64,13 +65,15 @@ export function validateData(dataDir: string, only?: string[]): ValidationReport
 
   const bmIds = new Set<string>();
   const indexBms = new Set<string>();
-  const benchmarks: unknown[] = readJsonArray(benchmarksPath(dataDir), 'benchmarks.json', err);
-  for (const [i, b] of benchmarks.entries()) {
+  const benchmarksRaw: unknown[] = readJsonArray(benchmarksPath(dataDir), 'benchmarks.json', err);
+  const benchmarkRanges: { id: string; min: number; max: number }[] = [];
+  for (const [i, b] of benchmarksRaw.entries()) {
     const r = BenchmarkSchema.safeParse(b);
     if (!r.success) { err(`benchmarks.json[${i}]: ${issuesToString(r.error.issues)}`); continue; }
     if (bmIds.has(r.data.id)) err(`benchmarks.json: duplicate benchmark id ${r.data.id}`);
     bmIds.add(r.data.id);
     if (r.data.in_index) indexBms.add(r.data.id);
+    benchmarkRanges.push({ id: r.data.id, min: r.data.min, max: r.data.max });
   }
   report.benchmarks = bmIds.size;
 
@@ -100,6 +103,10 @@ export function validateData(dataDir: string, only?: string[]): ValidationReport
 
     const unknown = findUnknownBenchmarks(file.releases, bmIds);
     if (unknown.length) err(`${name}: unknown benchmark ids: ${unknown.join(', ')}`);
+
+    for (const oor of findOutOfRangeScores(file.releases, benchmarkRanges)) {
+      err(`${name} ${oor.release_id} ${oor.benchmark}: value ${oor.value} outside the benchmark range`);
+    }
 
     for (const rel of file.releases) {
       report.releases++;

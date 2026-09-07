@@ -32,6 +32,27 @@ export interface Config {
   pageCacheTtlMs: number;
   siteUrl: string;
   siteTitle: string;
+  /** Max concurrent OpenRouter requests issued by the researcher (semaphore on the client). */
+  researchConcurrency: number;
+  /** Per-run call budget for `backfill` (discovery + extractions). */
+  researchMaxCalls: number;
+  /** Model used by researcher commands; defaults to the `:online` model. */
+  researchModel: string;
+  /** `arena` inside `loop`. */
+  arenaEnabled: boolean;
+  /** Leaderboard URLs tried in order by `arena`. */
+  arenaUrls: string[];
+  /** `backfill --incremental` inside `loop`. */
+  backfillEnabled: boolean;
+  /** `promote` gates (REDESIGN §11). */
+  promoteMinRecall: number;
+  promoteMinPrecision: number;
+  promoteMinScoreRecall: number;
+  /** Version stamped on researcher-written releases and in the bundle. */
+  researcherVersion: string;
+  /** USD per 1M tokens; when set they override the built-in price table. */
+  openRouterPriceIn: number | null;
+  openRouterPriceOut: number | null;
 }
 
 const DEFAULT_UA =
@@ -56,6 +77,13 @@ function envBool(name: string, fallback: boolean): boolean {
   const raw = env(name);
   if (raw === undefined) return fallback;
   return /^(1|true|yes|on)$/i.test(raw);
+}
+
+function envFloat(name: string, fallback: number | null): number | null {
+  const raw = env(name);
+  if (raw === undefined) return fallback;
+  const n = Number.parseFloat(raw);
+  return Number.isFinite(n) ? n : fallback;
 }
 
 /** Walk up from this file until a directory looks like the repo root. */
@@ -101,6 +129,26 @@ export function loadConfig(overrides: Partial<Config> = {}): Config {
     pageCacheTtlMs: envInt('PAGE_CACHE_TTL_MINUTES', 0) * 60_000,
     siteUrl: env('SITE_URL') ?? 'https://agi.pablogfx.com',
     siteTitle: env('SITE_TITLE') ?? 'AGI Frontier',
+    researchConcurrency: envInt('RESEARCH_CONCURRENCY', 2),
+    researchMaxCalls: envInt('RESEARCH_MAX_CALLS', 400),
+    researchModel: env('RESEARCH_MODEL') ?? env('OPENROUTER_MODEL_ONLINE') ?? `${model}:online`,
+    arenaEnabled: envBool('ARENA_ENABLED', true),
+    arenaUrls:
+      env('ARENA_URLS')
+        ?.split(',')
+        .map((s) => s.trim())
+        .filter(Boolean) ?? [
+        'https://lmarena.ai/leaderboard/text',
+        'https://lmarena.ai/leaderboard',
+        'https://huggingface.co/spaces/lmarena-ai/chatbot-arena-leaderboard',
+      ],
+    backfillEnabled: envBool('BACKFILL_ENABLED', true),
+    promoteMinRecall: envFloat('PROMOTE_MIN_RECALL', 0.85) ?? 0.85,
+    promoteMinPrecision: envFloat('PROMOTE_MIN_PRECISION', 0.95) ?? 0.95,
+    promoteMinScoreRecall: envFloat('PROMOTE_MIN_SCORE_RECALL', 0.8) ?? 0.8,
+    researcherVersion: env('RESEARCHER_VERSION') ?? '2.0.0',
+    openRouterPriceIn: envFloat('OPENROUTER_PRICE_IN', null),
+    openRouterPriceOut: envFloat('OPENROUTER_PRICE_OUT', null),
   };
   return { ...base, ...overrides };
 }

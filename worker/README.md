@@ -19,11 +19,15 @@ bun run worker/src/cli.ts bundle                         # write data/public/lat
 bun run worker/src/cli.ts verify [--lab id] [--only-unverified] [--limit N]
 bun run worker/src/cli.ts poll   [--lab id] [--dry-run]
 bun run worker/src/cli.ts discover [--lab id] [--dry-run]
+bun run worker/src/cli.ts backfill [--lab id] [--incremental] [--dry-run]
+bun run worker/src/cli.ts arena [--dry-run]
+bun run worker/src/cli.ts eval
+bun run worker/src/cli.ts promote [--force]
 bun run worker/src/cli.ts loop
 ```
 
 Or through the package scripts, using the workspace name (`--filter worker` does not match in
-bun 1.3): `bun run --filter '@agi/worker' validate|bundle|verify|poll|discover|loop`.
+bun 1.3): `bun run --filter '@agi/worker' validate|bundle|verify|poll|discover|backfill|arena|eval|promote|loop`.
 
 | command | what it does | exit code |
 |---|---|---|
@@ -32,11 +36,21 @@ bun 1.3): `bun run --filter '@agi/worker' validate|bundle|verify|poll|discover|l
 | `verify` | Re-fetches every `Source` in every lab file — `announcement`, each `sources[]`, each `score.source`, `expected_window.source` — and checks that `quote` is still a substring of the page. Writes `verified` / `verified_at` back, appends one `verified` ChangeEvent per release, and prints a table of everything that did **not** verify. | 0 (it reports, it does not gate) |
 | `poll` | The hourly job. See the pipeline below. | 1 if any source failed or a merge had to be rolled back |
 | `discover` | Once a day: asks an `:online` model what each lab shipped in the last 45 days, then re-derives everything from the primary page it points at. | 1 on errors |
-| `loop` | `poll` on a timer, `discover` once per 24 h, structured JSON logs, graceful SIGTERM. | 0 |
+| `backfill` | The researcher's rebuild: discovery + extraction per lab into `data/researched/<lab>.json` (see below). `--incremental` limits itself to candidates from the last 120 days not yet in `data/models`. | 1 on errors |
+| `arena` | Weekly: fetch the LMArena text leaderboard, map rows to releases by canonical name, upsert one `lmarena-text` score (`reported_by: maintainer`) per match. Unmatched rows are logged, never guessed. | 1 if no URL rendered rows or a write failed |
+| `eval` | Score `data/researched/` against the frozen gold set `data/gold/`: release precision/recall, score recall (±1.0 pts / ±15 Elo), MAE, quote-verified rate. Writes `worker/.state/researcher-eval.json` and the run state. | 0 (gates are reported, not enforced here) |
+| `promote` | Merge `data/researched/` into `data/models/` — only when the last `eval` clears the gates (`--force` bypasses). Adds releases and missing scores; never overwrites a verified score. | 1 when refused or a write failed |
+| `loop` | `poll` on a timer, `discover` daily, `arena` + `backfill --incremental` + `eval` weekly, structured JSON logs, graceful SIGTERM. Publishes `next_run_at` / `run_status` / `run_step` for the site's progress bar. | 0 |
 
 `--dry-run` on `poll` does everything except writing files and calling the LLM: it fetches, parses,
 diffs and prints the candidate table. It needs no API key, which makes it the fastest way to check
 whether a source in `labs.json` still works.
+
+`backfill --dry-run` plans from a canned discovery fixture — no key, no network, no writes — and
+prints the candidate table with each candidate's status (`pending`, `done` — already in the
+progress file, `failed-before`, `already-in-models`, `too-old`). `arena --dry-run` parses the
+checked-in fixture rendering of the leaderboard (`worker/test/fixtures/lmarena-text.md`) and prints
+the match table it would apply, also without a key or network.
 
 ## The poll pipeline
 
@@ -95,6 +109,53 @@ through the normal extraction. Items from elsewhere are only accepted from an al
 semafor), can only ever produce a `rumored` entry, and never contribute a score — press coverage is
 not an official number.
 
+## The researcher flow: gold → researched → eval → promote
+
+The OpenRouter researcher is the automation that keeps the dataset fresh without a human. It never
+publishes directly: everything lands in `data/researched/`, is scored against the frozen gold set
+`data/gold/`, and only reaches `data/models/` (and the site) through `promote` when it is measurably
+good. No LLM ever does maths — it only finds pages and reads numbers, each one re-checked by the
+quote gate.
+
+```
+data/gold/            frozen answer key (human-researched, never published, see docs/REDESIGN.md §6)
+   ▲                                              │ eval compares
+   │                                              ▼
+backfill ──► data/researched/<lab>.json ──► eval ──► promote ──► data/models/<lab>.json
+   │              (origin: 'researcher')        gates:             (published to the site)
+   │                                            recall ≥ 0.85
+   │                                            precision ≥ 0.95
+   │                                            score recall ≥ 0.8
+ arena ──► lmarena-text scores straight into data/models/ (maintainer provenance, idempotent upsert)
+```
+
+1. **`backfill`** rebuilds `data/researched/<lab>.json` from scratch: for each lab it runs ~10
+   discovery queries (flagships per year since 2018 + one mid/small sweep) against a `:online`
+   model, filters candidate `launch_url`s to official hosts or the press allowlist, then fetches
+   each candidate page and runs the same extraction pipeline as `poll` — official-host rule, quote
+   gate, tier resolution, per-benchmark range checks. Every release is written with
+   `origin: 'researcher'`.
+2. **Resume and budget.** Progress lives in `worker/.state/researcher-progress.json`
+   (`done` / `failed` per lab), so a killed run resumes where it stopped and a re-run only pays for
+   discovery. `RESEARCH_MAX_CALLS` (default 400) bounds the calls per run; when the budget is
+   exhausted the run stops cleanly and the remainder waits for the next one.
+3. **`eval`** scores the researched files against the gold set. A release matches when canonical
+   names agree (equal or one contains the other) and the dates sit within 45 days; a score matches
+   within 1.0 points (`%`) or 15 Elo. The result (precision, recall, score recall, MAE, quote-verified
+   rate, per-lab table) is written to `worker/.state/researcher-eval.json` and into the run state.
+4. **`promote`** refuses to run while the gates are not met (`PROMOTE_MIN_RECALL` 0.85,
+   `PROMOTE_MIN_PRECISION` 0.95, `PROMOTE_MIN_SCORE_RECALL` 0.8; `--force` bypasses for manual
+   use). The merge is additive: new releases get `origin: 'researcher'`; existing releases only
+   gain scores they lack — a verified score is never overwritten, a release never deleted.
+5. **`arena`** is independent of that flow: it fetches the LMArena text leaderboard weekly, maps
+   rows to releases by canonical name (exact → org-stripped → parenthetical-stripped; bare family
+   names like "Gemini 3" stay unmatched) and upserts a single `lmarena-text` score with
+   `reported_by: 'maintainer'` and the row line as the verbatim quote. Re-runs replace the
+   previous arena score instead of duplicating it.
+
+In `loop`, `arena` and `backfill --incremental` + `eval` fire once a week each
+(`ARENA_ENABLED`, `BACKFILL_ENABLED`), while `poll` stays hourly and `discover` daily.
+
 ## Cost
 
 Only changed pages trigger LLM calls, and within a changed page only genuinely new items do.
@@ -113,6 +174,23 @@ A steady-state hour is normally **zero** LLM calls: nothing shipped, so no hash 
 A launch day costs a handful. `MAX_LLM_CALLS_PER_RUN` (default 20) bounds the worst case — a site
 redesign that changes every URL at once. Raise it only if you are watching the bill.
 
+The researcher commands are bounded separately:
+
+| stage | cost |
+|---|---|
+| `backfill` discovery | ~10 web-search calls per lab (9 year buckets + 1 mid/small sweep) |
+| `backfill` extraction | 1 call per candidate page not yet `done` in the progress file |
+| `backfill` full run, 10 labs, fresh state | up to `RESEARCH_MAX_CALLS` (default 400) calls |
+| `arena` | 0 LLM calls — one HTTP fetch of the leaderboard, parsed locally |
+| `eval`, `promote` | 0 LLM calls, 0 network — pure local maths on JSON files |
+
+Researcher calls run through a semaphore (`RESEARCH_CONCURRENCY`, default 2) with exponential
+backoff (2 s base, 60 s cap, ±25% jitter, `Retry-After` honoured) on 429/5xx, and every call's
+token usage is booked into `worker.researcher.budget` in the bundle so the site can show the
+running spend. Price table for the default `google/gemini-3.1-flash-lite`(+`:online`):
+$0.25/1M input, $1.00/1M output, plus ~$0.02 per `:online` web-search call; override with
+`OPENROUTER_PRICE_IN` / `OPENROUTER_PRICE_OUT`.
+
 The default model is `google/gemini-2.5-flash-lite`; the id in use is recorded in
 `latest.json → worker.llm_model` so the site can state which model produced a row. At startup the
 worker fetches `GET /api/v1/models` and warns if the configured id is not in the catalogue.
@@ -123,9 +201,11 @@ worker fetches `GET /api/v1/models` and warns if the configured id is not in the
 
 | file | contents |
 |---|---|
-| `state.json` | `last_run_at`, `last_success_at`, `pages_polled`, `pages_changed`, `llm_model`, `last_discover_at` |
+| `state.json` | `last_run_at`, `last_success_at`, `pages_polled`, `pages_changed`, `llm_model`, `last_discover_at`, plus the researcher block (`next_run_at`, `run_status`, `run_step`, `researcher.eval`, `researcher.budget`, `researcher.last_backfill_at`, `researcher.last_arena_at`, `researcher.last_eval_at`) |
 | `hashes.json` | per source: last item-list hash, `checked_at`, `changed_at`, and the item keys already processed (capped at 1200) |
 | `pages/<sha1>.txt` | fetched page text with a JSON header line (`url`, `fetched_at`, `status`, `via`) |
+| `researcher-progress.json` | per lab: candidate names `done` and `failed` — the backfill resume file |
+| `researcher-eval.json` | the latest eval report (also mirrored into the bundle) |
 
 Delete `hashes.json` and the next poll re-baselines every source without extracting anything;
 delete `state.json` and the footer's health numbers reset. Neither loses data.

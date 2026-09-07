@@ -63,6 +63,50 @@ export class StateStore {
   }
 }
 
+/** Flip the published state to "running" with a human-readable step (shown as `running · step`). */
+export function markRunning(store: StateStore, step: string, now: string = isoNow()): RunState {
+  const run = store.readRun();
+  run.run_status = 'running';
+  run.run_step = step;
+  run.last_run_at = now;
+  store.writeRun(run);
+  return run;
+}
+
+export interface IdleOptions {
+  /** When the loop will wake up — drives the site's "next research in …" progress bar. */
+  nextRunAt: string | null;
+  /** One-line result of the finished run, e.g. `poll: 23 pages, 1 changed · 0.004 USD`. */
+  summary?: string | null;
+  intervalMinutes?: number;
+  now?: string;
+}
+
+/** Flip the published state back to "idle" and schedule the next run. */
+export function markIdle(store: StateStore, opts: IdleOptions): RunState {
+  const run = store.readRun();
+  run.run_status = 'idle';
+  run.run_step = null;
+  run.next_run_at = opts.nextRunAt;
+  if (opts.summary !== undefined) run.last_run_summary = opts.summary;
+  if (opts.intervalMinutes !== undefined) run.interval_minutes = opts.intervalMinutes;
+  store.writeRun(run);
+  return run;
+}
+
+/** One line for `last_run_summary`, e.g. `poll: 23 pages, 1 changed, 2 LLM calls · 0.004 USD`. */
+export function summariseRun(
+  step: string,
+  parts: Record<string, number | string | undefined>,
+  usd?: number,
+): string {
+  const bits = Object.entries(parts)
+    .filter(([, v]) => v !== undefined && v !== '')
+    .map(([k, v]) => `${v} ${k}`);
+  const head = `${step}: ${bits.length ? bits.join(', ') : 'nothing to report'}`;
+  return usd !== undefined ? `${head} · ${usd.toFixed(3)} USD` : head;
+}
+
 export function sourceKey(labId: string, url: string): string {
   return `${labId}|${url}`;
 }

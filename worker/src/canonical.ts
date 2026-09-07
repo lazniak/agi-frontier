@@ -13,7 +13,7 @@ import type { LabFile, ModelRelease, Score, Source } from '@agi/shared';
 const SOURCE_KEYS = ['url', 'title', 'quote', 'retrieved_at', 'verified', 'verified_at', 'via', 'note'] as const;
 const SCORE_KEYS = ['benchmark', 'value', 'config', 'note', 'reported_by', 'source'] as const;
 const RELEASE_KEYS = [
-  'id', 'lab', 'name', 'family', 'date', 'date_precision', 'status',
+  'id', 'lab', 'name', 'family', 'date', 'date_precision', 'status', 'tier', 'origin',
   'expected_window', 'announcement', 'sources', 'scores', 'notes',
 ] as const;
 const WINDOW_KEYS = ['start', 'end', 'source'] as const;

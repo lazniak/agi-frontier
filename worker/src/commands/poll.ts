@@ -13,7 +13,7 @@ import { readBenchmarks, readLabs } from '../data-store';
 import { isoNow } from '../fetcher';
 import { hashItems, extractItems, type SourceItem } from '../items';
 import { compileHints, rankCandidates } from '../candidates';
-import { diffSource, sourceKey, type HashState } from '../state';
+import { diffSource, sourceKey, summariseRun, type HashState } from '../state';
 import { LabWorkspace, extractFromPage, itemDateOrToday, todayISO } from '../pipeline';
 import { commitAndPush, buildCommitMessage, dataDirty } from '../git';
 import { print } from '../log';
@@ -48,6 +48,9 @@ export async function runPoll(rt: Runtime, opts: PollOptions = {}): Promise<numb
   }
 
   await warnUnknownModel(rt, dryRun);
+
+  // Snapshot for the per-run usage delta published in `researcher.budget`.
+  const usageAtStart = rt.openRouter?.stats() ?? null;
 
   const hashes: HashState = dryRun ? {} : rt.state.readHashes();
   const summary: PollSummary = {
@@ -165,7 +168,34 @@ export async function runPoll(rt: Runtime, opts: PollOptions = {}): Promise<numb
   run.pages_changed = summary.pagesChanged;
   run.llm_model = rt.config.openRouterModel;
   if (summary.errors === 0) run.last_success_at = now;
+  // Per-run delta: the client is shared with the researcher commands, so subtract the snapshot
+  // taken at run start; the lifetime totals stay in the log below.
+  const statsAtStart = usageAtStart;
+  const usage = rt.openRouter?.stats();
+  const perRun = usage && statsAtStart
+    ? {
+        calls: usage.calls - statsAtStart.calls,
+        tokens_in: usage.tokens_in - statsAtStart.tokens_in,
+        tokens_out: usage.tokens_out - statsAtStart.tokens_out,
+        usd_estimate: Math.round((usage.usd_estimate - statsAtStart.usd_estimate) * 1_000_000) / 1_000_000,
+      }
+    : null;
+  if (perRun) {
+    run.researcher = {
+      ...run.researcher,
+      version: rt.config.researcherVersion,
+      budget: perRun,
+    };
+  }
+  run.last_run_summary = summariseRun('poll', {
+    pages: summary.pagesPolled,
+    changed: summary.pagesChanged,
+    'LLM calls': summary.llmCalls,
+    'new releases': summary.releasesAdded,
+    errors: summary.errors || undefined,
+  }, perRun?.usd_estimate);
   rt.state.writeRun(run);
+  rt.log.info('openrouter usage (lifetime totals)', usage ? { ...usage } : {});
 
   const bundleCode = runBundle(rt, { quiet: true });
   if (bundleCode !== 0) summary.errors++;

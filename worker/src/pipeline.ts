@@ -24,6 +24,7 @@ import {
   type OpenRouterClient,
 } from './llm';
 import { mergeReleases, type MergeContext } from './merge';
+import { compileHints } from './candidates';
 import type { Logger } from './log';
 
 export interface ExtractPageInput {
@@ -38,6 +39,8 @@ export interface ExtractPageInput {
   fallbackDate: ISODate;
   forceStatus?: ReleaseStatus;
   dropScores?: boolean;
+  /** Pre-compiled `flagship_hints` for tier resolution; compiled from the lab when omitted. */
+  flagshipHints?: RegExp[];
   log?: Logger;
 }
 
@@ -77,6 +80,8 @@ export async function extractFromPage(input: ExtractPageInput): Promise<ExtractP
     benchmarkIds: input.benchmarkIds,
     today: input.today,
     fallbackDate: input.fallbackDate,
+    benchmarks: input.benchmarks,
+    flagshipHints: input.flagshipHints ?? compileHints(input.lab.flagship_hints),
     ...(input.forceStatus ? { forceStatus: input.forceStatus } : {}),
     ...(input.dropScores ? { dropScores: input.dropScores } : {}),
   });

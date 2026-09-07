@@ -193,3 +193,39 @@ describe('mergeReleases — id collisions and bad names', () => {
     expect(next.notes[0]).toContain('no usable characters');
   });
 });
+
+describe('mergeReleases — tiers never demote', () => {
+  test('a new release records the explicit extraction tier, not the context tier', () => {
+    const explicit = mergeReleases(emptyFile(), [release({ tier: 'small' })], { ...ctx, tier: 'flagship' });
+    expect(explicit.file.releases[0]?.tier).toBe('small');
+    // No tier anywhere: the field stays unset (unset = flagship by contract).
+    const untiered = mergeReleases(emptyFile(), [release({ tier: undefined })], ctx);
+    expect(untiered.file.releases[0]?.tier).toBeUndefined();
+  });
+
+  test('an existing tier is never overwritten, not even by an explicit extraction tier', () => {
+    const seeded: LabFile = {
+      ...emptyFile(),
+      releases: [{ ...emptyFile().releases[0], id: 'openai-gpt-6', lab: 'openai', name: 'GPT-6', family: 'GPT', date: '2026-05-04', date_precision: 'day' as const, status: 'released' as const, announcement: { url: ctx.sourceUrl, retrieved_at: NOW, verified: true }, scores: [], tier: 'flagship' }],
+    };
+    const next = mergeReleases(seeded, [release({ tier: 'mid' })], ctx);
+    expect(next.file.releases[0]?.tier).toBe('flagship');
+    expect(next.changes.some((c) => c.kind === 'release_updated')).toBe(false);
+  });
+
+  test('an explicit mid/small fills an untiered release exactly once', () => {
+    const seeded: LabFile = {
+      ...emptyFile(),
+      releases: [{ ...emptyFile().releases[0], id: 'openai-gpt-6', lab: 'openai', name: 'GPT-6', family: 'GPT', date: '2026-05-04', date_precision: 'day' as const, status: 'released' as const, announcement: { url: ctx.sourceUrl, retrieved_at: NOW, verified: true }, scores: [] }],
+    };
+    const first = mergeReleases(seeded, [release({ tier: 'mid' })], ctx);
+    expect(first.file.releases[0]?.tier).toBe('mid');
+    expect(first.changes.some((c) => c.kind === 'release_updated')).toBe(true);
+    // A hint-derived `flagship` (rel.tier undefined) may not retag it; a later `small`
+    // may not flip it either.
+    const hintFlagship = mergeReleases(first.file, [release({ tier: undefined })], ctx);
+    expect(hintFlagship.file.releases[0]?.tier).toBe('mid');
+    const smaller = mergeReleases(hintFlagship.file, [release({ tier: 'small' })], ctx);
+    expect(smaller.file.releases[0]?.tier).toBe('mid');
+  });
+});

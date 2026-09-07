@@ -7,6 +7,10 @@
  *   bun run worker/src/cli.ts verify [--lab <id>] [--only-unverified] [--limit N]
  *   bun run worker/src/cli.ts poll   [--lab <id>] [--dry-run]
  *   bun run worker/src/cli.ts discover [--lab <id>] [--dry-run]
+ *   bun run worker/src/cli.ts backfill [--lab <id>] [--out <dir>] [--incremental] [--dry-run]
+ *   bun run worker/src/cli.ts arena    [--dry-run]
+ *   bun run worker/src/cli.ts eval     [--candidate <dir>] [--gold <dir>]
+ *   bun run worker/src/cli.ts promote  [--force]
  *   bun run worker/src/cli.ts loop
  */
 import { LAB_IDS, type LabId } from '@agi/shared';
@@ -17,6 +21,10 @@ import { runBundle } from './commands/bundle';
 import { runVerify } from './commands/verify';
 import { runPoll } from './commands/poll';
 import { runDiscover } from './commands/discover';
+import { runBackfillCommand } from './commands/backfill';
+import { runArenaCommand } from './commands/arena';
+import { runEvalCommand } from './commands/eval';
+import { runPromoteCommand } from './commands/promote';
 import { runLoop } from './commands/loop';
 
 export interface ParsedArgs {
@@ -68,7 +76,12 @@ const HELP = `AGI Frontier worker
                                              re-fetch every source and check its quote
   poll     [--lab id] [--dry-run]            hourly job: fetch, hash-diff, extract, merge, bundle
   discover [--lab id] [--dry-run]            daily web-search sweep for missed releases
-  loop                                       poll on a timer, discover once a day
+  backfill [--lab id] [--out dir] [--incremental] [--dry-run]
+                                             researcher: rebuild data/researched/<lab>.json from the web
+  arena    [--dry-run]                       fetch the LMArena text leaderboard, upsert lmarena-text scores
+  eval     [--candidate dir] [--gold dir]    score data/researched against the frozen gold set
+  promote  [--force]                          copy data/researched into data/models when the eval gates pass
+  loop                                       poll on a timer, discover daily, arena + backfill weekly
 
 Environment is documented in worker/.env.example.`;
 
@@ -107,6 +120,31 @@ export async function main(argv: string[]): Promise<number> {
       if (lab) opts.lab = lab;
       if (flags['dry-run'] === true) opts.dryRun = true;
       return runDiscover(rt, opts);
+    }
+    case 'backfill': {
+      const opts: Parameters<typeof runBackfillCommand>[1] = {};
+      const lab = labFlag(flags);
+      if (lab) opts.lab = lab;
+      if (typeof flags['out'] === 'string') opts.out = flags['out'];
+      if (flags['incremental'] === true) opts.incremental = true;
+      if (flags['dry-run'] === true) opts.dryRun = true;
+      return runBackfillCommand(rt, opts);
+    }
+    case 'arena': {
+      const opts: Parameters<typeof runArenaCommand>[1] = {};
+      if (flags['dry-run'] === true) opts.dryRun = true;
+      return runArenaCommand(rt, opts);
+    }
+    case 'eval': {
+      const opts: Parameters<typeof runEvalCommand>[1] = {};
+      if (typeof flags['candidate'] === 'string') opts.candidate = flags['candidate'];
+      if (typeof flags['gold'] === 'string') opts.gold = flags['gold'];
+      return runEvalCommand(rt, opts);
+    }
+    case 'promote': {
+      const opts: Parameters<typeof runPromoteCommand>[1] = {};
+      if (flags['force'] === true) opts.force = true;
+      return runPromoteCommand(rt, opts);
     }
     case 'loop':
       return runLoop(rt);
