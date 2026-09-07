@@ -27,8 +27,17 @@ export interface BacktestSeriesOptions {
   stepDays?: number | undefined;
   /** Pseudo-observations pulling each lab toward the pooled cadence prior (default 2). */
   priorWeight?: number | undefined;
+  /** Cadence recency half-life in days passed to every forecast (default 730; Infinity = unweighted). */
+  halfLifeDays?: number | undefined;
+  /** σ multiplier passed to every forecast (default 1). */
+  sigmaScale?: number | undefined;
   /** A fit as of *today*, so rows can take actual theta without refitting per call. */
   todayFit?: IndexFit | undefined;
+  /**
+   * Shared per-`asOf` fit cache. The fit does not depend on the forecast options, so
+   * `calibrateForecast` passes one cache across all σ scales and pays for the fits once.
+   */
+  fitCache?: Map<ISODate, IndexFit> | undefined;
 }
 
 /** Everything the row builder needs, precomputed once per call site. */
@@ -37,6 +46,8 @@ interface ReplayContext {
   prior: ReturnType<typeof cadencePrior>;
   todayFit: IndexFit;
   priorWeight: number | undefined;
+  halfLifeDays: number | undefined;
+  sigmaScale: number | undefined;
 }
 
 /** A replay row plus the waiting law behind its prediction (for the calibration curve). */
@@ -55,6 +66,8 @@ function replayRow(releases: ModelRelease[], lab: LabId, asOf: ISODate, ctx: Rep
   const forecast = forecastLab(lab, releases, ctx.fit, ctx.prior, {
     asOf,
     ...(ctx.priorWeight !== undefined ? { priorWeight: ctx.priorWeight } : {}),
+    ...(ctx.halfLifeDays !== undefined ? { halfLifeDays: ctx.halfLifeDays } : {}),
+    ...(ctx.sigmaScale !== undefined ? { sigmaScale: ctx.sigmaScale } : {}),
   });
   const pred = forecast.next[0] ?? null;
 
@@ -82,8 +95,10 @@ function replayRow(releases: ModelRelease[], lab: LabId, asOf: ISODate, ctx: Rep
     predictedTheta,
     actual: actual !== null ? { release_id: actual.release_id, date: actual.date, theta: actualTheta } : null,
     errorDays: pred !== null && actual !== null ? daysBetween(pred.medianDate, actual.date) : null,
-    in68: pred !== null && actual !== null ? pred.p16Date <= actual.date && actual.date <= pred.p84Date : null,
-    in90: pred !== null && actual !== null ? pred.p05Date <= actual.date && actual.date <= pred.p95Date : null,
+    in68: pred !== null && actual !== null ? pred.p16Date <= actual.date && actual.date <= pred.p84Date
+      : null,
+    in90: pred !== null && actual !== null ? pred.p05Date <= actual.date && actual.date <= pred.p95Date
+      : null,
     thetaError: pred !== null && actual !== null && actualTheta !== null ? actualTheta - pred.theta : null,
   };
   return {
@@ -109,13 +124,20 @@ export function backtestAsOf(
   benchmarks: Benchmark[],
   labIds: LabId[],
   asOf: ISODate,
-  opts: { priorWeight?: number | undefined; todayFit?: IndexFit | undefined } = {},
+  opts: {
+    priorWeight?: number | undefined;
+    halfLifeDays?: number | undefined;
+    sigmaScale?: number | undefined;
+    todayFit?: IndexFit | undefined;
+  } = {},
 ): BacktestAsOf {
   const ctx: ReplayContext = {
     fit: fitFrontierIndex(releases, benchmarks, { asOf }),
-    prior: cadencePrior(releases, asOf),
+    prior: cadencePrior(releases, asOf, ['flagship'], opts.halfLifeDays ?? 730),
     todayFit: opts.todayFit ?? fitFrontierIndex(releases, benchmarks, {}),
     priorWeight: opts.priorWeight,
+    halfLifeDays: opts.halfLifeDays,
+    sigmaScale: opts.sigmaScale,
   };
   return { asOf, rows: labIds.map((lab) => replayRow(releases, lab, asOf, ctx).row) };
 }
@@ -151,6 +173,7 @@ export function backtestSeries(
   const rows: BacktestRow[] = [];
   type LabAgg = { n: number; hits68: number; hits90: number; absSum: number; signedSum: number };
   const perLab = new Map<LabId, LabAgg>();
+  let unforecastable = 0;
   // (lab, asOf) -> the waiting law of the k = 1 prediction made there, for the calibration
   // curve (which needs quantiles other than the four published percentile dates).
   const law = new Map<string, { mu: number; sigma: number; elapsedDays: number; lastDate: ISODate }>();
@@ -163,9 +186,11 @@ export function backtestSeries(
     }
     const ctx: ReplayContext = {
       fit,
-      prior: cadencePrior(releases, asOf),
+      prior: cadencePrior(releases, asOf, ['flagship'], opts.halfLifeDays ?? 730),
       todayFit,
       priorWeight: opts.priorWeight,
+      halfLifeDays: opts.halfLifeDays,
+      sigmaScale: opts.sigmaScale,
     };
     for (const lab of labIds) {
       const { row, law: waitingLaw } = replayRow(releases, lab, asOf, ctx);
@@ -174,12 +199,17 @@ export function backtestSeries(
 
       const agg = perLab.get(lab) ?? { n: 0, hits68: 0, hits90: 0, absSum: 0, signedSum: 0 };
       if (row.actual !== null) {
-        agg.n += 1;
-        if (row.in68 === true) agg.hits68 += 1;
-        if (row.in90 === true) agg.hits90 += 1;
-        if (row.errorDays !== null) {
-          agg.absSum += Math.abs(row.errorDays);
-          agg.signedSum += row.errorDays;
+        if (row.predictedMedian !== null) {
+          // Forecastable row: the only ones coverage and errors are measured over.
+          agg.n += 1;
+          if (row.in68 === true) agg.hits68 += 1;
+          if (row.in90 === true) agg.hits90 += 1;
+          if (row.errorDays !== null) {
+            agg.absSum += Math.abs(row.errorDays);
+            agg.signedSum += row.errorDays;
+          }
+        } else {
+          unforecastable += 1;
         }
       }
       perLab.set(lab, agg);
@@ -187,19 +217,18 @@ export function backtestSeries(
   }
 
   const withActual = rows.filter((r) => r.actual !== null);
-  const n = withActual.length;
-  const hits68 = withActual.filter((r) => r.in68 === true).length;
-  const hits90 = withActual.filter((r) => r.in90 === true).length;
-  // Error statistics need an actual *and* a prediction; rows with actual but no forecast
-  // (the lab did not exist yet as of asOf) carry errorDays = null and are excluded.
-  const withError = withActual.filter((r) => r.errorDays !== null);
+  const forecastable = withActual.filter((r) => r.predictedMedian !== null);
+  const n = forecastable.length;
+  const hits68 = forecastable.filter((r) => r.in68 === true).length;
+  const hits90 = forecastable.filter((r) => r.in90 === true).length;
+  const withError = forecastable.filter((r) => r.errorDays !== null);
   const absMean = withError.reduce((s, r) => s + Math.abs(r.errorDays!), 0);
   const signedMean = withError.reduce((s, r) => s + r.errorDays!, 0);
   const maeDays = withError.length > 0 ? absMean / withError.length : 0;
   const biasDays = withError.length > 0 ? signedMean / withError.length : 0;
   const medianAbsDays = withError.length > 0 ? median(withError.map((r) => Math.abs(r.errorDays!))) : 0;
 
-  const thetaPairs = withActual.filter((r) => r.thetaError !== null);
+  const thetaPairs = forecastable.filter((r) => r.thetaError !== null);
   const thetaMae =
     thetaPairs.length > 0
       ? thetaPairs.reduce((s, r) => s + Math.abs(r.thetaError!), 0) / thetaPairs.length
@@ -222,7 +251,7 @@ export function backtestSeries(
   const calibration = CALIBRATION_NOMINAL.map((nominal) => {
     let covered = 0;
     let counted = 0;
-    for (const r of withActual) {
+    for (const r of forecastable) {
       const ms = law.get(`${r.lab}|${r.asOf}`);
       if (!ms) continue;
       const days = lognormalConditionalQuantile(ms.mu, ms.sigma, Math.max(0, ms.elapsedDays), nominal);
@@ -237,6 +266,7 @@ export function backtestSeries(
     to: opts.to,
     stepDays,
     n,
+    unforecastable,
     coverage68: n > 0 ? hits68 / n : 0,
     coverage90: n > 0 ? hits90 / n : 0,
     maeDays,
@@ -245,6 +275,8 @@ export function backtestSeries(
     thetaMae,
     byLab,
     calibration,
+    sigmaScale: opts.sigmaScale ?? 1,
+    halfLifeDays: opts.halfLifeDays ?? 730,
     rows,
   };
 }
@@ -255,4 +287,49 @@ function median(xs: number[]): number {
   const s = [...xs].sort((a, b) => a - b);
   const mid = s.length >> 1;
   return s.length % 2 === 1 ? s[mid]! : (s[mid - 1]! + s[mid]!) / 2;
+}
+
+export interface CalibrateForecastResult {
+  /** The winning σ multiplier. */
+  sigmaScale: number;
+  /** The full report produced with the winning scale. */
+  report: BacktestReport;
+  /** Loss `|cov68 − 0.68| + |cov90 − 0.90|` of the winner. */
+  loss: number;
+}
+
+/**
+ * Grid-search the σ multiplier (REDESIGN §5, iteration 2): try `sigmaScale ∈ {1.0, 1.1, …, 3.0}`
+ * and pick the scale minimising `|cov68 − 0.68| + |cov90 − 0.90|` on `backtestSeries`
+ * (ties → the smaller scale, i.e. the first minimum in scan order). The per-`asOf` fits do not
+ * depend on the scale, so one shared `fitCache` serves the whole search and the cost is one
+ * grid of fits plus 21 cheap forecast passes.
+ */
+export function calibrateForecast(
+  releases: ModelRelease[],
+  benchmarks: Benchmark[],
+  labIds: LabId[],
+  opts: {
+    to: ISODate;
+    stepDays?: number | undefined;
+    halfLifeDays?: number | undefined;
+    from?: ISODate | undefined;
+  },
+): CalibrateForecastResult {
+  const fitCache = new Map<ISODate, IndexFit>();
+  let best: CalibrateForecastResult | null = null;
+  for (let k = 10; k <= 30; k++) {
+    const sigmaScale = k / 10;
+    const report = backtestSeries(releases, benchmarks, labIds, {
+      to: opts.to,
+      ...(opts.stepDays !== undefined ? { stepDays: opts.stepDays } : {}),
+      ...(opts.halfLifeDays !== undefined ? { halfLifeDays: opts.halfLifeDays } : {}),
+      ...(opts.from !== undefined ? { from: opts.from } : {}),
+      sigmaScale,
+      fitCache,
+    });
+    const loss = Math.abs(report.coverage68 - 0.68) + Math.abs(report.coverage90 - 0.9);
+    if (best === null || loss < best.loss) best = { sigmaScale, report, loss };
+  }
+  return best!;
 }

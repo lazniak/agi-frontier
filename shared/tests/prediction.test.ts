@@ -109,7 +109,8 @@ describe('cadencePrior', () => {
       // A same-day sibling must not create a zero-length interval.
       release('openai-twin', 'openai', addDays('2024-01-01', 300), [score('a', 66)]),
     ]);
-    const prior = cadencePrior(releases, ASOF);
+    // Infinity = the unweighted estimator this test asserts (T31 iteration 2 adds recency).
+    const prior = cadencePrior(releases, ASOF, ['flagship'], Infinity);
     const logs = [Math.log(100), Math.log(100), Math.log(100), Math.log(150), Math.log(150)];
     expect(prior.n).toBe(5);
     expect(prior.mu).toBeCloseTo(mean(logs), 12);
@@ -142,8 +143,8 @@ describe('cadencePrior', () => {
 describe('forecastLab — cadence and shrinkage', () => {
   const releases = fixture();
   const fit = fitOf(releases);
-  const prior = cadencePrior(releases, ASOF);
-  const opts = { asOf: ASOF };
+  const prior = cadencePrior(releases, ASOF, ['flagship'], Infinity);
+  const opts: ForecastOptions = { asOf: ASOF, halfLifeDays: Infinity };
 
   test('shrinkage formula for a lab with three intervals', () => {
     const f = forecastLab('openai', releases, fit, prior, opts);
@@ -381,6 +382,7 @@ describe('forecastAll', () => {
 /* ------------------------------------------------------------------ T31 additions */
 
 import { MAX_RELEASES_CAP, windowDaysOf, Z90 } from '../src/prediction';
+import type { ForecastOptions } from '../src/prediction';
 
 /** A release with an explicit tier (the fixture builder has no tier option). */
 function tiered(id: string, tier: 'mid' | 'small', day: number): ModelRelease {
@@ -419,8 +421,8 @@ describe('forecastLab — tier filter', () => {
 
   test('cadencePrior gains the same tier default', () => {
     const releases = fixture([tiered('openai-s', 'small', 280)]);
-    const flagshipOnly = cadencePrior(releases, ASOF);
-    const allTiers = cadencePrior(releases, ASOF, ['flagship', 'small']);
+    const flagshipOnly = cadencePrior(releases, ASOF, ['flagship'], Infinity);
+    const allTiers = cadencePrior(releases, ASOF, ['flagship', 'small'], Infinity);
     expect(allTiers.n).toBe(flagshipOnly.n + 1);
     expect(flagshipOnly.n).toBe(5);
   });
@@ -511,5 +513,94 @@ describe('capabilityFan — quadrature width and theta fields', () => {
       expect(p.indexLow).toBeLessThanOrEqual(p.index);
       expect(p.indexHigh).toBeGreaterThanOrEqual(p.index);
     }
+  });
+});
+
+describe('forecastLab — recency-weighted cadence (T31 it. 2)', () => {
+  test('halfLifeDays: Infinity reproduces the unweighted numbers exactly', () => {
+    const releases = fixture();
+    const fit = fitOf(releases);
+    const oldPrior = cadencePrior(releases, ASOF, ['flagship'], Infinity);
+    const oldF = forecastLab('openai', releases, fit, oldPrior, { asOf: ASOF, halfLifeDays: Infinity });
+    // reference: the literal unweighted formulas on [100, 100, 100]
+    expect(oldF.mu).toBeCloseTo((3 * Math.log(100) + 2 * oldPrior.mu) / 5, 12);
+    const pooledLogs = [Math.log(100), Math.log(100), Math.log(100), Math.log(150), Math.log(150)];
+    expect(oldPrior.mu).toBeCloseTo(mean(pooledLogs), 12);
+    expect(oldPrior.n).toBe(5);
+  });
+
+  test('recent intervals dominate: equal halves beat a stale long gap', () => {
+    // anthropic: [150, 150] then a 400-day gap ending 30 days before asOf.
+    const stale = [
+      release('anthropic-a', 'anthropic', '2023-06-01', [score('a', 55), score('b', 45)]),
+      release('anthropic-b', 'anthropic', '2023-11-28', [score('a', 60), score('b', 50)]),
+      release('anthropic-c', 'anthropic', '2024-04-25', [score('a', 65), score('b', 55)]),
+      release('anthropic-d', 'anthropic', '2025-05-29', [score('a', 70), score('b', 60)]),
+    ];
+    const fit = fitOf(stale);
+    const weighted = cadencePrior(stale, ASOF, ['flagship'], 730);
+    const unweighted = cadencePrior(stale, ASOF, ['flagship'], Infinity);
+    // 400-day gap is old → weighted mu below the unweighted one
+    expect(weighted.mu).toBeLessThan(unweighted.mu);
+    const f = forecastLab('anthropic', stale, fit, weighted, { asOf: ASOF });
+    const g = forecastLab('anthropic', stale, fit, unweighted, { asOf: ASOF });
+    expect(f.mu).toBeLessThan(g.mu);
+  });
+
+  test('weighted shrinkage matches the documented n_eff formula', () => {
+    // Two intervals: 100 d ending 365 d before asOf, 50 d ending 315 d before asOf.
+    // weights w1 = 0.5^(365/730) = sqrt(0.5), w2 = 0.5^(315/730); n_eff = (Σw)² / Σw².
+    const rels = [
+      release('openai-a', 'openai', addDays(ASOF, -465), [score('a', 50), score('b', 40)]),
+      release('openai-b', 'openai', addDays(ASOF, -365), [score('a', 55), score('b', 45)]),
+      release('openai-c', 'openai', addDays(ASOF, -315), [score('a', 60), score('b', 50)]),
+    ];
+    const fit = fitOf(rels);
+    const prior = cadencePrior(rels, ASOF, ['flagship'], 730);
+    const w1 = Math.sqrt(0.5);
+    const w2 = Math.pow(0.5, 315 / 730);
+    const neff = (w1 + w2) ** 2 / (w1 * w1 + w2 * w2);
+    expect(prior.n).toBeCloseTo(neff, 12);
+    const f = forecastLab('openai', rels, fit, prior, { asOf: ASOF });
+    const meanW = (w1 * Math.log(100) + w2 * Math.log(50)) / (w1 + w2);
+    const mu = (neff * meanW + 2 * prior.mu) / (neff + 2);
+    expect(f.mu).toBeCloseTo(mu, 9);
+  });
+});
+
+describe('forecastLab — sigmaScale (T31 it. 2)', () => {
+  test('sigmaScale: 2 doubles the log-space window for a fresh lab (t0 = 0)', () => {
+    // The lab's only release is ON asOf, so elapsed = 0 and the quantiles are unconditional:
+    // offset(q) = exp(mu + sigma·z_q); the log window ln(p84off) − ln(p16off) = sigma·(z84−z16)
+    // must double when sigma doubles, and the median must not move.
+    const releases = [release('google-now', 'google', ASOF, [score('a', 55), score('b', 44)])];
+    const fit = fitOf(releases);
+    const prior = cadencePrior(releases, ASOF);
+    const base = forecastLab('google', releases, fit, prior, { asOf: ASOF });
+    const p1 = base.next[0]!;
+    const wide = forecastLab('google', releases, fit, prior, { asOf: ASOF, sigmaScale: 2 });
+    const p2 = wide.next[0]!;
+    const off = (p: { p16Date: string; p84Date: string }, q: 'p16Date' | 'p84Date') =>
+      daysBetween(ASOF, p[q]);
+    const logWindow1 = Math.log(off(p1, 'p84Date')) - Math.log(off(p1, 'p16Date'));
+    const logWindow2 = Math.log(off(p2, 'p84Date')) - Math.log(off(p2, 'p16Date'));
+    // Quantile dates are whole days, so the doubling holds only up to rounding (~0.5/66 per bound).
+    expect(Math.abs(logWindow2 - 2 * logWindow1)).toBeLessThan(0.03);
+    expect(p2.medianDate).toBe(p1.medianDate);
+    // In day space the window grows too (convexity makes it slightly more than 2x, not exactly).
+    const w1 = off(p1, 'p84Date') - off(p1, 'p16Date');
+    const w2 = off(p2, 'p84Date') - off(p2, 'p16Date');
+    expect(w2).toBeGreaterThan(w1);
+  });
+
+  test('p84 − p16 in days grows with the scale', () => {
+    const releases = fixture();
+    const fit = fitOf(releases);
+    const prior = cadencePrior(releases, ASOF);
+    const a = forecastLab('openai', releases, fit, prior, { asOf: ASOF });
+    const b = forecastLab('openai', releases, fit, prior, { asOf: ASOF, sigmaScale: 1.5 });
+    const wa = daysBetween(a.next[0]!.p16Date, a.next[0]!.p84Date);
+    const wb = daysBetween(b.next[0]!.p16Date, b.next[0]!.p84Date);
+    expect(wb).toBeGreaterThan(wa);
   });
 });

@@ -320,8 +320,10 @@ export interface BacktestReport {
   from: ISODate;
   to: ISODate;
   stepDays: number;
-  /** Rows with an actual release (the ones that count). */
+  /** Rows with a prediction AND an actual release — the ones coverage is measured over. */
   n: number;
+  /** Rows with an actual but no prediction (the lab had no release yet as of `asOf`). */
+  unforecastable: number;
   coverage68: number;
   coverage90: number;
   maeDays: number;
@@ -331,6 +333,10 @@ export interface BacktestReport {
   byLab: Record<LabId, { n: number; coverage68: number; coverage90: number; maeDays: number }>;
   /** Share of actual dates at or before the nominal-quantile date; perfect ⇒ observed = nominal. */
   calibration: { nominal: number; observed: number }[];
+  /** σ multiplier the report was produced with (1 = unmodified shrinkage σ). */
+  sigmaScale: number;
+  /** Cadence recency half-life in days the report was produced with (Infinity = unweighted). */
+  halfLifeDays: number;
   rows: BacktestRow[];
 }
 

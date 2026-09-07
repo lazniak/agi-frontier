@@ -234,6 +234,9 @@ export function frontierFan(
       low: indexFromTheta(theta - half),
       mid: indexFromTheta(theta),
       high: indexFromTheta(theta + half),
+      theta,
+      thetaLow: theta - half,
+      thetaHigh: theta + half,
     };
   });
 }

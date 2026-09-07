@@ -6,6 +6,7 @@ import type { ISODate, LabId, ModelRelease, ModelTier } from './types';
 import type { IndexFit, ModelIndex } from './frontier-index';
 import { indexFromTheta, thetaFromIndex } from './frontier-index';
 import { addDays, dateToDayNumber, dayNumberToDate, daysBetween } from './timeline';
+
 import {
   clamp,
   lognormalCdf,
@@ -35,6 +36,14 @@ export interface ForecastOptions {
    * (REDESIGN §3/§4: flagship only by default — the forecast cadence is a flagship cadence).
    */
   tierFilter?: ModelTier[] | undefined;
+  /**
+   * Recency half-life in days for the cadence (default 730): interval i is weighted
+   * `w_i = 0.5^(age_i / halfLifeDays)` where `age_i` = days from the END of the interval
+   * (the later release) to `asOf`. `Infinity` = unweighted (REDESIGN §4, iteration 2).
+   */
+  halfLifeDays?: number | undefined;
+  /** Multiplier on the lab's σ after shrinkage, before any quantile (default 1). */
+  sigmaScale?: number | undefined;
 }
 
 /** Log-normal parameters of inter-release intervals in days. */
@@ -107,14 +116,10 @@ export interface FanPoint {
   low: number;
   mid: number;
   high: number;
-  /**
-   * The θ values behind `low` / `mid` / `high` (un-clamped, REDESIGN §4). Optional because
-   * `stages.frontierFan` (T30) also emits FanPoints and fills them on its own schedule;
-   * `capabilityFan` always sets them.
-   */
-  theta?: number | undefined;
-  thetaLow?: number | undefined;
-  thetaHigh?: number | undefined;
+  /** The θ values behind `low` / `mid` / `high` (un-clamped, REDESIGN §4). */
+  theta: number;
+  thetaLow: number;
+  thetaHigh: number;
 }
 
 /** z for the 90th percentile — the constant published in METHODOLOGY §4. */
@@ -184,13 +189,60 @@ function intervalsOf(dates: ISODate[]): number[] {
 }
 
 /**
+ * Recency weight of one cadence observation (REDESIGN §4, iteration 2):
+ * `w = 0.5^(age / halfLifeDays)`, age = days from the END of the interval to `asOf`.
+ * `halfLifeDays = Infinity` (or ≤ 0 half-life degeneracy) gives the unweighted w = 1.
+ */
+export function recencyWeight(ageDays: number, halfLifeDays: number): number {
+  if (!Number.isFinite(halfLifeDays) || halfLifeDays <= 0) return 1;
+  return Math.pow(0.5, ageDays / halfLifeDays);
+}
+
+/** Weighted mean (Σw·x / Σw). */
+function weightedMean(xs: number[], ws: number[]): number {
+  let sw = 0;
+  let swx = 0;
+  for (let i = 0; i < xs.length; i++) {
+    sw += ws[i]!;
+    swx += ws[i]! * xs[i]!;
+  }
+  return sw > 0 ? swx / sw : 0;
+}
+
+/** Weighted population variance (Σw·(x − mean)² / Σw). */
+function weightedPopulationVariance(xs: number[], ws: number[], meanW: number): number {
+  let sw = 0;
+  let acc = 0;
+  for (let i = 0; i < xs.length; i++) {
+    sw += ws[i]!;
+    acc += ws[i]! * (xs[i]! - meanW) ** 2;
+  }
+  return sw > 0 ? acc / sw : 0;
+}
+
+/** Kish effective sample size (Σw)² / Σw². */
+function kishN(ws: number[]): number {
+  let sw = 0;
+  let sw2 = 0;
+  for (const w of ws) {
+    sw += w;
+    sw2 += w * w;
+  }
+  return sw2 > 0 ? (sw * sw) / sw2 : 0;
+}
+
+/**
  * Pooled prior over all labs' log-intervals (released flagships by default, date <= asOf).
  * `tiers` restricts which lineup tiers feed the prior (default `['flagship']`, REDESIGN §3).
+ * `halfLifeDays` (default 730) recency-weights every interval across labs, exactly like
+ * `forecastLab` does (w = 0.5^(age/HL), age from the interval's later release; the Kish
+ * `n_eff` is reported as `n`); `Infinity` reproduces the unweighted prior.
  */
 export function cadencePrior(
   releases: ModelRelease[],
   asOf: ISODate,
   tiers: ModelTier[] = ['flagship'],
+  halfLifeDays: number = 730,
 ): CadencePrior {
   const tierSet = new Set<ModelTier>(tiers);
   const labs = new Set<LabId>();
@@ -199,14 +251,24 @@ export function cadencePrior(
   }
 
   const logs: number[] = [];
+  const weights: number[] = [];
   for (const lab of labs) {
-    for (const d of intervalsOf(eventDates(releases, lab, asOf, tierSet))) logs.push(Math.log(d));
+    const dates = eventDates(releases, lab, asOf, tierSet);
+    const intervals = intervalsOf(dates);
+    for (let i = 0; i < intervals.length; i++) {
+      logs.push(Math.log(intervals[i]!));
+      // age of interval i = days from its end (dates[i + 1]) to asOf
+      weights.push(recencyWeight(Math.max(0, daysBetween(dates[i + 1]!, asOf)), halfLifeDays));
+    }
   }
   if (logs.length === 0) return { mu: DEFAULT_PRIOR_MU, sigma: DEFAULT_PRIOR_SIGMA, n: 0 };
   return {
-    mu: mean(logs),
-    sigma: logs.length < 2 ? DEFAULT_PRIOR_SIGMA : populationSd(logs),
-    n: logs.length,
+    mu: weightedMean(logs, weights),
+    sigma:
+      logs.length < 2
+        ? DEFAULT_PRIOR_SIGMA
+        : Math.sqrt(weightedPopulationVariance(logs, weights, weightedMean(logs, weights))),
+    n: kishN(weights),
   };
 }
 
@@ -310,16 +372,32 @@ export function forecastLab(
   }
 
   // --- cadence -----------------------------------------------------------------------
-  const intervalsDays = intervalsOf(eventDates(releases, lab, asOf, tiers));
-  const n = intervalsDays.length;
+  // Recency-weighted cadence (REDESIGN §4, iteration 2): each interval is weighted by
+  // w_i = 0.5^(age_i / halfLifeDays), age from the interval's END (its later release) to
+  // asOf. The lab's (μ, σ²) shrink toward the prior with the Kish effective sample size
+  // n_eff = (Σw)² / Σw² in place of the raw count:
+  //   μ_lab = (n_eff·mean_w + w·μ_prior) / (n_eff + w)
+  //   σ²_lab = (n_eff·var_w + w·σ²_prior) / (n_eff + w)
+  // halfLifeDays = Infinity gives w = 1 for every interval and reproduces the unweighted
+  // numbers exactly.
+  const halfLifeDays = opts.halfLifeDays ?? 730;
+  const sigmaScale = opts.sigmaScale ?? 1;
+  const dates = eventDates(releases, lab, asOf, tiers);
+  const intervalsDays = intervalsOf(dates);
   const logs = intervalsDays.map(Math.log);
-  const meanLog = n > 0 ? mean(logs) : 0;
-  const varLab = populationVariance(logs); // 0 when n < 2
+  const weights = intervalsDays.map((_, i) =>
+    recencyWeight(Math.max(0, daysBetween(dates[i + 1]!, asOf)), halfLifeDays),
+  );
+  const meanLog = logs.length > 0 ? weightedMean(logs, weights) : 0;
+  // 0 when fewer than two gaps carry weight
+  const varLab = weightedPopulationVariance(logs, weights, meanLog);
+  const n = kishN(weights);
   const w = Math.max(0, priorWeight);
   const denom = n + w;
   const mu = denom > 0 ? (n * meanLog + w * prior.mu) / denom : prior.mu;
-  const sigma =
+  const sigmaRaw =
     denom > 0 ? Math.sqrt(Math.max(0, (n * varLab + w * prior.sigma * prior.sigma) / denom)) : prior.sigma;
+  const sigma = sigmaRaw * sigmaScale;
 
   // --- anchor release ------------------------------------------------------------------
   const lastDate = labReleased[labReleased.length - 1]!.date;
@@ -477,7 +555,7 @@ export function forecastLab(
 
 export function forecastAll(labIds: LabId[], releases: ModelRelease[], fit: IndexFit, opts: ForecastOptions): LabForecast[] {
   const tiers = opts.tierFilter ?? ['flagship'];
-  const prior = cadencePrior(releases, opts.asOf, tiers);
+  const prior = cadencePrior(releases, opts.asOf, tiers, opts.halfLifeDays ?? 730);
   return labIds.map((lab) => forecastLab(lab, releases, fit, prior, opts));
 }
 

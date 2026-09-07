@@ -155,6 +155,24 @@ describe('frontierFan', () => {
     const line = thetaRamp(3, 0.01, '2020-01-01');
     expect(frontierFan(line, '2025-06-01', { toDate: '2026-06-01' })).toEqual([]);
   });
+
+  test('theta, thetaLow, thetaHigh are present and consistent (T31 it. 2)', () => {
+    const line = thetaRamp(365, 0.003, '2025-01-01', 0, 0.05);
+    const asOf = addDays('2025-01-01', 364);
+    const fan = frontierFan(line, asOf, { toDate: addDays(asOf, 90), stepDays: 7 });
+    expect(fan.length).toBeGreaterThan(5);
+    for (const p of fan) {
+      expect(typeof p.theta).toBe('number');
+      expect(typeof p.thetaLow).toBe('number');
+      expect(typeof p.thetaHigh).toBe('number');
+      expect(p.thetaLow).toBeLessThan(p.theta);
+      expect(p.thetaHigh).toBeGreaterThan(p.theta);
+      // the published percentiles sit exactly on the un-clamped θ band
+      expect(p.mid).toBeCloseTo(indexFromTheta(p.theta), 12);
+      expect(p.low).toBeCloseTo(indexFromTheta(p.thetaLow), 12);
+      expect(p.high).toBeCloseTo(indexFromTheta(p.thetaHigh), 12);
+    }
+  });
 });
 
 describe('frontierCrossings', () => {
