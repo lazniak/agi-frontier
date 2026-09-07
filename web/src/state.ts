@@ -6,6 +6,8 @@ import type { ISODate, LabId } from '@agi/shared';
 
 export type Channel = 'asOf' | 'filters' | 'selection' | 'hover' | 'view';
 
+export type YMode = 'logit' | 'linear';
+
 export interface StateShape {
   /** Everything on the page is computed as of this date. */
   asOf: ISODate;
@@ -21,6 +23,10 @@ export interface StateShape {
   selected: string | null;
   /** Release id under the pointer / keyboard focus. */
   hover: string | null;
+  /** Lab under the pointer in the legend — focuses that lab on the chart. */
+  hoverLab: LabId | null;
+  /** Y axis: linear in latent ability θ (logit) or in the 0–100 index. */
+  yMode: YMode;
   /** "Fit to data" y-axis toggle. */
   fitY: boolean;
   /**
@@ -38,13 +44,15 @@ export class Store {
   private queued = new Set<Channel>();
   private frame = 0;
 
-  constructor(init: Pick<StateShape, 'asOf' | 'today' | 'minDate'> & { longRange?: boolean }) {
+  constructor(init: Pick<StateShape, 'asOf' | 'today' | 'minDate'> & { longRange?: boolean; yMode?: YMode }) {
     this.state = {
       ...init,
       hidden: new Set<LabId>(),
       solo: null,
       selected: null,
       hover: null,
+      hoverLab: null,
+      yMode: init.yMode ?? 'logit',
       fitY: false,
       longRange: init.longRange ?? false,
     };
@@ -131,6 +139,18 @@ export class Store {
     if (this.state.hover === id) return;
     this.state.hover = id;
     this.emit('hover');
+  }
+
+  setHoverLab(lab: LabId | null): void {
+    if (this.state.hoverLab === lab) return;
+    this.state.hoverLab = lab;
+    this.emit('hover');
+  }
+
+  setYMode(mode: YMode): void {
+    if (this.state.yMode === mode) return;
+    this.state.yMode = mode;
+    this.emit('view');
   }
 
   setFitY(on: boolean): void {

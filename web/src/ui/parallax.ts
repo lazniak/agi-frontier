@@ -15,6 +15,7 @@ const DEPTH: Record<LayerName, number> = {
   points: 6,
   markers: 5,
   labels: 8,
+  pace: 2,
   overlay: 1,
 };
 

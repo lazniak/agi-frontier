@@ -76,9 +76,10 @@
 .chart-canvas {
   position: relative;
   width: 100%;
-  min-height: 72vh;
-  height: 72vh;
-  max-height: 880px;
+  /* The plot plus the pace strip under it (see chart/scales.ts geometry). */
+  min-height: calc(72vh + 96px);
+  height: calc(72vh + 96px);
+  max-height: 960px;
   touch-action: pan-y;
   cursor: grab;
   overscroll-behavior-x: contain;
@@ -97,8 +98,8 @@
 
 @media (max-width: 760px) {
   .chart-canvas {
-    min-height: 60vh;
-    height: 60vh;
+    min-height: calc(60vh + 76px);
+    height: calc(60vh + 76px);
   }
 }
 
@@ -285,6 +286,73 @@
 
 .pred-dot {
   pointer-events: none;
+}
+
+/* A lab outside the spotlight: its 68 % window as a bar, the median as a dot. */
+.pred-whisker {
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.pred-whisker__bar,
+.pred-whisker__cap {
+  stroke-width: 1.25;
+  stroke-linecap: round;
+}
+
+.pred-whisker__hit {
+  stroke: transparent;
+  stroke-width: 12;
+}
+
+.pred-whisker:hover,
+.pred-whisker:focus-visible {
+  opacity: 1 !important;
+}
+
+/* A released flagship with no basket score: a tick on the leadership strip. */
+.release-tick {
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.release-tick:hover,
+.release-tick:focus-visible {
+  opacity: 1 !important;
+}
+
+/* ------------------------------------------------------------ pace strip */
+.pace-base {
+  stroke: var(--hair);
+  stroke-width: 1;
+  shape-rendering: crispEdges;
+}
+
+.pace-bar {
+  opacity: 0.16;
+  transition: opacity 0.2s ease;
+  cursor: default;
+}
+
+.pace-bar:hover,
+.pace-bar:focus-visible {
+  opacity: 0.55;
+  outline: none;
+}
+
+.pace-summary {
+  font-size: 10.5px;
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  fill: var(--ink-3);
+}
+
+.pace-now {
+  stroke: var(--ink-1);
+  stroke-width: 1;
+  opacity: 0.35;
+  shape-rendering: crispEdges;
 }
 
 .marker {
@@ -601,6 +669,40 @@
   height: 0;
   border-top: 1px solid var(--ink-1);
   transform: translateY(-2px);
+}
+
+.key__swatch--whisker {
+  width: 18px;
+  height: 0;
+  border-top: 1.5px solid var(--predict);
+  transform: translateY(-2px);
+  position: relative;
+}
+
+.key__swatch--whisker::after {
+  content: '';
+  position: absolute;
+  left: 7px;
+  top: -3.5px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--predict);
+}
+
+.key__swatch--tick {
+  width: 2px;
+  height: 11px;
+  border-radius: 1px;
+  background: var(--ink-1);
+  opacity: 0.85;
+}
+
+.key__swatch--pace {
+  width: 14px;
+  height: 9px;
+  background: linear-gradient(to right, transparent 0 20%, rgba(17, 17, 17, 0.18) 20% 45%, transparent 45% 55%, rgba(17, 17, 17, 0.18) 55% 100%);
+  border-bottom: 1px solid var(--hair);
 }
 
 /* --------------------------------------------------------------- tooltip */

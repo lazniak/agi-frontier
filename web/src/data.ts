@@ -9,6 +9,8 @@ import type {
   Bundle,
   Benchmark,
   FanPoint,
+  FrontierGain,
+  FrontierPace,
   FrontierPoint,
   IndexFit,
   ISODate,
@@ -26,7 +28,11 @@ import {
   capabilityFan,
   fitFrontierIndex,
   forecastAll,
+  indexFromTheta,
+  thetaFromIndex,
+  frontierGains,
   frontierLine,
+  frontierPace,
   frontierVelocity,
   latestPerLab,
   leadershipStripes,
@@ -87,6 +93,11 @@ export interface LabView {
   predictions: PredictedRelease[];
   /** Non-released markers already known at `asOf`. */
   markers: ModelRelease[];
+  /**
+   * Released flagships with no score on any index benchmark (GPT-1, the first Kimi…). They have
+   * no height on the chart, so they are drawn as ticks on the timeline instead of vanishing.
+   */
+  unscored: ModelRelease[];
   last: SeriesPoint | null;
   /** Last *qualified* release — where the lab line actually ends. */
   lastQualified: SeriesPoint | null;
@@ -106,6 +117,10 @@ export interface Computed {
   fit: IndexFit;
   frontier: FrontierPoint[];
   velocity: number | null;
+  /** Trailing-year slope of the frontier in logits, and the implied odds-doubling time. */
+  pace: FrontierPace | null;
+  /** Frontier gain per calendar quarter, first knot to `asOf` — the pace strip under the chart. */
+  gains: FrontierGain[];
   stripes: LeadershipStripe[];
   rankings: ModelIndex[];
   labViews: LabView[];
@@ -195,6 +210,8 @@ function computeUncached(ctx: Ctx, asOf: ISODate): Computed {
     const fit = fitFrontierIndex(bundle.releases, bundle.benchmarks, { asOf });
     const frontier = frontierLine(fit);
     const velocity = frontier.length >= 2 ? frontierVelocity(frontier, asOf) : null;
+    const pace = frontier.length >= 2 ? frontierPace(frontier, asOf) : null;
+    const gains = frontierGains(frontier, asOf, 3);
     const stripes = leadershipStripes(fit);
     const rankings = rankCurrentFlagships(fit, bundle.releases, asOf);
 
@@ -215,6 +232,14 @@ function computeUncached(ctx: Ctx, asOf: ISODate): Computed {
       const arr = seriesByLab.get(r.lab);
       if (arr) arr.push({ release: r, mi });
       else seriesByLab.set(r.lab, [{ release: r, mi }]);
+    }
+
+    const unscoredByLab = new Map<LabId, ModelRelease[]>();
+    for (const r of released) {
+      if (fit.models[r.id]) continue;
+      const arr = unscoredByLab.get(r.lab);
+      if (arr) arr.push(r);
+      else unscoredByLab.set(r.lab, [r]);
     }
 
     const markersByLab = new Map<LabId, ModelRelease[]>();
@@ -247,6 +272,7 @@ function computeUncached(ctx: Ctx, asOf: ISODate): Computed {
         fanNear,
         predictions,
         markers: markersByLab.get(lab.id) ?? [],
+        unscored: unscoredByLab.get(lab.id) ?? [],
         last: points.length ? points[points.length - 1]! : null,
         lastQualified: qualified.length ? qualified[qualified.length - 1]! : null,
       });
@@ -266,6 +292,8 @@ function computeUncached(ctx: Ctx, asOf: ISODate): Computed {
       fit,
       frontier,
       velocity,
+      pace,
+      gains,
       stripes,
       rankings,
       labViews,
@@ -313,6 +341,7 @@ function emptyComputed(ctx: Ctx, asOf: ISODate): Computed {
     fanNear: [],
     predictions: [],
     markers: [],
+    unscored: [],
     last: null,
     lastQualified: null,
   }));
@@ -324,6 +353,8 @@ function emptyComputed(ctx: Ctx, asOf: ISODate): Computed {
     fit: EMPTY_FIT,
     frontier: [],
     velocity: null,
+    pace: null,
+    gains: [],
     stripes: [],
     rankings: [],
     labViews,
@@ -385,6 +416,29 @@ export function extentOfViews(views: LabView[], longRange = false): [number, num
   if (!Number.isFinite(lo) || !Number.isFinite(hi)) return [0, 100];
   const pad = Math.max(2, (hi - lo) * 0.12);
   return [Math.max(0, lo - pad), Math.min(100, hi + pad)];
+}
+
+/**
+ * The resting range of the logit axis: from the lowest *point* to the highest fan edge. Unlike
+ * `extentOfViews` it ignores the error bars — a provisional release fitted from one score has a
+ * ± that reaches the floor of the scale and would leave the bottom third of the chart empty.
+ * Padded by a fixed amount of latent ability rather than a fraction of the index.
+ */
+export function restingLogitExtent(views: LabView[], longRange = false): [number, number] {
+  let lo = Number.POSITIVE_INFINITY;
+  let hi = Number.NEGATIVE_INFINITY;
+  for (const v of views) {
+    for (const p of v.points) {
+      lo = Math.min(lo, p.mi.index);
+      hi = Math.max(hi, p.mi.index);
+    }
+    for (const f of longRange ? v.fan : v.fanNear) hi = Math.max(hi, f.high);
+  }
+  if (!Number.isFinite(lo) || !Number.isFinite(hi)) return [2, 99];
+  const clamp = (v: number): number => Math.min(99.5, Math.max(0.5, v));
+  const tl = thetaFromIndex(clamp(lo)) - 0.45;
+  const th = thetaFromIndex(clamp(hi)) + 0.15;
+  return [clamp(indexFromTheta(tl)), clamp(indexFromTheta(th))];
 }
 
 /**

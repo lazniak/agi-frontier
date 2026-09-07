@@ -1,6 +1,6 @@
-/** Geometry, scales and the editorial tick ladder for the frontier chart. */
-import { scaleLinear, scaleTime, type ScaleLinear, type ScaleTime } from 'd3-scale';
-import type { ISODate } from '@agi/shared';
+/** Geometry, scales and the editorial tick ladders for the frontier chart. */
+import { scaleLinear, scaleTime, type ScaleTime } from 'd3-scale';
+import { indexFromTheta, thetaFromIndex, type ISODate } from '@agi/shared';
 
 export interface Margins {
   top: number;
@@ -24,28 +24,53 @@ export interface Geom {
   compact: boolean;
   /** Is the right-hand gutter wide enough for the lab end-labels? */
   endLabels: boolean;
+  /** The pace strip under the plot: top edge and height (0 when there is no room). */
+  paceTop: number;
+  paceH: number;
 }
 
 export type XScale = ScaleTime<number, number>;
-export type YScale = ScaleLinear<number, number>;
+
+/**
+ * The y axis is either linear in the 0–100 index or linear in the latent ability θ (logit scale).
+ * Both take and return *index* units, so every layer draws with `y(index)` regardless of mode;
+ * only the spacing of the ticks tells them apart.
+ */
+export type YMode = 'logit' | 'linear';
+
+export interface YScale {
+  (index: number): number;
+  invert(px: number): number;
+  /** Domain in index units. */
+  domain(): [number, number];
+  range(): [number, number];
+  mode: YMode;
+}
 
 const DAY = 86_400_000;
 
 /** Below this the right-hand gutter cannot hold a lab name without eating the plot. */
 const END_LABEL_MIN_WIDTH = 560;
+/** Height of the pace strip (frontier gain per quarter) under the plot. */
+const PACE_H = 54;
+const PACE_H_COMPACT = 40;
+/** Gap between the x-axis labels / leadership stripe and the pace strip. */
+const PACE_GAP = 44;
 
 export function geometry(width: number, height: number): Geom {
   const compact = width < 720;
   const endLabels = width >= END_LABEL_MIN_WIDTH;
+  const paceH = height < 360 ? 0 : compact ? PACE_H_COMPACT : PACE_H;
   const m: Margins = {
     // The "Frontier Index" caption sits above the plot, clear of the 100 tick and the scrubber.
     top: compact ? 32 : 38,
     right: endLabels ? (compact ? 76 : 96) : 20,
-    bottom: compact ? 58 : 66,
+    bottom: (compact ? 58 : 66) + (paceH ? paceH + PACE_GAP - (compact ? 12 : 8) : 0),
     left: compact ? 38 : 54,
   };
   const iw = Math.max(10, width - m.left - m.right);
   const ih = Math.max(10, height - m.top - m.bottom);
+  const y0 = m.top + ih;
   return {
     width,
     height,
@@ -54,10 +79,12 @@ export function geometry(width: number, height: number): Geom {
     ih,
     x0: m.left,
     x1: m.left + iw,
-    y0: m.top + ih,
+    y0,
     y1: m.top,
     compact,
     endLabels,
+    paceTop: y0 + PACE_GAP + (compact ? 4 : 8),
+    paceH,
   };
 }
 
@@ -74,8 +101,33 @@ export function makeX(domain: [Date, Date], geom: Geom): XScale {
   return scaleTime().domain(domain).range([geom.x0, geom.x1]);
 }
 
-export function makeY(domain: [number, number], geom: Geom): YScale {
-  return scaleLinear().domain(domain).range([geom.y0, geom.y1]).clamp(false);
+/** Index values are clipped to the same band as the fit (0.5–99.5) before taking the logit. */
+const LOGIT_LO = 0.5;
+const LOGIT_HI = 99.5;
+
+function clampIndex(v: number): number {
+  return v < LOGIT_LO ? LOGIT_LO : v > LOGIT_HI ? LOGIT_HI : v;
+}
+
+export function makeY(domain: [number, number], geom: Geom, mode: YMode): YScale {
+  if (mode === 'linear') {
+    const lin = scaleLinear().domain(domain).range([geom.y0, geom.y1]).clamp(false);
+    const y = ((v: number) => lin(v)) as YScale;
+    y.invert = (px) => lin.invert(px);
+    y.domain = () => [domain[0], domain[1]];
+    y.range = () => [geom.y0, geom.y1];
+    y.mode = 'linear';
+    return y;
+  }
+  const lo = thetaFromIndex(clampIndex(domain[0]));
+  const hi = thetaFromIndex(clampIndex(domain[1]));
+  const lin = scaleLinear().domain([lo, hi]).range([geom.y0, geom.y1]).clamp(false);
+  const y = ((v: number) => lin(thetaFromIndex(clampIndex(v)))) as YScale;
+  y.invert = (px) => indexFromTheta(lin.invert(px));
+  y.domain = () => [domain[0], domain[1]];
+  y.range = () => [geom.y0, geom.y1];
+  y.mode = 'logit';
+  return y;
 }
 
 /* ------------------------------------------------------------------- ticks */
@@ -176,17 +228,46 @@ function thin(ticks: TimeTick[], x: XScale, maxTicks: number): TimeTick[] {
   return kept;
 }
 
-export function valueTicks(y: YScale, count: number): number[] {
-  const dom = y.domain();
-  const lo = dom[0] ?? 0;
-  const hi = dom[1] ?? 100;
-  if (lo === 0 && hi === 100) return [0, 20, 40, 60, 80, 100];
-  return y.ticks(count);
+/**
+ * The logit ladder, in the order ticks are *admitted*: the round numbers first, the tails last.
+ * A tick is kept only when it sits at least `minPx` from every tick already kept, so a short
+ * chart shows 10 · 50 · 90 · 99 and a tall one fills in 20 · 80 · 95 · 98 between them.
+ */
+const LOGIT_LADDER = [50, 90, 10, 99, 1, 80, 20, 95, 5, 70, 30, 98, 2, 60, 40, 99.5, 0.5];
+
+export function valueTicks(y: YScale, geom: Geom): number[] {
+  const [lo, hi] = y.domain();
+  if (y.mode === 'linear') {
+    if (lo === 0 && hi === 100) return [0, 20, 40, 60, 80, 100];
+    return scaleLinear().domain([lo, hi]).ticks(geom.compact ? 4 : 6);
+  }
+  const minPx = geom.compact ? 30 : 26;
+  const kept: number[] = [];
+  for (const v of LOGIT_LADDER) {
+    if (v < lo - 1e-9 || v > hi + 1e-9) continue;
+    const px = y(v);
+    if (kept.every((k) => Math.abs(y(k) - px) >= minPx)) kept.push(v);
+  }
+  return kept.sort((a, b) => a - b);
 }
 
-/** Nice, stable bounds so "fit to data" never lands on ragged numbers. */
-export function niceExtent([lo, hi]: [number, number]): [number, number] {
-  if (!(hi > lo)) return [0, 100];
+/** Tick label: whole numbers in the body, one decimal only where the ladder needs it. */
+export function fmtTick(v: number): string {
+  return Number.isInteger(v) ? String(v) : v.toFixed(1);
+}
+
+/**
+ * Nice, stable bounds so "fit to data" never lands on ragged numbers. In logit mode the rounding
+ * happens in θ (quarter-logit steps), which is what "nice" means on that axis.
+ */
+export function niceExtent([lo, hi]: [number, number], mode: YMode = 'linear'): [number, number] {
+  if (!(hi > lo)) return mode === 'logit' ? [2, 99] : [0, 100];
+  if (mode === 'logit') {
+    const step = 0.25;
+    const tl = Math.floor(thetaFromIndex(clampIndex(lo)) / step) * step;
+    const th = Math.ceil(thetaFromIndex(clampIndex(hi)) / step) * step;
+    return [Math.max(LOGIT_LO, indexFromTheta(tl)), Math.min(LOGIT_HI, indexFromTheta(th))];
+  }
   const step = hi - lo > 40 ? 10 : hi - lo > 16 ? 5 : 2;
   return [Math.max(0, Math.floor(lo / step) * step), Math.min(100, Math.ceil(hi / step) * step)];
 }

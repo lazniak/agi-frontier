@@ -2,7 +2,9 @@ import { describe, expect, test } from 'bun:test';
 import {
   DEFAULT_CLIP,
   fitFrontierIndex,
+  frontierGains,
   frontierLine,
+  frontierPace,
   frontierVelocity,
   indexFromTheta,
   logit,
@@ -384,5 +386,104 @@ describe('qualified flag', () => {
     expect(fit.models['p1']!.index).toBeGreaterThan(fit.models['q2']!.index);
     expect(frontierLine(fit).map((p) => p.release_id)).toEqual(['q1', 'q2']);
     expect(frontierLine(fit, { includeProvisional: true }).map((p) => p.release_id)).toEqual(['q1', 'p1']);
+  });
+});
+
+describe('anchor recentring (legacy benchmarks)', () => {
+  // Three modern anchors + one easy legacy benchmark; four models, all four benchmarks.
+  const build = (legacyFlag: boolean) => {
+    const benches = [benchmark('a'), benchmark('b'), benchmark('c'), benchmark('old', { legacy: legacyFlag })];
+    const thetas = [-1, 0, 1, 2];
+    const deltas = [-0.5, 0, 0.5, -3]; // the legacy one is far easier than the anchors
+    const releases = thetas.map((t, m) =>
+      release(`m${m}`, 'openai', addDays('2024-01-01', m * 30), benches.map((b, i) => score(b.id, indexFromTheta(t - deltas[i]!)))),
+    );
+    return { benches, releases, thetas, deltas };
+  };
+
+  test('δ is centred on the non-legacy anchors only', () => {
+    const fx = build(true);
+    const fit = fitFrontierIndex(fx.releases, fx.benches, { ridge: 0, tolerance: 1e-14, maxIter: 500 });
+    const anchorMean = (fit.difficulties.a! + fit.difficulties.b! + fit.difficulties.c!) / 3;
+    expect(anchorMean).toBeCloseTo(0, 10);
+    expect(fit.difficulties.old!).toBeCloseTo(-3, 6);
+    // θ comes back on the anchors' scale: mean(anchor δ) was 0 in the fixture too.
+    for (let m = 0; m < fx.thetas.length; m++) expect(fit.models[`m${m}`]!.theta).toBeCloseTo(fx.thetas[m]!, 6);
+  });
+
+  test('without the legacy flag the easy benchmark drags the zero (old behaviour)', () => {
+    const fx = build(false);
+    const fit = fitFrontierIndex(fx.releases, fx.benches, { ridge: 0, tolerance: 1e-14, maxIter: 500 });
+    const allMean = fit.benchmarksInIndex.reduce((acc, id) => acc + fit.difficulties[id]!, 0) / 4;
+    expect(allMean).toBeCloseTo(0, 10);
+    expect(fit.models.m1!.theta).toBeCloseTo(0.75, 6); // shifted by −mean(δ) = +0.75
+  });
+
+  test('falls back to all observed benchmarks when every one is legacy', () => {
+    const benches = [benchmark('x', { legacy: true }), benchmark('y', { legacy: true })];
+    const releases = [0, 1].map((m) => release(`m${m}`, 'openai', addDays('2024-01-01', m * 30), [score('x', 40 + m * 10), score('y', 60 + m * 10)]));
+    const fit = fitFrontierIndex(releases, benches, { ridge: 0, tolerance: 1e-14, maxIter: 500 });
+    expect(fit.difficulties.x! + fit.difficulties.y!).toBeCloseTo(0, 10);
+  });
+});
+
+describe('frontierPace', () => {
+  const thetaRamp = (days: number, perDay: number, from = '2025-01-01'): FrontierPoint[] =>
+    Array.from({ length: days }, (_, i) => ({
+      date: addDays(from, i),
+      index: indexFromTheta(-1 + i * perDay),
+      release_id: `r${i}`,
+      lab: 'openai' as const,
+    }));
+
+  test('a linear ramp in θ gives its slope in logits per year and ln2/slope doubling days', () => {
+    const perDay = 0.01;
+    const pace = frontierPace(thetaRamp(366, perDay), '2026-01-01', 365);
+    expect(pace).not.toBeNull();
+    expect(pace!.logitsPerYear).toBeCloseTo(perDay * 365, 6);
+    expect(pace!.doublingDays!).toBeCloseTo(Math.LN2 / perDay, 4);
+    expect(pace!.steps).toBe(366);
+  });
+
+  test('a flat frontier has no doubling time', () => {
+    const line: FrontierPoint[] = [
+      { date: '2025-01-01', index: 50, release_id: 'a', lab: 'openai' },
+      { date: '2025-03-01', index: 50.000000001, release_id: 'b', lab: 'openai' },
+    ];
+    const pace = frontierPace(line, '2025-12-31', 365);
+    expect(pace!.logitsPerYear).toBeCloseTo(0, 6);
+    expect(pace!.doublingDays === null || pace!.doublingDays > 1e6).toBe(true);
+  });
+
+  test('null when fewer than two knots fall in the window', () => {
+    expect(frontierPace([{ date: '2020-01-01', index: 40, release_id: 'a', lab: 'openai' }], '2025-12-31')).toBeNull();
+    expect(frontierPace([], '2025-12-31')).toBeNull();
+  });
+});
+
+describe('frontierGains', () => {
+  const line: FrontierPoint[] = [
+    { date: '2024-02-10', index: indexFromTheta(0), release_id: 'a', lab: 'openai' },
+    { date: '2024-03-20', index: indexFromTheta(0.5), release_id: 'b', lab: 'openai' },
+    { date: '2024-08-01', index: indexFromTheta(1.5), release_id: 'c', lab: 'google' },
+  ];
+
+  test('quarterly gains sum to the total θ climb after the first knot', () => {
+    const gains = frontierGains(line, '2024-12-31', 3);
+    expect(gains.map((g) => g.start)).toEqual(['2024-01-01', '2024-04-01', '2024-07-01', '2024-10-01']);
+    expect(gains.map((g) => g.steps)).toEqual([2, 0, 1, 0]);
+    expect(gains[0]!.gain).toBeCloseTo(0.5, 9); // b − a; the first knot itself is the origin
+    expect(gains[1]!.gain).toBeCloseTo(0, 9);
+    expect(gains[2]!.gain).toBeCloseTo(1.0, 9);
+    const total = gains.reduce((acc, g) => acc + g.gain, 0);
+    expect(total).toBeCloseTo(1.5, 9);
+  });
+
+  test('half-years and empty input', () => {
+    expect(frontierGains([], '2024-12-31')).toEqual([]);
+    const h = frontierGains(line, '2024-12-31', 6);
+    expect(h.map((g) => g.start)).toEqual(['2024-01-01', '2024-07-01']);
+    expect(h[0]!.gain + h[1]!.gain).toBeCloseTo(1.5, 9);
+    expect(h[1]!.end).toBe('2025-01-01');
   });
 });

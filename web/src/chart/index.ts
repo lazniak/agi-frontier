@@ -8,10 +8,11 @@ import { select } from 'd3-selection';
 import { zoomTransform, type ZoomTransform } from 'd3-zoom';
 import type { ISODate } from '@agi/shared';
 import type { Computed, Ctx } from '../data';
-import { CHART_START, extentOfViews } from '../data';
+import { CHART_START, compute, extentOfViews, restingLogitExtent } from '../data';
 import type { Store } from '../state';
 import { prefersReducedMotion, svg as mk } from '../dom';
-import { drawFans, drawPredictions } from './forecast';
+import { drawFans, drawPredictions, spotlightLabs } from './forecast';
+import { drawPace } from './pace';
 import { attachKeyboardNav, attachScrub, attachZoom } from './interaction';
 import {
   drawGrid,
@@ -21,12 +22,14 @@ import {
   drawOverlay,
   drawPoints,
   drawStripes,
+  drawTicks,
   type G,
 } from './layers';
-import { geometry, makeX, makeY, niceExtent, toDate, type Geom, type XScale } from './scales';
+import { geometry, makeX, makeY, niceExtent, toDate, type Geom, type XScale, type YMode } from './scales';
+import { indexFromTheta, thetaFromIndex, type LabId } from '@agi/shared';
 import type { Interactions, RenderCtx } from './types';
 
-const LAYER_ORDER = ['grid', 'stripes', 'fans', 'lines', 'points', 'markers', 'labels', 'overlay'] as const;
+const LAYER_ORDER = ['grid', 'stripes', 'fans', 'lines', 'points', 'markers', 'labels', 'pace', 'overlay'] as const;
 export type LayerName = (typeof LAYER_ORDER)[number];
 
 export interface ChartApi {
@@ -95,11 +98,53 @@ export function createChart(host: HTMLElement, ctx: Ctx, store: Store, io: Inter
 
   const zoomHandle = attachZoom(svgEl, () => geom, () => schedule());
 
+  /**
+   * The resting y-domain. Linear: the full 0–100. Logit: 0–100 would put the data in a sliver
+   * between two infinities, so the default is the extent of *all* data as of today (not as of the
+   * scrubber, or the axis would breathe while dragging), rounded to quarter-logits.
+   */
+  function defaultYDomain(mode: YMode): [number, number] {
+    if (mode === 'linear') return [0, 100];
+    const all = compute(ctx, ctx.today);
+    return niceExtent(restingLogitExtent(all.labViews, store.get().longRange), 'logit');
+  }
+
   function targetYDomain(): [number, number] {
-    if (!store.get().fitY || !computed) return [0, 100];
+    const mode = store.get().yMode;
+    if (!store.get().fitY || !computed) return defaultYDomain(mode);
     // Fit what the legend is actually showing, not every lab in the dataset.
     const shown = computed.labViews.filter((v) => store.visible(v.lab.id));
-    return niceExtent(extentOfViews(shown.length ? shown : computed.labViews, store.get().longRange));
+    const views = shown.length ? shown : computed.labViews;
+    const long = store.get().longRange;
+    return niceExtent(mode === 'logit' ? restingLogitExtent(views, long) : extentOfViews(views, long), mode);
+  }
+
+  /** Tween in the axis' own units: a logit axis eases in θ, a linear one in index points. */
+  function lerpDomain(from: [number, number], to: [number, number], e: number, mode: YMode): [number, number] {
+    if (mode === 'linear') {
+      return [interpolateNumber(from[0], to[0])(e), interpolateNumber(from[1], to[1])(e)];
+    }
+    const t = (v: number): number => thetaFromIndex(Math.min(99.5, Math.max(0.5, v)));
+    return [
+      indexFromTheta(interpolateNumber(t(from[0]), t(to[0]))(e)),
+      indexFromTheta(interpolateNumber(t(from[1]), t(to[1]))(e)),
+    ];
+  }
+
+  /** The lab the reader is looking at, in priority order: legend hover, hovered/selected release, solo. */
+  function focusLab(): LabId | null {
+    const st = store.get();
+    if (st.hoverLab) return st.hoverLab;
+    const of = (id: string | null): LabId | null => (id ? (ctx.releasesById.get(id)?.lab ?? null) : null);
+    return of(st.hover) ?? of(st.selected) ?? st.solo;
+  }
+
+  let paceMax = 0;
+  function paceScale(): { maxGain: number } {
+    if (!paceMax) {
+      for (const gain of compute(ctx, ctx.today).gains) paceMax = Math.max(paceMax, gain.gain);
+    }
+    return { maxGain: paceMax };
   }
 
   function schedule(): void {
@@ -130,10 +175,7 @@ export function createChart(host: HTMLElement, ctx: Ctx, store: Store, io: Inter
     if (yTween) {
       const k = reduced ? 1 : Math.min(1, (performance.now() - yTween.t0) / 420);
       const e = easeCubicOut(k);
-      yDomain = [
-        interpolateNumber(yTween.from[0], yTween.to[0])(e),
-        interpolateNumber(yTween.from[1], yTween.to[1])(e),
-      ];
+      yDomain = lerpDomain(yTween.from, yTween.to, e, store.get().yMode);
       if (k >= 1) yTween = null;
       else schedule();
     }
@@ -144,8 +186,9 @@ export function createChart(host: HTMLElement, ctx: Ctx, store: Store, io: Inter
     clipRect.setAttribute('height', String(geom.ih + 12));
 
     const x = currentX();
-    const y = makeY(yDomain, geom);
     const st = store.get();
+    const y = makeY(yDomain, geom, st.yMode);
+    const focus = focusLab();
     const r: RenderCtx = {
       ctx,
       computed,
@@ -156,6 +199,8 @@ export function createChart(host: HTMLElement, ctx: Ctx, store: Store, io: Inter
       today: st.today,
       hover: st.hover,
       selected: st.selected,
+      focusLab: focus,
+      spotlight: spotlightLabs(computed.labViews, (lab) => store.visible(lab), focus),
       visible: (lab) => store.visible(lab),
       reduced,
       longRange: st.longRange,
@@ -165,12 +210,14 @@ export function createChart(host: HTMLElement, ctx: Ctx, store: Store, io: Inter
 
     drawGrid(sel('grid'), r);
     drawStripes(sel('stripes'), r);
+    drawTicks(sel('stripes'), r);
     drawFans(sel('fans'), r);
     drawLines(sel('lines'), r);
     drawPoints(sel('points'), r);
     drawPredictions(sel('markers'), r);
     drawMarkers(sel('markers'), r);
     drawLabels(sel('labels'), r);
+    drawPace(sel('pace'), r, paceScale());
     const overlay = drawOverlay(sel('overlay'), r);
 
     if (!scrubDetach && overlay.handle) {
@@ -219,6 +266,7 @@ export function createChart(host: HTMLElement, ctx: Ctx, store: Store, io: Inter
       computed = next;
       // First paint is synchronous so the chart is never blank in a background tab.
       if (!drawn) {
+        yDomain = targetYDomain();
         draw();
         return;
       }

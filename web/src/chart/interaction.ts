@@ -214,6 +214,11 @@ export function buildLegend(ctx: Ctx, store: Store, root: ParentNode = document)
       if ((ev as MouseEvent).detail > 1) return; // let dblclick own the second press
       store.toggleLab(lab.id);
     });
+    // Hovering a chip focuses its lab on the chart: the others step back, its forecast opens up.
+    chip.addEventListener('pointerenter', () => store.setHoverLab(lab.id));
+    chip.addEventListener('pointerleave', () => store.setHoverLab(null));
+    chip.addEventListener('focus', () => store.setHoverLab(lab.id));
+    chip.addEventListener('blur', () => store.setHoverLab(null));
     chip.addEventListener('dblclick', (ev) => {
       ev.preventDefault();
       store.soloLab(lab.id);

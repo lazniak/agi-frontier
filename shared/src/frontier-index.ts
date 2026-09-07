@@ -60,7 +60,11 @@ export interface IndexFit {
   asOf: ISODate | null;
   /** Benchmark ids with in_index = true, in basket order. */
   benchmarksInIndex: string[];
-  /** δ_b per benchmark id; mean over index benchmarks = 0. */
+  /**
+   * δ_b per benchmark id. Mean over the *anchor* benchmarks (observed, non-legacy) = 0, so the
+   * index keeps its meaning when saturated benchmarks are retired to `legacy` or older ones are
+   * added to link early models. Falls back to all observed benchmarks when none is non-legacy.
+   */
   difficulties: Record<string, number>;
   models: Record<string, ModelIndex>;
   /** Pooled logit-space residual σ. */
@@ -235,6 +239,10 @@ export function fitFrontierIndex(
   const observedB: number[] = [];
   for (let b = 0; b < B; b++) if (nB[b]! > 0) observedB.push(b);
   const bObs = observedB.length;
+  // The anchor set fixes the origin of the scale: the current (non-legacy) basket. Legacy
+  // benchmarks are fitted like any other but do not pull the zero of δ around (METHODOLOGY §3).
+  const anchorB = observedB.filter((b) => indexBenchmarks[b]!.legacy !== true);
+  const centreB = anchorB.length > 0 ? anchorB : observedB;
 
   let iterations = 0;
   let converged = false;
@@ -259,12 +267,12 @@ export function fitFrontierIndex(
     }
     for (let b = 0; b < B; b++) delta[b] = nB[b]! > 0 ? accB[b]! / (nB[b]! + ridge) : 0;
 
-    // Re-centre δ over the observed index benchmarks and shift θ by the same amount,
+    // Re-centre δ over the anchor benchmarks and shift every δ and θ by the same amount,
     // which leaves every prediction θ_m − δ_b unchanged (METHODOLOGY §3).
     if (bObs > 0) {
       let c = 0;
-      for (const b of observedB) c += delta[b]!;
-      c /= bObs;
+      for (const b of centreB) c += delta[b]!;
+      c /= centreB.length;
       if (c !== 0) {
         for (const b of observedB) delta[b] = delta[b]! - c;
         for (let m = 0; m < M; m++) theta[m] = theta[m]! - c;
@@ -412,4 +420,119 @@ export function frontierVelocity(line: FrontierPoint[], asOf: ISODate, windowDay
   if (!(denom > 0)) return null;
   const slopePerDay = (sxy - (sx * sy) / n) / denom;
   return slopePerDay * 30;
+}
+
+export interface FrontierPace {
+  /** OLS slope of the running maximum in latent-ability units (logits) per 365 days. */
+  logitsPerYear: number;
+  /**
+   * Days for the frontier's odds of solving a basket item to double (ln 2 / daily slope).
+   * null when the slope is not positive.
+   */
+  doublingDays: number | null;
+  /** Knots that fell inside the window. */
+  steps: number;
+}
+
+/**
+ * The same regression as `frontierVelocity`, but on θ = logit(index / 100) rather than on the
+ * 0–100 index. Near saturation the index slope shrinks towards zero by construction, so it
+ * understates progress; the logit slope is the honest pace (METHODOLOGY §3).
+ */
+export function frontierPace(line: FrontierPoint[], asOf: ISODate, windowDays = 365): FrontierPace | null {
+  if (line.length === 0) return null;
+  const endDay = dateToDayNumber(asOf);
+  const startDay = endDay - Math.max(0, Math.round(windowDays));
+  let steps = 0;
+  for (const p of line) {
+    const d = dateToDayNumber(p.date);
+    if (d >= startDay && d <= endDay) steps++;
+  }
+  if (steps < 2) return null;
+  const knotDays = line.map((p) => dateToDayNumber(p.date));
+  const from = Math.max(startDay, knotDays[0]!);
+  if (endDay < from) return null;
+  let ptr = -1;
+  let cur = 0;
+  let n = 0;
+  let sx = 0;
+  let sy = 0;
+  let sxx = 0;
+  let sxy = 0;
+  for (let d = from; d <= endDay; d++) {
+    while (ptr + 1 < line.length && knotDays[ptr + 1]! <= d) {
+      ptr++;
+      cur = thetaFromIndex(line[ptr]!.index);
+    }
+    if (ptr < 0) continue;
+    const x = d - from;
+    n++;
+    sx += x;
+    sy += cur;
+    sxx += x * x;
+    sxy += x * cur;
+  }
+  if (n < 2) return null;
+  const denom = sxx - (sx * sx) / n;
+  if (!(denom > 0)) return null;
+  const slopePerDay = (sxy - (sx * sy) / n) / denom;
+  return {
+    logitsPerYear: slopePerDay * 365,
+    doublingDays: slopePerDay > 0 ? Math.LN2 / slopePerDay : null,
+    steps,
+  };
+}
+
+export interface FrontierGain {
+  /** First day of the period (inclusive). */
+  start: ISODate;
+  /** First day of the next period (exclusive). */
+  end: ISODate;
+  /** θ(running max at `end`) − θ(running max at `start`), in logits. 0 when nothing moved. */
+  gain: number;
+  /** Frontier knots dated inside the period. */
+  steps: number;
+}
+
+/**
+ * Frontier gain per calendar period (quarters or half-years) from the first knot up to `to`.
+ * Periods before the first knot are not emitted; the running max is held flat between knots.
+ */
+export function frontierGains(line: FrontierPoint[], to: ISODate, periodMonths: 3 | 6 | 12 = 3): FrontierGain[] {
+  if (line.length === 0) return [];
+  const first = line[0]!.date;
+  if (to < first) return [];
+  const thetaAt = (iso: ISODate): number => {
+    let v = Number.NEGATIVE_INFINITY;
+    for (const p of line) {
+      if (p.date < iso) v = Math.max(v, thetaFromIndex(p.index));
+      else break;
+    }
+    return v;
+  };
+  const startOf = (iso: ISODate): ISODate => {
+    const y = Number(iso.slice(0, 4));
+    const m = Number(iso.slice(5, 7)) - 1;
+    const pm = Math.floor(m / periodMonths) * periodMonths;
+    return `${y}-${String(pm + 1).padStart(2, '0')}-01`;
+  };
+  const next = (iso: ISODate): ISODate => {
+    const y = Number(iso.slice(0, 4));
+    const m = Number(iso.slice(5, 7)) - 1 + periodMonths;
+    return `${y + Math.floor(m / 12)}-${String((m % 12) + 1).padStart(2, '0')}-01`;
+  };
+  const out: FrontierGain[] = [];
+  let start = startOf(first);
+  let prev = thetaFromIndex(line[0]!.index);
+  while (start <= to) {
+    const end = next(start);
+    const curTheta = thetaAt(end);
+    let steps = 0;
+    for (const p of line) if (p.date >= start && p.date < end) steps++;
+    const gain = Math.max(0, curTheta - prev);
+    out.push({ start, end, gain: Number.isFinite(gain) ? gain : 0, steps });
+    prev = Number.isFinite(curTheta) ? curTheta : prev;
+    start = end;
+  }
+  return out;
 }

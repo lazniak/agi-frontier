@@ -7,7 +7,11 @@ official benchmarks, with a calibrated forecast of *when* each lab ships its nex
 
 - **Frontier Index** — a single 0–100 capability number per model, fitted from the lab's own
   reported scores on a fixed basket of benchmarks (Rasch-style ability/difficulty model, so a
-  model that skipped a benchmark is not punished or rewarded for it). Method: [`docs/METHODOLOGY.md`](docs/METHODOLOGY.md).
+  model that skipped a benchmark is not punished or rewarded for it). Not an average: the chart
+  draws the latent ability on a logit axis, so progress near the top is not squashed, and a
+  legacy tier of older benchmarks chains the history back to GPT-2. Method: [`docs/METHODOLOGY.md`](docs/METHODOLOGY.md).
+- **Pace** — the frontier's slope in logits per year and the implied odds-doubling time, plus a
+  strip of the gain per quarter under the chart.
 - **Release forecast** — per lab, a log-normal model of historical release cadence gives the
   probability of the next flagship landing in the next 30 / 90 days. Drawn as a yellow
   min–max fan and a circle whose diameter is the 68 % release window.

@@ -1,5 +1,5 @@
 /** The floating tooltip: one element, HTML built per hovered thing. */
-import type { LeadershipStripe, ModelRelease, PredictedRelease } from '@agi/shared';
+import { addDays, type FrontierGain, type LeadershipStripe, type ModelRelease, type PredictedRelease } from '@agi/shared';
 import type { Ctx, SeriesPoint } from '../data';
 import { qs } from '../dom';
 import {
@@ -130,6 +130,34 @@ export function predictionTooltip(ctx: Ctx, labId: string, pred: PredictedReleas
       ['Expected index', `${fmtIndex(pred.indexLow)} ${EN_DASH} ${fmtIndex(pred.indexHigh)}`],
     ]) +
     `<p class="tt-hint">Circle diameter = the 68% window</p>`
+  );
+}
+
+/** A released flagship with no score on any index benchmark — a tick on the timeline. */
+export function tickTooltip(ctx: Ctx, r: ModelRelease): string {
+  const lab = ctx.labs.get(r.lab);
+  return (
+    head(lab?.color ?? '#111', r.name, `${lab?.name ?? r.lab} · ${fmtDatePrecision(r.date, r.date_precision)}`) +
+    `<p class="tt-note">Released, but it reported no score on any index benchmark — most of the basket did not exist yet. It sits on the timeline only and does not affect the index.</p>` +
+    `<p class="tt-hint">Click for sources</p>`
+  );
+}
+
+function quarterLabel(iso: string): string {
+  const q = Math.floor((Number(iso.slice(5, 7)) - 1) / 3) + 1;
+  return `Q${q} ${iso.slice(0, 4)}`;
+}
+
+/** One bar of the pace strip. */
+export function paceTooltip(d: FrontierGain): string {
+  return (
+    head('#111111', quarterLabel(d.start), 'Frontier gain, latent ability') +
+    `<p class="tt-big">${d.gain > 0 ? '+' : ''}${d.gain.toFixed(2)}<small>logits</small></p>` +
+    rows([
+      ['Frontier steps', String(d.steps)],
+      ['Period', `${esc(fmtDate(d.start))} ${EN_DASH} ${esc(fmtDate(addDays(d.end, -1)))}`],
+    ]) +
+    `<p class="tt-note">How far the running maximum of θ moved this quarter. One logit multiplies the odds of solving a basket item by e ≈ 2.7; the 0–100 index hides this near the top.</p>`
   );
 }
 

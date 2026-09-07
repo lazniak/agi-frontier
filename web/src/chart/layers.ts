@@ -7,9 +7,9 @@ import { curveMonotoneX, curveStepAfter, line } from 'd3-shape';
 import type { LeadershipStripe, ModelRelease } from '@agi/shared';
 import type { LabView, SeriesPoint } from '../data';
 import { fmtDate, fmtIndex } from '../ui/format';
-import { markerTooltip, releaseTooltip, stripeTooltip } from './tooltip';
-import { timeTicks, toDate, valueTicks } from './scales';
-import { ANNOUNCED, INK, type RenderCtx } from './types';
+import { markerTooltip, releaseTooltip, stripeTooltip, tickTooltip } from './tooltip';
+import { fmtTick, timeTicks, toDate, valueTicks } from './scales';
+import { ANNOUNCED, DIM_LINE, DIM_POINT, INK, type RenderCtx } from './types';
 
 export type G = Selection<SVGGElement, unknown, null, undefined>;
 
@@ -20,7 +20,7 @@ const KEY_STRIPE = (s: LeadershipStripe): string => `${s.lab}|${s.from}`;
 export function drawGrid(g: G, r: RenderCtx): void {
   const { geom, x, y } = r;
   const ticks = timeTicks(x, Math.max(3, Math.round(geom.iw / (geom.compact ? 78 : 104))));
-  const yTicks = valueTicks(y, geom.compact ? 4 : 6);
+  const yTicks = valueTicks(y, geom);
 
   // horizontal rules
   const rules = g.selectAll<SVGLineElement, number>('line.grid-h').data(yTicks, (d) => d);
@@ -45,7 +45,7 @@ export function drawGrid(g: G, r: RenderCtx): void {
     .merge(yLabels)
     .attr('x', geom.x0 - 10)
     .attr('y', (d) => y(d) + 3.5)
-    .text((d) => String(Math.round(d)));
+    .text((d) => fmtTick(d));
 
   // vertical rules + date labels
   const cols = g.selectAll<SVGLineElement, { date: Date }>('line.grid-v').data(ticks, (d) => String(d.date.getTime()));
@@ -79,22 +79,22 @@ export function drawGrid(g: G, r: RenderCtx): void {
     .attr('x', geom.x0)
     .attr('y', geom.y1 - 22)
     .attr('text-anchor', 'start')
-    .text('Frontier Index');
+    .text(y.mode === 'logit' ? 'Frontier Index · logit scale' : 'Frontier Index');
 
   // What the top of the scale means. Drawn only when 100 is actually on screen.
   const dom = y.domain();
   const sat = g.select<SVGTextElement>('text.saturation-note').empty()
     ? g.append('text').attr('class', 'saturation-note')
     : g.select<SVGTextElement>('text.saturation-note');
-  const showSat = (dom[1] ?? 100) >= 99.5 && !geom.compact;
+  const showSat = !geom.compact && (y.mode === 'logit' || (dom[1] ?? 100) >= 99.5);
   // Left-hand side: the top-right of the plot belongs to the forecast, and 100 is empty over there.
   // Hidden with `display`, not `opacity` — the stylesheet owns the latter and would win.
   sat
     .attr('x', geom.x0 + 7)
-    .attr('y', y(100) + 14)
+    .attr('y', (y.mode === 'logit' ? geom.y1 : y(100)) + 14)
     .attr('text-anchor', 'start')
     .attr('display', showSat ? null : 'none')
-    .text('Saturation of the basket');
+    .text(y.mode === 'logit' ? 'Equal steps are equal odds ratios · 100 is the asymptote' : 'Saturation of the basket');
 }
 
 /* ----------------------------------------------------------------- stripes */
@@ -126,6 +126,55 @@ export function drawStripes(g: G, r: RenderCtx): void {
     .on('pointerleave', () => r.io.tipHide());
 }
 
+/* ------------------------------------------------------------------- ticks */
+
+/**
+ * Released flagships with no index score at all (GPT-1, the first Kimi…) have no height, so
+ * they are drawn as ticks on the leadership strip. The timeline stays complete even where
+ * the basket cannot reach.
+ */
+export function drawTicks(g: G, r: RenderCtx): void {
+  const { geom, x, ctx } = r;
+  const bandY = geom.y0 + 12;
+  const items: ModelRelease[] = [];
+  for (const v of r.computed.labViews) if (r.visible(v.lab.id)) items.push(...v.unscored);
+
+  const sel = g.selectAll<SVGRectElement, ModelRelease>('rect.release-tick').data(items, (d) => d.id);
+  sel.exit().remove();
+  sel
+    .enter()
+    .append('rect')
+    .attr('class', 'release-tick')
+    .attr('width', 2)
+    .attr('height', 12)
+    .attr('rx', 1)
+    .attr('tabindex', 0)
+    .attr('role', 'button')
+    .merge(sel)
+    .attr('x', (d) => x(toDate(d.date)) - 1)
+    .attr('y', bandY - 3)
+    .attr('fill', (d) => ctx.labs.get(d.lab)?.color ?? INK)
+    .attr('opacity', (d) => (r.focusLab && r.focusLab !== d.lab ? DIM_POINT : 0.9))
+    .attr('aria-label', (d) => `${d.name}, ${ctx.labs.get(d.lab)?.name ?? d.lab}, released ${fmtDate(d.date)}, no index score. Activate for sources.`)
+    .on('pointerenter', function (ev: PointerEvent, d) {
+      r.io.tip(tickTooltip(ctx, d), ev);
+    })
+    .on('pointermove', (ev: PointerEvent) => r.io.tipMove(ev))
+    .on('pointerleave', () => r.io.tipHide())
+    .on('focus', function (this: SVGRectElement, _ev: FocusEvent, d) {
+      const box = this.getBoundingClientRect();
+      r.io.tip(tickTooltip(ctx, d), { clientX: box.left + box.width / 2, clientY: box.top });
+    })
+    .on('blur', () => r.io.tipHide())
+    .on('click', (_ev: PointerEvent, d) => r.io.openAudit(d.id))
+    .on('keydown', (ev: KeyboardEvent, d) => {
+      if (ev.key === 'Enter' || ev.key === ' ') {
+        ev.preventDefault();
+        r.io.openAudit(d.id);
+      }
+    });
+}
+
 /* ------------------------------------------------------------------- lines */
 
 export function drawLines(g: G, r: RenderCtx): void {
@@ -148,7 +197,8 @@ export function drawLines(g: G, r: RenderCtx): void {
     .merge(sel)
     .attr('d', (d) => path(d.qualified) ?? '')
     .attr('stroke', (d) => d.lab.color)
-    .attr('opacity', (d) => (r.visible(d.lab.id) ? 1 : 0.07))
+    .attr('stroke-width', (d) => (r.focusLab === d.lab.id ? 2.25 : 1.5))
+    .attr('opacity', (d) => (!r.visible(d.lab.id) ? 0.07 : r.focusLab && r.focusLab !== d.lab.id ? DIM_LINE : 1))
     .attr('pointer-events', 'none');
 
   // running-maximum envelope, drawn as a step function
@@ -235,6 +285,7 @@ export function drawPoints(g: G, r: RenderCtx): void {
     .attr('cy', (d) => y(d.mi.index))
     .attr('fill', (d) => (d.mi.qualified ? colorOf(d) : '#fff'))
     .attr('stroke', (d) => (d.mi.qualified ? '#fff' : colorOf(d)))
+    .attr('opacity', (d) => (r.focusLab && r.focusLab !== d.release.lab ? DIM_POINT : 1))
     .attr('aria-label', (d) =>
       `${d.release.name}, ${ctx.labs.get(d.release.lab)?.name ?? d.release.lab}, released ${fmtDate(d.release.date)}, Frontier Index ${fmtIndex(d.mi.index)}${
         d.mi.qualified ? '' : ', provisional'
@@ -311,6 +362,7 @@ export function drawMarkers(g: G, r: RenderCtx): void {
   const merged = enter.merge(sel);
   merged
     .attr('transform', (d) => `translate(${x(toDate(d.date))},${y(markerLevel(r, d))})`)
+    .attr('opacity', (d) => (r.focusLab && r.focusLab !== d.lab ? DIM_POINT : 1))
     .attr('data-id', (d) => d.id)
     .attr(
       'aria-label',
@@ -429,6 +481,7 @@ export function drawLabels(g: G, r: RenderCtx): void {
     .append('line')
     .attr('class', 'lab-leader')
     .merge(lines)
+    .attr('opacity', (d) => (r.focusLab && r.focusLab !== d.id ? DIM_POINT : 1))
     .attr('x1', (d) => d.x + 3)
     .attr('y1', (d) => d.anchorY)
     .attr('x2', (d) => textX(d) - 2)
@@ -445,6 +498,7 @@ export function drawLabels(g: G, r: RenderCtx): void {
     .attr('x', textX)
     .attr('y', (d) => d.y + 4)
     .attr('fill', (d) => d.color)
+    .attr('opacity', (d) => (r.focusLab && r.focusLab !== d.id ? DIM_POINT : 1))
     .text((d) => d.short);
 }
 

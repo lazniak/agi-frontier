@@ -20,7 +20,7 @@ import { buildLegend } from './chart/interaction';
 import type { Interactions } from './chart/types';
 import { compute, loadBundle, makeCtx, type Computed, type Ctx } from './data';
 import { announce, maybe, prefersReducedMotion, qs } from './dom';
-import { Store } from './state';
+import { Store, type YMode } from './state';
 import { renderChanges } from './ui/changes';
 import { Drawer } from './ui/drawer';
 import { fmtDate } from './ui/format';
@@ -47,6 +47,25 @@ function writeLongRange(on: boolean): void {
     localStorage.setItem(LONG_RANGE_KEY, on ? '1' : '0');
   } catch {
     /* storage unavailable — the toggle simply does not persist */
+  }
+}
+
+/** The y-axis choice sticks too. Anything but "linear" means the default, the logit axis. */
+const Y_SCALE_KEY = 'agi:y-scale';
+
+function readYMode(): YMode {
+  try {
+    return localStorage.getItem(Y_SCALE_KEY) === 'linear' ? 'linear' : 'logit';
+  } catch {
+    return 'logit';
+  }
+}
+
+function writeYMode(mode: YMode): void {
+  try {
+    localStorage.setItem(Y_SCALE_KEY, mode);
+  } catch {
+    /* storage unavailable */
   }
 }
 
@@ -77,6 +96,7 @@ async function boot(): Promise<void> {
     today: ctx.today,
     minDate: minScrub(ctx),
     longRange: readLongRange(),
+    yMode: readYMode(),
   });
   const tooltip = new Tooltip();
   const drawer = new Drawer(ctx, store);
@@ -86,6 +106,7 @@ async function boot(): Promise<void> {
     tipMove: (at) => tooltip.move(at.clientX, at.clientY),
     tipHide: () => tooltip.hide(),
     hoverRelease: (id) => store.setHover(id),
+    hoverLab: (id) => store.setHoverLab(id),
     openAudit: (id) => store.select(id),
   };
 
@@ -125,12 +146,26 @@ async function boot(): Promise<void> {
     );
   });
 
+  const yBtn = qs<HTMLButtonElement>('[data-y-scale]');
+  yBtn.setAttribute('aria-pressed', String(store.get().yMode === 'logit'));
+  yBtn.addEventListener('click', () => {
+    const mode: YMode = yBtn.getAttribute('aria-pressed') === 'true' ? 'linear' : 'logit';
+    yBtn.setAttribute('aria-pressed', String(mode === 'logit'));
+    store.setYMode(mode);
+    writeYMode(mode);
+    announce(
+      mode === 'logit'
+        ? 'Logit axis — linear in latent ability, equal steps are equal odds ratios'
+        : 'Linear axis — the 0 to 100 index as is',
+    );
+  });
+
   const fitBtn = qs<HTMLButtonElement>('[data-fit]');
   fitBtn.addEventListener('click', () => {
     const on = fitBtn.getAttribute('aria-pressed') !== 'true';
     fitBtn.setAttribute('aria-pressed', String(on));
     store.setFitY(on);
-    announce(on ? 'Y axis fitted to the visible data' : 'Y axis reset to 0 to 100');
+    announce(on ? 'Y axis fitted to the visible data' : 'Y axis reset to its default range');
   });
   qs<HTMLButtonElement>('[data-reset-zoom]').addEventListener('click', () => {
     chart.resetZoom();

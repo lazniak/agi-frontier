@@ -24,10 +24,18 @@ shown in the UI; we never invent a day.
 ## 2. Benchmark basket
 
 The basket is fixed in `data/benchmarks.json`. Index benchmarks (in order of introduction):
-MMLU, HumanEval, MATH (legacy anchors, saturated), GPQA Diamond, MMMU, SWE-bench Verified,
-AIME, MMLU-Pro, LiveCodeBench, Humanity's Last Exam, ARC-AGI-2, Terminal-Bench 2.0, τ²-bench.
+LAMBADA, ARC Challenge, HellaSwag, WinoGrande, MMLU, HumanEval, MATH, GSM8K (**legacy** — saturated,
+still fitted), then GPQA Diamond, MMMU, SWE-bench Verified, AIME, MMLU-Pro, LiveCodeBench,
+Humanity's Last Exam, ARC-AGI-2, Terminal-Bench 2.0, τ²-bench (the **anchor** basket).
 All are percentages, higher is better. Non-index benchmarks (SWE-bench Pro, BrowseComp,
 OSWorld, FrontierMath) are recorded and displayed but not fitted.
+
+The legacy tier exists to reach back in time. GPT-2 reported LAMBADA; GPT-3 reported LAMBADA,
+HellaSwag, ARC and WinoGrande; the 2023 generation reported those plus MMLU, GSM8K and HumanEval;
+the 2024 generation reported MMLU and GSM8K next to GPQA and MATH. Each benchmark overlaps two
+or three generations, so the Rasch fit (§3) chains the whole history onto one scale even though
+no single benchmark spans it. A release with no score on any index benchmark (GPT-1, the first
+Kimi) has no index and is drawn as a tick on the timeline only.
 
 Only numbers the lab itself published (launch post, model card, system card, HF card) are
 `official`. A benchmark maintainer's own leaderboard number may be recorded as `maintainer`
@@ -45,7 +53,8 @@ than one that also reports hard ones. We fit a one-parameter logistic (Rasch) mo
 
 θ_m is model ability, δ_b is benchmark difficulty, fitted jointly on all official scores by
 alternating least squares with a small ridge (λ = 0.05) and the constraint mean(δ) = 0 over
-index benchmarks. Scores are clipped to [0.5 %, 99.5 %] before the logit.
+the **anchor** benchmarks — the non-legacy index basket. Scores are clipped to [0.5 %, 99.5 %]
+before the logit.
 
 **One score per benchmark.** A release may report the same benchmark several times. For each
 index benchmark we keep exactly one number, picked deterministically: `official` beats
@@ -62,8 +71,12 @@ date. Starting from θ = δ = 0 we alternate
 
 where y_mb is the clipped logit, n_m the number of index benchmarks the model reports and n_b
 the number of models reporting the benchmark. After every sweep δ is re-centred to mean zero
-over the benchmarks that carry at least one observation and θ is shifted by the same amount,
-which leaves every prediction θ_m − δ_b untouched. We stop when no parameter moves by more
+over the *anchor* benchmarks that carry at least one observation (every observed benchmark
+when no anchor is observed), every δ and θ is shifted by the same amount, and every prediction
+θ_m − δ_b stays untouched. Anchoring on the current basket rather than on everything ever
+fitted is what keeps the index meaningful as benchmarks are retired to `legacy` or old ones
+are added to link early models: the zero of the scale is "average difficulty of today's
+basket", whatever else is in the file. We stop when no parameter moves by more
 than 1e-6, or after 200 sweeps. On a complete matrix with λ = 0 this reproduces the additive
 decomposition exactly. Benchmarks nobody reported keep δ = 0; a model with no index score at
 all gets no index rather than an invented one, and the UI says "no official scores".
@@ -87,11 +100,23 @@ qualified releases. The reason is mechanical: a launch post that reports only on
 mid-90s with nothing to contradict it. Three benchmarks are the minimum for the residual to say
 anything about that model.
 
+**The axis is logit, not linear.** The index is 100 · σ(θ), so it saturates: a model at 90 and
+one at 97 differ by 1.3 logits — as much as 50 and 79. On a linear 0–100 axis the last two
+years look like a flattening curve, which is the sigmoid, not the models. The chart therefore
+draws the y axis linear in θ (equal steps are equal odds ratios), labelled in index units; a
+toggle switches to the linear index for readers who want it. The tick ladder is fixed
+(…10 · 20 · 30 · 50 · 70 · 80 · 90 · 95 · 98 · 99…) and thinned by pixel distance.
+
 The **frontier line** is the running maximum of the index over released, qualified models sorted
-by date; a point is emitted only where the maximum increases. **Velocity** is the ordinary
-least-squares slope of that step function sampled once per day over the trailing 365 days,
-expressed in index points per 30 days. Days before the first knot are excluded, and we
-report no velocity at all when fewer than two knots fall inside the window.
+by date; a point is emitted only where the maximum increases. **Pace** is the ordinary
+least-squares slope of θ along that step function, sampled once per day over the trailing 365
+days, in logits per year; we also report the implied **odds-doubling time**, ln 2 divided by
+the daily slope. Days before the first knot are excluded, and no pace is reported when fewer
+than two knots fall inside the window. The strip under the chart shows the frontier's gain in θ
+per calendar quarter, bars scaled to the largest quarter as of today so they do not re-scale
+while the scrubber moves. (`frontierVelocity`, the same slope in index points per 30 days, is
+still computed and published, but it understates progress near saturation by construction and
+the UI no longer leads with it.)
 
 Because δ_b is re-estimated whenever new scores arrive, historical index values can move by
 a fraction of a point between updates. Every bundle records the δ vector it used.

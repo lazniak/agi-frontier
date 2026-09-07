@@ -10,6 +10,11 @@
      `config` as reported, `reported_by: "official"`, `source.url` + `source.quote` verbatim.
      The quote must contain the number.
    - `retrieved_at`: UTC timestamp when you looked, e.g. `2026-09-07T04:00:00Z`.
+   - Early models: the legacy tier (`lambada`, `arc-challenge`, `hellaswag`, `winogrande`,
+     `mmlu`, `humaneval`, `math`, `gsm8k`) is there so 2019–2024 releases can be fitted. A
+     release with no index score at all is fine — it is drawn as a tick on the timeline.
+   - Papers: prefer the ar5iv HTML mirror (`https://ar5iv.labs.arxiv.org/html/<id>`) over the
+     PDF so `verify` can check the quote.
 3. Append a row to `data/history/changes.jsonl`:
    `{"at":"…Z","actor":"manual","lab":"openai","release_id":"openai-gpt-5.1","kind":"release_added","summary":"GPT-5.1 launch post","source_url":"…"}`
 4. `bun run validate` must pass. `bun run --filter @agi/worker verify --lab openai` re-fetches

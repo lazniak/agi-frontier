@@ -102,8 +102,8 @@ and a “Compute error” banner names the failure instead of a blank screen.
 
 ### The chart
 
-One `<svg>` with eight sibling `<g>` layers in a fixed z-order — `grid`, `stripes`, `fans`,
-`lines`, `points`, `markers`, `labels`, `overlay` — so `ui/parallax` can translate each by a
+One `<svg>` with nine sibling `<g>` layers in a fixed z-order — `grid`, `stripes`, `fans`,
+`lines`, `points`, `markers`, `labels`, `pace`, `overlay` — so `ui/parallax` can translate each by a
 different amount. `fans` and `markers` are clipped to the plot rect; the others are not, so lab
 labels can sit in the right-hand gutter and the stripe band below the axis.
 
@@ -115,10 +115,28 @@ labels can sit in the right-hand gutter and the stripe band below the axis.
   full chained forecast and the today + 3 years horizon that matches METHODOLOGY §4. The choice
   is kept in `localStorage` under `agi:long-range`, and flipping it resets the zoom, because the
   base x-domain it was built on has just changed. What each mode draws is listed below.
-- **y** is the index, 0–100 by default; “Fit to data” tweens to the range of whatever the
-  legend is currently showing (and of whichever fan the toggle has on). The **“Frontier index”**
-  caption sits above the plot, flush with the y axis, and a grey **“Saturation of the basket”**
-  note marks 100 from inside the plot's top-left, where nothing is ever drawn.
+- **y is a logit axis by default** (`chart/scales.ts: makeY`): linear in the latent ability θ,
+  labelled in index units on a fixed ladder (…10 · 20 · 30 · 50 · 70 · 80 · 90 · 95 · 98 · 99…)
+  thinned by pixel distance. Every layer still calls `y(index)`; only the spacing changes. The
+  resting domain is the extent of *all* points and fans as of today (`data.ts: restingLogitExtent`,
+  which ignores error bars — a one-score model's ± reaches the floor of the scale), rounded to
+  quarter-logits, and it is deliberately computed as of today rather than as of the scrubber so
+  the axis does not breathe while dragging. The **“Logit scale”** pill (kept in `localStorage`
+  under `agi:y-scale`) switches to the linear 0–100 index; “Fit to data” tweens — in θ on the
+  logit axis — to the range of whatever the legend is currently showing. The **“Frontier index ·
+  logit scale”** caption sits above the plot, flush with the y axis, and a grey note inside the
+  plot's top-left says what the axis means (“Saturation of the basket” on the linear one).
+- **Pace strip** (`chart/pace.ts`): under the x axis, one bar per calendar quarter, height =
+  the frontier's gain in θ that quarter (`frontierGains` in shared), scaled to the largest
+  quarter as of today so bars do not re-scale under the scrubber; the trailing-year slope and
+  odds-doubling time (`frontierPace`) sit top-right. The “now” rule continues through it.
+- **Focus.** Hovering a legend chip, a point, a marker or a forecast sets a focus lab
+  (`RenderCtx.focusLab`, from `store.hoverLab` → hovered/selected release's lab → solo). The
+  other labs' lines drop to 16 % and their points/labels to 28 % (`DIM_LINE`, `DIM_POINT`), the
+  focused line thickens, and the focused lab joins the forecast spotlight.
+- **Unscored releases.** A released flagship with no index score at all (GPT-1, the first Kimi)
+  has no height, so `drawTicks` puts a 2 px tick in the lab colour on the leadership strip;
+  hover explains, click opens the audit drawer.
 - The **time-tick ladder thins by pixel distance, not by index** (`chart/scales.ts`): a year mark
   is never dropped, and a quarter that would collide with one is. Keeping every n-th tick instead
   is what used to print “Q2” on top of “2024” on a phone.
@@ -132,12 +150,17 @@ labels can sit in the right-hand gutter and the stripe band below the axis.
   the same trick at 10 %; their strokes stay outside it so each window still reads as a ring.
   The future tint right of the “now” rule is a separate 3.2 % wash — deliberately below the fan,
   so the region reads as “after today”, never as a forecast.
-- **The default view draws one release ahead, not five.** Each lab's fan runs from the scrubbed
-  date to its own k = 1 `p95Date` + 30 days (`data.ts: nearFanEnd`, kept as `LabView.fanNear`
-  beside the full-horizon `fan`); its k = 1 circle is drawn in full, k = 2 as a ghost — dashed
-  1 px, 30 % opacity, no fill — and k ≥ 3 not at all. Chained out to three years, ten labs put
-  fifty circles and ten full-width fans in the same corner and the future became one yellow
-  blob. The long-range toggle brings all of it back.
+- **Spotlight, not ten fans.** Ten labs forecast into the same three months, so the layer draws
+  two tiers (`chart/forecast.ts: spotlightLabs`): the three visible labs with the highest
+  P(30 d) — always joined by the focus lab, and all of them when four or fewer are on — get the
+  fan, the dashed median and the window circle; every other lab gets a **whisker**, a 1.25 px bar
+  from the 16th to the 84th percentile date at its expected index with a dot on the median, at
+  55 % opacity, hoverable and focusable with the same tooltip. Same information, a tenth of the
+  ink.
+- **The default view draws one release ahead, not five.** Each spotlight lab's fan runs from the
+  scrubbed date to its own k = 1 `p95Date` + 30 days (`data.ts: nearFanEnd`, kept as
+  `LabView.fanNear` beside the full-horizon `fan`); only the k = 1 circle is drawn. The long-range
+  toggle restores the full chain (k = 1…5, fading) for the spotlight labs and the three-year fans.
 - The **k = 1 circle of the lab with the highest P(30 d)** carries a soft yellow halo (25 %,
   a 6 px blur from a `feGaussianBlur` filter the chart shell puts in `<defs>`), so the eye lands
   on the release the cadence model actually expects first.

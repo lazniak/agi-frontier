@@ -49,14 +49,19 @@ export function renderStats(ctx: Ctx, c: Computed): void {
   }
   renderProvisionalFootnote(idx, c);
 
-  // 2 — how fast it is moving
-  if (c.velocity === null) {
+  // 2 — how fast it is moving. In latent ability (logits), not index points: near the top of
+  //     the 0–100 scale the index slope shrinks by construction and would read as a slowdown.
+  if (!c.pace) {
     value(vel, EN_DASH);
     velMeta.textContent = 'Fewer than two frontier steps in the trailing year.';
   } else {
-    const v = c.velocity;
-    value(vel, `${v >= 0 ? '+' : '−'}${Math.abs(v).toFixed(2)}`, 'pts / mo');
-    velMeta.innerHTML = `Least-squares slope of the running maximum over the trailing 365 days${
+    const v = c.pace.logitsPerYear;
+    value(vel, `${v >= 0 ? '+' : '−'}${Math.abs(v).toFixed(1)}`, 'logits / yr');
+    const doubling =
+      c.pace.doublingDays && c.pace.doublingDays < 3650
+        ? `Odds of solving a basket item double every <b>${(c.pace.doublingDays / 30.4375).toFixed(1)} months</b> · `
+        : '';
+    velMeta.innerHTML = `${doubling}slope of the running maximum in latent ability over the trailing 365 days${
       c.frontier.length ? ` · <b>${c.frontier.length}</b> frontier steps so far` : ''
     }.`;
   }

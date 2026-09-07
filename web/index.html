@@ -84,9 +84,11 @@
           <p class="intro-copy">
             Labs publish benchmark scores in a different mix every time, so raw percentages are not
             comparable. AGI Frontier fits a single 0–100 <strong>Frontier&nbsp;Index</strong> per model
-            from the numbers each lab reported itself, then models each lab's release cadence to
-            forecast when — and how capable — the next flagship will be. Everything on this page is
-            recomputed in your browser from one auditable file.
+            from the numbers each lab reported itself — not an average, but the latent ability of a
+            Rasch model, drawn on a logit axis so a step from 90 to 97 is as large as one from 50 to 80.
+            It then models each lab's release cadence to forecast when — and how capable — the next
+            flagship will be. Everything on this page is recomputed in your browser from one auditable
+            file, back to the first GPT.
           </p>
 
           <div class="statbar" data-stats>
@@ -123,6 +125,15 @@
             >
               Long-range forecast (3 years)
             </button>
+            <button
+              type="button"
+              class="pill pill--toggle"
+              data-y-scale
+              aria-pressed="true"
+              title="Y axis linear in latent ability (log-odds): equal steps are equal odds ratios, so progress near the top is not squashed"
+            >
+              Logit scale
+            </button>
             <button type="button" class="pill" data-fit aria-pressed="false">Fit to data</button>
             <button type="button" class="pill" data-reset-zoom>Reset zoom</button>
             <button type="button" class="pill pill--accent" data-today hidden>Back to today</button>
@@ -134,8 +145,9 @@
             <div class="chart-status" data-chart-status role="status">Loading the frontier…</div>
           </div>
           <figcaption class="visually-hidden">
-            Frontier Index of every flagship model over time, per lab, with yellow forecast fans and
-            release-window circles for predicted releases. A table of the same data is under Rankings.
+            Frontier Index of every flagship model over time, per lab, on a logit axis, with yellow
+            forecast fans and release-window circles for predicted releases, and a strip of the
+            frontier's quarterly gain underneath. A table of the same data is under Rankings.
           </figcaption>
         </figure>
 
@@ -173,9 +185,15 @@
             <span class="key__sep" aria-hidden="true">·</span>
             <span class="key__swatch key__swatch--fan" aria-hidden="true"></span> forecast fan (10th–90th pct)
             <span class="key__sep" aria-hidden="true">·</span>
-            <span class="key__swatch key__swatch--circle" aria-hidden="true"></span> circle diameter = 68 % release window
+            <span class="key__swatch key__swatch--circle" aria-hidden="true"></span> circle diameter = 68 % release window (3 most likely labs, or the one you point at)
+            <span class="key__sep" aria-hidden="true">·</span>
+            <span class="key__swatch key__swatch--whisker" aria-hidden="true"></span> same window as a whisker (other labs)
             <span class="key__sep" aria-hidden="true">·</span>
             <span class="key__swatch key__swatch--frontier" aria-hidden="true"></span> running maximum
+            <span class="key__sep" aria-hidden="true">·</span>
+            <span class="key__swatch key__swatch--tick" aria-hidden="true"></span> released, no basket score (timeline only)
+            <span class="key__sep" aria-hidden="true">·</span>
+            <span class="key__swatch key__swatch--pace" aria-hidden="true"></span> pace = frontier gain per quarter, in logits
           </p>
         </div>
       </section>

@@ -99,7 +99,7 @@ export const BenchmarkSchema = z.object({
   preferred_config: z.string(),
   human_baseline: z.number().nullable(),
   human_baseline_note: z.string().nullable(),
-  introduced: z.number().int().min(2018).max(2030),
+  introduced: z.number().int().min(2016).max(2030),
 }).strict();
 
 export const ChangeEventSchema = z.object({
