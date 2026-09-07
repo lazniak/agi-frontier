@@ -1,6 +1,6 @@
 {
   "lab": "anthropic",
-  "updated_at": "2026-09-07T09:34:20Z",
+  "updated_at": "2026-09-07T16:28:41Z",
   "releases": [
     {
       "id": "anthropic-claude-1.3",
@@ -337,6 +337,20 @@
             "verified": false,
             "verified_at": "2026-09-07T09:34:20Z"
           }
+        },
+        {
+          "benchmark": "lmarena-text",
+          "value": 1322,
+          "config": "text, style control",
+          "reported_by": "maintainer",
+          "source": {
+            "url": "https://lmarena.ai/leaderboard/text",
+            "title": "LMArena text leaderboard",
+            "quote": "242 230 256 claude-3-opus-20240229 Anthropic · Proprietary 1322 ±3 194,909",
+            "retrieved_at": "2026-09-07T16:28:41Z",
+            "verified": true,
+            "verified_at": "2026-09-07T16:28:41Z"
+          }
         }
       ],
       "notes": "Model card PDF is the primary source for scores; the marketing announcement page renders its benchmark comparison as an image chart with no extractable text. GSM8K/ARC-Challenge/HellaSwag/WinoGrande legacy scores added from the same model card's common-sense-reasoning and math tables (PDF source, not yet auto-verifiable — see per-score notes)."
@@ -439,6 +453,20 @@
             "verified_at": "2026-09-07T09:34:20Z",
             "note": "Table 2, columns 3.5 Sonnet / Claude 3 Opus / Claude 3 Sonnet / GPT-4o / GPT-4T."
           }
+        },
+        {
+          "benchmark": "lmarena-text",
+          "value": 1374,
+          "config": "text, style control",
+          "reported_by": "maintainer",
+          "source": {
+            "url": "https://lmarena.ai/leaderboard/text",
+            "title": "LMArena text leaderboard",
+            "quote": "179 171 184 claude-3-5-sonnet-20241022 Anthropic · Proprietary 1374 ±3 87,696",
+            "retrieved_at": "2026-09-07T16:28:41Z",
+            "verified": true,
+            "verified_at": "2026-09-07T16:28:41Z"
+          }
         }
       ],
       "notes": "This is the original June 2024 Claude 3.5 Sonnet (model string claude-3-5-sonnet-20240620), the top tier at the time (Claude 3 Opus successor was not yet released). A later 'upgraded' Claude 3.5 Sonnet (October 2024, claude-3-5-sonnet-20241022) is treated as an incremental update, not a separate flagship entry."
@@ -459,7 +487,22 @@
         "verified": true,
         "verified_at": "2026-09-07T09:34:20Z"
       },
-      "scores": [],
+      "scores": [
+        {
+          "benchmark": "lmarena-text",
+          "value": 1388,
+          "config": "text, style control",
+          "reported_by": "maintainer",
+          "source": {
+            "url": "https://lmarena.ai/leaderboard/text",
+            "title": "LMArena text leaderboard",
+            "quote": "163 151 173 claude-3-7-sonnet-20250219-thinking-32k Anthropic · Proprietary 1388 ±4 38,090",
+            "retrieved_at": "2026-09-07T16:28:41Z",
+            "verified": true,
+            "verified_at": "2026-09-07T16:28:41Z"
+          }
+        }
+      ],
       "notes": "The launch post states 'Claude 3.7 Sonnet achieves state-of-the-art performance on SWE-bench Verified' and shows comparison charts for SWE-bench Verified, TAU-bench and a broader benchmark table, but all of these are rendered as images with no extractable text, and the companion system card (anthropic.com/claude-3-7-sonnet-system-card) covers only safety evaluations, not the standard capability benchmarks. No verified numeric score could be sourced within the research budget for this release; left empty rather than guessed. Widely-reported third-party figures (e.g. ~70.3% SWE-bench Verified, ~86.4% MMLU) exist but were not confirmed against Anthropic's own text and are therefore omitted."
     },
     {
@@ -533,6 +576,20 @@
             "verified": false,
             "verified_at": "2026-09-07T09:34:20Z"
           }
+        },
+        {
+          "benchmark": "lmarena-text",
+          "value": 1426,
+          "config": "text, style control",
+          "reported_by": "maintainer",
+          "source": {
+            "url": "https://lmarena.ai/leaderboard/text",
+            "title": "LMArena text leaderboard",
+            "quote": "107 91 125 claude-opus-4-20250514-thinking-16k Anthropic · Proprietary 1426 ±4 35,743",
+            "retrieved_at": "2026-09-07T16:28:41Z",
+            "verified": true,
+            "verified_at": "2026-09-07T16:28:41Z"
+          }
         }
       ],
       "notes": "Launched alongside Claude Sonnet 4 at the 'Code with Claude' developer event; the API model snapshot id (claude-opus-4-20250514) carries an earlier internal date than the May 22, 2025 public launch, which is used here. TAU-bench figures reported on this page are for the original tau-bench, not the tau2-bench in this project's basket, so they are not recorded as tau2-bench scores."
@@ -564,6 +621,20 @@
             "retrieved_at": "2026-09-07T05:00:00Z",
             "verified": true,
             "verified_at": "2026-09-07T09:34:20Z"
+          }
+        },
+        {
+          "benchmark": "lmarena-text",
+          "value": 1450,
+          "config": "text, style control",
+          "reported_by": "maintainer",
+          "source": {
+            "url": "https://lmarena.ai/leaderboard/text",
+            "title": "LMArena text leaderboard",
+            "quote": "68 55 80 claude-opus-4-1-20250805-thinking-16k Anthropic · Proprietary 1450 ±3 48,828",
+            "retrieved_at": "2026-09-07T16:28:41Z",
+            "verified": true,
+            "verified_at": "2026-09-07T16:28:41Z"
           }
         }
       ],
@@ -694,6 +765,20 @@
             "verified": false,
             "verified_at": "2026-09-07T09:34:20Z"
           }
+        },
+        {
+          "benchmark": "lmarena-text",
+          "value": 1473,
+          "config": "text, style control",
+          "reported_by": "maintainer",
+          "source": {
+            "url": "https://lmarena.ai/leaderboard/text",
+            "title": "LMArena text leaderboard",
+            "quote": "34 20 47 claude-opus-4-5-20251101-high-32k Anthropic · Proprietary 1473 ±4 36,269",
+            "retrieved_at": "2026-09-07T16:28:41Z",
+            "verified": true,
+            "verified_at": "2026-09-07T16:28:41Z"
+          }
         }
       ],
       "notes": "The marketing announcement page (anthropic.com/news/claude-opus-4-5) shows its benchmark comparisons only as images; all scores here are sourced from the text of the Claude Opus 4.5 System Card PDF (served at anthropic.com/claude-opus-4-5-system-card), Table 2.3.A and the corresponding narrative sections 2.16-2.20."
@@ -809,6 +894,20 @@
             "verified": false,
             "verified_at": "2026-09-07T09:34:20Z"
           }
+        },
+        {
+          "benchmark": "lmarena-text",
+          "value": 1498,
+          "config": "text, style control",
+          "reported_by": "maintainer",
+          "source": {
+            "url": "https://lmarena.ai/leaderboard/text",
+            "title": "LMArena text leaderboard",
+            "quote": "6 3 11 claude-opus-4-6 Anthropic · Proprietary 1498 ±3 76,015",
+            "retrieved_at": "2026-09-07T16:28:41Z",
+            "verified": true,
+            "verified_at": "2026-09-07T16:28:41Z"
+          }
         }
       ],
       "notes": "First Opus model with a 1M-token context window (beta). Launch date corroborated by CNBC (https://www.cnbc.com/2026/02/05/anthropic-claude-opus-4-6-vibe-working.html); the system card itself only states 'February 2026'."
@@ -878,6 +977,20 @@
             "verified_at": "2026-09-07T09:34:20Z",
             "note": "Table 8.1 Humanity's Last Exam row (no-tools variant)."
           }
+        },
+        {
+          "benchmark": "lmarena-text",
+          "value": 1473,
+          "config": "text, style control",
+          "reported_by": "maintainer",
+          "source": {
+            "url": "https://lmarena.ai/leaderboard/text",
+            "title": "LMArena text leaderboard",
+            "quote": "33 20 48 claude-opus-4-8 Anthropic · Proprietary 1473 ±4 49,404",
+            "retrieved_at": "2026-09-07T16:28:41Z",
+            "verified": true,
+            "verified_at": "2026-09-07T16:28:41Z"
+          }
         }
       ],
       "notes": "System card title page date (May 28, 2026) is exact, dated the same day as the launch post. Anthropic's own Table 8.1 note: 'Changes to the Opus 4.7 BrowseComp/OSWorld scores' imply Opus 4.7 existed as an immediate predecessor (reported ~April 2026 per press, e.g. technology.org); Opus 4.7 is not recorded as its own release in this file given its very short 41-day lifespan and the research time budget for this pass. This system card switches to Terminal-Bench 2.1 (not 2.0), so no terminal-bench-2 score is recorded here to avoid mixing incompatible benchmark versions."
@@ -925,6 +1038,20 @@
             "verified": false,
             "verified_at": "2026-09-07T09:34:20Z",
             "note": "Table 8.1.A, columns Mythos 5 / Fable 5 / Mythos Preview / Opus 4.8 / GPT-5.2 / Gemini 3.1 Pro; 95 is Fable 5's value (Mythos 5 itself scores 95.5)."
+          }
+        },
+        {
+          "benchmark": "lmarena-text",
+          "value": 1507,
+          "config": "text, style control",
+          "reported_by": "maintainer",
+          "source": {
+            "url": "https://lmarena.ai/leaderboard/text",
+            "title": "LMArena text leaderboard",
+            "quote": "1 1 6 claude-fable-5 Anthropic · Proprietary 1507 ±5 27,189",
+            "retrieved_at": "2026-09-07T16:28:41Z",
+            "verified": true,
+            "verified_at": "2026-09-07T16:28:41Z"
           }
         }
       ],
@@ -982,6 +1109,20 @@
             "verified": false,
             "verified_at": "2026-09-07T09:34:20Z",
             "note": "Table 8.1.A Humanity's Last Exam row, no-tools variant."
+          }
+        },
+        {
+          "benchmark": "lmarena-text",
+          "value": 1504,
+          "config": "text, style control",
+          "reported_by": "maintainer",
+          "source": {
+            "url": "https://lmarena.ai/leaderboard/text",
+            "title": "LMArena text leaderboard",
+            "quote": "3 1 14 claude-fable-5.1-max Anthropic · Proprietary 1504 ±11 2,906",
+            "retrieved_at": "2026-09-07T16:28:41Z",
+            "verified": true,
+            "verified_at": "2026-09-07T16:28:41Z"
           }
         }
       ],

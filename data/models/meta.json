@@ -1,6 +1,6 @@
 {
   "lab": "meta",
-  "updated_at": "2026-09-07T09:29:10Z",
+  "updated_at": "2026-09-07T16:28:41Z",
   "releases": [
     {
       "id": "meta-llama-1-65b",
@@ -233,6 +233,20 @@
             "verified_at": "2026-09-07T09:29:10Z",
             "note": "Appendix Table 21 row for the pretrained Llama 2 70B model. Columns: HumanEval pass@1, HumanEval pass@100, MBPP pass@1, MBPP pass@80."
           }
+        },
+        {
+          "benchmark": "lmarena-text",
+          "value": 1170,
+          "config": "text, style control",
+          "reported_by": "maintainer",
+          "source": {
+            "url": "https://lmarena.ai/leaderboard/text",
+            "title": "LMArena text leaderboard",
+            "quote": "351 339 358 llama-2-70b-chat Meta · Llama 2 Community 1170 ±5 38,492",
+            "retrieved_at": "2026-09-07T16:28:41Z",
+            "verified": true,
+            "verified_at": "2026-09-07T16:28:41Z"
+          }
         }
       ]
     },
@@ -324,6 +338,20 @@
             "verified": true,
             "verified_at": "2026-09-07T09:29:10Z",
             "note": "Instruct-model benchmark table row. Columns: Llama 3 8B, Llama 2 7B, Llama 2 13B, Llama 3 70B (this value), Llama 2 70B."
+          }
+        },
+        {
+          "benchmark": "lmarena-text",
+          "value": 1276,
+          "config": "text, style control",
+          "reported_by": "maintainer",
+          "source": {
+            "url": "https://lmarena.ai/leaderboard/text",
+            "title": "LMArena text leaderboard",
+            "quote": "289 281 295 llama-3-70b-instruct Meta · Llama 3 Community 1276 ±4 156,876",
+            "retrieved_at": "2026-09-07T16:28:41Z",
+            "verified": true,
+            "verified_at": "2026-09-07T16:28:41Z"
           }
         }
       ]
@@ -616,6 +644,20 @@
             "verified": true,
             "verified_at": "2026-09-07T09:29:10Z",
             "via": "r.jina.ai"
+          }
+        },
+        {
+          "benchmark": "lmarena-text",
+          "value": 1488,
+          "config": "text, style control",
+          "reported_by": "maintainer",
+          "source": {
+            "url": "https://lmarena.ai/leaderboard/text",
+            "title": "LMArena text leaderboard",
+            "quote": "13 5 25 muse-spark Meta · Proprietary 1488 ±6 13,572",
+            "retrieved_at": "2026-09-07T16:28:41Z",
+            "verified": true,
+            "verified_at": "2026-09-07T16:28:41Z"
           }
         }
       ],

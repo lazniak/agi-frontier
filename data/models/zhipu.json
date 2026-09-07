@@ -1,6 +1,6 @@
 {
   "lab": "zhipu",
-  "updated_at": "2026-09-07T09:36:07Z",
+  "updated_at": "2026-09-07T16:28:41Z",
   "releases": [
     {
       "id": "zhipu-glm-130b",
@@ -69,7 +69,22 @@
         "verified": true,
         "verified_at": "2026-09-07T09:36:07Z"
       },
-      "scores": [],
+      "scores": [
+        {
+          "benchmark": "lmarena-text",
+          "value": 995,
+          "config": "text, style control",
+          "reported_by": "maintainer",
+          "source": {
+            "url": "https://lmarena.ai/leaderboard/text",
+            "title": "LMArena text leaderboard",
+            "quote": "396 396 399 chatglm-6b Non-commercial 995 ±13 4,914",
+            "retrieved_at": "2026-09-07T16:28:41Z",
+            "verified": true,
+            "verified_at": "2026-09-07T16:28:41Z"
+          }
+        }
+      ],
       "notes": "ChatGLM-6B (6.2B parameters) was not Zhipu's largest model at the time — GLM-130B (130B) predates it by seven months — but GLM-130B was a research-access checkpoint requiring an 8-GPU server, with no public chat product. ChatGLM-6B was Zhipu's first publicly accessible flagship chat product (ran locally on a single consumer GPU, and via a public web demo). Recorded here as a timeline tick with no basket scores: the model's GitHub README does not report legacy-basket benchmark numbers for this checkpoint (only for its June 2023 successor, ChatGLM2-6B)."
     },
     {
@@ -246,6 +261,20 @@
             "verified_at": "2026-09-07T09:36:07Z",
             "note": "Row columns: AlignBench, MMLU, MATH, GPQA, LiveCodeBench(*reproduced by Zhipu), NaturalCodeBench, IFEval."
           }
+        },
+        {
+          "benchmark": "lmarena-text",
+          "value": 1319,
+          "config": "text, style control",
+          "reported_by": "maintainer",
+          "source": {
+            "url": "https://lmarena.ai/leaderboard/text",
+            "title": "LMArena text leaderboard",
+            "quote": "246 230 261 glm-4-plus Z.ai · Proprietary 1319 ±5 26,126",
+            "retrieved_at": "2026-09-07T16:28:41Z",
+            "verified": true,
+            "verified_at": "2026-09-07T16:28:41Z"
+          }
         }
       ]
     },
@@ -355,6 +384,20 @@
             "verified": true,
             "verified_at": "2026-09-07T09:36:07Z",
             "note": "Row order: GLM-4.5, GLM-4.5-Air, o3, GPT-4.1, Claude 4 Opus, Claude 4 Sonnet, Gemini 2.5 Pro, DeepSeek-R1-0528, Kimi K2."
+          }
+        },
+        {
+          "benchmark": "lmarena-text",
+          "value": 1411,
+          "config": "text, style control",
+          "reported_by": "maintainer",
+          "source": {
+            "url": "https://lmarena.ai/leaderboard/text",
+            "title": "LMArena text leaderboard",
+            "quote": "134 113 146 glm-4.5 Z.ai · MIT 1411 ±5 23,715",
+            "retrieved_at": "2026-09-07T16:28:41Z",
+            "verified": true,
+            "verified_at": "2026-09-07T16:28:41Z"
           }
         }
       ]
@@ -498,6 +541,20 @@
             "verified_at": "2026-09-07T09:36:07Z",
             "via": "r.jina.ai",
             "note": "17-benchmark comparison table published in the GLM-4.7 launch post; columns are GLM-4.7, GLM-4.6, Kimi K2 Thinking, DeepSeek-V3.2, Gemini 3.0 Pro, Claude Sonnet 4.5, GPT-5 High, GPT-5.1 High."
+          }
+        },
+        {
+          "benchmark": "lmarena-text",
+          "value": 1425,
+          "config": "text, style control",
+          "reported_by": "maintainer",
+          "source": {
+            "url": "https://lmarena.ai/leaderboard/text",
+            "title": "LMArena text leaderboard",
+            "quote": "110 94 125 glm-4.6 Z.ai · MIT 1425 ±4 35,068",
+            "retrieved_at": "2026-09-07T16:28:41Z",
+            "verified": true,
+            "verified_at": "2026-09-07T16:28:41Z"
           }
         }
       ],
@@ -643,6 +700,20 @@
             "via": "r.jina.ai",
             "note": "17-benchmark comparison table published in the GLM-4.7 launch post; columns are GLM-4.7, GLM-4.6, Kimi K2 Thinking, DeepSeek-V3.2, Gemini 3.0 Pro, Claude Sonnet 4.5, GPT-5 High, GPT-5.1 High."
           }
+        },
+        {
+          "benchmark": "lmarena-text",
+          "value": 1442,
+          "config": "text, style control",
+          "reported_by": "maintainer",
+          "source": {
+            "url": "https://lmarena.ai/leaderboard/text",
+            "title": "LMArena text leaderboard",
+            "quote": "81 64 100 glm-4.7 Z.ai · MIT 1442 ±6 11,889",
+            "retrieved_at": "2026-09-07T16:28:41Z",
+            "verified": true,
+            "verified_at": "2026-09-07T16:28:41Z"
+          }
         }
       ]
     },
@@ -759,6 +830,20 @@
             "verified_at": "2026-09-07T09:36:07Z",
             "via": "r.jina.ai"
           }
+        },
+        {
+          "benchmark": "lmarena-text",
+          "value": 1458,
+          "config": "text, style control",
+          "reported_by": "maintainer",
+          "source": {
+            "url": "https://lmarena.ai/leaderboard/text",
+            "title": "LMArena text leaderboard",
+            "quote": "56 44 68 glm-5 Z.ai · MIT 1458 ±4 27,647",
+            "retrieved_at": "2026-09-07T16:28:41Z",
+            "verified": true,
+            "verified_at": "2026-09-07T16:28:41Z"
+          }
         }
       ]
     },
@@ -853,6 +938,20 @@
             "verified_at": "2026-09-07T09:36:07Z",
             "via": "r.jina.ai"
           }
+        },
+        {
+          "benchmark": "lmarena-text",
+          "value": 1466,
+          "config": "text, style control",
+          "reported_by": "maintainer",
+          "source": {
+            "url": "https://lmarena.ai/leaderboard/text",
+            "title": "LMArena text leaderboard",
+            "quote": "44 28 56 glm-5.1 Z.ai · MIT 1466 ±4 45,650",
+            "retrieved_at": "2026-09-07T16:28:41Z",
+            "verified": true,
+            "verified_at": "2026-09-07T16:28:41Z"
+          }
         }
       ]
     },
@@ -932,6 +1031,20 @@
             "verified_at": "2026-09-07T09:36:07Z",
             "via": "r.jina.ai"
           }
+        },
+        {
+          "benchmark": "lmarena-text",
+          "value": 1472,
+          "config": "text, style control",
+          "reported_by": "maintainer",
+          "source": {
+            "url": "https://lmarena.ai/leaderboard/text",
+            "title": "LMArena text leaderboard",
+            "quote": "37 20 51 glm-5.2-max Z.ai · MIT 1472 ±5 33,966",
+            "retrieved_at": "2026-09-07T16:28:41Z",
+            "verified": true,
+            "verified_at": "2026-09-07T16:28:41Z"
+          }
         }
       ],
       "notes": "GLM-5.2 reports 'Terminal Bench 2.1' rather than the 2.0 version tracked in this dataset's basket, so that score is not recorded here."
@@ -968,6 +1081,20 @@
             "verified_at": "2026-09-07T09:36:07Z",
             "via": "r.jina.ai",
             "note": "Row order: GLM-5.3, GLM-5.2, Kimi K3, DeepSeek-V4 Pro-0813, Qwen3.8-Max, Opus 4.8, Fable 5 (w/ fallback), GPT-5.6 Sol."
+          }
+        },
+        {
+          "benchmark": "lmarena-text",
+          "value": 1482,
+          "config": "text, style control",
+          "reported_by": "maintainer",
+          "source": {
+            "url": "https://lmarena.ai/leaderboard/text",
+            "title": "LMArena text leaderboard",
+            "quote": "20 7 38 glm-5.3-max Z.ai · MIT 1482 ±7 7,668",
+            "retrieved_at": "2026-09-07T16:28:41Z",
+            "verified": true,
+            "verified_at": "2026-09-07T16:28:41Z"
           }
         }
       ],

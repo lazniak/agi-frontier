@@ -1,6 +1,6 @@
 {
   "lab": "openai",
-  "updated_at": "2026-09-07T09:33:07Z",
+  "updated_at": "2026-09-07T16:28:41Z",
   "releases": [
     {
       "id": "openai-gpt-1",
@@ -489,6 +489,20 @@
             "verified": true,
             "verified_at": "2026-09-07T09:33:07Z"
           }
+        },
+        {
+          "benchmark": "lmarena-text",
+          "value": 1324,
+          "config": "text, style control",
+          "reported_by": "maintainer",
+          "source": {
+            "url": "https://lmarena.ai/leaderboard/text",
+            "title": "LMArena text leaderboard",
+            "quote": "237 229 254 gpt-4-turbo-2024-04-09 OpenAI · Proprietary 1324 ±4 98,114",
+            "retrieved_at": "2026-09-07T16:28:41Z",
+            "verified": true,
+            "verified_at": "2026-09-07T16:28:41Z"
+          }
         }
       ],
       "notes": "Announced at OpenAI DevDay (November 6, 2023) as gpt-4-1106-preview, immediately available via the API. No separate academic benchmark scores were published at launch; the post focuses on context length (128k), pricing and knowledge cutoff (April 2023) rather than a benchmark table. Scores above are for the later gpt-4-turbo-2024-04-09 snapshot (same 'GPT-4 Turbo' product line, per OpenAI's own naming in the simple-evals table), taken from OpenAI's own open-sourced simple-evals results table on GitHub since no benchmark numbers were published for the original Nov 2023 preview snapshot itself."
@@ -565,6 +579,20 @@
             "verified": false,
             "verified_at": "2026-09-07T09:33:07Z"
           }
+        },
+        {
+          "benchmark": "lmarena-text",
+          "value": 1346,
+          "config": "text, style control",
+          "reported_by": "maintainer",
+          "source": {
+            "url": "https://lmarena.ai/leaderboard/text",
+            "title": "LMArena text leaderboard",
+            "quote": "211 196 221 gpt-4o-2024-05-13 OpenAI · Proprietary 1346 ±3 112,881",
+            "retrieved_at": "2026-09-07T16:28:41Z",
+            "verified": true,
+            "verified_at": "2026-09-07T16:28:41Z"
+          }
         }
       ],
       "notes": "Launch date (May 13, 2024, OpenAI Spring Update) is well documented in press coverage but not stated in the post's own body text. Benchmark values are not present as page text; they were recovered from aria-label accessibility attributes on the SVG bar chart in the page's raw HTML, which are part of the page as served."
@@ -598,6 +626,20 @@
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
             "verified_at": "2026-09-07T09:33:07Z"
+          }
+        },
+        {
+          "benchmark": "lmarena-text",
+          "value": 1388,
+          "config": "text, style control",
+          "reported_by": "maintainer",
+          "source": {
+            "url": "https://lmarena.ai/leaderboard/text",
+            "title": "LMArena text leaderboard",
+            "quote": "162 149 173 o1-preview OpenAI · Proprietary 1388 ±5 31,122",
+            "retrieved_at": "2026-09-07T16:28:41Z",
+            "verified": true,
+            "verified_at": "2026-09-07T16:28:41Z"
           }
         }
       ],
@@ -673,6 +715,20 @@
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
             "verified_at": "2026-09-07T09:33:07Z"
+          }
+        },
+        {
+          "benchmark": "lmarena-text",
+          "value": 1445,
+          "config": "text, style control",
+          "reported_by": "maintainer",
+          "source": {
+            "url": "https://lmarena.ai/leaderboard/text",
+            "title": "LMArena text leaderboard",
+            "quote": "76 64 94 gpt-4.5-preview-2025-02-27 OpenAI · Proprietary 1445 ±6 14,547",
+            "retrieved_at": "2026-09-07T16:28:41Z",
+            "verified": true,
+            "verified_at": "2026-09-07T16:28:41Z"
           }
         }
       ],
@@ -836,6 +892,20 @@
             "verified": true,
             "verified_at": "2026-09-07T09:33:07Z"
           }
+        },
+        {
+          "benchmark": "lmarena-text",
+          "value": 1434,
+          "config": "text, style control",
+          "reported_by": "maintainer",
+          "source": {
+            "url": "https://lmarena.ai/leaderboard/text",
+            "title": "LMArena text leaderboard",
+            "quote": "93 79 109 gpt-5-high OpenAI · Proprietary 1434 ±5 31,433",
+            "retrieved_at": "2026-09-07T16:28:41Z",
+            "verified": true,
+            "verified_at": "2026-09-07T16:28:41Z"
+          }
         }
       ],
       "notes": "GPT-5 launched as a unified system (Instant/Thinking/Pro routed automatically); GPQA Diamond figure of 88.4% is specifically GPT-5 pro's extended-reasoning score, the highest in the family at launch. Launch date corroborated by extensive same-day press coverage (August 7, 2025)."
@@ -916,6 +986,20 @@
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
             "verified_at": "2026-09-07T09:33:07Z"
+          }
+        },
+        {
+          "benchmark": "lmarena-text",
+          "value": 1439,
+          "config": "text, style control",
+          "reported_by": "maintainer",
+          "source": {
+            "url": "https://lmarena.ai/leaderboard/text",
+            "title": "LMArena text leaderboard",
+            "quote": "84 74 100 gpt-5.1 OpenAI · Proprietary 1439 ±4 43,008",
+            "retrieved_at": "2026-09-07T16:28:41Z",
+            "verified": true,
+            "verified_at": "2026-09-07T16:28:41Z"
           }
         }
       ],
@@ -1003,6 +1087,20 @@
             "verified": true,
             "verified_at": "2026-09-07T09:33:07Z"
           }
+        },
+        {
+          "benchmark": "lmarena-text",
+          "value": 1436,
+          "config": "text, style control",
+          "reported_by": "maintainer",
+          "source": {
+            "url": "https://lmarena.ai/leaderboard/text",
+            "title": "LMArena text leaderboard",
+            "quote": "88 79 105 gpt-5.2 OpenAI · Proprietary 1436 ±3 79,070",
+            "retrieved_at": "2026-09-07T16:28:41Z",
+            "verified": true,
+            "verified_at": "2026-09-07T16:28:41Z"
+          }
         }
       ],
       "notes": "GPT-5.2 Thinking is the top general-purpose reasoning tier at launch (GPT-5.2 Pro scores marginally higher on some evals, e.g. GPQA Diamond 93.2%, and is recorded in config text where relevant)."
@@ -1077,6 +1175,20 @@
             "verified": true,
             "verified_at": "2026-09-07T09:33:07Z"
           }
+        },
+        {
+          "benchmark": "lmarena-text",
+          "value": 1466,
+          "config": "text, style control",
+          "reported_by": "maintainer",
+          "source": {
+            "url": "https://lmarena.ai/leaderboard/text",
+            "title": "LMArena text leaderboard",
+            "quote": "46 29 57 gpt-5.4 OpenAI · Proprietary 1466 ±4 63,588",
+            "retrieved_at": "2026-09-07T16:28:41Z",
+            "verified": true,
+            "verified_at": "2026-09-07T16:28:41Z"
+          }
         }
       ],
       "notes": "First mainline GPT-5.x reasoning model to incorporate GPT-5.3-Codex's coding capabilities; classic AIME/SWE-bench Verified were not reported in this launch post's appendix (GDPval, SWE-Bench Pro and OSWorld-Verified were emphasized instead)."
@@ -1149,6 +1261,20 @@
             "verified": true,
             "verified_at": "2026-09-07T09:33:07Z"
           }
+        },
+        {
+          "benchmark": "lmarena-text",
+          "value": 1477,
+          "config": "text, style control",
+          "reported_by": "maintainer",
+          "source": {
+            "url": "https://lmarena.ai/leaderboard/text",
+            "title": "LMArena text leaderboard",
+            "quote": "24 17 39 gpt-5.5 OpenAI · Proprietary 1477 ±4 64,977",
+            "retrieved_at": "2026-09-07T16:28:41Z",
+            "verified": true,
+            "verified_at": "2026-09-07T16:28:41Z"
+          }
         }
       ],
       "notes": "Launch post's evaluation table lists competing models including 'Opus 4.6' as a comparison column, corroborating Anthropic's Opus 4.x line was still current in April 2026."
@@ -1195,6 +1321,20 @@
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
             "verified_at": "2026-09-07T09:33:07Z"
+          }
+        },
+        {
+          "benchmark": "lmarena-text",
+          "value": 1483,
+          "config": "text, style control",
+          "reported_by": "maintainer",
+          "source": {
+            "url": "https://lmarena.ai/leaderboard/text",
+            "title": "LMArena text leaderboard",
+            "quote": "17 9 32 gpt-5.6-sol-xhigh OpenAI · Proprietary 1483 ±5 23,413",
+            "retrieved_at": "2026-09-07T16:28:41Z",
+            "verified": true,
+            "verified_at": "2026-09-07T16:28:41Z"
           }
         }
       ],

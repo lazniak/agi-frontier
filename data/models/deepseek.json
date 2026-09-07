@@ -1,6 +1,6 @@
 {
   "lab": "deepseek",
-  "updated_at": "2026-09-07T09:33:20Z",
+  "updated_at": "2026-09-07T16:28:41Z",
   "releases": [
     {
       "id": "deepseek-llm-67b",
@@ -88,6 +88,20 @@
             "retrieved_at": "2026-09-07T05:30:00Z",
             "verified": true,
             "verified_at": "2026-09-07T09:33:20Z"
+          }
+        },
+        {
+          "benchmark": "lmarena-text",
+          "value": 1184,
+          "config": "text, style control",
+          "reported_by": "maintainer",
+          "source": {
+            "url": "https://lmarena.ai/leaderboard/text",
+            "title": "LMArena text leaderboard",
+            "quote": "337 330 354 deepseek-llm-67b-chat DeepSeek · DeepSeek License 1184 ±11 4,932",
+            "retrieved_at": "2026-09-07T16:28:41Z",
+            "verified": true,
+            "verified_at": "2026-09-07T16:28:41Z"
           }
         }
       ],
@@ -265,6 +279,20 @@
             "verified": true,
             "verified_at": "2026-09-07T09:33:20Z"
           }
+        },
+        {
+          "benchmark": "lmarena-text",
+          "value": 1307,
+          "config": "text, style control",
+          "reported_by": "maintainer",
+          "source": {
+            "url": "https://lmarena.ai/leaderboard/text",
+            "title": "LMArena text leaderboard",
+            "quote": "262 250 273 deepseek-v2.5 DeepSeek · DeepSeek 1307 ±5 24,572",
+            "retrieved_at": "2026-09-07T16:28:41Z",
+            "verified": true,
+            "verified_at": "2026-09-07T16:28:41Z"
+          }
         }
       ],
       "notes": "No MMLU/GPQA/MATH figures were published in this model card (it focuses on deltas over DeepSeek-V2-Chat and DeepSeek-Coder-V2-Instruct)."
@@ -419,6 +447,20 @@
             "verified": true,
             "verified_at": "2026-09-07T09:33:20Z"
           }
+        },
+        {
+          "benchmark": "lmarena-text",
+          "value": 1358,
+          "config": "text, style control",
+          "reported_by": "maintainer",
+          "source": {
+            "url": "https://lmarena.ai/leaderboard/text",
+            "title": "LMArena text leaderboard",
+            "quote": "192 184 209 deepseek-v3 DeepSeek · DeepSeek 1358 ±5 21,770",
+            "retrieved_at": "2026-09-07T16:28:41Z",
+            "verified": true,
+            "verified_at": "2026-09-07T16:28:41Z"
+          }
         }
       ]
     },
@@ -515,6 +557,20 @@
             "verified": true,
             "verified_at": "2026-09-07T09:33:20Z"
           }
+        },
+        {
+          "benchmark": "lmarena-text",
+          "value": 1398,
+          "config": "text, style control",
+          "reported_by": "maintainer",
+          "source": {
+            "url": "https://lmarena.ai/leaderboard/text",
+            "title": "LMArena text leaderboard",
+            "quote": "149 139 163 deepseek-r1 DeepSeek · MIT 1398 ±5 18,524",
+            "retrieved_at": "2026-09-07T16:28:41Z",
+            "verified": true,
+            "verified_at": "2026-09-07T16:28:41Z"
+          }
         }
       ]
     },
@@ -583,6 +639,20 @@
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
             "verified_at": "2026-09-07T09:33:20Z"
+          }
+        },
+        {
+          "benchmark": "lmarena-text",
+          "value": 1396,
+          "config": "text, style control",
+          "reported_by": "maintainer",
+          "source": {
+            "url": "https://lmarena.ai/leaderboard/text",
+            "title": "LMArena text leaderboard",
+            "quote": "151 140 167 deepseek-v3-0324 DeepSeek · MIT 1396 ±4 44,795",
+            "retrieved_at": "2026-09-07T16:28:41Z",
+            "verified": true,
+            "verified_at": "2026-09-07T16:28:41Z"
           }
         }
       ],
@@ -681,6 +751,20 @@
             "verified": true,
             "verified_at": "2026-09-07T09:33:20Z"
           }
+        },
+        {
+          "benchmark": "lmarena-text",
+          "value": 1421,
+          "config": "text, style control",
+          "reported_by": "maintainer",
+          "source": {
+            "url": "https://lmarena.ai/leaderboard/text",
+            "title": "LMArena text leaderboard",
+            "quote": "115 97 134 deepseek-r1-0528 DeepSeek · MIT 1421 ±6 18,092",
+            "retrieved_at": "2026-09-07T16:28:41Z",
+            "verified": true,
+            "verified_at": "2026-09-07T16:28:41Z"
+          }
         }
       ],
       "notes": "Minor version upgrade of DeepSeek-R1 (same architecture/size), with increased post-training compute."
@@ -777,6 +861,20 @@
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
             "verified_at": "2026-09-07T09:33:20Z"
+          }
+        },
+        {
+          "benchmark": "lmarena-text",
+          "value": 1417,
+          "config": "text, style control",
+          "reported_by": "maintainer",
+          "source": {
+            "url": "https://lmarena.ai/leaderboard/text",
+            "title": "LMArena text leaderboard",
+            "quote": "121 102 139 deepseek-v3.1 DeepSeek · MIT 1417 ±6 14,609",
+            "retrieved_at": "2026-09-07T16:28:41Z",
+            "verified": true,
+            "verified_at": "2026-09-07T16:28:41Z"
           }
         }
       ],
@@ -888,6 +986,20 @@
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
             "verified_at": "2026-09-07T09:33:20Z"
+          }
+        },
+        {
+          "benchmark": "lmarena-text",
+          "value": 1422,
+          "config": "text, style control",
+          "reported_by": "maintainer",
+          "source": {
+            "url": "https://lmarena.ai/leaderboard/text",
+            "title": "LMArena text leaderboard",
+            "quote": "114 94 132 deepseek-v3.2-exp DeepSeek · MIT 1422 ±6 11,756",
+            "retrieved_at": "2026-09-07T16:28:41Z",
+            "verified": true,
+            "verified_at": "2026-09-07T16:28:41Z"
           }
         }
       ],
@@ -1019,6 +1131,20 @@
             "verified": true,
             "verified_at": "2026-09-07T09:33:20Z"
           }
+        },
+        {
+          "benchmark": "lmarena-text",
+          "value": 1425,
+          "config": "text, style control",
+          "reported_by": "maintainer",
+          "source": {
+            "url": "https://lmarena.ai/leaderboard/text",
+            "title": "LMArena text leaderboard",
+            "quote": "108 94 124 deepseek-v3.2 DeepSeek · MIT 1425 ±4 46,493",
+            "retrieved_at": "2026-09-07T16:28:41Z",
+            "verified": true,
+            "verified_at": "2026-09-07T16:28:41Z"
+          }
         }
       ],
       "notes": "Official successor to V3.2-Exp; DeepSeek-V3.2-Speciale (API-only, maximum reasoning) was launched the same day as a separate reasoning-maximized variant, not recorded here as it targets research/eval use rather than general availability."
@@ -1135,6 +1261,20 @@
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
             "verified_at": "2026-09-07T09:33:20Z"
+          }
+        },
+        {
+          "benchmark": "lmarena-text",
+          "value": 1458,
+          "config": "text, style control",
+          "reported_by": "maintainer",
+          "source": {
+            "url": "https://lmarena.ai/leaderboard/text",
+            "title": "LMArena text leaderboard",
+            "quote": "55 45 68 deepseek-v4-pro DeepSeek · MIT 1458 ±4 54,225",
+            "retrieved_at": "2026-09-07T16:28:41Z",
+            "verified": true,
+            "verified_at": "2026-09-07T16:28:41Z"
           }
         }
       ],

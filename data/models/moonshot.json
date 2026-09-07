@@ -1,6 +1,6 @@
 {
   "lab": "moonshot",
-  "updated_at": "2026-09-07T09:31:20Z",
+  "updated_at": "2026-09-07T16:28:41Z",
   "releases": [
     {
       "id": "moonshot-kimi-chat",
@@ -434,6 +434,20 @@
             "verified_at": "2026-09-07T09:31:20Z",
             "note": "Lab notes Terminal-Bench 2.0 was evaluated under non-thinking mode because their context-management strategy for thinking mode is incompatible with Terminus-2."
           }
+        },
+        {
+          "benchmark": "lmarena-text",
+          "value": 1451,
+          "config": "text, style control",
+          "reported_by": "maintainer",
+          "source": {
+            "url": "https://lmarena.ai/leaderboard/text",
+            "title": "LMArena text leaderboard",
+            "quote": "67 52 79 kimi-k2.5-thinking Moonshot · Modified MIT 1451 ±3 70,586",
+            "retrieved_at": "2026-09-07T16:28:41Z",
+            "verified": true,
+            "verified_at": "2026-09-07T16:28:41Z"
+          }
         }
       ]
     },
@@ -537,6 +551,20 @@
             "verified": true,
             "verified_at": "2026-09-07T09:31:20Z"
           }
+        },
+        {
+          "benchmark": "lmarena-text",
+          "value": 1461,
+          "config": "text, style control",
+          "reported_by": "maintainer",
+          "source": {
+            "url": "https://lmarena.ai/leaderboard/text",
+            "title": "LMArena text leaderboard",
+            "quote": "50 39 66 kimi-k2.6 Moonshot · Modified MIT 1461 ±5 37,568",
+            "retrieved_at": "2026-09-07T16:28:41Z",
+            "verified": true,
+            "verified_at": "2026-09-07T16:28:41Z"
+          }
         }
       ]
     },
@@ -601,6 +629,20 @@
             "verified": false,
             "verified_at": "2026-09-07T09:31:20Z",
             "note": "Cell format is 'without tools / with tools' per the README's evaluation notes; 81.6 is the no-tools figure for Kimi K3 (first column)."
+          }
+        },
+        {
+          "benchmark": "lmarena-text",
+          "value": 1489,
+          "config": "text, style control",
+          "reported_by": "maintainer",
+          "source": {
+            "url": "https://lmarena.ai/leaderboard/text",
+            "title": "LMArena text leaderboard",
+            "quote": "12 5 24 kimi-k3-max Moonshot · Kimi K3 license 1489 ±5 18,090",
+            "retrieved_at": "2026-09-07T16:28:41Z",
+            "verified": true,
+            "verified_at": "2026-09-07T16:28:41Z"
           }
         }
       ],

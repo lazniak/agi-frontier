@@ -1,6 +1,6 @@
 {
   "lab": "google",
-  "updated_at": "2026-09-07T09:35:15Z",
+  "updated_at": "2026-09-07T16:28:41Z",
   "releases": [
     {
       "id": "google-palm-2",
@@ -122,6 +122,20 @@
             "retrieved_at": "2026-09-07T09:30:00Z",
             "verified": false,
             "verified_at": "2026-09-07T09:35:15Z"
+          }
+        },
+        {
+          "benchmark": "lmarena-text",
+          "value": 1138,
+          "config": "text, style control",
+          "reported_by": "maintainer",
+          "source": {
+            "url": "https://lmarena.ai/leaderboard/text",
+            "title": "LMArena text leaderboard",
+            "quote": "369 355 378 palm-2 Google · Proprietary 1138 ±9 8,554",
+            "retrieved_at": "2026-09-07T16:28:41Z",
+            "verified": true,
+            "verified_at": "2026-09-07T16:28:41Z"
           }
         }
       ],
@@ -483,6 +497,20 @@
             "verified": false,
             "verified_at": "2026-09-07T09:35:15Z"
           }
+        },
+        {
+          "benchmark": "lmarena-text",
+          "value": 1446,
+          "config": "text, style control",
+          "reported_by": "maintainer",
+          "source": {
+            "url": "https://lmarena.ai/leaderboard/text",
+            "title": "LMArena text leaderboard",
+            "quote": "75 64 85 gemini-2.5-pro Google · Proprietary 1446 ±2 122,612",
+            "retrieved_at": "2026-09-07T16:28:41Z",
+            "verified": true,
+            "verified_at": "2026-09-07T16:28:41Z"
+          }
         }
       ],
       "notes": "Launched as an 'Experimental (03-25)' model in Google AI Studio and Gemini Advanced; Vertex AI access and pricing followed weeks later. Google's official model card records this exact checkpoint under the column header 'Gemini 2.5 Pro (Experimental 03-25)', distinct from the later 'Preview 05-06' and GA revisions of the same model line (which score differently); the scores recorded here use that Experimental 03-25 column to match this release's launch date."
@@ -594,6 +622,20 @@
             "verified": false,
             "verified_at": "2026-09-07T09:35:15Z",
             "note": "Base Gemini 3 Pro figure from the current DeepMind model-comparison page, distinct from the higher-effort 'Gemini 3 Deep Think' mode's 45.1% mentioned below."
+          }
+        },
+        {
+          "benchmark": "lmarena-text",
+          "value": 1486,
+          "config": "text, style control",
+          "reported_by": "maintainer",
+          "source": {
+            "url": "https://lmarena.ai/leaderboard/text",
+            "title": "LMArena text leaderboard",
+            "quote": "16 7 25 gemini-3-pro Google · Proprietary 1486 ±4 40,668",
+            "retrieved_at": "2026-09-07T16:28:41Z",
+            "verified": true,
+            "verified_at": "2026-09-07T16:28:41Z"
           }
         }
       ],
@@ -741,6 +783,20 @@
             "retrieved_at": "2026-09-07T04:09:50Z",
             "verified": false,
             "verified_at": "2026-09-07T09:35:15Z"
+          }
+        },
+        {
+          "benchmark": "lmarena-text",
+          "value": 1487,
+          "config": "text, style control",
+          "reported_by": "maintainer",
+          "source": {
+            "url": "https://lmarena.ai/leaderboard/text",
+            "title": "LMArena text leaderboard",
+            "quote": "15 7 24 gemini-3.1-pro-preview Google · Proprietary 1487 ±3 102,999",
+            "retrieved_at": "2026-09-07T16:28:41Z",
+            "verified": true,
+            "verified_at": "2026-09-07T16:28:41Z"
           }
         }
       ],
