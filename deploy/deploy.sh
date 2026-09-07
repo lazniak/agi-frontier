@@ -21,6 +21,8 @@ if [ ! -f .env ]; then
 fi
 mkdir -p data/public worker/.state
 docker compose -f deploy/docker-compose.yml up -d --build --remove-orphans
+# latest.json is generated, not tracked: rebuild it right away so the site never 404s after a pull
+docker compose -f deploy/docker-compose.yml exec -T worker bun run worker/src/cli.ts bundle
 docker compose -f deploy/docker-compose.yml ps
 REMOTE
 

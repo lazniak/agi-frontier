@@ -13,7 +13,7 @@ every number links to a primary source and a verbatim quote.
 | `shared/` | data contract (`types.ts`, `schema.ts`) + all math (`frontier-index.ts`, `prediction.ts`, `timeline.ts`). Pure TS, zero DOM, zero Node APIs. Unit-tested with `bun test`. | Both worker and web import it. Never duplicate math elsewhere. |
 | `worker/` | Node 22 CLI: `validate`, `bundle`, `verify`, `poll`, `loop`. Fetches lab pages hourly, hash-diffs them, extracts new flagship releases/scores via OpenRouter, validates with zod, appends the audit log, commits `data/` to git. | Only place that talks to the network or writes `data/`. |
 | `web/` | Vite + TypeScript + D3 static site. Reads `/latest.json`. No framework. | No network calls except `/latest.json` and self-hosted fonts. |
-| `data/` | Source of truth: `labs.json`, `benchmarks.json`, `models/<lab>.json`, `history/changes.jsonl`, `public/latest.json` (generated). | Every edit must pass `bun run validate`. |
+| `data/` | Source of truth: `labs.json`, `benchmarks.json`, `models/<lab>.json`, `history/changes.jsonl`; `public/latest.json` is generated on the server and git-ignored. | Every edit must pass `bun run validate`. |
 | `deploy/` | Dockerfiles, `docker-compose.yml`, nginx site conf, `deploy.sh`. | Target: `/opt/agi-frontier` on the Hostinger VPS `hexart-main`, port `127.0.0.1:3040`. |
 | `docs/` | `METHODOLOGY.md` (public, linked from the site), `DATA-GUIDE.md` (how to add a release by hand). | Docs change in the same PR as the code they describe. |
 

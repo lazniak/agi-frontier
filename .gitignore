@@ -9,3 +9,8 @@ Thumbs.db
 # worker runtime state (page hashes, caches) — not data
 worker/.state/
 graphify-out/
+
+# generated on the server by the worker (bundle); served by nginx from the volume
+data/public/latest.json
+# local tooling
+.claude/
