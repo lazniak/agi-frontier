@@ -390,3 +390,178 @@ than adding it elsewhere.
 | backtest grid | 30 d, from first knot + 365 d to asOf − 30 d | backtest.ts |
 | LMArena reference | 1200 Elo, weight 2 | benchmarks.json |
 | researcher promote thresholds | recall ≥ 0.85, precision ≥ 0.95, score recall ≥ 0.8 | worker |
+
+
+---
+
+## 12. v3 — chart stage, smart hover, real-data ribbons, release lens, benchmark lifetimes, researcher truth (2026-09-07 evening)
+
+User feedback after v2 went live, distilled:
+
+1. Scrolling fights the chart. Plain wheel must scroll the page; the chart is zoomed/panned only
+   with **Ctrl+Shift+wheel** (both axes), Ctrl+wheel (time), Shift+wheel (rating), drag, pinch,
+   and the +/− buttons. Show the hint once. The chart, its date axis and its legend become one
+   **stage** with the date bar pinned to the stage's bottom edge and a friendlier legend dock.
+2. The rating axis must be scrollable **upwards without end**: zooming out reveals the fans
+   opening like scissors, and far above the basket ceiling sit clearly-labelled **speculative
+   markers** (up to "technological singularity") — the user asked for them half in jest; they are
+   drawn as landmarks, never as data.
+3. **Smart hover**: the family (lab) nearest to the pointer is emphasised and the others quieten,
+   with hysteresis (the focus only moves when the pointer is clearly closer to another family) and
+   an animated cross-fade. Click pins.
+4. **Real-data family ribbons**: a filled vertical band per lab through time — the family's upper
+   and lower bound — "like the forecast fan, but on real data".
+5. The forecast **circles are weak**: replace them with a shape whose geometry follows the
+   probability of the launch date (denser toward the centre).
+6. Methodology worry: the chart rests on fragmentary benchmark data; benchmarks are born, live and
+   burn out at 100 %; the index must come from shared benchmark sets and convert saturation into
+   real developmental jumps. Gemini 3.1 Pro ranks too high for an outdated model.
+7. The researcher panel says the LLM is not working (0 calls, 0 %). It works (107 calls on the
+   first incremental run); the panel shows the last *poll*'s delta. Fix the truth of the panel and
+   the researcher's first-run defects.
+
+### 12.1 Chart stage (web, `web/src/chart/**`, `web/src/styles/chart.css`, `web/index.html` chart section)
+
+- `.chart-stage`: one block = control bar (top) · canvas (flex 1) · **time axis strip** (fixed
+  height 40 px, always at the stage's bottom, drawn from the same x scale) · **legend dock**
+  (`[data-legend-dock]`, already in `index.html`): lab chips (visibility toggle + hover focus) and
+  layer chips (fans, ribbons, ladder, crossings, backtest, tiers) that toggle `ChartApi.layers`.
+  Stage height: `clamp(560px, calc(100vh - 120px), 1000px)`; on phones `calc(100vh - 160px)`.
+  The x axis moves out of the main SVG into the strip (a second SVG sharing the x scale and the
+  zoom transform) so the plot can pan vertically without the dates leaving the screen. The pace
+  strip moves under the axis strip (same fixed area) or into the legend dock's first row.
+- Wheel: `interaction.ts` — plain wheel is **not** captured (page scrolls). `ctrlKey && shiftKey`
+  → zoom both axes about the pointer; `ctrlKey` only → time; `shiftKey` only → rating; d3-zoom's
+  own wheel handler is disabled (`filter` returns false for wheel without modifiers), drag pans
+  both axes, touch pinch zooms both. First plain wheel over the canvas shows `.chart-hint`
+  ("Ctrl + Shift + scroll to zoom · drag to pan · +/− buttons") for 4 s, remembered in
+  `agi:chart-hint`. Zoom range k ∈ [0.25, 60] on each axis; `translateExtent` y is unbounded
+  upward, bounded below at rating 0.
+- `ChartApi.zoomBy(kx, ky)` honours `ky`; +/− zoom both axes by ×1.25 about the plot centre;
+  `fitView` fits both axes to the visible data + fans; `resetZoom` returns to the resting view.
+- Unbounded rating axis: `valueTicks` must produce nice ticks for any domain (steps 50/100/200/
+  500/1000/2000 chosen from the pixel density); the grid extends over the whole visible range; the
+  frontier fan and the forecast fans are drawn to the visible x edge and clipped to the plot.
+- **Speculative markers** (`shared/src/stages.ts`, `LevelKind` gains `'speculative'`):
+  `speculativeLevels(ceiling: Level): Level[]` returns, above the basket ceiling θ_c:
+  `θ_c + ln 10` "Ten times the odds of the whole basket", `θ_c + 2 ln 10` "A hundred times",
+  `θ_c + 3 ln 10` "Every benchmark ever written saturated (speculative)", `θ_c + 4 ln 10`
+  "Technological singularity — speculative landmark, not derived from data". The ladder draws
+  them in a distinct dotted grey style with the word *speculative* in the label and the tooltip;
+  they never enter crossings, stages, eras or the paper's results.
+- **Legend dock**: replaces the static `.key` paragraph. Rows: labs (chips with colour dot, count
+  of models, visibility toggle, hover → `store.setHoverLab`); marks (released / provisional / tier
+  / announced / rumored); layers (toggle buttons with the swatch: family ribbon, forecast fan,
+  frontier trend fan, release lens, ladder, crossings, backtest hairline, pace). Keyboard
+  reachable; 44 px targets on phones; wraps into two rows on narrow screens.
+
+### 12.2 Smart hover (`web/src/chart/hover.ts` new, `interaction.ts`, `layers.ts`, `index.ts`)
+
+- `nearestFamily(pointer, geometry)`: distance from the pointer to every lab's polyline (segment
+  distance in pixels, current zoom) and to its points and lens shapes; returns the nearest lab
+  and the margin to the second nearest.
+- Hysteresis: focus changes only when the new nearest lab is closer by ≥ 14 px than the current
+  focus (or the current focus is farther than 60 px) and the pointer has rested ≥ 90 ms there.
+  Leaving the plot clears the focus after 250 ms. Click pins (`store.pinLab`), click again or Esc
+  unpins.
+- Transition: every lab layer group carries `data-lab` and the classes `is-focus` / `is-dim` are
+  toggled by the shell instead of recomputing opacity attributes; `chart.css` transitions
+  `opacity` and `stroke-width` over 260 ms `cubic-bezier(.2,.7,.2,1)`. Focused family: full
+  colour, stroke 2.4 px, its label and ribbon at full strength; the others fall to 0.18 opacity;
+  the frontier line, ladder and fans stay untouched. `prefers-reduced-motion` disables the
+  transition.
+- The same focus drives the legend chips (`aria-current`) and the tooltip's family header.
+
+### 12.3 Real-data family ribbons (`shared/src/lineup.ts`, `web/src/chart/bands.ts`)
+
+`familyRibbon(fit, releases, lab, { asOf, windowDays = 365, tiers = ALL_TIERS }): BandPoint[]` —
+for every date t in the lab's release dates ≤ asOf (plus asOf), the *current family* is every
+released model of the lab with `t − windowDays ≤ date ≤ t`, or the single latest one when the
+window is empty; `hiTheta` = max θ, `loTheta` = min θ over that set (ids in `hiId`/`loId`). Step
+path. With mid/small tiers present the ribbon is flagship ↔ smallest tier; with flagships only it
+is the spread between the last two flagships (collapsing to the line when one model is current).
+`Computed.bands` is filled from `familyRibbon` (the old `lineupBand` stays for the rankings'
+family line). Drawn at 14 % opacity, 34 % when the family is focused, fading after `asOf`.
+
+### 12.4 Release lens (`shared/src/prediction.ts`, `web/src/chart/forecast.ts`)
+
+- `releaseDensity(f: LabForecast, pred: PredictedRelease, n = 48): { date: ISODate; p: number }[]`
+  — samples the density of the release date between the 2nd and 98th percentile, normalised so
+  the mode is 1. For k = 1 the density is the finite-difference derivative of the stretched
+  conditional CDF (`stretchedConditionalProb`), for k ≥ 2 the log-normal pdf with
+  `σ · s · √k` (matching the chain in `forecastLab`).
+- Shape: at the predicted rating, a **lens** whose half-thickness at date t is
+  `h · p(t)`, `h` = half the 68 % rating window in pixels (`thetaLow..thetaHigh`), clamped to
+  [6, 42] px; filled with a linear gradient along time from 0.10 opacity at the tails to 0.55 at
+  the mode; the 68 % window as a stronger inner outline, the 90 % window as the outer edge; a
+  1.5 px tick at the median; the shape shrinks as `asOf` advances toward the release exactly like
+  the circle did (the conditional law does it). Tooltip and aria-label unchanged in content
+  ("median, 68 % window, expected rating"). Whiskers for non-spotlight labs stay.
+- The legend calls it "release lens — the denser, the likelier that launch date".
+
+### 12.5 Benchmark lifetimes and comparability (`shared/src/lifetimes.ts` new, `web/src/ui/lifetimes.ts` new, `[data-lifetimes]` in the Method section)
+
+- `benchmarkLifetimes(fit, releases, benchmarks, asOf): BenchmarkLifetime[]` — per benchmark:
+  `introduced` (year), `firstScore` (date of the first released model scoring it), `nScores`,
+  `saturatedAt` (first release date at which the frontier's best score on it ≥ 95 %, null when
+  alive), `state: 'fresh' | 'active' | 'saturated' | 'legacy'`, `generation`, `delta` (δ),
+  `weight`, `coverageOfFrontier` (share of the last 12 months' flagships reporting it).
+- `comparability(fit, releases): Map<modelId, { shared: number; neighbours: number }>` — how many
+  benchmarks a model shares with the frontier models released within ±18 months (the "common
+  benchmark set" the user asked about). Rankings show it as the coverage tooltip.
+- UI: a Gantt-like strip under the Method copy — one row per benchmark from introduction to
+  saturation (or today), coloured by generation, saturated ones ending in a filled cap, with the
+  count of scores; a one-paragraph explanation that the Rasch fit *is* the shared-benchmark
+  comparison generalised (every model is compared through the benchmarks it shares with its
+  neighbours, and a benchmark's death removes nothing because the difficulty it measured is kept
+  in δ). Rankings add an **age** column (months since release) and mark a lab's best row as
+  *superseded on LMArena* when the arena lists a newer model of that lab that the dataset lacks
+  (computed from `lmarena-text` scores' dates vs the lab's latest release — off until the arena
+  rows carry dates, so implement as a plain age column now).
+
+### 12.6 Researcher truth (worker + web + contract)
+
+- Contract: `WorkerState.researcher` gains `usage_total: ResearcherBudget | null` (lifetime
+  OpenRouter totals across poll, discover and backfill, persisted in the run state) and
+  `last_backfill_summary: string | null`; `budget` keeps the last *research* run's delta.
+- Web: the Researcher panel shows "Lifetime" (calls, tokens, USD) and "Last research run" side
+  by side, the last poll summary under "What changed last", and a green/grey **LLM** status dot:
+  green when `usage_total.calls > 0` and `last_success_at` is within 2 h of `last_run_at`.
+- Worker (T37 findings):
+  1. Extraction names get the lab's family prefix when the model returns a bare family member
+     ("Opus 5" → "Claude Opus 5"): `data/labs.json` gains `name_prefixes` (e.g. anthropic:
+     `[{ match: /^(opus|sonnet|haiku|fable|mythos)\b/i, prefix: "Claude " }]`), applied in
+     `validateExtraction`.
+  2. Discovery prefers launch posts: model overview pages (`/models/`, `/models/gemini/`) are
+     used only to find links to dated announcements; an extraction without a usable date retries
+     once through the lab's news index before being dropped.
+  3. Schema issues are logged verbatim (`issues: zod.issues.map(i => i.path.join('.') + ': ' +
+     i.message)`), never `[""]`.
+  4. Arena commit message `data(bot): arena <n> scores`; backfill/arena/eval summaries land in
+     `last_backfill_summary`.
+  5. `eval`: extra researched releases whose source is on the lab's official host and that the
+     gold set lacks are listed as **unverified extras** in the report (still counted against
+     precision) so a human can promote them to gold — the first live run found "Claude Opus 5"
+     (system card 24 Jul 2026), which the gold set notes but never recorded.
+- Gold: add Claude Opus 5 to `data/gold/anthropic.json` with a primary source and its scores
+  (human/Claude research — the gold set is the human answer key, so this is allowed).
+- Then: full `backfill` (non-incremental, ≈ 3.3 USD) on the VPS, `eval`, and `promote` when the
+  gates pass.
+
+### 12.7 Tasks (file scopes exclusive; Claude subagents — GLM delegation suspended by the user)
+
+| task | owns |
+|---|---|
+| T40 shared v3: `familyRibbon`, `releaseDensity`, `speculativeLevels`, `lifetimes.ts`, `comparability`, tests, exports | `shared/src/lineup.ts`, `shared/src/prediction.ts`, `shared/src/stages.ts`, `shared/src/lifetimes.ts`, `shared/src/index.ts`, `shared/tests/**` |
+| T41 web chart stage: stage layout + axis strip + legend dock, wheel semantics + hint, unbounded y + ticks, speculative ladder, smart hover, ribbons, release lens, zoomBy both axes | `web/src/chart/**`, `web/src/data.ts`, `web/src/state.ts`, `web/src/styles/chart.css`, `web/index.html` (chart section only) |
+| T42 web ui: researcher panel truth, rankings age column, lifetimes strip, controls +/− wiring and copy, shortcuts copy, tour step for the hint | `web/src/ui/**`, `web/src/main.ts`, `web/src/styles/panels.css`, `web/src/styles/controls.css` |
+| T43 worker: name prefixes, discovery via launch posts, verbatim issues, commit messages, `usage_total`/`last_backfill_summary`, eval unverified extras, tests | `worker/**`, `data/labs.json` (`name_prefixes` only) |
+| T44 gold: Claude Opus 5 entry with primary sources | `data/gold/anthropic.json` |
+| T45 docs: METHODOLOGY (§ lifetimes, ribbons, lens, speculative markers, wheel), PAPER, README, DATA-GUIDE | `docs/**`, `README.md` |
+| T46 ops: deploy, full backfill, eval, promote decision | commander |
+
+Contract edits (types, schema, `index.html` containers `[data-legend-dock]`, `[data-lifetimes]`,
+`[data-chart-axis]`) are made by the commander before the tasks start. Verification for every
+task: `bun run typecheck && bun run test && bun run validate` from the root, plus
+`bun run --filter @agi/web build` for web tasks; T41/T42 also run the Playwright shots
+(`C:\Users\lazni\AppData\Local\Temp\agi-shots\chart2.mjs`) and look at the PNGs.

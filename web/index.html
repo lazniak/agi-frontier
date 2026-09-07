@@ -144,6 +144,7 @@
           <div class="chart-canvas" data-chart-canvas>
             <div class="chart-status" data-chart-status role="status">Loading the frontier…</div>
           </div>
+          <div class="chart-axis" data-chart-axis aria-hidden="true"></div>
           <figcaption class="visually-hidden">
             Frontier Rating of every flagship model over time, per lab, with family bands, the level
             ladder on the right, yellow forecast fans and release-window circles for predicted
@@ -151,6 +152,7 @@
             data is under Rankings.
           </figcaption>
         </figure>
+        <div class="shell legend-dock" data-legend-dock role="group" aria-label="Chart legend and layers"></div>
 
         <div class="shell chart-controls">
           <div class="scrubber">
@@ -329,6 +331,7 @@
               backtest earned. Scrubbing back in time re-runs the whole fit as of that date, which is how
               you check whether the forecast would have called what actually happened.
             </p>
+            <div class="lifetimes" data-lifetimes aria-label="Benchmark lifetimes"></div>
             <p>
               <a class="link-out" href="/paper.html">Read the paper — the standard in full</a>
             </p>

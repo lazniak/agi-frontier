@@ -85,6 +85,7 @@ export const LabSchema = z.object({
   website: z.string().url(),
   sources: z.array(LabSourceSchema).min(1),
   flagship_hints: z.array(z.string()),
+  name_prefixes: z.array(z.object({ match: z.string(), prefix: z.string() }).strict()).optional(),
 }).strict();
 
 export const BenchmarkSchema = z.object({
@@ -153,6 +154,8 @@ export const BundleSchema = z.object({
       last_eval_at: isoTs.nullable(),
       eval: z.any().nullable(),
       budget: z.any().nullable(),
+      usage_total: z.any().nullable().optional(),
+      last_backfill_summary: z.string().nullable().optional(),
     }).strict(),
   }).strict(),
 }).strict();

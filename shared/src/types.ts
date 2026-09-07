@@ -44,6 +44,12 @@ export interface Lab {
   sources: LabSource[];
   /** Name patterns that identify the flagship tier (regex, case-insensitive). Hints for the LLM extractor, never the sole filter. */
   flagship_hints: string[];
+  /**
+   * Family prefixes the researcher restores when an extraction names a bare family member
+   * ("Opus 5" → "Claude Opus 5"): `match` is a case-insensitive regex source tested against the
+   * start of the extracted name, `prefix` is prepended when it matches (REDESIGN §12.6).
+   */
+  name_prefixes?: { match: string; prefix: string }[];
 }
 
 export interface Benchmark {
@@ -229,7 +235,12 @@ export interface WorkerState {
     last_arena_at: ISOTimestamp | null;
     last_eval_at: ISOTimestamp | null;
     eval: ResearcherEval | null;
+    /** The last *research* run's OpenRouter delta (backfill / discover), not the last poll's. */
     budget: ResearcherBudget | null;
+    /** Lifetime OpenRouter totals across poll, discover and backfill (REDESIGN §12.6). */
+    usage_total?: ResearcherBudget | null;
+    /** One line about the last backfill / arena / eval, e.g. "backfill: 10 labs, 8 candidates …". */
+    last_backfill_summary?: string | null;
   };
 }
 
@@ -250,7 +261,7 @@ export interface FrontierTrend {
   refDay: number;
 }
 
-export type LevelKind = 'human' | 'saturation' | 'generation' | 'ceiling';
+export type LevelKind = 'human' | 'saturation' | 'generation' | 'ceiling' | 'speculative';
 
 /** A rung of the y-axis ladder: a θ (and rating) with a meaning derived from the fit. */
 export interface Level {
