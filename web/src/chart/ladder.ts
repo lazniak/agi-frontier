@@ -11,7 +11,7 @@ import { toDate, type ValueTick } from './scales';
 import type { G } from './layers';
 
 const LABEL_GAP = 14;
-const KIND_RANK: Record<Level['kind'], number> = { ceiling: 0, generation: 1, human: 2, saturation: 3 };
+const KIND_RANK: Record<Level['kind'], number> = { speculative: -1, ceiling: 0, generation: 1, human: 2, saturation: 3 };
 
 interface LadderRow {
   level: Level;

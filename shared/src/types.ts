@@ -49,7 +49,7 @@ export interface Lab {
    * ("Opus 5" → "Claude Opus 5"): `match` is a case-insensitive regex source tested against the
    * start of the extracted name, `prefix` is prepended when it matches (REDESIGN §12.6).
    */
-  name_prefixes?: { match: string; prefix: string }[];
+  name_prefixes?: { match: string; prefix: string }[] | undefined;
 }
 
 export interface Benchmark {
@@ -238,9 +238,9 @@ export interface WorkerState {
     /** The last *research* run's OpenRouter delta (backfill / discover), not the last poll's. */
     budget: ResearcherBudget | null;
     /** Lifetime OpenRouter totals across poll, discover and backfill (REDESIGN §12.6). */
-    usage_total?: ResearcherBudget | null;
+    usage_total?: ResearcherBudget | null | undefined;
     /** One line about the last backfill / arena / eval, e.g. "backfill: 10 labs, 8 candidates …". */
-    last_backfill_summary?: string | null;
+    last_backfill_summary?: string | null | undefined;
   };
 }
 
