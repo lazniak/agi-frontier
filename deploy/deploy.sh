@@ -21,6 +21,10 @@ if [ ! -f .env ]; then
 fi
 mkdir -p data/public worker/.state
 docker compose -f deploy/docker-compose.yml up -d --build --remove-orphans
+# The worker runs the bind-mounted repo, so a code-only change leaves its image id untouched and
+# compose keeps the old process (seen 2026-09-07: a loop from the previous release ran for 12 h
+# with a stale schema). Recreate it explicitly so every deploy restarts the loop.
+docker compose -f deploy/docker-compose.yml up -d --force-recreate --no-deps worker
 # latest.json is generated, not tracked: rebuild it right away so the site never 404s after a pull
 docker compose -f deploy/docker-compose.yml exec -T worker bun run worker/src/cli.ts bundle
 docker compose -f deploy/docker-compose.yml ps

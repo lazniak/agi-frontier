@@ -44,6 +44,11 @@ export interface ArenaRow {
  *   `- **Gemini 3 Pro** — 1485 (12034 votes)` (prose list)
  */
 export function parseArenaLeaderboard(text: string): ArenaRow[] {
+  // The live lmarena.ai page is a React table that r.jina.ai flattens into line blocks — no
+  // Markdown table at all. Try that shape first; it never triggers on a table rendering.
+  const flat = parseFlattenedLeaderboard(text);
+  if (flat.length > 0) return flat;
+
   const rows: ArenaRow[] = [];
   const seen = new Set<string>();
 
@@ -103,6 +108,86 @@ export function parseArenaLeaderboard(text: string): ArenaRow[] {
     }
   }
   return rows;
+}
+
+/**
+ * The live lmarena.ai leaderboard (2026) is a React table; r.jina.ai flattens each row into a
+ * block of lines separated by blank lines (tab-only lines inside a block):
+ *
+ *   1 / 1 / 6 / claude-fable-5 / Anthropic · Proprietary / 1507 / ±5 / 27,189  $10 / $50  1M
+ *   rank / rank-spread low / high / model slug / "Org · License" / score / ±ci / votes price ctx
+ *
+ * Detected by the header sequence Rank → (Rank Spread) → Model → Score → Votes. Blocks are
+ * parsed from there until three non-row blocks in a row (the page chrome after the table),
+ * which also stops a second table from leaking in. The quote is the block's lines joined by a
+ * single space: `quoteMatches` normalises whitespace, so `verify` finds it on the page again.
+ */
+export function parseFlattenedLeaderboard(text: string): ArenaRow[] {
+  const norm = text.replace(/\r/g, '');
+  const headerAt = norm.search(
+    /^Rank\n(?:[ \t]*\n)*(?:Rank Spread\n(?:[ \t]*\n)*)?Model\n(?:[ \t]*\n)*Score\n(?:[ \t]*\n)*Votes\n/m,
+  );
+  if (headerAt < 0) return [];
+  const blocks = norm.slice(headerAt).split(/\n(?:[ ]*\n)+/);
+  const rows: ArenaRow[] = [];
+  const seen = new Set<string>();
+  let started = false;
+  let misses = 0;
+  for (const block of blocks) {
+    const lines = block
+      .split('\n')
+      .map((l) => l.replace(/\t/g, ' ').trim())
+      .filter(Boolean);
+    const row = flattenedRow(lines);
+    if (!row) {
+      if (started && ++misses >= 3) break;
+      continue;
+    }
+    started = true;
+    misses = 0;
+    const key = nameKey(row.model);
+    if (!key || seen.has(key)) continue;
+    seen.add(key);
+    rows.push(row);
+  }
+  return rows;
+}
+
+function flattenedRow(lines: string[]): ArenaRow | null {
+  if (lines.length < 4) return null;
+  const rankLine = lines[0] ?? '';
+  if (!/^\d{1,4}$/.test(rankLine)) return null;
+  const rank = Number(rankLine);
+  if (rank < 1 || rank > 1000) return null;
+  // The model slug is the first line with a letter after the rank-spread numbers.
+  const modelIdx = lines.findIndex((l, i) => i > 0 && /[a-z]/i.test(l) && !l.startsWith('±'));
+  if (modelIdx < 0) return null;
+  const model = lines[modelIdx] ?? '';
+  if (!model || model.length > 80) return null;
+  let organization: string | null = null;
+  let next = modelIdx + 1;
+  const orgLine = lines[next] ?? '';
+  if (orgLine.includes('·')) {
+    organization = orgLine.split('·')[0]?.trim() || null;
+    next++;
+  }
+  const rest = lines.slice(next);
+  const scoreLine = rest.find((l) => /^\d{3,4}$/.test(l) && Number(l) >= 200 && Number(l) <= 2200);
+  if (!scoreLine) return null;
+  const score = Number(scoreLine);
+  let votes: number | null = null;
+  for (const l of rest) {
+    for (const tok of l.split(/\s+/)) {
+      if (!/^\d{1,3}(?:,\d{3})+$|^\d{4,}$/.test(tok)) continue;
+      const v = Number(tok.replace(/,/g, ''));
+      if (v >= 1000 && v !== score) {
+        votes = v;
+        break;
+      }
+    }
+    if (votes !== null) break;
+  }
+  return { rank, model, score, votes, organization, raw: lines.join(' ').slice(0, 300) };
 }
 
 /**
@@ -207,7 +292,48 @@ export function mapRowToRelease(
     const alt = releases.find((r) => nameKey(r.name) === unannotated);
     if (alt) return alt;
   }
+
+  // Live slugs carry effort / snapshot suffixes ("claude-opus-4-6-high", "gemini-3.1-pro-preview",
+  // "deepseek-v4-pro-high-20260813", "gemini-3-flash (thinking-minimal)") and write "4.6" as
+  // "4-6": drop annotations, dates and trailing variant tokens, compare dot-insensitively, and
+  // still require a specific key. runArena keeps one row per release — the plain-name row when
+  // the page has one, else the best-ranked variant — so this never double-counts.
+  for (const base of [row.model, stripOrganisation(row.model)]) {
+    const plain = slugKey(stripVariantSuffixes(base));
+    if (!plain || !keyIsSpecific(plain)) continue;
+    const alt = releases.find((r) => slugKey(r.name) === plain);
+    if (alt) return alt;
+  }
   return null;
+}
+
+/** Name key with dots removed too: "claude-opus-4-6" and "Claude Opus 4.6" agree. */
+function slugKey(name: string): string {
+  return nameKey(name).replace(/\./g, '');
+}
+
+/** True when the row names the release plainly (no effort / snapshot suffix). */
+export function isPlainRow(row: ArenaRow, releaseName: string): boolean {
+  const target = slugKey(releaseName);
+  return [row.model, stripOrganisation(row.model)].some(
+    (m) => slugKey(m.replace(/\([^)]*\)/g, ' ')) === target,
+  );
+}
+
+/**
+ * Strip what a leaderboard slug adds on top of the model name: parenthetical annotations,
+ * YYYYMMDD / YYYY-MM-DD snapshot dates, and trailing effort / mode tokens (repeatedly).
+ */
+export function stripVariantSuffixes(model: string): string {
+  let s = model.replace(/\([^)]*\)/g, ' ').trim();
+  s = s.replace(/[-_ ]?\b(?:20\d{6}|20\d{2}-\d{2}-\d{2})\b/g, ' ').trim();
+  const variant = /[-_ ](?:high|xhigh|max|low|medium|minimal|thinking|reasoning|preview|latest|exp|chat|instruct|\d{1,3}k)$/i;
+  let prev = '';
+  while (prev !== s) {
+    prev = s;
+    s = s.replace(variant, '').trim();
+  }
+  return s.replace(/\s{2,}/g, ' ').trim();
 }
 
 /** A name key may match only when it is specific enough: has a digit or is ≥ 6 chars. */
@@ -397,6 +523,15 @@ export async function runArena(rt: Runtime, opts: ArenaOptions = {}): Promise<nu
   for (const row of rows) {
     const rel = mapRowToRelease(row, releases);
     if (rel && organizationConsistent(row, rel.lab, labNames)) {
+      // One row per release: the plain-name row wins over its effort variants; otherwise the
+      // first (best-ranked) row seen keeps the slot.
+      const held = matches.findIndex((m) => m.releaseId === rel.id);
+      if (held >= 0) {
+        if (isPlainRow(row, rel.name) && !isPlainRow(matches[held]!.row, rel.name)) {
+          matches[held] = { row, releaseId: rel.id, lab: rel.lab, replaced: false };
+        }
+        continue;
+      }
       matches.push({ row, releaseId: rel.id, lab: rel.lab, replaced: false });
     } else {
       unmatched.push(row);

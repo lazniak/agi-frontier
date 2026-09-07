@@ -15,11 +15,16 @@ import {
   stripOrganisation,
   type ArenaMatch,
   type ArenaRow,
+  parseFlattenedLeaderboard,
+  isPlainRow,
+  stripVariantSuffixes,
 } from '../src/researcher/arena';
 import type { LabFile, ModelRelease } from '@agi/shared';
+import { quoteMatches } from '../src/text';
 
 const fixturePath = join(dirname(fileURLToPath(import.meta.url)), 'fixtures', 'lmarena-text.md');
 const fixture = readFileSync(fixturePath, 'utf8');
+const liveFixture = readFileSync(join(dirname(fileURLToPath(import.meta.url)), 'fixtures', 'lmarena-text-live.txt'), 'utf8');
 const NOW = '2026-09-07T04:00:00Z';
 const repoRoot = join(import.meta.dir, '..', '..');
 
@@ -93,6 +98,79 @@ describe('parseArenaLeaderboard', () => {
 
   test('lines without an Elo-sized number produce nothing', () => {
     expect(parseArenaLeaderboard('| Rank | Model | Org |\n| 1 | GPT-5.1 | OpenAI |')).toHaveLength(0);
+  });
+});
+
+describe('parseArenaLeaderboard — live flattened rendering (r.jina.ai of the React table)', () => {
+  const rows = parseArenaLeaderboard(liveFixture);
+
+  test('parses every row block of the text table and stops at the page chrome', () => {
+    expect(rows.length).toBeGreaterThanOrEqual(20);
+    expect(rows.length).toBeLessThanOrEqual(30);
+    expect(rows.map((r) => r.model)).not.toContain('Search the Web');
+    expect(rows.map((r) => r.model)).not.toContain('Vision');
+  });
+
+  test('rank, slug, org, score and votes come from the right lines', () => {
+    const first = rows[0]!;
+    expect(first.rank).toBe(1);
+    expect(first.model).toBe('claude-fable-5');
+    expect(first.organization).toBe('Anthropic');
+    expect(first.score).toBe(1507);
+    expect(first.votes).toBe(27189);
+    // The quote is the block joined by single spaces — whitespace-normalised, it is on the page.
+    expect(first.raw).toContain('claude-fable-5 Anthropic · Proprietary 1507 ±5 27,189');
+    expect(quoteMatches(liveFixture, first.raw)).toBe(true);
+  });
+
+  test('annotated slugs keep their annotation in the row (matching strips it later)', () => {
+    expect(rows.some((r) => r.model === 'muse-spark-1.2 (xHigh)')).toBe(true);
+  });
+
+  test('the Markdown-table fixture is untouched by the flattened parser', () => {
+    expect(parseFlattenedLeaderboard(fixture)).toEqual([]);
+  });
+});
+
+describe('mapRowToRelease — live slugs', () => {
+  const rel = (id: string, name: string, lab: LabFile['lab']) => ({ id, name, lab });
+  const releases = [
+    rel('anthropic-claude-opus-4.6', 'Claude Opus 4.6', 'anthropic'),
+    rel('anthropic-claude-fable-5.1', 'Claude Fable 5.1', 'anthropic'),
+    rel('google-gemini-3.1-pro', 'Gemini 3.1 Pro', 'google'),
+    rel('meta-muse-spark-1.2', 'Muse Spark 1.2', 'meta'),
+    rel('deepseek-v4-pro', 'DeepSeek V4 Pro', 'deepseek'),
+    rel('anthropic-claude-sonnet-4.5', 'Claude Sonnet 4.5', 'anthropic'),
+  ];
+  const row = (model: string): ArenaRow => ({ rank: 1, model, score: 1500, votes: 1000, organization: null, raw: model });
+
+  test('hyphenated slugs match dotted release names', () => {
+    expect(mapRowToRelease(row('claude-opus-4-6'), releases)?.id).toBe('anthropic-claude-opus-4.6');
+  });
+
+  test('effort, preview, snapshot-date and context suffixes are stripped', () => {
+    expect(mapRowToRelease(row('claude-opus-4-6-high'), releases)?.id).toBe('anthropic-claude-opus-4.6');
+    expect(mapRowToRelease(row('claude-fable-5.1-max'), releases)?.id).toBe('anthropic-claude-fable-5.1');
+    expect(mapRowToRelease(row('gemini-3.1-pro-preview'), releases)?.id).toBe('google-gemini-3.1-pro');
+    expect(mapRowToRelease(row('deepseek-v4-pro-high-20260813'), releases)?.id).toBe('deepseek-v4-pro');
+    expect(mapRowToRelease(row('claude-sonnet-4-5-20250929-high-32k'), releases)?.id).toBe('anthropic-claude-sonnet-4.5');
+    expect(mapRowToRelease(row('muse-spark-1.2 (xHigh)'), releases)?.id).toBe('meta-muse-spark-1.2');
+  });
+
+  test('a different model number never matches through the slug path', () => {
+    expect(mapRowToRelease(row('claude-opus-4-7-high'), releases)).toBeNull();
+    expect(mapRowToRelease(row('gemini-3-pro'), releases)).toBeNull();
+  });
+
+  test('isPlainRow tells the bare row from its variants', () => {
+    expect(isPlainRow(row('claude-opus-4-6'), 'Claude Opus 4.6')).toBe(true);
+    expect(isPlainRow(row('claude-opus-4-6-high'), 'Claude Opus 4.6')).toBe(false);
+  });
+
+  test('stripVariantSuffixes is idempotent and leaves plain names alone', () => {
+    expect(stripVariantSuffixes('gpt-5.4')).toBe('gpt-5.4');
+    expect(stripVariantSuffixes('gpt-5.2-chat-latest-20260210')).toBe('gpt-5.2');
+    expect(stripVariantSuffixes(stripVariantSuffixes('glm-5-thinking'))).toBe('glm-5');
   });
 });
 
