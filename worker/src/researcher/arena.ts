@@ -111,83 +111,104 @@ export function parseArenaLeaderboard(text: string): ArenaRow[] {
 }
 
 /**
- * The live lmarena.ai leaderboard (2026) is a React table; r.jina.ai flattens each row into a
- * block of lines separated by blank lines (tab-only lines inside a block):
+ * The live lmarena.ai leaderboard (2026) is a server-rendered React table. Both text renderings
+ * the fetcher can return — the direct HTML flattened by `htmlToText`, and the r.jina.ai reader —
+ * put one cell per line (or a couple of cells on one line) with no Markdown table at all:
  *
- *   1 / 1 / 6 / claude-fable-5 / Anthropic · Proprietary / 1507 / ±5 / 27,189  $10 / $50  1M
- *   rank / rank-spread low / high / model slug / "Org · License" / score / ±ci / votes price ctx
+ *   1 / 1 6 / claude-fable-5 / Anthropic · Proprietary / 1507 ±5 / 27,189 / $10 / $50 / 1M
+ *   rank / rank spread / model slug / "Org · License" / score ±ci [Preliminary] / votes / price / ctx
  *
- * Detected by the header sequence Rank → (Rank Spread) → Model → Score → Votes. Blocks are
- * parsed from there until three non-row blocks in a row (the page chrome after the table),
- * which also stops a second table from leaking in. The quote is the block's lines joined by a
- * single space: `quoteMatches` normalises whitespace, so `verify` finds it on the page again.
+ * The scanner starts after the column header (Rank … Model, Score, Votes) and reads rows as
+ * rank line → numeric spread lines → model line → optional org line → score line (±ci on the
+ * same or the next line) → votes within the next few lines. Ranks must not go backwards, and forty
+ * lines without a row end the table (the page chrome). The quote is the row's cells
+ * joined by single spaces: `quoteMatches` normalises whitespace, so `verify` finds it again.
  */
 export function parseFlattenedLeaderboard(text: string): ArenaRow[] {
-  const norm = text.replace(/\r/g, '');
-  const headerAt = norm.search(
-    /^Rank\n(?:[ \t]*\n)*(?:Rank Spread\n(?:[ \t]*\n)*)?Model\n(?:[ \t]*\n)*Score\n(?:[ \t]*\n)*Votes\n/m,
-  );
-  if (headerAt < 0) return [];
-  const blocks = norm.slice(headerAt).split(/\n(?:[ ]*\n)+/);
+  const lines = text
+    .replace(/\r/g, '')
+    .split('\n')
+    .map((l) => l.replace(/\t/g, ' ').replace(/\s{2,}/g, ' ').trim())
+    .filter(Boolean);
+  let start = -1;
+  for (let i = 0; i < lines.length; i++) {
+    if (lines[i] !== 'Model') continue;
+    const after = lines.slice(i + 1, i + 6);
+    const before = lines.slice(Math.max(0, i - 3), i);
+    if (after.includes('Score') && after.includes('Votes') && before.some((l) => /^Rank\b/.test(l))) {
+      start = i + after.indexOf('Votes') + 2;
+      break;
+    }
+  }
+  if (start < 0) return [];
+
   const rows: ArenaRow[] = [];
   const seen = new Set<string>();
-  let started = false;
+  let prevRank = 0;
   let misses = 0;
-  for (const block of blocks) {
-    const lines = block
-      .split('\n')
-      .map((l) => l.replace(/\t/g, ' ').trim())
-      .filter(Boolean);
-    const row = flattenedRow(lines);
-    if (!row) {
-      if (started && ++misses >= 3) break;
+  for (let i = start; i < lines.length; ) {
+    const scanned = /^\d{1,4}$/.test(lines[i] ?? '') ? scanFlattenedRow(lines, i, prevRank) : null;
+    if (!scanned) {
+      i++;
+      if (rows.length > 0 && ++misses > 40) break;
       continue;
     }
-    started = true;
     misses = 0;
-    const key = nameKey(row.model);
+    prevRank = scanned.row.rank ?? prevRank;
+    i = scanned.next;
+    const key = nameKey(scanned.row.model);
     if (!key || seen.has(key)) continue;
     seen.add(key);
-    rows.push(row);
+    rows.push(scanned.row);
   }
   return rows;
 }
 
-function flattenedRow(lines: string[]): ArenaRow | null {
-  if (lines.length < 4) return null;
-  const rankLine = lines[0] ?? '';
-  if (!/^\d{1,4}$/.test(rankLine)) return null;
-  const rank = Number(rankLine);
-  if (rank < 1 || rank > 1000) return null;
-  // The model slug is the first line with a letter after the rank-spread numbers.
-  const modelIdx = lines.findIndex((l, i) => i > 0 && /[a-z]/i.test(l) && !l.startsWith('±'));
-  if (modelIdx < 0) return null;
-  const model = lines[modelIdx] ?? '';
-  if (!model || model.length > 80) return null;
+const CHROME_WORDS = /^(leaderboard|vote|about|blog|docs?|home|search|log in|login|sign|menu|expand|pin|archive|compare|arena|battle|rank|model|score|votes|organization|organisation|org|price|context|filters?|models|labs)$/i;
+
+function scanFlattenedRow(lines: string[], at: number, prevRank: number): { row: ArenaRow; next: number } | null {
+  const rank = Number(lines[at]);
+  if (!(rank >= 1 && rank <= 1000) || rank < prevRank || (prevRank > 0 && rank - prevRank > 50)) return null;
+  const cells: string[] = [lines[at] ?? ''];
+  let i = at + 1;
+  // Rank spread: "1 6" on one line, or "1" / "6" on two.
+  for (let n = 0; n < 2 && /^\d{1,4}( \d{1,4})?$/.test(lines[i] ?? ''); n++) cells.push(lines[i++] ?? '');
+  const model = lines[i] ?? '';
+  if (!/[a-z]/i.test(model) || model.startsWith('±') || model.length > 80 || CHROME_WORDS.test(model)) return null;
+  cells.push(model);
+  i++;
+  // "Org · License", or a bare license cell ("Apache-2.0") when the page has no org for the row.
   let organization: string | null = null;
-  let next = modelIdx + 1;
-  const orgLine = lines[next] ?? '';
+  const orgLine = lines[i] ?? '';
   if (orgLine.includes('·')) {
     organization = orgLine.split('·')[0]?.trim() || null;
-    next++;
+    cells.push(lines[i++] ?? '');
+  } else if (/[a-z]/i.test(orgLine) && !/^d/.test(orgLine) && !orgLine.startsWith('±')) {
+    cells.push(lines[i++] ?? '');
   }
-  const rest = lines.slice(next);
-  const scoreLine = rest.find((l) => /^\d{3,4}$/.test(l) && Number(l) >= 200 && Number(l) <= 2200);
-  if (!scoreLine) return null;
-  const score = Number(scoreLine);
+  const scoreMatch = /^(\d{3,4})(?: ?± ?\d+)?(?: [A-Za-z]+)?$/.exec(lines[i] ?? '');
+  if (!scoreMatch) return null;
+  const score = Number(scoreMatch[1]);
+  if (score < 200 || score > 2200) return null;
+  cells.push(lines[i++] ?? '');
+  if (/^± ?\d+/.test(lines[i] ?? '')) cells.push(lines[i++] ?? '');
+  // Votes: the first thousands-grouped (or ≥ 4-digit) number within the next few lines, never
+  // a bare rank line.
   let votes: number | null = null;
-  for (const l of rest) {
-    for (const tok of l.split(/\s+/)) {
+  for (let k = i; k < Math.min(lines.length, i + 4) && votes === null; k++) {
+    const l = lines[k] ?? '';
+    if (/^\d{1,4}$/.test(l)) break;
+    for (const tok of l.split(' ')) {
       if (!/^\d{1,3}(?:,\d{3})+$|^\d{4,}$/.test(tok)) continue;
       const v = Number(tok.replace(/,/g, ''));
       if (v >= 1000 && v !== score) {
         votes = v;
+        cells.push(tok);
         break;
       }
     }
-    if (votes !== null) break;
   }
-  return { rank, model, score, votes, organization, raw: lines.join(' ').slice(0, 300) };
+  return { row: { rank, model, score, votes, organization, raw: cells.join(' ').slice(0, 300) }, next: i };
 }
 
 /**

@@ -1,0 +1,473 @@
+LLM Leaderboard - Best Text & Chat AI Models Compared
+
+New Chat
+Leaderboard
+Search
+
+Log In Terms of Use Privacy Policy Cookies
+
+Start Voting
+
+Overview
+Agent
+Chat
+Code
+Image
+Video
+
+Start Voting
+
+Agent Chat Code Image Video
+
+View as
+
+Ranking Pareto
+
+Categories ( 29 )
+
+🏆 Overall 🤓 Expert Learn more 💼 Occupational
+🧮 Math 📝 Instruction Following 💬 Multi-Turn ✍️ Creative Writing 💻 Coding 🌶️ Hard Prompts 🧠 Hard Prompts (English) + View more
+
+Adjustments
+
+Style Control
+Factuality Learn more
+None
+
+License Type
+
+All
+Proprietary
+Open Source
+
+Score Range
+
+Min 952
+Max 1508
+
+Input Price
+
+Min $0.00
+Max $75
+
+Output Price
+
+Min $0.00
+Max $150
+
+Context Length
+
+Min 2K
+Max 2.1M
+
+Text Arena 🏆 Overall
+View overall rankings across various AI models in text-to-text tasks across math, coding, creative writing, and other open-ended domains.
+
+Sep 2, 2026
+7,999,020 votes
+400 models
+
+Hide Filters Filters
+Models Labs
+
+Rank
+Rank Spread
+
+Model
+Score
+Votes
+Price $/M
+
+Context
+
+1
+
+1 6
+
+claude-fable-5
+Anthropic · Proprietary
+
+1507 ±5
+
+27,189
+$10 / $50
+1M
+
+2
+
+1 6
+
+claude-opus-4-6-high
+Anthropic · Proprietary
+
+1505 ±4
+
+72,099
+$5 / $25
+1M
+
+3
+
+1 14
+
+claude-fable-5.1-max
+Anthropic · Proprietary
+
+1504 ±11
+
+2,906
+$10 / $50
+1M
+
+4
+
+1 9
+
+claude-opus-4-7-high
+Anthropic · Proprietary
+
+1502 ±4
+
+60,103
+$5 / $25
+1M
+
+5
+
+1 17
+
+muse-spark-1.2 (xHigh)
+Meta · Proprietary
+
+1499 ±10
+
+3,240
+$1.25 / $4.25
+N/A
+
+6
+
+3 11
+
+claude-opus-4-6
+Anthropic · Proprietary
+
+1498 ±3
+
+76,015
+$5 / $25
+1M
+
+7
+
+3 14
+
+claude-opus-4-7
+Anthropic · Proprietary
+
+1494 ±4
+
+61,238
+$5 / $25
+1M
+
+8
+
+1 22
+
+gemini-3.8-flash-high
+Google · Proprietary
+
+1494 ±9 Preliminary
+
+5,125
+$0.75 / $3.75
+1M
+
+9
+
+4 17
+
+claude-opus-5-high
+Anthropic · Proprietary
+
+1493 ±5
+
+35,174
+$5 / $25
+1M
+
+10
+
+4 18
+
+muse-spark-1.1
+Meta · Proprietary
+
+1492 ±5
+
+24,064
+$1.25 / $4.25
+N/A
+
+11
+
+3 25
+
+gemini-3.7-flash-high
+Google · Proprietary
+
+1491 ±8 Preliminary
+
+5,682
+$0.75 / $3.75
+1M
+
+12
+
+5 24
+
+kimi-k3-max
+Moonshot · Kimi K3 license
+
+1489 ±5
+
+18,090
+N/A
+N/A
+
+13
+
+5 25
+
+muse-spark
+Meta · Proprietary
+
+1488 ±6
+
+13,572
+N/A
+N/A
+
+14
+
+5 25
+
+claude-opus-5-max
+Anthropic · Proprietary
+
+1488 ±6
+
+17,119
+$5 / $25
+1M
+
+15
+
+7 24
+
+gemini-3.1-pro-preview
+Google · Proprietary
+
+1487 ±3
+
+102,999
+$1 / $6
+1M
+
+16
+
+7 25
+
+gemini-3-pro
+Google · Proprietary
+
+1486 ±4
+
+40,668
+$2 / $12
+1M
+
+17
+
+9 32
+
+gpt-5.6-sol-xhigh
+OpenAI · Proprietary
+
+1483 ±5
+
+23,413
+$4 / $20
+N/A
+
+18
+
+10 32
+
+claude-opus-4-8-high
+Anthropic · Proprietary
+
+1482 ±4
+
+48,727
+$5 / $25
+1M
+
+19
+
+10 32
+
+gpt-5.5-high
+OpenAI · Proprietary
+
+1482 ±4
+
+63,547
+$5 / $30
+1.1M
+
+20
+
+7 38
+
+glm-5.3-max
+Z.ai · MIT
+
+1482 ±7
+
+7,668
+$1.40 / $4.40
+1M
+
+21
+
+10 38
+
+gemini-3.6-flash-high
+Google · Proprietary
+
+1480 ±5
+
+22,286
+$0.75 / $3.75
+1M
+
+22
+
+10 39
+
+qwen3.8-max
+Alibaba · Proprietary
+
+1480 ±6
+
+13,346
+$2 / $6
+1M
+
+23
+
+11 38
+
+gemini-3.5-flash-high
+Google · Proprietary
+
+1479 ±4
+
+34,180
+$0.75 / $4.50
+1M
+
+24
+
+17 39
+
+gpt-5.5
+OpenAI · Proprietary
+
+1477 ±4
+
+64,977
+$5 / $30
+1.1M
+
+25
+
+17 40
+
+gpt-5.4-high
+OpenAI · Proprietary
+
+1477 ±4
+
+60,624
+$2.50 / $15
+1.1M
+
+26
+
+17 41
+
+gpt-5.2-chat-latest-20260210
+OpenAI · Proprietary
+
+1476 ±4
+
+34,217
+$1.75 / $14
+128K
+
+
+…
+
+Battle Count for Each Pair of Models (Ties Excluded)
+
+Average of Win Rates Against Each Opponent (Ties Excluded)
+
+USE CASES
+Chat with AI
+Build Apps & Websites
+Write & Edit Text
+Search the Web
+Generate Images
+Generate Videos
+Chose any model
+Compare Models Side by Side
+
+LEADERBOARD RANKINGS
+Overall
+Agent
+Text
+WebDev
+Image-to-WebDev
+Text to Image
+Image Edit
+Text to Video
+Image to Video
+Video Edit
+Vision
+Document
+Search
+
+COMPANY
+About Us
+How It Works
+Blog
+Careers
+Leaderboard Changelog
+Product Changelog
+Help Center
+FAQ
+
+LEGAL
+Terms
+Privacy
+Cookies
+
+FOLLOW
+X
+LinkedIn
+YouTube
+Discord
+

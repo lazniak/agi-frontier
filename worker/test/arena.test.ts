@@ -25,6 +25,7 @@ import { quoteMatches } from '../src/text';
 const fixturePath = join(dirname(fileURLToPath(import.meta.url)), 'fixtures', 'lmarena-text.md');
 const fixture = readFileSync(fixturePath, 'utf8');
 const liveFixture = readFileSync(join(dirname(fileURLToPath(import.meta.url)), 'fixtures', 'lmarena-text-live.txt'), 'utf8');
+const directFixture = readFileSync(join(dirname(fileURLToPath(import.meta.url)), 'fixtures', 'lmarena-text-direct.txt'), 'utf8');
 const NOW = '2026-09-07T04:00:00Z';
 const repoRoot = join(import.meta.dir, '..', '..');
 
@@ -125,6 +126,26 @@ describe('parseArenaLeaderboard — live flattened rendering (r.jina.ai of the R
 
   test('annotated slugs keep their annotation in the row (matching strips it later)', () => {
     expect(rows.some((r) => r.model === 'muse-spark-1.2 (xHigh)')).toBe(true);
+  });
+
+  test('the direct HTML rendering (htmlToText, cells split across blank lines) parses the same rows', () => {
+    const direct = parseArenaLeaderboard(directFixture);
+    expect(direct.length).toBeGreaterThanOrEqual(20);
+    expect(direct[0]).toEqual(rows[0]);
+    expect(direct.map((r) => r.model).slice(0, 10)).toEqual(rows.map((r) => r.model).slice(0, 10));
+    expect(quoteMatches(directFixture, direct[0]!.raw)).toBe(true);
+  });
+
+  test('a row without an organisation cell (bare license) still parses', () => {
+    const text = [
+      'Rank', 'Rank Spread', 'Model', 'Score', 'Votes', 'Price $/M', 'Context',
+      '325', '321 330', 'yi-1.5-34b-chat', 'Apache-2.0', '1212 ±5', '24,146', 'N/A',
+      '326', '316 332', 'zephyr-orpo-141b', 'Apache 2.0', '1212 ±11', '4,652',
+    ].join('\n');
+    expect(parseArenaLeaderboard(text).map((r) => [r.model, r.score, r.votes, r.organization])).toEqual([
+      ['yi-1.5-34b-chat', 1212, 24146, null],
+      ['zephyr-orpo-141b', 1212, 4652, null],
+    ]);
   });
 
   test('the Markdown-table fixture is untouched by the flattened parser', () => {
