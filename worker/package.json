@@ -7,15 +7,17 @@
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "lint": "tsc --noEmit -p tsconfig.json",
     "test": "bun test",
-    "build": "tsc -p tsconfig.build.json",
+    "build": "echo worker runs from TS source under bun",
     "validate": "bun run src/cli.ts validate",
     "bundle": "bun run src/cli.ts bundle",
     "verify": "bun run src/cli.ts verify",
     "poll": "bun run src/cli.ts poll",
+    "discover": "bun run src/cli.ts discover",
     "loop": "bun run src/cli.ts loop"
   },
   "dependencies": {
     "@agi/shared": "workspace:*",
+    "fast-xml-parser": "^4.5.0",
     "zod": "^3.23.8"
   },
   "devDependencies": {
