@@ -1,7 +1,8 @@
 import { describe, expect, test } from 'bun:test';
 import { backtestAsOf, backtestSeries, calibrateForecast } from '../src/backtest';
 import { fitFrontierIndex } from '../src/frontier-index';
-import { addDays } from '../src/timeline';
+import { cadencePrior, forecastLab } from '../src/prediction';
+import { addDays, daysBetween } from '../src/timeline';
 import { benchmark, release, score } from './test-helpers';
 import { LAB_IDS } from '../src/schema';
 import type { LabId, ModelRelease } from '../src/types';
@@ -256,5 +257,94 @@ describe('calibrateForecast — synthetic under-coverage (T31 it. 2)', () => {
     expect(cal.sigmaScale).toBe(bestScale);
     expect(cal.loss).toBeCloseTo(bestLoss, 12);
     expect(cal.report.sigmaScale).toBe(bestScale);
+  });
+});
+
+/* ------------------------------------------------- T31 iteration 3 additions: drift */
+
+describe('backtestSeries — drift (T31 it. 3)', () => {
+  const releases = regularLab();
+  const to = '2025-01-01';
+
+  test('the report records drift and driftPerYear; null driftPerYear on an empty pool', () => {
+    const r1 = backtestSeries(releases, BMS, ['openai'], { to, stepDays: 30 });
+    expect(r1.drift).toBe(true); // default
+    expect(typeof r1.driftPerYear).toBe('number');
+
+    const r2 = backtestSeries(releases, BMS, ['openai'], { to, stepDays: 30, drift: false });
+    expect(r2.drift).toBe(false);
+    expect(typeof r2.driftPerYear).toBe('number');
+
+    // No intervals anywhere → no drift estimate to publish.
+    const solo: ModelRelease[] = [
+      release('solo-only', 'mistral', '2024-06-01', [score('a', 50), score('b', 42), score('c', 35)]),
+    ];
+    const r3 = backtestSeries(solo, BMS, ['mistral'], { to: '2025-06-01', stepDays: 30 });
+    expect(r3.driftPerYear).toBeNull();
+  });
+
+  test('drift: false + halfLifeDays: Infinity reproduces the it.-2 report exactly', () => {
+    // The iteration-2 numbers were produced with a stationary cadence: switching drift off
+    // must bring them back verbatim (checked on the row level and the aggregate level).
+    const off = backtestSeries(releases, BMS, ['openai'], {
+      to,
+      stepDays: 30,
+      drift: false,
+      halfLifeDays: Infinity,
+    });
+    // The reference here is the shape of iteration 2: every row forecast equals a manual
+    // forecastLab call with drift off (there is no stored it.-2 golden file).
+    expect(off.drift).toBe(false);
+    // 2024-03-01 sits on the default grid (first flagship 2023-01-01 + 365 d, step 30).
+    const gridDate = addDays('2023-01-01', 365 + 60);
+    const fit = fitFrontierIndex(releases, BMS, { asOf: gridDate });
+    const prior = cadencePrior(releases, gridDate, ['flagship'], Infinity);
+    const manual = forecastLab('openai', releases, fit, prior, {
+      asOf: gridDate,
+      halfLifeDays: Infinity,
+      drift: false,
+    });
+    const row = off.rows.find((r) => r.asOf === gridDate)!;
+    expect(row.predictedMedian).toBe(manual.next[0]!.medianDate);
+    expect(row.p16).toBe(manual.next[0]!.p16Date);
+    expect(row.p84).toBe(manual.next[0]!.p84Date);
+  });
+
+  test('calibrateForecast passes drift through to the winning report', () => {
+    const cal = calibrateForecast(releases, BMS, ['openai'], {
+      to,
+      stepDays: 60,
+      drift: false,
+    });
+    expect(cal.report.drift).toBe(false);
+    expect(cal.report.driftPerYear).not.toBeNull();
+  });
+
+  test('drift on moves medians earlier on an accelerating lab (series level)', () => {
+    // Gaps 360, 300, 240, 180, 150 ending before the grid ends: with drift on the pooled β
+    // is negative, so the k = 1 medians late in the grid must sit at or before the drift-off
+    // ones, and strictly earlier once (asOf − t̄) grows past the shrinkage.
+    const gaps = [360, 300, 240, 180, 150];
+    const dates = [addDays(to, -30)];
+    for (let i = gaps.length - 1; i >= 0; i--) dates.unshift(addDays(dates[0]!, -gaps[i]!));
+    const acc = dates.map((date, i) =>
+      release(
+        `accx-m${i}`,
+        'openai',
+        date,
+        [score('a', 40 + 6 * i), score('b', 32 + 5 * i), score('c', 26 + 4 * i)],
+      ),
+    );
+    const on = backtestSeries(acc, BMS, ['openai'], { to, stepDays: 30, halfLifeDays: Infinity });
+    const off = backtestSeries(acc, BMS, ['openai'], {
+      to, stepDays: 30, halfLifeDays: Infinity, drift: false,
+    });
+    expect(on.driftPerYear).toBeLessThan(0);
+    const cmp = on.rows.filter((r) => r.predictedMedian !== null).map((r, i) => ({
+      diff: daysBetween(off.rows[i]!.predictedMedian!, r.predictedMedian!),
+    }));
+    expect(cmp.length).toBeGreaterThan(0);
+    expect(cmp.every((c) => c.diff <= 0)).toBe(true); // never later with drift on
+    expect(cmp.some((c) => c.diff < 0)).toBe(true); // and strictly earlier somewhere
   });
 });

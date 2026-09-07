@@ -7,7 +7,7 @@
 import type { BacktestReport, BacktestRow, Benchmark, ISODate, LabId, ModelRelease } from './types';
 import type { IndexFit } from './frontier-index';
 import { fitFrontierIndex } from './frontier-index';
-import { cadencePrior, forecastLab, lognormalConditionalQuantile } from './prediction';
+import { cadencePrior, forecastLab, stretchedConditionalQuantile } from './prediction';
 import { addDays, daysBetween } from './timeline';
 
 export interface BacktestAsOf {
@@ -31,6 +31,8 @@ export interface BacktestSeriesOptions {
   halfLifeDays?: number | undefined;
   /** σ multiplier passed to every forecast (default 1). */
   sigmaScale?: number | undefined;
+  /** Pooled cadence drift passed to every forecast (default true; REDESIGN §4, iteration 3). */
+  drift?: boolean | undefined;
   /** A fit as of *today*, so rows can take actual theta without refitting per call. */
   todayFit?: IndexFit | undefined;
   /**
@@ -48,12 +50,13 @@ interface ReplayContext {
   priorWeight: number | undefined;
   halfLifeDays: number | undefined;
   sigmaScale: number | undefined;
+  drift: boolean | undefined;
 }
 
 /** A replay row plus the waiting law behind its prediction (for the calibration curve). */
 interface ReplayResult {
   row: BacktestRow;
-  law: { mu: number; sigma: number; elapsedDays: number; lastDate: ISODate } | null;
+  law: { mu: number; sigma: number; sigmaScale: number; elapsedDays: number; lastDate: ISODate } | null;
 }
 
 /**
@@ -68,6 +71,7 @@ function replayRow(releases: ModelRelease[], lab: LabId, asOf: ISODate, ctx: Rep
     ...(ctx.priorWeight !== undefined ? { priorWeight: ctx.priorWeight } : {}),
     ...(ctx.halfLifeDays !== undefined ? { halfLifeDays: ctx.halfLifeDays } : {}),
     ...(ctx.sigmaScale !== undefined ? { sigmaScale: ctx.sigmaScale } : {}),
+    ...(ctx.drift !== undefined ? { drift: ctx.drift } : {}),
   });
   const pred = forecast.next[0] ?? null;
 
@@ -108,6 +112,7 @@ function replayRow(releases: ModelRelease[], lab: LabId, asOf: ISODate, ctx: Rep
         ? {
             mu: forecast.mu,
             sigma: forecast.sigma,
+            sigmaScale: forecast.sigmaScale,
             elapsedDays: forecast.elapsedDays,
             lastDate: forecast.lastRelease.date,
           }
@@ -128,6 +133,7 @@ export function backtestAsOf(
     priorWeight?: number | undefined;
     halfLifeDays?: number | undefined;
     sigmaScale?: number | undefined;
+    drift?: boolean | undefined;
     todayFit?: IndexFit | undefined;
   } = {},
 ): BacktestAsOf {
@@ -138,6 +144,7 @@ export function backtestAsOf(
     priorWeight: opts.priorWeight,
     halfLifeDays: opts.halfLifeDays,
     sigmaScale: opts.sigmaScale,
+    drift: opts.drift,
   };
   return { asOf, rows: labIds.map((lab) => replayRow(releases, lab, asOf, ctx).row) };
 }
@@ -176,7 +183,7 @@ export function backtestSeries(
   let unforecastable = 0;
   // (lab, asOf) -> the waiting law of the k = 1 prediction made there, for the calibration
   // curve (which needs quantiles other than the four published percentile dates).
-  const law = new Map<string, { mu: number; sigma: number; elapsedDays: number; lastDate: ISODate }>();
+  const law = new Map<string, { mu: number; sigma: number; sigmaScale: number; elapsedDays: number; lastDate: ISODate }>();
 
   for (const asOf of grid) {
     let fit = fitCache.get(asOf);
@@ -191,6 +198,7 @@ export function backtestSeries(
       priorWeight: opts.priorWeight,
       halfLifeDays: opts.halfLifeDays,
       sigmaScale: opts.sigmaScale,
+      drift: opts.drift,
     };
     for (const lab of labIds) {
       const { row, law: waitingLaw } = replayRow(releases, lab, asOf, ctx);
@@ -254,12 +262,17 @@ export function backtestSeries(
     for (const r of forecastable) {
       const ms = law.get(`${r.lab}|${r.asOf}`);
       if (!ms) continue;
-      const days = lognormalConditionalQuantile(ms.mu, ms.sigma, Math.max(0, ms.elapsedDays), nominal);
+      const days = stretchedConditionalQuantile(ms.mu, ms.sigma, Math.max(0, ms.elapsedDays), nominal, ms.sigmaScale);
       if (r.actual!.date <= addDays(ms.lastDate, days)) covered += 1;
       counted += 1;
     }
     return { nominal, observed: counted > 0 ? covered / counted : 0 };
   });
+
+  // The pooled drift the report was produced *with* is the one the forecasts apply; for the
+  // report we publish the pooled β as of `to` (β·365 = log-gaps per year), null with no data.
+  const priorAtTo = cadencePrior(releases, opts.to, ['flagship'], opts.halfLifeDays ?? 730);
+  const driftPerYear: number | null = priorAtTo.n > 0 ? priorAtTo.driftPerDay * 365 : null;
 
   return {
     from,
@@ -277,6 +290,8 @@ export function backtestSeries(
     calibration,
     sigmaScale: opts.sigmaScale ?? 1,
     halfLifeDays: opts.halfLifeDays ?? 730,
+    drift: opts.drift ?? true,
+    driftPerYear,
     rows,
   };
 }
@@ -314,6 +329,7 @@ export function calibrateForecast(
     stepDays?: number | undefined;
     halfLifeDays?: number | undefined;
     from?: ISODate | undefined;
+    drift?: boolean | undefined;
   },
 ): CalibrateForecastResult {
   const fitCache = new Map<ISODate, IndexFit>();
@@ -325,6 +341,7 @@ export function calibrateForecast(
       ...(opts.stepDays !== undefined ? { stepDays: opts.stepDays } : {}),
       ...(opts.halfLifeDays !== undefined ? { halfLifeDays: opts.halfLifeDays } : {}),
       ...(opts.from !== undefined ? { from: opts.from } : {}),
+      ...(opts.drift !== undefined ? { drift: opts.drift } : {}),
       sigmaScale,
       fitCache,
     });

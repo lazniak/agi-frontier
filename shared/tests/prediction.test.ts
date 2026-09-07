@@ -10,9 +10,9 @@ import {
   lognormalConditionalQuantile,
 } from '../src/prediction';
 import { fitFrontierIndex, logit } from '../src/frontier-index';
-import { addDays, daysBetween } from '../src/timeline';
+import { addDays, dateToDayNumber, daysBetween } from '../src/timeline';
 import { benchmark, release, score } from './test-helpers';
-import { lognormalQuantile, mean, populationSd } from '../src/stats';
+import { clamp, lognormalQuantile, mean, populationSd } from '../src/stats';
 import type { LabId, ModelRelease } from '../src/types';
 
 const BMS = [benchmark('a'), benchmark('b')];
@@ -130,7 +130,13 @@ describe('cadencePrior', () => {
 
   test('no data at all falls back to the documented defaults', () => {
     const prior = cadencePrior([], ASOF);
-    expect(prior).toEqual({ mu: DEFAULT_PRIOR_MU, sigma: DEFAULT_PRIOR_SIGMA, n: 0 });
+    expect(prior).toEqual({
+      mu: DEFAULT_PRIOR_MU,
+      sigma: DEFAULT_PRIOR_SIGMA,
+      n: 0,
+      driftPerDay: 0,
+      tBar: 0,
+    });
   });
 
   test('respects asOf', () => {
@@ -144,7 +150,8 @@ describe('forecastLab — cadence and shrinkage', () => {
   const releases = fixture();
   const fit = fitOf(releases);
   const prior = cadencePrior(releases, ASOF, ['flagship'], Infinity);
-  const opts: ForecastOptions = { asOf: ASOF, halfLifeDays: Infinity };
+  // drift: false — this block unit-tests the shrinkage formula in isolation (T31 it. 3).
+  const opts: ForecastOptions = { asOf: ASOF, halfLifeDays: Infinity, drift: false };
 
   test('shrinkage formula for a lab with three intervals', () => {
     const f = forecastLab('openai', releases, fit, prior, opts);
@@ -190,7 +197,7 @@ describe('forecastLab — cadence and shrinkage', () => {
   });
 
   test('priorWeight 0 leaves a lab entirely on its own data', () => {
-    const f = forecastLab('openai', releases, fit, prior, { asOf: ASOF, priorWeight: 0 });
+    const f = forecastLab('openai', releases, fit, prior, { asOf: ASOF, priorWeight: 0, drift: false });
     expect(f.mu).toBeCloseTo(Math.log(100), 12);
     expect(f.sigma).toBeCloseTo(0, 12);
   });
@@ -517,11 +524,15 @@ describe('capabilityFan — quadrature width and theta fields', () => {
 });
 
 describe('forecastLab — recency-weighted cadence (T31 it. 2)', () => {
-  test('halfLifeDays: Infinity reproduces the unweighted numbers exactly', () => {
+  test('drift: false + halfLifeDays: Infinity reproduces the it.-2 unweighted numbers exactly', () => {
     const releases = fixture();
     const fit = fitOf(releases);
     const oldPrior = cadencePrior(releases, ASOF, ['flagship'], Infinity);
-    const oldF = forecastLab('openai', releases, fit, oldPrior, { asOf: ASOF, halfLifeDays: Infinity });
+    const oldF = forecastLab('openai', releases, fit, oldPrior, {
+      asOf: ASOF,
+      halfLifeDays: Infinity,
+      drift: false,
+    });
     // reference: the literal unweighted formulas on [100, 100, 100]
     expect(oldF.mu).toBeCloseTo((3 * Math.log(100) + 2 * oldPrior.mu) / 5, 12);
     const pooledLogs = [Math.log(100), Math.log(100), Math.log(100), Math.log(150), Math.log(150)];
@@ -561,7 +572,7 @@ describe('forecastLab — recency-weighted cadence (T31 it. 2)', () => {
     const w2 = Math.pow(0.5, 315 / 730);
     const neff = (w1 + w2) ** 2 / (w1 * w1 + w2 * w2);
     expect(prior.n).toBeCloseTo(neff, 12);
-    const f = forecastLab('openai', rels, fit, prior, { asOf: ASOF });
+    const f = forecastLab('openai', rels, fit, prior, { asOf: ASOF, drift: false });
     const meanW = (w1 * Math.log(100) + w2 * Math.log(50)) / (w1 + w2);
     const mu = (neff * meanW + 2 * prior.mu) / (neff + 2);
     expect(f.mu).toBeCloseTo(mu, 9);
@@ -593,6 +604,24 @@ describe('forecastLab — sigmaScale (T31 it. 2)', () => {
     expect(w2).toBeGreaterThan(w1);
   });
 
+  test('the stretch keeps the conditional median of an elapsed lab exactly (t0 > 0)', () => {
+    const releases = fixture();
+    const fit = fitOf(releases);
+    const prior = cadencePrior(releases, ASOF);
+    const a = forecastLab('openai', releases, fit, prior, { asOf: ASOF });
+    const b = forecastLab('openai', releases, fit, prior, { asOf: ASOF, sigmaScale: 2.5 });
+    expect(a.elapsedDays).toBeGreaterThan(0);
+    expect(b.next[0]!.medianDate).toBe(a.next[0]!.medianDate);
+    expect(b.sigma).toBe(a.sigma);
+    expect(b.sigmaScale).toBe(2.5);
+    // Windows open on both sides of the fixed centre.
+    expect(b.next[0]!.p16Date <= a.next[0]!.p16Date).toBe(true);
+    expect(b.next[0]!.p84Date >= a.next[0]!.p84Date).toBe(true);
+    // P(within 90 d) moves toward 1/2 as the law flattens about its median: never past it from either side.
+    const side = (p: number) => Math.sign(p - 0.5);
+    expect(side(b.p90) === side(a.p90) || b.p90 === 0.5).toBe(true);
+  });
+
   test('p84 − p16 in days grows with the scale', () => {
     const releases = fixture();
     const fit = fitOf(releases);
@@ -602,5 +631,161 @@ describe('forecastLab — sigmaScale (T31 it. 2)', () => {
     const wa = daysBetween(a.next[0]!.p16Date, a.next[0]!.p84Date);
     const wb = daysBetween(b.next[0]!.p16Date, b.next[0]!.p84Date);
     expect(wb).toBeGreaterThan(wa);
+  });
+});
+
+/* ------------------------------------------- T31 iteration 3 additions: cadence drift */
+
+describe('cadencePrior — pooled drift (T31 it. 3)', () => {
+  test('ridge pulls β to exactly 0 when the pool holds a single interval', () => {
+    // One interval in the whole pool: Σw(t−t̄)(y−ȳ) = 0 identically, so the ridge keeps the
+    // slope identified (β = 0) instead of learning the one observed gap.
+    const rels = [
+      release('openai-a', 'openai', '2024-01-01', [score('a', 50), score('b', 40)]),
+      release('openai-b', 'openai', '2024-06-01', [score('a', 55), score('b', 45)]),
+    ];
+    const prior = cadencePrior(rels, ASOF, ['flagship'], Infinity);
+    expect(prior.n).toBe(1);
+    expect(prior.driftPerDay).toBe(0);
+    expect(prior.tBar).toBe(dateToDayNumber('2024-06-01'));
+  });
+
+  test('negative drift for accelerating intervals; positive for decelerating', () => {
+    // openai gaps 200, 160, 120, 80 (accelerating → β < 0); anthropic mirrored 80..200.
+    const acc: ModelRelease[] = [];
+    const dec: ModelRelease[] = [];
+    const gapsAcc = [200, 160, 120, 80];
+    const gapsDec = [80, 120, 160, 200];
+    let d = '2023-01-01';
+    gapsAcc.forEach((g, i) => {
+      acc.push(release(`acc-m${i}`, 'openai', d, [score('a', 50 + 5 * i), score('b', 40 + 5 * i)]));
+      d = addDays(d, g);
+    });
+    acc.push(release('acc-m4', 'openai', d, [score('a', 70), score('b', 60)]));
+    d = '2023-01-01';
+    gapsDec.forEach((g, i) => {
+      dec.push(release(`dec-m${i}`, 'anthropic', d, [score('a', 50 + 5 * i), score('b', 40 + 5 * i)]));
+      d = addDays(d, g);
+    });
+    dec.push(release('dec-m4', 'anthropic', d, [score('a', 70), score('b', 60)]));
+    const decOnly = cadencePrior(dec, ASOF, ['flagship'], Infinity).driftPerDay;
+    const accOnly = cadencePrior(acc, ASOF, ['flagship'], Infinity).driftPerDay;
+    expect(accOnly).toBeLessThan(0);
+    expect(decOnly).toBeGreaterThan(0);
+    // The pooled β of the two opposite trends must land strictly between them.
+    const pooled = cadencePrior([...acc, ...dec], ASOF, ['flagship'], Infinity).driftPerDay;
+    expect(pooled).toBeGreaterThan(accOnly);
+    expect(pooled).toBeLessThan(decOnly);
+  });
+
+  test('recency weights apply to the drift too: old acceleration counts less', () => {
+    // Same accelerating gaps, but shifted a decade back from asOf — the recent weight mass
+    // sits on near-zero weights, so |β| must shrink toward 0 relative to the fresh fixture.
+    const mk = (offsetDays: number): ModelRelease[] => {
+      const gaps = [200, 160, 120, 80];
+      const out: ModelRelease[] = [];
+      let d = addDays(ASOF, -offsetDays);
+      gaps.forEach((g, i) => {
+        out.push(release(`sh-m${i}`, 'openai', d, [score('a', 50 + 5 * i), score('b', 40 + 5 * i)]));
+        d = addDays(d, g);
+      });
+      out.push(release('sh-m4', 'openai', d, [score('a', 70), score('b', 60)]));
+      return out;
+    };
+    const fresh = cadencePrior(mk(560), ASOF, ['flagship'], 730);
+    const stale = cadencePrior(mk(560 + 3650), ASOF, ['flagship'], 730);
+    expect(fresh.driftPerDay).toBeLessThan(0);
+    expect(stale.driftPerDay).toBeGreaterThan(fresh.driftPerDay); // pulled toward 0
+    expect(Math.abs(stale.driftPerDay)).toBeLessThan(Math.abs(fresh.driftPerDay));
+  });
+});
+
+describe('forecastLab — drift shift (T31 it. 3)', () => {
+  /**
+   * Gaps 360, 300, 240, 180, 150 d with the LAST release 30 days before asOf: a clearly
+   * accelerating lab whose every interval is visible to the prior. Returns the releases and
+   * the interval END day numbers (the t̄_lab the unweighted drift uses).
+   */
+  function acceleratingLab(): { releases: ModelRelease[]; endDays: number[] } {
+    const gaps = [360, 300, 240, 180, 150];
+    const dates = [addDays(ASOF, -30)];
+    for (let i = gaps.length - 1; i >= 0; i--) {
+      dates.unshift(addDays(dates[0]!, -gaps[i]!));
+    }
+    const releases = dates.map((date, i) =>
+      release(`dlab-m${i}`, 'openai', date, [score('a', 40 + 5 * i), score('b', 32 + 4 * i)]),
+    );
+    return { releases, endDays: dates.slice(1).map(dateToDayNumber) };
+  }
+
+  const lab = acceleratingLab();
+  const releases = lab.releases;
+  const fit = fitOf(releases);
+  const prior = cadencePrior(releases, ASOF);
+
+  test('drift on gives an earlier median than drift off for an accelerating lab', () => {
+    const off = forecastLab('openai', releases, fit, prior, { asOf: ASOF, drift: false });
+    const on = forecastLab('openai', releases, fit, prior, { asOf: ASOF, drift: true });
+    expect(prior.driftPerDay).toBeLessThan(0);
+    expect(on.next[0]!.medianDate < off.next[0]!.medianDate).toBe(true);
+    // μ is the only thing that moved; σ must be identical.
+    expect(on.sigma).toBe(off.sigma);
+    expect(on.mu).toBeLessThan(off.mu);
+  });
+
+  test('the shift equals the clamped β·(dayNumber(asOf) − t̄_lab) and σ stays untouched', () => {
+    // halfLifeDays: Infinity → every weight is 1, so t̄_lab is the plain mean of the five
+    // interval END day numbers and the expected shift is a hand-checkable formula.
+    const infPrior = cadencePrior(releases, ASOF, ['flagship'], Infinity);
+    const off = forecastLab('openai', releases, fit, infPrior, {
+      asOf: ASOF, halfLifeDays: Infinity, drift: false,
+    });
+    const on = forecastLab('openai', releases, fit, infPrior, {
+      asOf: ASOF, halfLifeDays: Infinity, drift: true,
+    });
+    const expected = clamp(infPrior.driftPerDay * (dateToDayNumber(ASOF) - mean(lab.endDays)), -1, 1);
+    expect(on.mu - off.mu).toBeCloseTo(expected, 9);
+    expect(off.mu).toBeCloseTo(on.mu - expected, 9);
+    expect(on.sigma).toBe(off.sigma);
+  });
+
+  test('the clamp holds the shift at −1.0 for an extreme fixture', () => {
+    // Monstrous negative β: gaps halving over 20 releases, the last ones ending near asOf,
+    // so β·(asOf − t̄) is far below −1 and the clamp must bite.
+    const gaps: number[] = [];
+    let g = 720;
+    for (let i = 0; i < 20; i++) {
+      gaps.push(g);
+      g = Math.max(2, g * 0.5);
+    }
+    const out: ModelRelease[] = [];
+    const dates = [addDays(ASOF, -4000)];
+    gaps.forEach((gg, i) => {
+      out.push(
+        release(`clamp-m${i}`, 'openai', dates[dates.length - 1]!, [score('a', 40 + i), score('b', 32 + i)]),
+      );
+      dates.push(addDays(dates[dates.length - 1]!, gg));
+    });
+    out.push(release('clamp-m20', 'openai', dates[dates.length - 1]!, [score('a', 70), score('b', 60)]));
+    const p = cadencePrior(out, ASOF, ['flagship'], Infinity);
+    const fitClamp = fitOf(out);
+    const off = forecastLab('openai', out, fitClamp, p, { asOf: ASOF, halfLifeDays: Infinity, drift: false });
+    const on = forecastLab('openai', out, fitClamp, p, { asOf: ASOF, halfLifeDays: Infinity, drift: true });
+    const raw = p.driftPerDay * (dateToDayNumber(ASOF) - mean(dates.slice(1).map(dateToDayNumber)));
+    expect(raw).toBeLessThan(-1); // the clamp is genuinely exercised
+    expect(on.mu - off.mu).toBeCloseTo(-1, 9);
+  });
+
+  test('a lab with no intervals falls back to the pooled tBar', () => {
+    // google has a single release: no intervals of its own → the shift uses prior.tBar.
+    const releases2 = fixture();
+    const fit2 = fitOf(releases2);
+    const prior2 = cadencePrior(releases2, ASOF);
+    const off = forecastLab('google', releases2, fit2, prior2, { asOf: ASOF, drift: false });
+    const on = forecastLab('google', releases2, fit2, prior2, { asOf: ASOF, drift: true });
+    expect(on.mu - off.mu).toBeCloseTo(
+      clamp(prior2.driftPerDay * (dateToDayNumber(ASOF) - prior2.tBar), -1, 1),
+      9,
+    );
   });
 });

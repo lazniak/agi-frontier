@@ -337,6 +337,10 @@ export interface BacktestReport {
   sigmaScale: number;
   /** Cadence recency half-life in days the report was produced with (Infinity = unweighted). */
   halfLifeDays: number;
+  /** Whether the pooled cadence drift was applied to the forecasts. */
+  drift: boolean;
+  /** Pooled drift β·365 (log-gaps per year) estimated as of `to`; null with no intervals. */
+  driftPerYear: number | null;
   rows: BacktestRow[];
 }
 

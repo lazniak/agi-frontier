@@ -44,14 +44,31 @@ export interface ForecastOptions {
   halfLifeDays?: number | undefined;
   /** Multiplier on the lab's σ after shrinkage, before any quantile (default 1). */
   sigmaScale?: number | undefined;
+  /**
+   * Apply the pooled cadence drift to the lab's μ (default true; REDESIGN §4, iteration 3).
+   * `false` reproduces the iteration-2 stationary forecast exactly.
+   */
+  drift?: boolean | undefined;
 }
 
-/** Log-normal parameters of inter-release intervals in days. */
+/**
+ * Pooled cadence prior over all labs' log-intervals: the shrinkage target (μ, σ) plus the
+ * pooled drift of the cadence (REDESIGN §4, iteration 3).
+ */
 export interface CadencePrior {
   mu: number;
   sigma: number;
-  /** Total intervals pooled. */
+  /** Kish effective number of intervals pooled. */
   n: number;
+  /**
+   * Pooled recency-weighted ridge slope of log-gap on end-day, in log-days per day:
+   * `β = Σw(t−t̄)(y−ȳ) / (Σw(t−t̄)² + κ)` with `κ = (365·2)²`, `t` = the interval's END day
+   * number, `y = ln(interval)` and `w = 0.5^(age/halfLifeDays)`. Exactly 0 with a single
+   * interval (the ridge keeps the slope identified and shrunk toward 0).
+   */
+  driftPerDay: number;
+  /** Recency-weighted mean END day number of the pooled intervals (the drift's time origin). */
+  tBar: number;
 }
 
 export interface PredictedRelease {
@@ -99,9 +116,11 @@ export interface LabForecast {
   lastRelease: { release_id: string; date: ISODate; index: number } | null;
   /** Inter-release intervals used (days), oldest first. */
   intervalsDays: number[];
-  /** Shrunk log-normal parameters. */
+  /** Shrunk log-normal parameters (σ unstretched; see `sigmaScale`). */
   mu: number;
   sigma: number;
+  /** Conformal stretch of every window about its median (REDESIGN §5); 1 = the raw law. */
+  sigmaScale: number;
   elapsedDays: number;
   /** P(next release within 30 / 90 days | none so far). 0 when the lab has no released flagship yet. */
   p30: number;
@@ -134,6 +153,9 @@ export const DEFAULT_PRIOR_MU = Math.log(120);
 /** Fallback σ of log-intervals when fewer than 2 intervals exist (METHODOLOGY §4). */
 export const DEFAULT_PRIOR_SIGMA = 0.6;
 
+/** Ridge constant of the pooled drift: two years of end-day variance in log-day units. */
+export const DRIFT_KAPPA = (365 * 2) ** 2;
+
 const Q_LEVELS = { p05: 0.05, p16: 0.16, p50: 0.5, p84: 0.84, p95: 0.95 } as const;
 
 function clampOffset(days: number): number {
@@ -165,6 +187,34 @@ export function lognormalConditionalProb(mu: number, sigma: number, t0: number, 
   const f0 = lognormalCdf(mu, sigma, t0);
   if (1 - f0 < OVERDUE_EPS) return 1; // overdue → treat as certain within any horizon
   return clamp((lognormalCdf(mu, sigma, t0 + horizon) - f0) / (1 - f0), 0, 1);
+}
+
+/**
+ * Conformal stretch of the conditional waiting law about its median (REDESIGN §5): with
+ * m = the conditional median, the q-quantile becomes m · (q_raw / m)^s. s > 1 widens every
+ * window in log-time while the median — the circle's centre — stays exactly where the
+ * unstretched law puts it (scaling σ instead would drag the conditional median later).
+ */
+export function stretchedConditionalQuantile(mu: number, sigma: number, t0: number, q: number, s: number): number {
+  const raw = lognormalConditionalQuantile(mu, sigma, t0, q);
+  if (!(s > 0) || s === 1) return raw;
+  const m = lognormalConditionalQuantile(mu, sigma, t0, 0.5);
+  if (!(m > 0) || !(raw > 0)) return raw;
+  return m * Math.pow(raw / m, s);
+}
+
+/**
+ * P(T' <= t0 + horizon | T' > t0) under the stretched law T' = m · (T / m)^s — i.e. the
+ * unstretched probability at the pulled-back time m · (t / m)^(1/s).
+ */
+export function stretchedConditionalProb(mu: number, sigma: number, t0: number, horizon: number, s: number): number {
+  if (!(s > 0) || s === 1) return lognormalConditionalProb(mu, sigma, t0, horizon);
+  if (!(horizon > 0)) return 0;
+  const m = lognormalConditionalQuantile(mu, sigma, t0, 0.5);
+  const t = t0 + horizon;
+  if (!(m > 0) || !(t > 0)) return lognormalConditionalProb(mu, sigma, t0, horizon);
+  const back = m * Math.pow(t / m, 1 / s);
+  return lognormalConditionalProb(mu, sigma, t0, Math.max(0, back - t0));
 }
 
 /** Distinct release dates of a lab, ascending, restricted to tiers. Same-day launches count as one event. */
@@ -237,6 +287,15 @@ function kishN(ws: number[]): number {
  * `halfLifeDays` (default 730) recency-weights every interval across labs, exactly like
  * `forecastLab` does (w = 0.5^(age/HL), age from the interval's later release; the Kish
  * `n_eff` is reported as `n`); `Infinity` reproduces the unweighted prior.
+ *
+ * The drift (REDESIGN §4, iteration 3) is a recency-weighted *ridge* OLS of `y = ln(interval)`
+ * on `t` = the interval's END day number over all pooled intervals:
+ *
+ *   β = Σw(t−t̄)(y−ȳ) / (Σw(t−t̄)² + κ),   κ = (365·2)²  (DRIFT_KAPPA)
+ *
+ * `μ` stays the weighted mean of `y`; β and the weighted mean end-day `tBar` only shift μ in
+ * `forecastLab`. With a single interval the numerator is exactly 0, so the ridge keeps the
+ * slope identified (β = 0) instead of any observed gap.
  */
 export function cadencePrior(
   releases: ModelRelease[],
@@ -252,6 +311,7 @@ export function cadencePrior(
 
   const logs: number[] = [];
   const weights: number[] = [];
+  const endDays: number[] = [];
   for (const lab of labs) {
     const dates = eventDates(releases, lab, asOf, tierSet);
     const intervals = intervalsOf(dates);
@@ -259,16 +319,32 @@ export function cadencePrior(
       logs.push(Math.log(intervals[i]!));
       // age of interval i = days from its end (dates[i + 1]) to asOf
       weights.push(recencyWeight(Math.max(0, daysBetween(dates[i + 1]!, asOf)), halfLifeDays));
+      endDays.push(dateToDayNumber(dates[i + 1]!));
     }
   }
-  if (logs.length === 0) return { mu: DEFAULT_PRIOR_MU, sigma: DEFAULT_PRIOR_SIGMA, n: 0 };
+  if (logs.length === 0) {
+    return { mu: DEFAULT_PRIOR_MU, sigma: DEFAULT_PRIOR_SIGMA, n: 0, driftPerDay: 0, tBar: 0 };
+  }
+  const mu = weightedMean(logs, weights);
+  const tBar = weightedMean(endDays, weights);
+  let swtt = 0;
+  let swty = 0;
+  for (let i = 0; i < logs.length; i++) {
+    const dt = endDays[i]! - tBar;
+    const dy = logs[i]! - mu;
+    swtt += weights[i]! * dt * dt;
+    swty += weights[i]! * dt * dy;
+  }
+  const driftPerDay = swty / (swtt + DRIFT_KAPPA);
   return {
-    mu: weightedMean(logs, weights),
+    mu,
     sigma:
       logs.length < 2
         ? DEFAULT_PRIOR_SIGMA
-        : Math.sqrt(weightedPopulationVariance(logs, weights, weightedMean(logs, weights))),
+        : Math.sqrt(weightedPopulationVariance(logs, weights, mu)),
     n: kishN(weights),
+    driftPerDay,
+    tBar,
   };
 }
 
@@ -363,6 +439,7 @@ export function forecastLab(
       intervalsDays: [],
       mu: prior.mu,
       sigma: prior.sigma,
+      sigmaScale: opts.sigmaScale ?? 1,
       elapsedDays: 0,
       p30: 0,
       p90: 0,
@@ -379,25 +456,39 @@ export function forecastLab(
   //   μ_lab = (n_eff·mean_w + w·μ_prior) / (n_eff + w)
   //   σ²_lab = (n_eff·var_w + w·σ²_prior) / (n_eff + w)
   // halfLifeDays = Infinity gives w = 1 for every interval and reproduces the unweighted
-  // numbers exactly.
+  // numbers exactly. On top of the stationary mean, the pooled cadence drift (iteration 3)
+  // shifts μ to *asOf*: μ_lab(asOf) = μ_lab + β·(dayNumber(asOf) − t̄_lab), where t̄_lab is
+  // the lab's own weighted mean END day number (the pooled prior.tBar when the lab has no
+  // intervals of its own). The shift is clamped to ±1.0 log-days (~×e ±) so a wild pooled β
+  // can never run away; σ is left untouched. drift = false reproduces iteration 2 exactly.
   const halfLifeDays = opts.halfLifeDays ?? 730;
   const sigmaScale = opts.sigmaScale ?? 1;
+  const applyDrift = opts.drift ?? true;
   const dates = eventDates(releases, lab, asOf, tiers);
   const intervalsDays = intervalsOf(dates);
   const logs = intervalsDays.map(Math.log);
   const weights = intervalsDays.map((_, i) =>
     recencyWeight(Math.max(0, daysBetween(dates[i + 1]!, asOf)), halfLifeDays),
   );
+  const endDays = intervalsDays.map((_, i) => dateToDayNumber(dates[i + 1]!));
   const meanLog = logs.length > 0 ? weightedMean(logs, weights) : 0;
   // 0 when fewer than two gaps carry weight
   const varLab = weightedPopulationVariance(logs, weights, meanLog);
   const n = kishN(weights);
   const w = Math.max(0, priorWeight);
   const denom = n + w;
-  const mu = denom > 0 ? (n * meanLog + w * prior.mu) / denom : prior.mu;
+  const muShrunk = denom > 0 ? (n * meanLog + w * prior.mu) / denom : prior.mu;
   const sigmaRaw =
     denom > 0 ? Math.sqrt(Math.max(0, (n * varLab + w * prior.sigma * prior.sigma) / denom)) : prior.sigma;
-  const sigma = sigmaRaw * sigmaScale;
+  const tBarLab =
+    intervalsDays.length > 0 ? weightedMean(endDays, weights) : prior.tBar;
+  const driftShift = applyDrift
+    ? clamp(prior.driftPerDay * (dateToDayNumber(asOf) - tBarLab), -1, 1)
+    : 0;
+  const mu = muShrunk + driftShift;
+  // The conformal scale is NOT applied to σ: it stretches the windows about the conditional
+  // median (stretchedConditionalQuantile), so the circle's centre never moves with it.
+  const sigma = sigmaRaw;
 
   // --- anchor release ------------------------------------------------------------------
   const lastDate = labReleased[labReleased.length - 1]!.date;
@@ -413,8 +504,8 @@ export function forecastLab(
   }
   const elapsedDays = Math.max(0, daysBetween(lastRel.date, asOf));
 
-  const p30 = lognormalConditionalProb(mu, sigma, elapsedDays, 30);
-  const p90 = lognormalConditionalProb(mu, sigma, elapsedDays, 90);
+  const p30 = stretchedConditionalProb(mu, sigma, elapsedDays, 30, sigmaScale);
+  const p90 = stretchedConditionalProb(mu, sigma, elapsedDays, 90, sigmaScale);
 
   // --- capability trend ----------------------------------------------------------------
   const fittedAll: ModelIndex[] = [];
@@ -489,19 +580,19 @@ export function forecastLab(
     chainAnchor = medianDate;
     chainOffset = 0;
   } else {
-    const off = clampOffset(lognormalConditionalQuantile(mu, sigma, elapsedDays, Q_LEVELS.p50));
+    const off = clampOffset(stretchedConditionalQuantile(mu, sigma, elapsedDays, Q_LEVELS.p50, sigmaScale));
     const medianDate = addDays(lastRel.date, off);
     if (withinHorizon(medianDate)) {
       const cap = capabilityAt(medianDate);
-      const p16Date = addDays(lastRel.date, clampOffset(lognormalConditionalQuantile(mu, sigma, elapsedDays, Q_LEVELS.p16)));
-      const p84Date = addDays(lastRel.date, clampOffset(lognormalConditionalQuantile(mu, sigma, elapsedDays, Q_LEVELS.p84)));
+      const p16Date = addDays(lastRel.date, clampOffset(stretchedConditionalQuantile(mu, sigma, elapsedDays, Q_LEVELS.p16, sigmaScale)));
+      const p84Date = addDays(lastRel.date, clampOffset(stretchedConditionalQuantile(mu, sigma, elapsedDays, Q_LEVELS.p84, sigmaScale)));
       next.push({
         k: 1,
         medianDate,
-        p05Date: addDays(lastRel.date, clampOffset(lognormalConditionalQuantile(mu, sigma, elapsedDays, Q_LEVELS.p05))),
+        p05Date: addDays(lastRel.date, clampOffset(stretchedConditionalQuantile(mu, sigma, elapsedDays, Q_LEVELS.p05, sigmaScale))),
         p16Date,
         p84Date,
-        p95Date: addDays(lastRel.date, clampOffset(lognormalConditionalQuantile(mu, sigma, elapsedDays, Q_LEVELS.p95))),
+        p95Date: addDays(lastRel.date, clampOffset(stretchedConditionalQuantile(mu, sigma, elapsedDays, Q_LEVELS.p95, sigmaScale))),
         ...cap,
         certainty: certaintyFor(p16Date, p84Date),
         source: 'statistical',
@@ -520,7 +611,8 @@ export function forecastLab(
     chainOffset = clampOffset(chainOffset + medianStep);
     const medianDate = addDays(chainAnchor, chainOffset);
     if (!withinHorizon(medianDate)) break;
-    const sigmaK = sigma * Math.sqrt(k);
+    // For an unconditional log-normal the stretch about the median is exactly a σ scale.
+    const sigmaK = sigma * sigmaScale * Math.sqrt(k);
     const at = (q: number) => addDays(chainAnchor, clampOffset(chainOffset * Math.exp(sigmaK * normalInverseCdf(q))));
     const p16Date = at(Q_LEVELS.p16);
     const p84Date = at(Q_LEVELS.p84);
@@ -545,6 +637,7 @@ export function forecastLab(
     intervalsDays,
     mu,
     sigma,
+    sigmaScale,
     elapsedDays,
     p30,
     p90,
