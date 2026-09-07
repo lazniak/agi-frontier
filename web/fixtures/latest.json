@@ -1,0 +1,5222 @@
+{
+ "generated_at": "2026-09-06T22:00:00Z",
+ "version": 1,
+ "labs": [
+  {
+   "id": "openai",
+   "name": "OpenAI",
+   "short": "OpenAI",
+   "color": "#10A37F",
+   "color_note": "Historic ChatGPT/OpenAI brand green (#10A37F). The current wordmark is black; green is kept so the line stays legible next to xAI.",
+   "website": "https://openai.com",
+   "sources": [
+    {
+     "label": "News RSS",
+     "url": "https://openai.com/news/rss.xml",
+     "kind": "rss"
+    },
+    {
+     "label": "News",
+     "url": "https://openai.com/news/",
+     "kind": "html"
+    }
+   ],
+   "flagship_hints": [
+    "^GPT-\\d",
+    "^o\\d",
+    "GPT-\\d+(\\.\\d+)?(?!.*(mini|nano))"
+   ]
+  },
+  {
+   "id": "anthropic",
+   "name": "Anthropic",
+   "short": "Anthropic",
+   "color": "#D97757",
+   "color_note": "Anthropic/Claude terracotta (#D97757), official brand colour.",
+   "website": "https://www.anthropic.com",
+   "sources": [
+    {
+     "label": "News",
+     "url": "https://www.anthropic.com/news",
+     "kind": "html"
+    },
+    {
+     "label": "Model overview (docs)",
+     "url": "https://docs.anthropic.com/en/docs/about-claude/models/overview",
+     "kind": "html"
+    }
+   ],
+   "flagship_hints": [
+    "Claude (Opus|Fable|Mythos)",
+    "Claude \\d(\\.\\d)? Opus"
+   ]
+  },
+  {
+   "id": "google",
+   "name": "Google DeepMind",
+   "short": "Google",
+   "color": "#9168C0",
+   "color_note": "Gemini brand-gradient purple (#9168C0). The four-colour Google palette cannot represent a single line.",
+   "website": "https://deepmind.google",
+   "sources": [
+    {
+     "label": "Google Keyword blog — Gemini RSS",
+     "url": "https://blog.google/products-and-platforms/products/gemini/rss/",
+     "kind": "rss"
+    },
+    {
+     "label": "DeepMind blog",
+     "url": "https://deepmind.google/blog/",
+     "kind": "html"
+    },
+    {
+     "label": "Gemini models docs",
+     "url": "https://ai.google.dev/gemini-api/docs/models",
+     "kind": "html"
+    }
+   ],
+   "flagship_hints": [
+    "Gemini \\d(\\.\\d)? (Pro|Ultra)",
+    "Gemini \\d(\\.\\d)? Deep Think"
+   ]
+  },
+  {
+   "id": "xai",
+   "name": "xAI",
+   "short": "xAI",
+   "color": "#111111",
+   "color_note": "xAI/Grok brand is monochrome black; used as-is.",
+   "website": "https://x.ai",
+   "sources": [
+    {
+     "label": "News",
+     "url": "https://x.ai/news",
+     "kind": "html"
+    },
+    {
+     "label": "API models docs",
+     "url": "https://docs.x.ai/docs/models",
+     "kind": "html"
+    }
+   ],
+   "flagship_hints": [
+    "Grok \\d(\\.\\d)?(?!.*(mini|fast))"
+   ]
+  },
+  {
+   "id": "meta",
+   "name": "Meta",
+   "short": "Meta",
+   "color": "#0866FF",
+   "color_note": "Meta brand blue (#0866FF), official.",
+   "website": "https://ai.meta.com",
+   "sources": [
+    {
+     "label": "Meta AI blog RSS",
+     "url": "https://ai.meta.com/blog/rss/",
+     "kind": "rss"
+    },
+    {
+     "label": "Meta AI blog",
+     "url": "https://ai.meta.com/blog/",
+     "kind": "html"
+    },
+    {
+     "label": "Hugging Face org",
+     "url": "https://huggingface.co/api/models?author=meta-llama&sort=lastModified&limit=20",
+     "kind": "hf-org"
+    }
+   ],
+   "flagship_hints": [
+    "Llama \\d",
+    "Muse Spark",
+    "Meta Superintelligence"
+   ]
+  },
+  {
+   "id": "deepseek",
+   "name": "DeepSeek",
+   "short": "DeepSeek",
+   "color": "#4D6BFE",
+   "color_note": "DeepSeek whale-logo blue (#4D6BFE), official.",
+   "website": "https://www.deepseek.com",
+   "sources": [
+    {
+     "label": "API news",
+     "url": "https://api-docs.deepseek.com/news/",
+     "kind": "html"
+    },
+    {
+     "label": "Hugging Face org",
+     "url": "https://huggingface.co/api/models?author=deepseek-ai&sort=lastModified&limit=20",
+     "kind": "hf-org"
+    }
+   ],
+   "flagship_hints": [
+    "DeepSeek-V\\d",
+    "DeepSeek-R\\d"
+   ]
+  },
+  {
+   "id": "alibaba",
+   "name": "Alibaba (Qwen)",
+   "short": "Qwen",
+   "color": "#FF6A00",
+   "color_note": "Alibaba Cloud orange (#FF6A00), official corporate colour; Qwen purple would collide with Gemini.",
+   "website": "https://qwen.ai",
+   "sources": [
+    {
+     "label": "Qwen blog",
+     "url": "https://qwenlm.github.io/blog/",
+     "kind": "html"
+    },
+    {
+     "label": "Alibaba Cloud press room",
+     "url": "https://www.alibabacloud.com/en/press-room",
+     "kind": "html"
+    },
+    {
+     "label": "Hugging Face org",
+     "url": "https://huggingface.co/api/models?author=Qwen&sort=lastModified&limit=20",
+     "kind": "hf-org"
+    }
+   ],
+   "flagship_hints": [
+    "Qwen\\d(\\.\\d)?-?(Max|Plus)?",
+    "Qwen \\d(\\.\\d)? Max"
+   ]
+  },
+  {
+   "id": "moonshot",
+   "name": "Moonshot AI (Kimi)",
+   "short": "Kimi",
+   "color": "#06B6D4",
+   "color_note": "Approximate: Moonshot/Kimi brand is monochrome; cyan chosen for separation from the blues and greens.",
+   "website": "https://www.moonshot.ai",
+   "sources": [
+    {
+     "label": "Moonshot site",
+     "url": "https://www.moonshot.ai/",
+     "kind": "html"
+    },
+    {
+     "label": "Hugging Face org",
+     "url": "https://huggingface.co/api/models?author=moonshotai&sort=lastModified&limit=20",
+     "kind": "hf-org"
+    }
+   ],
+   "flagship_hints": [
+    "Kimi K\\d(\\.\\d)?"
+   ]
+  },
+  {
+   "id": "zhipu",
+   "name": "Zhipu AI (Z.ai)",
+   "short": "GLM",
+   "color": "#DB2777",
+   "color_note": "Approximate: Z.ai brand is monochrome; magenta chosen for separation.",
+   "website": "https://z.ai",
+   "sources": [
+    {
+     "label": "Z.ai blog",
+     "url": "https://z.ai/blog",
+     "kind": "html"
+    },
+    {
+     "label": "Release notes",
+     "url": "https://docs.z.ai/release-notes",
+     "kind": "html"
+    },
+    {
+     "label": "Hugging Face org",
+     "url": "https://huggingface.co/api/models?author=zai-org&sort=lastModified&limit=20",
+     "kind": "hf-org"
+    }
+   ],
+   "flagship_hints": [
+    "GLM-\\d(\\.\\d)?(?!.*(Air|Flash))"
+   ]
+  },
+  {
+   "id": "mistral",
+   "name": "Mistral AI",
+   "short": "Mistral",
+   "color": "#E10500",
+   "color_note": "Red end of the Mistral yellow–orange–red gradient (#E10500); yellow and orange are reserved for predictions and Qwen.",
+   "website": "https://mistral.ai",
+   "sources": [
+    {
+     "label": "News",
+     "url": "https://mistral.ai/news",
+     "kind": "html"
+    },
+    {
+     "label": "Hugging Face org",
+     "url": "https://huggingface.co/api/models?author=mistralai&sort=lastModified&limit=20",
+     "kind": "hf-org"
+    }
+   ],
+   "flagship_hints": [
+    "Mistral Large \\d",
+    "Mistral Medium \\d",
+    "Magistral"
+   ]
+  }
+ ],
+ "benchmarks": [
+  {
+   "id": "gpqa-diamond",
+   "name": "GPQA Diamond",
+   "short": "GPQA",
+   "description": "198 graduate-level, Google-proof science questions (biology, physics, chemistry) written and validated by PhD experts.",
+   "url": "https://arxiv.org/abs/2311.12022",
+   "unit": "%",
+   "min": 0,
+   "max": 100,
+   "higher_is_better": true,
+   "in_index": true,
+   "legacy": false,
+   "preferred_config": "no tools, pass@1 (or lab-reported default)",
+   "human_baseline": 69.7,
+   "human_baseline_note": "PhD-level domain experts scored 69.7% (Rein et al. 2023, Diamond subset).",
+   "introduced": 2023
+  },
+  {
+   "id": "swe-bench-verified",
+   "name": "SWE-bench Verified",
+   "short": "SWE-bench",
+   "description": "500 human-validated real GitHub issues; the model must produce a patch that passes the repository tests.",
+   "url": "https://openai.com/index/introducing-swe-bench-verified/",
+   "unit": "%",
+   "min": 0,
+   "max": 100,
+   "higher_is_better": true,
+   "in_index": true,
+   "legacy": false,
+   "preferred_config": "lab-reported default scaffold, pass@1 (no parallel test-time compute)",
+   "human_baseline": null,
+   "human_baseline_note": null,
+   "introduced": 2024
+  },
+  {
+   "id": "aime",
+   "name": "AIME (American Invitational Mathematics Examination)",
+   "short": "AIME",
+   "description": "30 competition math problems per year with integer answers; labs report the most recent edition (2024 or 2025). Edition recorded in config.",
+   "url": "https://matharena.ai",
+   "unit": "%",
+   "min": 0,
+   "max": 100,
+   "higher_is_better": true,
+   "in_index": true,
+   "legacy": false,
+   "preferred_config": "AIME 2025 without tools; fall back to AIME 2024 for models from 2024",
+   "human_baseline": null,
+   "human_baseline_note": "Top ~5% of US high-school contestants qualify; a median qualifier scores roughly 5/15 per exam.",
+   "introduced": 2024
+  },
+  {
+   "id": "mmlu-pro",
+   "name": "MMLU-Pro",
+   "short": "MMLU-Pro",
+   "description": "12k harder multiple-choice questions (10 options) across 14 domains; reasoning-heavy successor to MMLU.",
+   "url": "https://arxiv.org/abs/2406.01574",
+   "unit": "%",
+   "min": 0,
+   "max": 100,
+   "higher_is_better": true,
+   "in_index": true,
+   "legacy": false,
+   "preferred_config": "lab-reported default (usually CoT, 5-shot or 0-shot)",
+   "human_baseline": null,
+   "human_baseline_note": null,
+   "introduced": 2024
+  },
+  {
+   "id": "hle",
+   "name": "Humanity's Last Exam",
+   "short": "HLE",
+   "description": "2,500 expert-written questions across 100+ subjects designed to sit at the frontier of human knowledge.",
+   "url": "https://lastexam.ai",
+   "unit": "%",
+   "min": 0,
+   "max": 100,
+   "higher_is_better": true,
+   "in_index": true,
+   "legacy": false,
+   "preferred_config": "no tools, full set (text + multimodal); record 'text-only' or 'with tools' in config when that is all a lab reports",
+   "human_baseline": null,
+   "human_baseline_note": "Each question is solvable by its expert author; no aggregate human score exists.",
+   "introduced": 2025
+  },
+  {
+   "id": "arc-agi-2",
+   "name": "ARC-AGI-2",
+   "short": "ARC-AGI-2",
+   "description": "Novel visual abstraction puzzles that humans solve easily and that resist memorisation; measures fluid intelligence.",
+   "url": "https://arcprize.org/arc-agi/2/",
+   "unit": "%",
+   "min": 0,
+   "max": 100,
+   "higher_is_better": true,
+   "in_index": true,
+   "legacy": false,
+   "preferred_config": "semi-private evaluation set (ARC Prize verified); public eval if that is all a lab reports",
+   "human_baseline": 100,
+   "human_baseline_note": "Every task was solved by at least two humans in controlled testing; the average test-taker panel scored about 60%.",
+   "introduced": 2025
+  },
+  {
+   "id": "terminal-bench-2",
+   "name": "Terminal-Bench 2.0",
+   "short": "Terminal-Bench",
+   "description": "89 hard, verified real-world terminal tasks (compilation, ops, data wrangling) solved end-to-end by an agent in a sandbox.",
+   "url": "https://www.tbench.ai",
+   "unit": "%",
+   "min": 0,
+   "max": 100,
+   "higher_is_better": true,
+   "in_index": true,
+   "legacy": false,
+   "preferred_config": "Terminus-2 harness or lab default; version 2.0 only (1.0 is a different benchmark)",
+   "human_baseline": null,
+   "human_baseline_note": null,
+   "introduced": 2025
+  },
+  {
+   "id": "tau2-bench",
+   "name": "τ²-bench",
+   "short": "τ²-bench",
+   "description": "Agentic customer-service simulations (retail, airline, telecom) where the model must follow policy while using tools and talking to a simulated user.",
+   "url": "https://github.com/sierra-research/tau2-bench",
+   "unit": "%",
+   "min": 0,
+   "max": 100,
+   "higher_is_better": true,
+   "in_index": true,
+   "legacy": false,
+   "preferred_config": "pass^1 average across domains; if only per-domain numbers exist, record the unweighted mean and list domains in note",
+   "human_baseline": null,
+   "human_baseline_note": null,
+   "introduced": 2025
+  },
+  {
+   "id": "mmmu",
+   "name": "MMMU",
+   "short": "MMMU",
+   "description": "11.5k college-level multimodal questions spanning 30 subjects; requires reading diagrams, charts and images.",
+   "url": "https://mmmu-benchmark.github.io",
+   "unit": "%",
+   "min": 0,
+   "max": 100,
+   "higher_is_better": true,
+   "in_index": true,
+   "legacy": false,
+   "preferred_config": "validation split, original MMMU (record 'MMMU-Pro' in config when that is what a lab reports)",
+   "human_baseline": 88.6,
+   "human_baseline_note": "Human experts scored 88.6% on the validation set (Yue et al. 2023).",
+   "introduced": 2023
+  },
+  {
+   "id": "livecodebench",
+   "name": "LiveCodeBench",
+   "short": "LiveCodeBench",
+   "description": "Continuously refreshed competitive-programming problems collected after model training cut-offs to resist contamination.",
+   "url": "https://livecodebench.github.io",
+   "unit": "%",
+   "min": 0,
+   "max": 100,
+   "higher_is_better": true,
+   "in_index": true,
+   "legacy": false,
+   "preferred_config": "pass@1; record the problem window/version (e.g. v6) in config",
+   "human_baseline": null,
+   "human_baseline_note": null,
+   "introduced": 2024
+  },
+  {
+   "id": "mmlu",
+   "name": "MMLU",
+   "short": "MMLU",
+   "description": "57-subject multiple-choice knowledge test; saturated since 2024 but anchors the 2023–2024 generation.",
+   "url": "https://arxiv.org/abs/2009.03300",
+   "unit": "%",
+   "min": 0,
+   "max": 100,
+   "higher_is_better": true,
+   "in_index": true,
+   "legacy": true,
+   "preferred_config": "5-shot (or lab default)",
+   "human_baseline": 89.8,
+   "human_baseline_note": "Estimated expert-level accuracy 89.8% (Hendrycks et al. 2021).",
+   "introduced": 2020
+  },
+  {
+   "id": "humaneval",
+   "name": "HumanEval",
+   "short": "HumanEval",
+   "description": "164 hand-written Python programming problems checked by unit tests; saturated, kept as a legacy anchor.",
+   "url": "https://arxiv.org/abs/2107.03374",
+   "unit": "%",
+   "min": 0,
+   "max": 100,
+   "higher_is_better": true,
+   "in_index": true,
+   "legacy": true,
+   "preferred_config": "pass@1, 0-shot",
+   "human_baseline": null,
+   "human_baseline_note": null,
+   "introduced": 2021
+  },
+  {
+   "id": "math",
+   "name": "MATH (Hendrycks)",
+   "short": "MATH",
+   "description": "12.5k competition mathematics problems; saturated by 2025, kept as a legacy anchor (MATH-500 accepted, noted in config).",
+   "url": "https://arxiv.org/abs/2103.03874",
+   "unit": "%",
+   "min": 0,
+   "max": 100,
+   "higher_is_better": true,
+   "in_index": true,
+   "legacy": true,
+   "preferred_config": "full test set or MATH-500 (record which)",
+   "human_baseline": null,
+   "human_baseline_note": "A three-time IMO gold medalist scored 90% on a sample (Hendrycks et al. 2021).",
+   "introduced": 2021
+  },
+  {
+   "id": "swe-bench-pro",
+   "name": "SWE-bench Pro",
+   "short": "SWE-bench Pro",
+   "description": "Harder, contamination-resistant successor to SWE-bench Verified (Scale AI). Recorded, not yet in the index (too few labs report it).",
+   "url": "https://scale.com/leaderboard/swe_bench_pro_public",
+   "unit": "%",
+   "min": 0,
+   "max": 100,
+   "higher_is_better": true,
+   "in_index": false,
+   "legacy": false,
+   "preferred_config": "public set",
+   "human_baseline": null,
+   "human_baseline_note": null,
+   "introduced": 2025
+  },
+  {
+   "id": "browsecomp",
+   "name": "BrowseComp",
+   "short": "BrowseComp",
+   "description": "1,266 hard-to-find facts that require persistent multi-step web browsing to locate. Recorded, not in the index.",
+   "url": "https://openai.com/index/browsecomp/",
+   "unit": "%",
+   "min": 0,
+   "max": 100,
+   "higher_is_better": true,
+   "in_index": false,
+   "legacy": false,
+   "preferred_config": "with browsing tools",
+   "human_baseline": null,
+   "human_baseline_note": "Human trainers solved 29.2% of problems within a 2-hour limit.",
+   "introduced": 2025
+  },
+  {
+   "id": "osworld",
+   "name": "OSWorld / OSWorld-Verified",
+   "short": "OSWorld",
+   "description": "369 real computer-use tasks across operating systems and applications executed by an agent. Recorded, not in the index.",
+   "url": "https://os-world.github.io",
+   "unit": "%",
+   "min": 0,
+   "max": 100,
+   "higher_is_better": true,
+   "in_index": false,
+   "legacy": false,
+   "preferred_config": "OSWorld-Verified, record step budget in config",
+   "human_baseline": 72.36,
+   "human_baseline_note": "Human success rate 72.36% (Xie et al. 2024).",
+   "introduced": 2024
+  },
+  {
+   "id": "frontiermath",
+   "name": "FrontierMath",
+   "short": "FrontierMath",
+   "description": "Unpublished research-level mathematics problems evaluated by Epoch AI. Usually reported by the maintainer, not labs. Recorded, not in the index.",
+   "url": "https://epoch.ai/frontiermath",
+   "unit": "%",
+   "min": 0,
+   "max": 100,
+   "higher_is_better": true,
+   "in_index": false,
+   "legacy": false,
+   "preferred_config": "Tiers 1–3 (record tier in config)",
+   "human_baseline": null,
+   "human_baseline_note": null,
+   "introduced": 2024
+  }
+ ],
+ "releases": [
+  {
+   "id": "openai-gpt-4",
+   "lab": "openai",
+   "name": "GPT-4",
+   "family": "GPT",
+   "date": "2023-03-14",
+   "date_precision": "day",
+   "status": "released",
+   "announcement": {
+    "url": "https://openai.com/synthetic/gpt-4",
+    "title": "GPT-4 — synthetic launch note",
+    "quote": "GPT-4 is available today. (SYNTHETIC FIXTURE — not real data; this quote is fabricated.)",
+    "retrieved_at": "2026-09-06T22:00:00Z",
+    "verified": true,
+    "verified_at": "2026-09-06T22:00:00Z"
+   },
+   "scores": [
+    {
+     "benchmark": "mmlu",
+     "value": 88.6,
+     "config": "5-shot",
+     "reported_by": "official",
+     "source": {
+      "url": "https://openai.com/synthetic/gpt-4-mmlu",
+      "title": "GPT-4 MMLU — synthetic launch note",
+      "quote": "GPT-4 scores 88.6% on MMLU (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "humaneval",
+     "value": 82,
+     "config": "pass@1, 0-shot",
+     "reported_by": "official",
+     "source": {
+      "url": "https://openai.com/synthetic/gpt-4-humaneval",
+      "title": "GPT-4 HumanEval — synthetic launch note",
+      "quote": "GPT-4 scores 82% on HumanEval (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "math",
+     "value": 58.9,
+     "config": "MATH-500",
+     "reported_by": "official",
+     "source": {
+      "url": "https://openai.com/synthetic/gpt-4-math",
+      "title": "GPT-4 MATH — synthetic launch note",
+      "quote": "GPT-4 scores 58.9% on MATH (Hendrycks) (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    }
+   ],
+   "notes": "SYNTHETIC FIXTURE — not real data"
+  },
+  {
+   "id": "anthropic-claude-2",
+   "lab": "anthropic",
+   "name": "Claude 2",
+   "family": "Claude",
+   "date": "2023-07-11",
+   "date_precision": "day",
+   "status": "released",
+   "announcement": {
+    "url": "https://www.anthropic.com/synthetic/claude-2",
+    "title": "Claude 2 — synthetic launch note",
+    "quote": "Claude 2 is available today. (SYNTHETIC FIXTURE — not real data; this quote is fabricated.)",
+    "retrieved_at": "2026-09-06T22:00:00Z",
+    "verified": true,
+    "verified_at": "2026-09-06T22:00:00Z"
+   },
+   "scores": [
+    {
+     "benchmark": "gpqa-diamond",
+     "value": 67.7,
+     "config": "no tools, pass@1",
+     "reported_by": "official",
+     "source": {
+      "url": "https://www.anthropic.com/synthetic/claude-2-gpqa",
+      "title": "Claude 2 GPQA — synthetic launch note",
+      "quote": "Claude 2 scores 67.7% on GPQA Diamond (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "mmlu",
+     "value": 91.4,
+     "config": "5-shot",
+     "reported_by": "official",
+     "source": {
+      "url": "https://www.anthropic.com/synthetic/claude-2-mmlu",
+      "title": "Claude 2 MMLU — synthetic launch note",
+      "quote": "Claude 2 scores 91.4% on MMLU (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "humaneval",
+     "value": 76.9,
+     "config": "pass@1, 0-shot",
+     "reported_by": "official",
+     "source": {
+      "url": "https://www.anthropic.com/synthetic/claude-2-humaneval",
+      "title": "Claude 2 HumanEval — synthetic launch note",
+      "quote": "Claude 2 scores 76.9% on HumanEval (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "math",
+     "value": 54.5,
+     "config": "MATH-500",
+     "reported_by": "official",
+     "source": {
+      "url": "https://www.anthropic.com/synthetic/claude-2-math",
+      "title": "Claude 2 MATH — synthetic launch note",
+      "quote": "Claude 2 scores 54.5% on MATH (Hendrycks) (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    }
+   ],
+   "notes": "SYNTHETIC FIXTURE — not real data"
+  },
+  {
+   "id": "meta-llama-2-70b",
+   "lab": "meta",
+   "name": "Llama 2 70B",
+   "family": "Llama",
+   "date": "2023-07-18",
+   "date_precision": "day",
+   "status": "released",
+   "announcement": {
+    "url": "https://ai.meta.com/synthetic/llama-2-70b",
+    "title": "Llama 2 70B — synthetic launch note",
+    "quote": "Llama 2 70B is available today. (SYNTHETIC FIXTURE — not real data; this quote is fabricated.)",
+    "retrieved_at": "2026-09-06T22:00:00Z",
+    "verified": true,
+    "verified_at": "2026-09-06T22:00:00Z"
+   },
+   "scores": [
+    {
+     "benchmark": "mmlu",
+     "value": 88.2,
+     "config": "5-shot",
+     "reported_by": "official",
+     "source": {
+      "url": "https://ai.meta.com/synthetic/llama-2-70b-mmlu",
+      "title": "Llama 2 70B MMLU — synthetic launch note",
+      "quote": "Llama 2 70B scores 88.2% on MMLU (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "humaneval",
+     "value": 80.1,
+     "config": "pass@1, 0-shot",
+     "reported_by": "official",
+     "source": {
+      "url": "https://ai.meta.com/synthetic/llama-2-70b-humaneval",
+      "title": "Llama 2 70B HumanEval — synthetic launch note",
+      "quote": "Llama 2 70B scores 80.1% on HumanEval (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "math",
+     "value": 49.7,
+     "config": "MATH-500",
+     "reported_by": "official",
+     "source": {
+      "url": "https://ai.meta.com/synthetic/llama-2-70b-math",
+      "title": "Llama 2 70B MATH — synthetic launch note",
+      "quote": "Llama 2 70B scores 49.7% on MATH (Hendrycks) (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    }
+   ],
+   "notes": "SYNTHETIC FIXTURE — not real data"
+  },
+  {
+   "id": "xai-grok-1",
+   "lab": "xai",
+   "name": "Grok-1",
+   "family": "Grok",
+   "date": "2023-11-04",
+   "date_precision": "day",
+   "status": "released",
+   "announcement": {
+    "url": "https://x.ai/synthetic/grok-1",
+    "title": "Grok-1 — synthetic launch note",
+    "quote": "Grok-1 is available today. (SYNTHETIC FIXTURE — not real data; this quote is fabricated.)",
+    "retrieved_at": "2026-09-06T22:00:00Z",
+    "verified": true,
+    "verified_at": "2026-09-06T22:00:00Z"
+   },
+   "scores": [
+    {
+     "benchmark": "mmlu",
+     "value": 88.4,
+     "config": "5-shot",
+     "reported_by": "official",
+     "source": {
+      "url": "https://x.ai/synthetic/grok-1-mmlu",
+      "title": "Grok-1 MMLU — synthetic launch note",
+      "quote": "Grok-1 scores 88.4% on MMLU (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "humaneval",
+     "value": 86.8,
+     "config": "pass@1, 0-shot",
+     "reported_by": "official",
+     "source": {
+      "url": "https://x.ai/synthetic/grok-1-humaneval",
+      "title": "Grok-1 HumanEval — synthetic launch note",
+      "quote": "Grok-1 scores 86.8% on HumanEval (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "math",
+     "value": 58.9,
+     "config": "MATH-500",
+     "reported_by": "official",
+     "source": {
+      "url": "https://x.ai/synthetic/grok-1-math",
+      "title": "Grok-1 MATH — synthetic launch note",
+      "quote": "Grok-1 scores 58.9% on MATH (Hendrycks) (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    }
+   ],
+   "notes": "SYNTHETIC FIXTURE — not real data"
+  },
+  {
+   "id": "openai-gpt-4-turbo",
+   "lab": "openai",
+   "name": "GPT-4 Turbo",
+   "family": "GPT",
+   "date": "2023-11-06",
+   "date_precision": "day",
+   "status": "released",
+   "announcement": {
+    "url": "https://openai.com/synthetic/gpt-4-turbo",
+    "title": "GPT-4 Turbo — synthetic launch note",
+    "quote": "GPT-4 Turbo is available today. (SYNTHETIC FIXTURE — not real data; this quote is fabricated.)",
+    "retrieved_at": "2026-09-06T22:00:00Z",
+    "verified": true,
+    "verified_at": "2026-09-06T22:00:00Z"
+   },
+   "scores": [
+    {
+     "benchmark": "gpqa-diamond",
+     "value": 80.4,
+     "config": "no tools, pass@1",
+     "reported_by": "official",
+     "source": {
+      "url": "https://openai.com/synthetic/gpt-4-turbo-gpqa",
+      "title": "GPT-4 Turbo GPQA — synthetic launch note",
+      "quote": "GPT-4 Turbo scores 80.4% on GPQA Diamond (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "mmlu",
+     "value": 91.7,
+     "config": "5-shot",
+     "reported_by": "official",
+     "source": {
+      "url": "https://openai.com/synthetic/gpt-4-turbo-mmlu",
+      "title": "GPT-4 Turbo MMLU — synthetic launch note",
+      "quote": "GPT-4 Turbo scores 91.7% on MMLU (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "humaneval",
+     "value": 90.2,
+     "config": "pass@1, 0-shot",
+     "reported_by": "official",
+     "source": {
+      "url": "https://openai.com/synthetic/gpt-4-turbo-humaneval",
+      "title": "GPT-4 Turbo HumanEval — synthetic launch note",
+      "quote": "GPT-4 Turbo scores 90.2% on HumanEval (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z"
+     }
+    }
+   ],
+   "notes": "SYNTHETIC FIXTURE — not real data"
+  },
+  {
+   "id": "google-gemini-1.0-ultra",
+   "lab": "google",
+   "name": "Gemini 1.0 Ultra",
+   "family": "Gemini Ultra",
+   "date": "2023-12-06",
+   "date_precision": "day",
+   "status": "released",
+   "announcement": {
+    "url": "https://deepmind.google/synthetic/gemini-1-0-ultra",
+    "title": "Gemini 1.0 Ultra — synthetic launch note",
+    "quote": "Gemini 1.0 Ultra is available today. (SYNTHETIC FIXTURE — not real data; this quote is fabricated.)",
+    "retrieved_at": "2026-09-06T22:00:00Z",
+    "verified": true,
+    "verified_at": "2026-09-06T22:00:00Z"
+   },
+   "scores": [
+    {
+     "benchmark": "gpqa-diamond",
+     "value": 74,
+     "config": "no tools, pass@1",
+     "reported_by": "official",
+     "source": {
+      "url": "https://deepmind.google/synthetic/gemini-1-0-ultra-gpqa",
+      "title": "Gemini 1.0 Ultra GPQA — synthetic launch note",
+      "quote": "Gemini 1.0 Ultra scores 74% on GPQA Diamond (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "mmlu",
+     "value": 94.4,
+     "config": "5-shot",
+     "reported_by": "official",
+     "source": {
+      "url": "https://deepmind.google/synthetic/gemini-1-0-ultra-mmlu",
+      "title": "Gemini 1.0 Ultra MMLU — synthetic launch note",
+      "quote": "Gemini 1.0 Ultra scores 94.4% on MMLU (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "humaneval",
+     "value": 83,
+     "config": "pass@1, 0-shot",
+     "reported_by": "official",
+     "source": {
+      "url": "https://deepmind.google/synthetic/gemini-1-0-ultra-humaneval",
+      "title": "Gemini 1.0 Ultra HumanEval — synthetic launch note",
+      "quote": "Gemini 1.0 Ultra scores 83% on HumanEval (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "math",
+     "value": 63.9,
+     "config": "MATH-500",
+     "reported_by": "official",
+     "source": {
+      "url": "https://deepmind.google/synthetic/gemini-1-0-ultra-math",
+      "title": "Gemini 1.0 Ultra MATH — synthetic launch note",
+      "quote": "Gemini 1.0 Ultra scores 63.9% on MATH (Hendrycks) (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    }
+   ],
+   "notes": "SYNTHETIC FIXTURE — not real data"
+  },
+  {
+   "id": "zhipu-glm-4",
+   "lab": "zhipu",
+   "name": "GLM-4",
+   "family": "GLM",
+   "date": "2024-01-16",
+   "date_precision": "day",
+   "status": "released",
+   "announcement": {
+    "url": "https://z.ai/synthetic/glm-4",
+    "title": "GLM-4 — synthetic launch note",
+    "quote": "GLM-4 is available today. (SYNTHETIC FIXTURE — not real data; this quote is fabricated.)",
+    "retrieved_at": "2026-09-06T22:00:00Z",
+    "verified": true,
+    "verified_at": "2026-09-06T22:00:00Z"
+   },
+   "scores": [
+    {
+     "benchmark": "gpqa-diamond",
+     "value": 66.1,
+     "config": "no tools, pass@1",
+     "reported_by": "official",
+     "source": {
+      "url": "https://z.ai/synthetic/glm-4-gpqa",
+      "title": "GLM-4 GPQA — synthetic launch note",
+      "quote": "GLM-4 scores 66.1% on GPQA Diamond (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "mmlu",
+     "value": 92.3,
+     "config": "5-shot",
+     "reported_by": "official",
+     "source": {
+      "url": "https://z.ai/synthetic/glm-4-mmlu",
+      "title": "GLM-4 MMLU — synthetic launch note",
+      "quote": "GLM-4 scores 92.3% on MMLU (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "humaneval",
+     "value": 82.4,
+     "config": "pass@1, 0-shot",
+     "reported_by": "official",
+     "source": {
+      "url": "https://z.ai/synthetic/glm-4-humaneval",
+      "title": "GLM-4 HumanEval — synthetic launch note",
+      "quote": "GLM-4 scores 82.4% on HumanEval (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "math",
+     "value": 66.1,
+     "config": "MATH-500",
+     "reported_by": "official",
+     "source": {
+      "url": "https://z.ai/synthetic/glm-4-math",
+      "title": "GLM-4 MATH — synthetic launch note",
+      "quote": "GLM-4 scores 66.1% on MATH (Hendrycks) (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    }
+   ],
+   "notes": "SYNTHETIC FIXTURE — not real data"
+  },
+  {
+   "id": "google-gemini-1.5-pro",
+   "lab": "google",
+   "name": "Gemini 1.5 Pro",
+   "family": "Gemini Pro",
+   "date": "2024-02-15",
+   "date_precision": "day",
+   "status": "released",
+   "announcement": {
+    "url": "https://deepmind.google/synthetic/gemini-1-5-pro",
+    "title": "Gemini 1.5 Pro — synthetic launch note",
+    "quote": "Gemini 1.5 Pro is available today. (SYNTHETIC FIXTURE — not real data; this quote is fabricated.)",
+    "retrieved_at": "2026-09-06T22:00:00Z",
+    "verified": true,
+    "verified_at": "2026-09-06T22:00:00Z"
+   },
+   "scores": [
+    {
+     "benchmark": "gpqa-diamond",
+     "value": 75,
+     "config": "no tools, pass@1",
+     "reported_by": "official",
+     "source": {
+      "url": "https://deepmind.google/synthetic/gemini-1-5-pro-gpqa",
+      "title": "Gemini 1.5 Pro GPQA — synthetic launch note",
+      "quote": "Gemini 1.5 Pro scores 75% on GPQA Diamond (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "mmlu",
+     "value": 91.3,
+     "config": "5-shot",
+     "reported_by": "official",
+     "source": {
+      "url": "https://deepmind.google/synthetic/gemini-1-5-pro-mmlu",
+      "title": "Gemini 1.5 Pro MMLU — synthetic launch note",
+      "quote": "Gemini 1.5 Pro scores 91.3% on MMLU (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "humaneval",
+     "value": 86.6,
+     "config": "pass@1, 0-shot",
+     "reported_by": "official",
+     "source": {
+      "url": "https://deepmind.google/synthetic/gemini-1-5-pro-humaneval",
+      "title": "Gemini 1.5 Pro HumanEval — synthetic launch note",
+      "quote": "Gemini 1.5 Pro scores 86.6% on HumanEval (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z"
+     }
+    }
+   ],
+   "notes": "SYNTHETIC FIXTURE — not real data"
+  },
+  {
+   "id": "mistral-large",
+   "lab": "mistral",
+   "name": "Mistral Large",
+   "family": "Mistral Large",
+   "date": "2024-02-26",
+   "date_precision": "day",
+   "status": "released",
+   "announcement": {
+    "url": "https://mistral.ai/synthetic/mistral-large",
+    "title": "Mistral Large — synthetic launch note",
+    "quote": "Mistral Large is available today. (SYNTHETIC FIXTURE — not real data; this quote is fabricated.)",
+    "retrieved_at": "2026-09-06T22:00:00Z",
+    "verified": true,
+    "verified_at": "2026-09-06T22:00:00Z"
+   },
+   "scores": [
+    {
+     "benchmark": "gpqa-diamond",
+     "value": 72.3,
+     "config": "no tools, pass@1",
+     "reported_by": "official",
+     "source": {
+      "url": "https://mistral.ai/synthetic/mistral-large-gpqa",
+      "title": "Mistral Large GPQA — synthetic launch note",
+      "quote": "Mistral Large scores 72.3% on GPQA Diamond (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "mmmu",
+     "value": 71.5,
+     "config": "validation split",
+     "reported_by": "official",
+     "source": {
+      "url": "https://mistral.ai/synthetic/mistral-large-mmmu",
+      "title": "Mistral Large MMMU — synthetic launch note",
+      "quote": "Mistral Large scores 71.5% on MMMU (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "mmlu",
+     "value": 87.3,
+     "config": "5-shot",
+     "reported_by": "official",
+     "source": {
+      "url": "https://mistral.ai/synthetic/mistral-large-mmlu",
+      "title": "Mistral Large MMLU — synthetic launch note",
+      "quote": "Mistral Large scores 87.3% on MMLU (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "humaneval",
+     "value": 82,
+     "config": "pass@1, 0-shot",
+     "reported_by": "official",
+     "source": {
+      "url": "https://mistral.ai/synthetic/mistral-large-humaneval",
+      "title": "Mistral Large HumanEval — synthetic launch note",
+      "quote": "Mistral Large scores 82% on HumanEval (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "math",
+     "value": 57.8,
+     "config": "MATH-500",
+     "reported_by": "official",
+     "source": {
+      "url": "https://mistral.ai/synthetic/mistral-large-math",
+      "title": "Mistral Large MATH — synthetic launch note",
+      "quote": "Mistral Large scores 57.8% on MATH (Hendrycks) (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z"
+     }
+    }
+   ],
+   "notes": "SYNTHETIC FIXTURE — not real data"
+  },
+  {
+   "id": "anthropic-claude-3-opus",
+   "lab": "anthropic",
+   "name": "Claude 3 Opus",
+   "family": "Claude Opus",
+   "date": "2024-03-04",
+   "date_precision": "day",
+   "status": "released",
+   "announcement": {
+    "url": "https://www.anthropic.com/synthetic/claude-3-opus",
+    "title": "Claude 3 Opus — synthetic launch note",
+    "quote": "Claude 3 Opus is available today. (SYNTHETIC FIXTURE — not real data; this quote is fabricated.)",
+    "retrieved_at": "2026-09-06T22:00:00Z",
+    "verified": true,
+    "verified_at": "2026-09-06T22:00:00Z"
+   },
+   "scores": [
+    {
+     "benchmark": "gpqa-diamond",
+     "value": 78.4,
+     "config": "no tools, pass@1",
+     "reported_by": "official",
+     "source": {
+      "url": "https://www.anthropic.com/synthetic/claude-3-opus-gpqa",
+      "title": "Claude 3 Opus GPQA — synthetic launch note",
+      "quote": "Claude 3 Opus scores 78.4% on GPQA Diamond (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "swe-bench-verified",
+     "value": 61.4,
+     "config": "default scaffold, pass@1",
+     "reported_by": "official",
+     "source": {
+      "url": "https://www.anthropic.com/synthetic/claude-3-opus-swe-bench",
+      "title": "Claude 3 Opus SWE-bench — synthetic launch note",
+      "quote": "Claude 3 Opus scores 61.4% on SWE-bench Verified (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "aime",
+     "value": 81.7,
+     "config": "AIME 2025, no tools",
+     "reported_by": "official",
+     "source": {
+      "url": "https://www.anthropic.com/synthetic/claude-3-opus-aime",
+      "title": "Claude 3 Opus AIME — synthetic launch note",
+      "quote": "Claude 3 Opus scores 81.7% on AIME (American Invitational Mathematics Examination) (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "mmmu",
+     "value": 83.7,
+     "config": "validation split",
+     "reported_by": "official",
+     "source": {
+      "url": "https://www.anthropic.com/synthetic/claude-3-opus-mmmu",
+      "title": "Claude 3 Opus MMMU — synthetic launch note",
+      "quote": "Claude 3 Opus scores 83.7% on MMMU (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "livecodebench",
+     "value": 65.9,
+     "config": "pass@1, v6",
+     "reported_by": "official",
+     "source": {
+      "url": "https://www.anthropic.com/synthetic/claude-3-opus-livecodebench",
+      "title": "Claude 3 Opus LiveCodeBench — synthetic launch note",
+      "quote": "Claude 3 Opus scores 65.9% on LiveCodeBench (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "humaneval",
+     "value": 89.1,
+     "config": "pass@1, 0-shot",
+     "reported_by": "official",
+     "source": {
+      "url": "https://www.anthropic.com/synthetic/claude-3-opus-humaneval",
+      "title": "Claude 3 Opus HumanEval — synthetic launch note",
+      "quote": "Claude 3 Opus scores 89.1% on HumanEval (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "math",
+     "value": 71.8,
+     "config": "MATH-500",
+     "reported_by": "official",
+     "source": {
+      "url": "https://www.anthropic.com/synthetic/claude-3-opus-math",
+      "title": "Claude 3 Opus MATH — synthetic launch note",
+      "quote": "Claude 3 Opus scores 71.8% on MATH (Hendrycks) (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "osworld",
+     "value": 52.4,
+     "config": "OSWorld-Verified, 100 steps",
+     "reported_by": "official",
+     "source": {
+      "url": "https://www.anthropic.com/synthetic/claude-3-opus-osworld",
+      "title": "Claude 3 Opus OSWorld — synthetic launch note",
+      "quote": "Claude 3 Opus scores 52.4% on OSWorld / OSWorld-Verified (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    }
+   ],
+   "notes": "SYNTHETIC FIXTURE — not real data"
+  },
+  {
+   "id": "deepseek-v2",
+   "lab": "deepseek",
+   "name": "DeepSeek-V2",
+   "family": "DeepSeek-V",
+   "date": "2024-05-06",
+   "date_precision": "day",
+   "status": "released",
+   "announcement": {
+    "url": "https://www.deepseek.com/synthetic/deepseek-v2",
+    "title": "DeepSeek-V2 — synthetic launch note",
+    "quote": "DeepSeek-V2 is available today. (SYNTHETIC FIXTURE — not real data; this quote is fabricated.)",
+    "retrieved_at": "2026-09-06T22:00:00Z",
+    "verified": true,
+    "verified_at": "2026-09-06T22:00:00Z"
+   },
+   "scores": [
+    {
+     "benchmark": "gpqa-diamond",
+     "value": 77,
+     "config": "no tools, pass@1",
+     "reported_by": "official",
+     "source": {
+      "url": "https://www.deepseek.com/synthetic/deepseek-v2-gpqa",
+      "title": "DeepSeek-V2 GPQA — synthetic launch note",
+      "quote": "DeepSeek-V2 scores 77% on GPQA Diamond (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "aime",
+     "value": 79.7,
+     "config": "AIME 2025, no tools",
+     "reported_by": "official",
+     "source": {
+      "url": "https://www.deepseek.com/synthetic/deepseek-v2-aime",
+      "title": "DeepSeek-V2 AIME — synthetic launch note",
+      "quote": "DeepSeek-V2 scores 79.7% on AIME (American Invitational Mathematics Examination) (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "mmlu-pro",
+     "value": 85.5,
+     "config": "CoT, 0-shot",
+     "reported_by": "official",
+     "source": {
+      "url": "https://www.deepseek.com/synthetic/deepseek-v2-mmlu-pro",
+      "title": "DeepSeek-V2 MMLU-Pro — synthetic launch note",
+      "quote": "DeepSeek-V2 scores 85.5% on MMLU-Pro (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "humaneval",
+     "value": 84.6,
+     "config": "pass@1, 0-shot",
+     "reported_by": "official",
+     "source": {
+      "url": "https://www.deepseek.com/synthetic/deepseek-v2-humaneval",
+      "title": "DeepSeek-V2 HumanEval — synthetic launch note",
+      "quote": "DeepSeek-V2 scores 84.6% on HumanEval (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "math",
+     "value": 74.3,
+     "config": "MATH-500",
+     "reported_by": "official",
+     "source": {
+      "url": "https://www.deepseek.com/synthetic/deepseek-v2-math",
+      "title": "DeepSeek-V2 MATH — synthetic launch note",
+      "quote": "DeepSeek-V2 scores 74.3% on MATH (Hendrycks) (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    }
+   ],
+   "notes": "SYNTHETIC FIXTURE — not real data"
+  },
+  {
+   "id": "openai-gpt-4o",
+   "lab": "openai",
+   "name": "GPT-4o",
+   "family": "GPT",
+   "date": "2024-05-13",
+   "date_precision": "day",
+   "status": "released",
+   "announcement": {
+    "url": "https://openai.com/synthetic/gpt-4o",
+    "title": "GPT-4o — synthetic launch note",
+    "quote": "GPT-4o is available today. (SYNTHETIC FIXTURE — not real data; this quote is fabricated.)",
+    "retrieved_at": "2026-09-06T22:00:00Z",
+    "verified": true,
+    "verified_at": "2026-09-06T22:00:00Z"
+   },
+   "scores": [
+    {
+     "benchmark": "gpqa-diamond",
+     "value": 74.3,
+     "config": "no tools, pass@1",
+     "reported_by": "official",
+     "source": {
+      "url": "https://openai.com/synthetic/gpt-4o-gpqa",
+      "title": "GPT-4o GPQA — synthetic launch note",
+      "quote": "GPT-4o scores 74.3% on GPQA Diamond (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "swe-bench-verified",
+     "value": 70.7,
+     "config": "default scaffold, pass@1",
+     "reported_by": "official",
+     "source": {
+      "url": "https://openai.com/synthetic/gpt-4o-swe-bench",
+      "title": "GPT-4o SWE-bench — synthetic launch note",
+      "quote": "GPT-4o scores 70.7% on SWE-bench Verified (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "mmmu",
+     "value": 80.5,
+     "config": "validation split",
+     "reported_by": "official",
+     "source": {
+      "url": "https://openai.com/synthetic/gpt-4o-mmmu",
+      "title": "GPT-4o MMMU — synthetic launch note",
+      "quote": "GPT-4o scores 80.5% on MMMU (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "mmlu",
+     "value": 94,
+     "config": "5-shot",
+     "reported_by": "official",
+     "source": {
+      "url": "https://openai.com/synthetic/gpt-4o-mmlu",
+      "title": "GPT-4o MMLU — synthetic launch note",
+      "quote": "GPT-4o scores 94% on MMLU (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "humaneval",
+     "value": 87.6,
+     "config": "pass@1, 0-shot",
+     "reported_by": "official",
+     "source": {
+      "url": "https://openai.com/synthetic/gpt-4o-humaneval",
+      "title": "GPT-4o HumanEval — synthetic launch note",
+      "quote": "GPT-4o scores 87.6% on HumanEval (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "math",
+     "value": 69.6,
+     "config": "MATH-500",
+     "reported_by": "official",
+     "source": {
+      "url": "https://openai.com/synthetic/gpt-4o-math",
+      "title": "GPT-4o MATH — synthetic launch note",
+      "quote": "GPT-4o scores 69.6% on MATH (Hendrycks) (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "frontiermath",
+     "value": 18.6,
+     "config": "Tiers 1-3",
+     "reported_by": "maintainer",
+     "source": {
+      "url": "https://openai.com/synthetic/gpt-4o-frontiermath",
+      "title": "GPT-4o FrontierMath — synthetic launch note",
+      "quote": "GPT-4o scores 18.6% on FrontierMath (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    }
+   ],
+   "notes": "SYNTHETIC FIXTURE — not real data"
+  },
+  {
+   "id": "alibaba-qwen2-72b",
+   "lab": "alibaba",
+   "name": "Qwen2-72B",
+   "family": "Qwen",
+   "date": "2024-06-07",
+   "date_precision": "day",
+   "status": "released",
+   "announcement": {
+    "url": "https://qwen.ai/synthetic/qwen2-72b",
+    "title": "Qwen2-72B — synthetic launch note",
+    "quote": "Qwen2-72B is available today. (SYNTHETIC FIXTURE — not real data; this quote is fabricated.)",
+    "retrieved_at": "2026-09-06T22:00:00Z",
+    "verified": true,
+    "verified_at": "2026-09-06T22:00:00Z"
+   },
+   "scores": [
+    {
+     "benchmark": "gpqa-diamond",
+     "value": 74.9,
+     "config": "no tools, pass@1",
+     "reported_by": "official",
+     "source": {
+      "url": "https://qwen.ai/synthetic/qwen2-72b-gpqa",
+      "title": "Qwen2-72B GPQA — synthetic launch note",
+      "quote": "Qwen2-72B scores 74.9% on GPQA Diamond (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "mmlu-pro",
+     "value": 77.4,
+     "config": "CoT, 0-shot",
+     "reported_by": "official",
+     "source": {
+      "url": "https://qwen.ai/synthetic/qwen2-72b-mmlu-pro",
+      "title": "Qwen2-72B MMLU-Pro — synthetic launch note",
+      "quote": "Qwen2-72B scores 77.4% on MMLU-Pro (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "mmmu",
+     "value": 74.1,
+     "config": "validation split",
+     "reported_by": "official",
+     "source": {
+      "url": "https://qwen.ai/synthetic/qwen2-72b-mmmu",
+      "title": "Qwen2-72B MMMU — synthetic launch note",
+      "quote": "Qwen2-72B scores 74.1% on MMMU (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "mmlu",
+     "value": 91.5,
+     "config": "5-shot",
+     "reported_by": "official",
+     "source": {
+      "url": "https://qwen.ai/synthetic/qwen2-72b-mmlu",
+      "title": "Qwen2-72B MMLU — synthetic launch note",
+      "quote": "Qwen2-72B scores 91.5% on MMLU (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "humaneval",
+     "value": 81.5,
+     "config": "pass@1, 0-shot",
+     "reported_by": "official",
+     "source": {
+      "url": "https://qwen.ai/synthetic/qwen2-72b-humaneval",
+      "title": "Qwen2-72B HumanEval — synthetic launch note",
+      "quote": "Qwen2-72B scores 81.5% on HumanEval (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "math",
+     "value": 57.7,
+     "config": "MATH-500",
+     "reported_by": "official",
+     "source": {
+      "url": "https://qwen.ai/synthetic/qwen2-72b-math",
+      "title": "Qwen2-72B MATH — synthetic launch note",
+      "quote": "Qwen2-72B scores 57.7% on MATH (Hendrycks) (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z"
+     }
+    }
+   ],
+   "notes": "SYNTHETIC FIXTURE — not real data"
+  },
+  {
+   "id": "meta-llama-3.1-405b",
+   "lab": "meta",
+   "name": "Llama 3.1 405B",
+   "family": "Llama",
+   "date": "2024-07-23",
+   "date_precision": "day",
+   "status": "released",
+   "announcement": {
+    "url": "https://ai.meta.com/synthetic/llama-3-1-405b",
+    "title": "Llama 3.1 405B — synthetic launch note",
+    "quote": "Llama 3.1 405B is available today. (SYNTHETIC FIXTURE — not real data; this quote is fabricated.)",
+    "retrieved_at": "2026-09-06T22:00:00Z",
+    "verified": true,
+    "verified_at": "2026-09-06T22:00:00Z"
+   },
+   "scores": [
+    {
+     "benchmark": "gpqa-diamond",
+     "value": 66.8,
+     "config": "no tools, pass@1",
+     "reported_by": "official",
+     "source": {
+      "url": "https://ai.meta.com/synthetic/llama-3-1-405b-gpqa",
+      "title": "Llama 3.1 405B GPQA — synthetic launch note",
+      "quote": "Llama 3.1 405B scores 66.8% on GPQA Diamond (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "aime",
+     "value": 73.6,
+     "config": "AIME 2025, no tools",
+     "reported_by": "official",
+     "source": {
+      "url": "https://ai.meta.com/synthetic/llama-3-1-405b-aime",
+      "title": "Llama 3.1 405B AIME — synthetic launch note",
+      "quote": "Llama 3.1 405B scores 73.6% on AIME (American Invitational Mathematics Examination) (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "mmlu-pro",
+     "value": 77.5,
+     "config": "CoT, 0-shot",
+     "reported_by": "official",
+     "source": {
+      "url": "https://ai.meta.com/synthetic/llama-3-1-405b-mmlu-pro",
+      "title": "Llama 3.1 405B MMLU-Pro — synthetic launch note",
+      "quote": "Llama 3.1 405B scores 77.5% on MMLU-Pro (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "mmmu",
+     "value": 74.5,
+     "config": "validation split",
+     "reported_by": "official",
+     "source": {
+      "url": "https://ai.meta.com/synthetic/llama-3-1-405b-mmmu",
+      "title": "Llama 3.1 405B MMMU — synthetic launch note",
+      "quote": "Llama 3.1 405B scores 74.5% on MMMU (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "humaneval",
+     "value": 83.3,
+     "config": "pass@1, 0-shot",
+     "reported_by": "official",
+     "source": {
+      "url": "https://ai.meta.com/synthetic/llama-3-1-405b-humaneval",
+      "title": "Llama 3.1 405B HumanEval — synthetic launch note",
+      "quote": "Llama 3.1 405B scores 83.3% on HumanEval (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "math",
+     "value": 58.7,
+     "config": "MATH-500",
+     "reported_by": "official",
+     "source": {
+      "url": "https://ai.meta.com/synthetic/llama-3-1-405b-math",
+      "title": "Llama 3.1 405B MATH — synthetic launch note",
+      "quote": "Llama 3.1 405B scores 58.7% on MATH (Hendrycks) (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "osworld",
+     "value": 41.8,
+     "config": "OSWorld-Verified, 100 steps",
+     "reported_by": "official",
+     "source": {
+      "url": "https://ai.meta.com/synthetic/llama-3-1-405b-osworld",
+      "title": "Llama 3.1 405B OSWorld — synthetic launch note",
+      "quote": "Llama 3.1 405B scores 41.8% on OSWorld / OSWorld-Verified (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    }
+   ],
+   "notes": "SYNTHETIC FIXTURE — not real data"
+  },
+  {
+   "id": "mistral-large-2",
+   "lab": "mistral",
+   "name": "Mistral Large 2",
+   "family": "Mistral Large",
+   "date": "2024-07-24",
+   "date_precision": "day",
+   "status": "released",
+   "announcement": {
+    "url": "https://mistral.ai/synthetic/mistral-large-2",
+    "title": "Mistral Large 2 — synthetic launch note",
+    "quote": "Mistral Large 2 is available today. (SYNTHETIC FIXTURE — not real data; this quote is fabricated.)",
+    "retrieved_at": "2026-09-06T22:00:00Z",
+    "verified": true,
+    "verified_at": "2026-09-06T22:00:00Z"
+   },
+   "scores": [
+    {
+     "benchmark": "gpqa-diamond",
+     "value": 68.6,
+     "config": "no tools, pass@1",
+     "reported_by": "official",
+     "source": {
+      "url": "https://mistral.ai/synthetic/mistral-large-2-gpqa",
+      "title": "Mistral Large 2 GPQA — synthetic launch note",
+      "quote": "Mistral Large 2 scores 68.6% on GPQA Diamond (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "livecodebench",
+     "value": 62.4,
+     "config": "pass@1, v6",
+     "reported_by": "official",
+     "source": {
+      "url": "https://mistral.ai/synthetic/mistral-large-2-livecodebench",
+      "title": "Mistral Large 2 LiveCodeBench — synthetic launch note",
+      "quote": "Mistral Large 2 scores 62.4% on LiveCodeBench (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "mmlu",
+     "value": 90,
+     "config": "5-shot",
+     "reported_by": "official",
+     "source": {
+      "url": "https://mistral.ai/synthetic/mistral-large-2-mmlu",
+      "title": "Mistral Large 2 MMLU — synthetic launch note",
+      "quote": "Mistral Large 2 scores 90% on MMLU (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "humaneval",
+     "value": 85.7,
+     "config": "pass@1, 0-shot",
+     "reported_by": "official",
+     "source": {
+      "url": "https://mistral.ai/synthetic/mistral-large-2-humaneval",
+      "title": "Mistral Large 2 HumanEval — synthetic launch note",
+      "quote": "Mistral Large 2 scores 85.7% on HumanEval (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "math",
+     "value": 56.5,
+     "config": "MATH-500",
+     "reported_by": "official",
+     "source": {
+      "url": "https://mistral.ai/synthetic/mistral-large-2-math",
+      "title": "Mistral Large 2 MATH — synthetic launch note",
+      "quote": "Mistral Large 2 scores 56.5% on MATH (Hendrycks) (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "frontiermath",
+     "value": 13.7,
+     "config": "Tiers 1-3",
+     "reported_by": "maintainer",
+     "source": {
+      "url": "https://mistral.ai/synthetic/mistral-large-2-frontiermath",
+      "title": "Mistral Large 2 FrontierMath — synthetic launch note",
+      "quote": "Mistral Large 2 scores 13.7% on FrontierMath (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z"
+     }
+    }
+   ],
+   "notes": "SYNTHETIC FIXTURE — not real data"
+  },
+  {
+   "id": "xai-grok-2",
+   "lab": "xai",
+   "name": "Grok-2",
+   "family": "Grok",
+   "date": "2024-08-13",
+   "date_precision": "day",
+   "status": "released",
+   "announcement": {
+    "url": "https://x.ai/synthetic/grok-2",
+    "title": "Grok-2 — synthetic launch note",
+    "quote": "Grok-2 is available today. (SYNTHETIC FIXTURE — not real data; this quote is fabricated.)",
+    "retrieved_at": "2026-09-06T22:00:00Z",
+    "verified": true,
+    "verified_at": "2026-09-06T22:00:00Z"
+   },
+   "scores": [
+    {
+     "benchmark": "gpqa-diamond",
+     "value": 80.1,
+     "config": "no tools, pass@1",
+     "reported_by": "official",
+     "source": {
+      "url": "https://x.ai/synthetic/grok-2-gpqa",
+      "title": "Grok-2 GPQA — synthetic launch note",
+      "quote": "Grok-2 scores 80.1% on GPQA Diamond (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "swe-bench-verified",
+     "value": 73.1,
+     "config": "default scaffold, pass@1",
+     "reported_by": "official",
+     "source": {
+      "url": "https://x.ai/synthetic/grok-2-swe-bench",
+      "title": "Grok-2 SWE-bench — synthetic launch note",
+      "quote": "Grok-2 scores 73.1% on SWE-bench Verified (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "aime",
+     "value": 79,
+     "config": "AIME 2025, no tools",
+     "reported_by": "official",
+     "source": {
+      "url": "https://x.ai/synthetic/grok-2-aime",
+      "title": "Grok-2 AIME — synthetic launch note",
+      "quote": "Grok-2 scores 79% on AIME (American Invitational Mathematics Examination) (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "mmmu",
+     "value": 82.3,
+     "config": "validation split",
+     "reported_by": "official",
+     "source": {
+      "url": "https://x.ai/synthetic/grok-2-mmmu",
+      "title": "Grok-2 MMMU — synthetic launch note",
+      "quote": "Grok-2 scores 82.3% on MMMU (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "livecodebench",
+     "value": 72.2,
+     "config": "pass@1, v6",
+     "reported_by": "official",
+     "source": {
+      "url": "https://x.ai/synthetic/grok-2-livecodebench",
+      "title": "Grok-2 LiveCodeBench — synthetic launch note",
+      "quote": "Grok-2 scores 72.2% on LiveCodeBench (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "mmlu",
+     "value": 95.1,
+     "config": "5-shot",
+     "reported_by": "official",
+     "source": {
+      "url": "https://x.ai/synthetic/grok-2-mmlu",
+      "title": "Grok-2 MMLU — synthetic launch note",
+      "quote": "Grok-2 scores 95.1% on MMLU (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "humaneval",
+     "value": 92.7,
+     "config": "pass@1, 0-shot",
+     "reported_by": "official",
+     "source": {
+      "url": "https://x.ai/synthetic/grok-2-humaneval",
+      "title": "Grok-2 HumanEval — synthetic launch note",
+      "quote": "Grok-2 scores 92.7% on HumanEval (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "math",
+     "value": 69.3,
+     "config": "MATH-500",
+     "reported_by": "official",
+     "source": {
+      "url": "https://x.ai/synthetic/grok-2-math",
+      "title": "Grok-2 MATH — synthetic launch note",
+      "quote": "Grok-2 scores 69.3% on MATH (Hendrycks) (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z"
+     }
+    }
+   ],
+   "notes": "SYNTHETIC FIXTURE — not real data"
+  },
+  {
+   "id": "openai-o1",
+   "lab": "openai",
+   "name": "o1",
+   "family": "o-series",
+   "date": "2024-12-05",
+   "date_precision": "day",
+   "status": "released",
+   "announcement": {
+    "url": "https://openai.com/synthetic/o1",
+    "title": "o1 — synthetic launch note",
+    "quote": "o1 is available today. (SYNTHETIC FIXTURE — not real data; this quote is fabricated.)",
+    "retrieved_at": "2026-09-06T22:00:00Z",
+    "verified": true,
+    "verified_at": "2026-09-06T22:00:00Z"
+   },
+   "scores": [
+    {
+     "benchmark": "gpqa-diamond",
+     "value": 82.5,
+     "config": "no tools, pass@1",
+     "reported_by": "official",
+     "source": {
+      "url": "https://openai.com/synthetic/o1-gpqa",
+      "title": "o1 GPQA — synthetic launch note",
+      "quote": "o1 scores 82.5% on GPQA Diamond (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "swe-bench-verified",
+     "value": 77.2,
+     "config": "default scaffold, pass@1",
+     "reported_by": "official",
+     "source": {
+      "url": "https://openai.com/synthetic/o1-swe-bench",
+      "title": "o1 SWE-bench — synthetic launch note",
+      "quote": "o1 scores 77.2% on SWE-bench Verified (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "mmmu",
+     "value": 87.9,
+     "config": "validation split",
+     "reported_by": "official",
+     "source": {
+      "url": "https://openai.com/synthetic/o1-mmmu",
+      "title": "o1 MMMU — synthetic launch note",
+      "quote": "o1 scores 87.9% on MMMU (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "livecodebench",
+     "value": 75.1,
+     "config": "pass@1, v6",
+     "reported_by": "official",
+     "source": {
+      "url": "https://openai.com/synthetic/o1-livecodebench",
+      "title": "o1 LiveCodeBench — synthetic launch note",
+      "quote": "o1 scores 75.1% on LiveCodeBench (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "mmlu",
+     "value": 95.3,
+     "config": "5-shot",
+     "reported_by": "official",
+     "source": {
+      "url": "https://openai.com/synthetic/o1-mmlu",
+      "title": "o1 MMLU — synthetic launch note",
+      "quote": "o1 scores 95.3% on MMLU (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "humaneval",
+     "value": 90.8,
+     "config": "pass@1, 0-shot",
+     "reported_by": "official",
+     "source": {
+      "url": "https://openai.com/synthetic/o1-humaneval",
+      "title": "o1 HumanEval — synthetic launch note",
+      "quote": "o1 scores 90.8% on HumanEval (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "math",
+     "value": 70.7,
+     "config": "MATH-500",
+     "reported_by": "official",
+     "source": {
+      "url": "https://openai.com/synthetic/o1-math",
+      "title": "o1 MATH — synthetic launch note",
+      "quote": "o1 scores 70.7% on MATH (Hendrycks) (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    }
+   ],
+   "notes": "SYNTHETIC FIXTURE — not real data"
+  },
+  {
+   "id": "deepseek-r1",
+   "lab": "deepseek",
+   "name": "DeepSeek-R1",
+   "family": "DeepSeek-R",
+   "date": "2025-01-20",
+   "date_precision": "day",
+   "status": "released",
+   "announcement": {
+    "url": "https://www.deepseek.com/synthetic/deepseek-r1",
+    "title": "DeepSeek-R1 — synthetic launch note",
+    "quote": "DeepSeek-R1 is available today. (SYNTHETIC FIXTURE — not real data; this quote is fabricated.)",
+    "retrieved_at": "2026-09-06T22:00:00Z",
+    "verified": true,
+    "verified_at": "2026-09-06T22:00:00Z"
+   },
+   "scores": [
+    {
+     "benchmark": "gpqa-diamond",
+     "value": 76.3,
+     "config": "no tools, pass@1",
+     "reported_by": "official",
+     "source": {
+      "url": "https://www.deepseek.com/synthetic/deepseek-r1-gpqa",
+      "title": "DeepSeek-R1 GPQA — synthetic launch note",
+      "quote": "DeepSeek-R1 scores 76.3% on GPQA Diamond (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "swe-bench-verified",
+     "value": 71.8,
+     "config": "default scaffold, pass@1",
+     "reported_by": "official",
+     "source": {
+      "url": "https://www.deepseek.com/synthetic/deepseek-r1-swe-bench",
+      "title": "DeepSeek-R1 SWE-bench — synthetic launch note",
+      "quote": "DeepSeek-R1 scores 71.8% on SWE-bench Verified (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "mmlu-pro",
+     "value": 84.3,
+     "config": "CoT, 0-shot",
+     "reported_by": "official",
+     "source": {
+      "url": "https://www.deepseek.com/synthetic/deepseek-r1-mmlu-pro",
+      "title": "DeepSeek-R1 MMLU-Pro — synthetic launch note",
+      "quote": "DeepSeek-R1 scores 84.3% on MMLU-Pro (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "mmmu",
+     "value": 81.7,
+     "config": "validation split",
+     "reported_by": "official",
+     "source": {
+      "url": "https://www.deepseek.com/synthetic/deepseek-r1-mmmu",
+      "title": "DeepSeek-R1 MMMU — synthetic launch note",
+      "quote": "DeepSeek-R1 scores 81.7% on MMMU (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "mmlu",
+     "value": 93.8,
+     "config": "5-shot",
+     "reported_by": "official",
+     "source": {
+      "url": "https://www.deepseek.com/synthetic/deepseek-r1-mmlu",
+      "title": "DeepSeek-R1 MMLU — synthetic launch note",
+      "quote": "DeepSeek-R1 scores 93.8% on MMLU (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "humaneval",
+     "value": 86.8,
+     "config": "pass@1, 0-shot",
+     "reported_by": "official",
+     "source": {
+      "url": "https://www.deepseek.com/synthetic/deepseek-r1-humaneval",
+      "title": "DeepSeek-R1 HumanEval — synthetic launch note",
+      "quote": "DeepSeek-R1 scores 86.8% on HumanEval (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "math",
+     "value": 70.8,
+     "config": "MATH-500",
+     "reported_by": "official",
+     "source": {
+      "url": "https://www.deepseek.com/synthetic/deepseek-r1-math",
+      "title": "DeepSeek-R1 MATH — synthetic launch note",
+      "quote": "DeepSeek-R1 scores 70.8% on MATH (Hendrycks) (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z"
+     }
+    }
+   ],
+   "notes": "SYNTHETIC FIXTURE — not real data"
+  },
+  {
+   "id": "moonshot-kimi-k1.5",
+   "lab": "moonshot",
+   "name": "Kimi k1.5",
+   "family": "Kimi K",
+   "date": "2025-01-20",
+   "date_precision": "day",
+   "status": "released",
+   "announcement": {
+    "url": "https://www.moonshot.ai/synthetic/kimi-k1-5",
+    "title": "Kimi k1.5 — synthetic launch note",
+    "quote": "Kimi k1.5 is available today. (SYNTHETIC FIXTURE — not real data; this quote is fabricated.)",
+    "retrieved_at": "2026-09-06T22:00:00Z",
+    "verified": true,
+    "verified_at": "2026-09-06T22:00:00Z"
+   },
+   "scores": [
+    {
+     "benchmark": "gpqa-diamond",
+     "value": 81.2,
+     "config": "no tools, pass@1",
+     "reported_by": "official",
+     "source": {
+      "url": "https://www.moonshot.ai/synthetic/kimi-k1-5-gpqa",
+      "title": "Kimi k1.5 GPQA — synthetic launch note",
+      "quote": "Kimi k1.5 scores 81.2% on GPQA Diamond (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "swe-bench-verified",
+     "value": 72.7,
+     "config": "default scaffold, pass@1",
+     "reported_by": "official",
+     "source": {
+      "url": "https://www.moonshot.ai/synthetic/kimi-k1-5-swe-bench",
+      "title": "Kimi k1.5 SWE-bench — synthetic launch note",
+      "quote": "Kimi k1.5 scores 72.7% on SWE-bench Verified (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "aime",
+     "value": 82.4,
+     "config": "AIME 2025, no tools",
+     "reported_by": "official",
+     "source": {
+      "url": "https://www.moonshot.ai/synthetic/kimi-k1-5-aime",
+      "title": "Kimi k1.5 AIME — synthetic launch note",
+      "quote": "Kimi k1.5 scores 82.4% on AIME (American Invitational Mathematics Examination) (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "mmlu",
+     "value": 95.9,
+     "config": "5-shot",
+     "reported_by": "official",
+     "source": {
+      "url": "https://www.moonshot.ai/synthetic/kimi-k1-5-mmlu",
+      "title": "Kimi k1.5 MMLU — synthetic launch note",
+      "quote": "Kimi k1.5 scores 95.9% on MMLU (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "humaneval",
+     "value": 85.8,
+     "config": "pass@1, 0-shot",
+     "reported_by": "official",
+     "source": {
+      "url": "https://www.moonshot.ai/synthetic/kimi-k1-5-humaneval",
+      "title": "Kimi k1.5 HumanEval — synthetic launch note",
+      "quote": "Kimi k1.5 scores 85.8% on HumanEval (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "math",
+     "value": 69.6,
+     "config": "MATH-500",
+     "reported_by": "official",
+     "source": {
+      "url": "https://www.moonshot.ai/synthetic/kimi-k1-5-math",
+      "title": "Kimi k1.5 MATH — synthetic launch note",
+      "quote": "Kimi k1.5 scores 69.6% on MATH (Hendrycks) (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "osworld",
+     "value": 50.1,
+     "config": "OSWorld-Verified, 100 steps",
+     "reported_by": "official",
+     "source": {
+      "url": "https://www.moonshot.ai/synthetic/kimi-k1-5-osworld",
+      "title": "Kimi k1.5 OSWorld — synthetic launch note",
+      "quote": "Kimi k1.5 scores 50.1% on OSWorld / OSWorld-Verified (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "frontiermath",
+     "value": 21.8,
+     "config": "Tiers 1-3",
+     "reported_by": "maintainer",
+     "source": {
+      "url": "https://www.moonshot.ai/synthetic/kimi-k1-5-frontiermath",
+      "title": "Kimi k1.5 FrontierMath — synthetic launch note",
+      "quote": "Kimi k1.5 scores 21.8% on FrontierMath (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    }
+   ],
+   "notes": "SYNTHETIC FIXTURE — not real data"
+  },
+  {
+   "id": "alibaba-qwen2.5-max",
+   "lab": "alibaba",
+   "name": "Qwen2.5-Max",
+   "family": "Qwen Max",
+   "date": "2025-01-28",
+   "date_precision": "day",
+   "status": "released",
+   "announcement": {
+    "url": "https://qwen.ai/synthetic/qwen2-5-max",
+    "title": "Qwen2.5-Max — synthetic launch note",
+    "quote": "Qwen2.5-Max is available today. (SYNTHETIC FIXTURE — not real data; this quote is fabricated.)",
+    "retrieved_at": "2026-09-06T22:00:00Z",
+    "verified": true,
+    "verified_at": "2026-09-06T22:00:00Z"
+   },
+   "scores": [
+    {
+     "benchmark": "gpqa-diamond",
+     "value": 79,
+     "config": "no tools, pass@1",
+     "reported_by": "official",
+     "source": {
+      "url": "https://qwen.ai/synthetic/qwen2-5-max-gpqa",
+      "title": "Qwen2.5-Max GPQA — synthetic launch note",
+      "quote": "Qwen2.5-Max scores 79% on GPQA Diamond (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "swe-bench-verified",
+     "value": 73.4,
+     "config": "default scaffold, pass@1",
+     "reported_by": "official",
+     "source": {
+      "url": "https://qwen.ai/synthetic/qwen2-5-max-swe-bench",
+      "title": "Qwen2.5-Max SWE-bench — synthetic launch note",
+      "quote": "Qwen2.5-Max scores 73.4% on SWE-bench Verified (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "aime",
+     "value": 80.6,
+     "config": "AIME 2025, no tools",
+     "reported_by": "official",
+     "source": {
+      "url": "https://qwen.ai/synthetic/qwen2-5-max-aime",
+      "title": "Qwen2.5-Max AIME — synthetic launch note",
+      "quote": "Qwen2.5-Max scores 80.6% on AIME (American Invitational Mathematics Examination) (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "mmlu-pro",
+     "value": 85.6,
+     "config": "CoT, 0-shot",
+     "reported_by": "official",
+     "source": {
+      "url": "https://qwen.ai/synthetic/qwen2-5-max-mmlu-pro",
+      "title": "Qwen2.5-Max MMLU-Pro — synthetic launch note",
+      "quote": "Qwen2.5-Max scores 85.6% on MMLU-Pro (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "mmmu",
+     "value": 84.4,
+     "config": "validation split",
+     "reported_by": "official",
+     "source": {
+      "url": "https://qwen.ai/synthetic/qwen2-5-max-mmmu",
+      "title": "Qwen2.5-Max MMMU — synthetic launch note",
+      "quote": "Qwen2.5-Max scores 84.4% on MMMU (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "mmlu",
+     "value": 95.1,
+     "config": "5-shot",
+     "reported_by": "official",
+     "source": {
+      "url": "https://qwen.ai/synthetic/qwen2-5-max-mmlu",
+      "title": "Qwen2.5-Max MMLU — synthetic launch note",
+      "quote": "Qwen2.5-Max scores 95.1% on MMLU (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "humaneval",
+     "value": 88.9,
+     "config": "pass@1, 0-shot",
+     "reported_by": "official",
+     "source": {
+      "url": "https://qwen.ai/synthetic/qwen2-5-max-humaneval",
+      "title": "Qwen2.5-Max HumanEval — synthetic launch note",
+      "quote": "Qwen2.5-Max scores 88.9% on HumanEval (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "math",
+     "value": 74,
+     "config": "MATH-500",
+     "reported_by": "official",
+     "source": {
+      "url": "https://qwen.ai/synthetic/qwen2-5-max-math",
+      "title": "Qwen2.5-Max MATH — synthetic launch note",
+      "quote": "Qwen2.5-Max scores 74% on MATH (Hendrycks) (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    }
+   ],
+   "notes": "SYNTHETIC FIXTURE — not real data"
+  },
+  {
+   "id": "google-gemini-2.5-pro",
+   "lab": "google",
+   "name": "Gemini 2.5 Pro",
+   "family": "Gemini Pro",
+   "date": "2025-03-25",
+   "date_precision": "day",
+   "status": "released",
+   "announcement": {
+    "url": "https://deepmind.google/synthetic/gemini-2-5-pro",
+    "title": "Gemini 2.5 Pro — synthetic launch note",
+    "quote": "Gemini 2.5 Pro is available today. (SYNTHETIC FIXTURE — not real data; this quote is fabricated.)",
+    "retrieved_at": "2026-09-06T22:00:00Z",
+    "verified": true,
+    "verified_at": "2026-09-06T22:00:00Z"
+   },
+   "scores": [
+    {
+     "benchmark": "gpqa-diamond",
+     "value": 87.1,
+     "config": "no tools, pass@1",
+     "reported_by": "official",
+     "source": {
+      "url": "https://deepmind.google/synthetic/gemini-2-5-pro-gpqa",
+      "title": "Gemini 2.5 Pro GPQA — synthetic launch note",
+      "quote": "Gemini 2.5 Pro scores 87.1% on GPQA Diamond (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "swe-bench-verified",
+     "value": 80.5,
+     "config": "default scaffold, pass@1",
+     "reported_by": "official",
+     "source": {
+      "url": "https://deepmind.google/synthetic/gemini-2-5-pro-swe-bench",
+      "title": "Gemini 2.5 Pro SWE-bench — synthetic launch note",
+      "quote": "Gemini 2.5 Pro scores 80.5% on SWE-bench Verified (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "aime",
+     "value": 86.7,
+     "config": "AIME 2025, no tools",
+     "reported_by": "official",
+     "source": {
+      "url": "https://deepmind.google/synthetic/gemini-2-5-pro-aime",
+      "title": "Gemini 2.5 Pro AIME — synthetic launch note",
+      "quote": "Gemini 2.5 Pro scores 86.7% on AIME (American Invitational Mathematics Examination) (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "mmlu-pro",
+     "value": 85.2,
+     "config": "CoT, 0-shot",
+     "reported_by": "official",
+     "source": {
+      "url": "https://deepmind.google/synthetic/gemini-2-5-pro-mmlu-pro",
+      "title": "Gemini 2.5 Pro MMLU-Pro — synthetic launch note",
+      "quote": "Gemini 2.5 Pro scores 85.2% on MMLU-Pro (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "hle",
+     "value": 32.2,
+     "config": "no tools, full set",
+     "reported_by": "official",
+     "source": {
+      "url": "https://deepmind.google/synthetic/gemini-2-5-pro-hle",
+      "title": "Gemini 2.5 Pro HLE — synthetic launch note",
+      "quote": "Gemini 2.5 Pro scores 32.2% on Humanity's Last Exam (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "livecodebench",
+     "value": 79.3,
+     "config": "pass@1, v6",
+     "reported_by": "official",
+     "source": {
+      "url": "https://deepmind.google/synthetic/gemini-2-5-pro-livecodebench",
+      "title": "Gemini 2.5 Pro LiveCodeBench — synthetic launch note",
+      "quote": "Gemini 2.5 Pro scores 79.3% on LiveCodeBench (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "mmlu",
+     "value": 94,
+     "config": "5-shot",
+     "reported_by": "official",
+     "source": {
+      "url": "https://deepmind.google/synthetic/gemini-2-5-pro-mmlu",
+      "title": "Gemini 2.5 Pro MMLU — synthetic launch note",
+      "quote": "Gemini 2.5 Pro scores 94% on MMLU (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "humaneval",
+     "value": 90.6,
+     "config": "pass@1, 0-shot",
+     "reported_by": "official",
+     "source": {
+      "url": "https://deepmind.google/synthetic/gemini-2-5-pro-humaneval",
+      "title": "Gemini 2.5 Pro HumanEval — synthetic launch note",
+      "quote": "Gemini 2.5 Pro scores 90.6% on HumanEval (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "math",
+     "value": 77.9,
+     "config": "MATH-500",
+     "reported_by": "official",
+     "source": {
+      "url": "https://deepmind.google/synthetic/gemini-2-5-pro-math",
+      "title": "Gemini 2.5 Pro MATH — synthetic launch note",
+      "quote": "Gemini 2.5 Pro scores 77.9% on MATH (Hendrycks) (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    }
+   ],
+   "notes": "SYNTHETIC FIXTURE — not real data"
+  },
+  {
+   "id": "meta-llama-4-maverick",
+   "lab": "meta",
+   "name": "Llama 4 Maverick",
+   "family": "Llama",
+   "date": "2025-04-05",
+   "date_precision": "day",
+   "status": "released",
+   "announcement": {
+    "url": "https://ai.meta.com/synthetic/llama-4-maverick",
+    "title": "Llama 4 Maverick — synthetic launch note",
+    "quote": "Llama 4 Maverick is available today. (SYNTHETIC FIXTURE — not real data; this quote is fabricated.)",
+    "retrieved_at": "2026-09-06T22:00:00Z",
+    "verified": true,
+    "verified_at": "2026-09-06T22:00:00Z"
+   },
+   "scores": [
+    {
+     "benchmark": "gpqa-diamond",
+     "value": 70.8,
+     "config": "no tools, pass@1",
+     "reported_by": "official",
+     "source": {
+      "url": "https://ai.meta.com/synthetic/llama-4-maverick-gpqa",
+      "title": "Llama 4 Maverick GPQA — synthetic launch note",
+      "quote": "Llama 4 Maverick scores 70.8% on GPQA Diamond (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "swe-bench-verified",
+     "value": 66.6,
+     "config": "default scaffold, pass@1",
+     "reported_by": "official",
+     "source": {
+      "url": "https://ai.meta.com/synthetic/llama-4-maverick-swe-bench",
+      "title": "Llama 4 Maverick SWE-bench — synthetic launch note",
+      "quote": "Llama 4 Maverick scores 66.6% on SWE-bench Verified (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "aime",
+     "value": 81.3,
+     "config": "AIME 2025, no tools",
+     "reported_by": "official",
+     "source": {
+      "url": "https://ai.meta.com/synthetic/llama-4-maverick-aime",
+      "title": "Llama 4 Maverick AIME — synthetic launch note",
+      "quote": "Llama 4 Maverick scores 81.3% on AIME (American Invitational Mathematics Examination) (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "mmlu-pro",
+     "value": 80.5,
+     "config": "CoT, 0-shot",
+     "reported_by": "official",
+     "source": {
+      "url": "https://ai.meta.com/synthetic/llama-4-maverick-mmlu-pro",
+      "title": "Llama 4 Maverick MMLU-Pro — synthetic launch note",
+      "quote": "Llama 4 Maverick scores 80.5% on MMLU-Pro (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "hle",
+     "value": 24.3,
+     "config": "no tools, full set",
+     "reported_by": "official",
+     "source": {
+      "url": "https://ai.meta.com/synthetic/llama-4-maverick-hle",
+      "title": "Llama 4 Maverick HLE — synthetic launch note",
+      "quote": "Llama 4 Maverick scores 24.3% on Humanity's Last Exam (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "livecodebench",
+     "value": 69.8,
+     "config": "pass@1, v6",
+     "reported_by": "official",
+     "source": {
+      "url": "https://ai.meta.com/synthetic/llama-4-maverick-livecodebench",
+      "title": "Llama 4 Maverick LiveCodeBench — synthetic launch note",
+      "quote": "Llama 4 Maverick scores 69.8% on LiveCodeBench (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "mmlu",
+     "value": 95.2,
+     "config": "5-shot",
+     "reported_by": "official",
+     "source": {
+      "url": "https://ai.meta.com/synthetic/llama-4-maverick-mmlu",
+      "title": "Llama 4 Maverick MMLU — synthetic launch note",
+      "quote": "Llama 4 Maverick scores 95.2% on MMLU (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "humaneval",
+     "value": 89.5,
+     "config": "pass@1, 0-shot",
+     "reported_by": "official",
+     "source": {
+      "url": "https://ai.meta.com/synthetic/llama-4-maverick-humaneval",
+      "title": "Llama 4 Maverick HumanEval — synthetic launch note",
+      "quote": "Llama 4 Maverick scores 89.5% on HumanEval (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    }
+   ],
+   "notes": "SYNTHETIC FIXTURE — not real data"
+  },
+  {
+   "id": "anthropic-claude-4-opus",
+   "lab": "anthropic",
+   "name": "Claude Opus 4",
+   "family": "Claude Opus",
+   "date": "2025-05-22",
+   "date_precision": "day",
+   "status": "released",
+   "announcement": {
+    "url": "https://www.anthropic.com/synthetic/claude-opus-4",
+    "title": "Claude Opus 4 — synthetic launch note",
+    "quote": "Claude Opus 4 is available today. (SYNTHETIC FIXTURE — not real data; this quote is fabricated.)",
+    "retrieved_at": "2026-09-06T22:00:00Z",
+    "verified": true,
+    "verified_at": "2026-09-06T22:00:00Z"
+   },
+   "scores": [
+    {
+     "benchmark": "gpqa-diamond",
+     "value": 83.4,
+     "config": "no tools, pass@1",
+     "reported_by": "official",
+     "source": {
+      "url": "https://www.anthropic.com/synthetic/claude-opus-4-gpqa",
+      "title": "Claude Opus 4 GPQA — synthetic launch note",
+      "quote": "Claude Opus 4 scores 83.4% on GPQA Diamond (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "swe-bench-verified",
+     "value": 75.9,
+     "config": "default scaffold, pass@1",
+     "reported_by": "official",
+     "source": {
+      "url": "https://www.anthropic.com/synthetic/claude-opus-4-swe-bench",
+      "title": "Claude Opus 4 SWE-bench — synthetic launch note",
+      "quote": "Claude Opus 4 scores 75.9% on SWE-bench Verified (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "aime",
+     "value": 85.9,
+     "config": "AIME 2025, no tools",
+     "reported_by": "official",
+     "source": {
+      "url": "https://www.anthropic.com/synthetic/claude-opus-4-aime",
+      "title": "Claude Opus 4 AIME — synthetic launch note",
+      "quote": "Claude Opus 4 scores 85.9% on AIME (American Invitational Mathematics Examination) (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "mmlu-pro",
+     "value": 88.5,
+     "config": "CoT, 0-shot",
+     "reported_by": "official",
+     "source": {
+      "url": "https://www.anthropic.com/synthetic/claude-opus-4-mmlu-pro",
+      "title": "Claude Opus 4 MMLU-Pro — synthetic launch note",
+      "quote": "Claude Opus 4 scores 88.5% on MMLU-Pro (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "hle",
+     "value": 33,
+     "config": "no tools, full set",
+     "reported_by": "official",
+     "source": {
+      "url": "https://www.anthropic.com/synthetic/claude-opus-4-hle",
+      "title": "Claude Opus 4 HLE — synthetic launch note",
+      "quote": "Claude Opus 4 scores 33% on Humanity's Last Exam (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "swe-bench-pro",
+     "value": 62.2,
+     "config": "public set",
+     "reported_by": "official",
+     "source": {
+      "url": "https://www.anthropic.com/synthetic/claude-opus-4-swe-bench-pro",
+      "title": "Claude Opus 4 SWE-bench Pro — synthetic launch note",
+      "quote": "Claude Opus 4 scores 62.2% on SWE-bench Pro (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "browsecomp",
+     "value": 42.9,
+     "config": "with browsing tools",
+     "reported_by": "official",
+     "source": {
+      "url": "https://www.anthropic.com/synthetic/claude-opus-4-browsecomp",
+      "title": "Claude Opus 4 BrowseComp — synthetic launch note",
+      "quote": "Claude Opus 4 scores 42.9% on BrowseComp (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    }
+   ],
+   "notes": "SYNTHETIC FIXTURE — not real data"
+  },
+  {
+   "id": "xai-grok-4",
+   "lab": "xai",
+   "name": "Grok 4",
+   "family": "Grok",
+   "date": "2025-07-09",
+   "date_precision": "day",
+   "status": "released",
+   "announcement": {
+    "url": "https://x.ai/synthetic/grok-4",
+    "title": "Grok 4 — synthetic launch note",
+    "quote": "Grok 4 is available today. (SYNTHETIC FIXTURE — not real data; this quote is fabricated.)",
+    "retrieved_at": "2026-09-06T22:00:00Z",
+    "verified": true,
+    "verified_at": "2026-09-06T22:00:00Z"
+   },
+   "scores": [
+    {
+     "benchmark": "gpqa-diamond",
+     "value": 85.6,
+     "config": "no tools, pass@1",
+     "reported_by": "official",
+     "source": {
+      "url": "https://x.ai/synthetic/grok-4-gpqa",
+      "title": "Grok 4 GPQA — synthetic launch note",
+      "quote": "Grok 4 scores 85.6% on GPQA Diamond (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "swe-bench-verified",
+     "value": 82.4,
+     "config": "default scaffold, pass@1",
+     "reported_by": "official",
+     "source": {
+      "url": "https://x.ai/synthetic/grok-4-swe-bench",
+      "title": "Grok 4 SWE-bench — synthetic launch note",
+      "quote": "Grok 4 scores 82.4% on SWE-bench Verified (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "aime",
+     "value": 84.5,
+     "config": "AIME 2025, no tools",
+     "reported_by": "official",
+     "source": {
+      "url": "https://x.ai/synthetic/grok-4-aime",
+      "title": "Grok 4 AIME — synthetic launch note",
+      "quote": "Grok 4 scores 84.5% on AIME (American Invitational Mathematics Examination) (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "mmlu-pro",
+     "value": 87.8,
+     "config": "CoT, 0-shot",
+     "reported_by": "official",
+     "source": {
+      "url": "https://x.ai/synthetic/grok-4-mmlu-pro",
+      "title": "Grok 4 MMLU-Pro — synthetic launch note",
+      "quote": "Grok 4 scores 87.8% on MMLU-Pro (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "hle",
+     "value": 29.9,
+     "config": "no tools, full set",
+     "reported_by": "official",
+     "source": {
+      "url": "https://x.ai/synthetic/grok-4-hle",
+      "title": "Grok 4 HLE — synthetic launch note",
+      "quote": "Grok 4 scores 29.9% on Humanity's Last Exam (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "tau2-bench",
+     "value": 78.5,
+     "config": "pass^1, mean of retail / airline / telecom",
+     "reported_by": "official",
+     "source": {
+      "url": "https://x.ai/synthetic/grok-4-bench",
+      "title": "Grok 4 τ²-bench — synthetic launch note",
+      "quote": "Grok 4 scores 78.5% on τ²-bench (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "mmmu",
+     "value": 87.5,
+     "config": "validation split",
+     "reported_by": "official",
+     "source": {
+      "url": "https://x.ai/synthetic/grok-4-mmmu",
+      "title": "Grok 4 MMMU — synthetic launch note",
+      "quote": "Grok 4 scores 87.5% on MMMU (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "math",
+     "value": 77.3,
+     "config": "MATH-500",
+     "reported_by": "official",
+     "source": {
+      "url": "https://x.ai/synthetic/grok-4-math",
+      "title": "Grok 4 MATH — synthetic launch note",
+      "quote": "Grok 4 scores 77.3% on MATH (Hendrycks) (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "swe-bench-pro",
+     "value": 61.4,
+     "config": "public set",
+     "reported_by": "official",
+     "source": {
+      "url": "https://x.ai/synthetic/grok-4-swe-bench-pro",
+      "title": "Grok 4 SWE-bench Pro — synthetic launch note",
+      "quote": "Grok 4 scores 61.4% on SWE-bench Pro (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "browsecomp",
+     "value": 57.1,
+     "config": "with browsing tools",
+     "reported_by": "official",
+     "source": {
+      "url": "https://x.ai/synthetic/grok-4-browsecomp",
+      "title": "Grok 4 BrowseComp — synthetic launch note",
+      "quote": "Grok 4 scores 57.1% on BrowseComp (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    }
+   ],
+   "notes": "SYNTHETIC FIXTURE — not real data"
+  },
+  {
+   "id": "moonshot-kimi-k2",
+   "lab": "moonshot",
+   "name": "Kimi K2",
+   "family": "Kimi K",
+   "date": "2025-07-11",
+   "date_precision": "day",
+   "status": "released",
+   "announcement": {
+    "url": "https://www.moonshot.ai/synthetic/kimi-k2",
+    "title": "Kimi K2 — synthetic launch note",
+    "quote": "Kimi K2 is available today. (SYNTHETIC FIXTURE — not real data; this quote is fabricated.)",
+    "retrieved_at": "2026-09-06T22:00:00Z",
+    "verified": true,
+    "verified_at": "2026-09-06T22:00:00Z"
+   },
+   "scores": [
+    {
+     "benchmark": "gpqa-diamond",
+     "value": 77.1,
+     "config": "no tools, pass@1",
+     "reported_by": "official",
+     "source": {
+      "url": "https://www.moonshot.ai/synthetic/kimi-k2-gpqa",
+      "title": "Kimi K2 GPQA — synthetic launch note",
+      "quote": "Kimi K2 scores 77.1% on GPQA Diamond (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "swe-bench-verified",
+     "value": 76.5,
+     "config": "default scaffold, pass@1",
+     "reported_by": "official",
+     "source": {
+      "url": "https://www.moonshot.ai/synthetic/kimi-k2-swe-bench",
+      "title": "Kimi K2 SWE-bench — synthetic launch note",
+      "quote": "Kimi K2 scores 76.5% on SWE-bench Verified (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "aime",
+     "value": 84.3,
+     "config": "AIME 2025, no tools",
+     "reported_by": "official",
+     "source": {
+      "url": "https://www.moonshot.ai/synthetic/kimi-k2-aime",
+      "title": "Kimi K2 AIME — synthetic launch note",
+      "quote": "Kimi K2 scores 84.3% on AIME (American Invitational Mathematics Examination) (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "mmlu-pro",
+     "value": 88.4,
+     "config": "CoT, 0-shot",
+     "reported_by": "official",
+     "source": {
+      "url": "https://www.moonshot.ai/synthetic/kimi-k2-mmlu-pro",
+      "title": "Kimi K2 MMLU-Pro — synthetic launch note",
+      "quote": "Kimi K2 scores 88.4% on MMLU-Pro (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "hle",
+     "value": 23,
+     "config": "no tools, full set",
+     "reported_by": "official",
+     "source": {
+      "url": "https://www.moonshot.ai/synthetic/kimi-k2-hle",
+      "title": "Kimi K2 HLE — synthetic launch note",
+      "quote": "Kimi K2 scores 23% on Humanity's Last Exam (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "arc-agi-2",
+     "value": 18.1,
+     "config": "semi-private eval",
+     "reported_by": "official",
+     "source": {
+      "url": "https://www.moonshot.ai/synthetic/kimi-k2-arc-agi-2",
+      "title": "Kimi K2 ARC-AGI-2 — synthetic launch note",
+      "quote": "Kimi K2 scores 18.1% on ARC-AGI-2 (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "tau2-bench",
+     "value": 72.3,
+     "config": "pass^1, mean of retail / airline / telecom",
+     "reported_by": "official",
+     "source": {
+      "url": "https://www.moonshot.ai/synthetic/kimi-k2-bench",
+      "title": "Kimi K2 τ²-bench — synthetic launch note",
+      "quote": "Kimi K2 scores 72.3% on τ²-bench (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "mmmu",
+     "value": 81.8,
+     "config": "validation split",
+     "reported_by": "official",
+     "source": {
+      "url": "https://www.moonshot.ai/synthetic/kimi-k2-mmmu",
+      "title": "Kimi K2 MMMU — synthetic launch note",
+      "quote": "Kimi K2 scores 81.8% on MMMU (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "livecodebench",
+     "value": 70.6,
+     "config": "pass@1, v6",
+     "reported_by": "official",
+     "source": {
+      "url": "https://www.moonshot.ai/synthetic/kimi-k2-livecodebench",
+      "title": "Kimi K2 LiveCodeBench — synthetic launch note",
+      "quote": "Kimi K2 scores 70.6% on LiveCodeBench (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    }
+   ],
+   "notes": "SYNTHETIC FIXTURE — not real data"
+  },
+  {
+   "id": "openai-gpt-5",
+   "lab": "openai",
+   "name": "GPT-5",
+   "family": "GPT",
+   "date": "2025-08-07",
+   "date_precision": "day",
+   "status": "released",
+   "announcement": {
+    "url": "https://openai.com/synthetic/gpt-5",
+    "title": "GPT-5 — synthetic launch note",
+    "quote": "GPT-5 is available today. (SYNTHETIC FIXTURE — not real data; this quote is fabricated.)",
+    "retrieved_at": "2026-09-06T22:00:00Z",
+    "verified": true,
+    "verified_at": "2026-09-06T22:00:00Z"
+   },
+   "scores": [
+    {
+     "benchmark": "gpqa-diamond",
+     "value": 86.6,
+     "config": "no tools, pass@1",
+     "reported_by": "official",
+     "source": {
+      "url": "https://openai.com/synthetic/gpt-5-gpqa",
+      "title": "GPT-5 GPQA — synthetic launch note",
+      "quote": "GPT-5 scores 86.6% on GPQA Diamond (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "aime",
+     "value": 90.2,
+     "config": "AIME 2025, no tools",
+     "reported_by": "official",
+     "source": {
+      "url": "https://openai.com/synthetic/gpt-5-aime",
+      "title": "GPT-5 AIME — synthetic launch note",
+      "quote": "GPT-5 scores 90.2% on AIME (American Invitational Mathematics Examination) (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "hle",
+     "value": 35.8,
+     "config": "no tools, full set",
+     "reported_by": "official",
+     "source": {
+      "url": "https://openai.com/synthetic/gpt-5-hle",
+      "title": "GPT-5 HLE — synthetic launch note",
+      "quote": "GPT-5 scores 35.8% on Humanity's Last Exam (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "mmmu",
+     "value": 90.2,
+     "config": "validation split",
+     "reported_by": "official",
+     "source": {
+      "url": "https://openai.com/synthetic/gpt-5-mmmu",
+      "title": "GPT-5 MMMU — synthetic launch note",
+      "quote": "GPT-5 scores 90.2% on MMMU (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "livecodebench",
+     "value": 80.7,
+     "config": "pass@1, v6",
+     "reported_by": "official",
+     "source": {
+      "url": "https://openai.com/synthetic/gpt-5-livecodebench",
+      "title": "GPT-5 LiveCodeBench — synthetic launch note",
+      "quote": "GPT-5 scores 80.7% on LiveCodeBench (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "osworld",
+     "value": 69.4,
+     "config": "OSWorld-Verified, 100 steps",
+     "reported_by": "official",
+     "source": {
+      "url": "https://openai.com/synthetic/gpt-5-osworld",
+      "title": "GPT-5 OSWorld — synthetic launch note",
+      "quote": "GPT-5 scores 69.4% on OSWorld / OSWorld-Verified (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z"
+     }
+    }
+   ],
+   "notes": "SYNTHETIC FIXTURE — not real data"
+  },
+  {
+   "id": "alibaba-qwen3-max",
+   "lab": "alibaba",
+   "name": "Qwen3-Max",
+   "family": "Qwen Max",
+   "date": "2025-09-05",
+   "date_precision": "day",
+   "status": "released",
+   "announcement": {
+    "url": "https://qwen.ai/synthetic/qwen3-max",
+    "title": "Qwen3-Max — synthetic launch note",
+    "quote": "Qwen3-Max is available today. (SYNTHETIC FIXTURE — not real data; this quote is fabricated.)",
+    "retrieved_at": "2026-09-06T22:00:00Z",
+    "verified": true,
+    "verified_at": "2026-09-06T22:00:00Z"
+   },
+   "scores": [
+    {
+     "benchmark": "gpqa-diamond",
+     "value": 79.8,
+     "config": "no tools, pass@1",
+     "reported_by": "official",
+     "source": {
+      "url": "https://qwen.ai/synthetic/qwen3-max-gpqa",
+      "title": "Qwen3-Max GPQA — synthetic launch note",
+      "quote": "Qwen3-Max scores 79.8% on GPQA Diamond (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "swe-bench-verified",
+     "value": 76.7,
+     "config": "default scaffold, pass@1",
+     "reported_by": "official",
+     "source": {
+      "url": "https://qwen.ai/synthetic/qwen3-max-swe-bench",
+      "title": "Qwen3-Max SWE-bench — synthetic launch note",
+      "quote": "Qwen3-Max scores 76.7% on SWE-bench Verified (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "aime",
+     "value": 86.4,
+     "config": "AIME 2025, no tools",
+     "reported_by": "official",
+     "source": {
+      "url": "https://qwen.ai/synthetic/qwen3-max-aime",
+      "title": "Qwen3-Max AIME — synthetic launch note",
+      "quote": "Qwen3-Max scores 86.4% on AIME (American Invitational Mathematics Examination) (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "mmlu-pro",
+     "value": 86.3,
+     "config": "CoT, 0-shot",
+     "reported_by": "official",
+     "source": {
+      "url": "https://qwen.ai/synthetic/qwen3-max-mmlu-pro",
+      "title": "Qwen3-Max MMLU-Pro — synthetic launch note",
+      "quote": "Qwen3-Max scores 86.3% on MMLU-Pro (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "hle",
+     "value": 29.1,
+     "config": "no tools, full set",
+     "reported_by": "official",
+     "source": {
+      "url": "https://qwen.ai/synthetic/qwen3-max-hle",
+      "title": "Qwen3-Max HLE — synthetic launch note",
+      "quote": "Qwen3-Max scores 29.1% on Humanity's Last Exam (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "arc-agi-2",
+     "value": 16.4,
+     "config": "semi-private eval",
+     "reported_by": "official",
+     "source": {
+      "url": "https://qwen.ai/synthetic/qwen3-max-arc-agi-2",
+      "title": "Qwen3-Max ARC-AGI-2 — synthetic launch note",
+      "quote": "Qwen3-Max scores 16.4% on ARC-AGI-2 (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "terminal-bench-2",
+     "value": 57.9,
+     "config": "Terminus-2 harness",
+     "reported_by": "official",
+     "source": {
+      "url": "https://qwen.ai/synthetic/qwen3-max-terminal-bench",
+      "title": "Qwen3-Max Terminal-Bench — synthetic launch note",
+      "quote": "Qwen3-Max scores 57.9% on Terminal-Bench 2.0 (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "tau2-bench",
+     "value": 74.4,
+     "config": "pass^1, mean of retail / airline / telecom",
+     "reported_by": "official",
+     "source": {
+      "url": "https://qwen.ai/synthetic/qwen3-max-bench",
+      "title": "Qwen3-Max τ²-bench — synthetic launch note",
+      "quote": "Qwen3-Max scores 74.4% on τ²-bench (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "mmmu",
+     "value": 85.6,
+     "config": "validation split",
+     "reported_by": "official",
+     "source": {
+      "url": "https://qwen.ai/synthetic/qwen3-max-mmmu",
+      "title": "Qwen3-Max MMMU — synthetic launch note",
+      "quote": "Qwen3-Max scores 85.6% on MMMU (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "browsecomp",
+     "value": 53,
+     "config": "with browsing tools",
+     "reported_by": "official",
+     "source": {
+      "url": "https://qwen.ai/synthetic/qwen3-max-browsecomp",
+      "title": "Qwen3-Max BrowseComp — synthetic launch note",
+      "quote": "Qwen3-Max scores 53% on BrowseComp (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z"
+     }
+    }
+   ],
+   "notes": "SYNTHETIC FIXTURE — not real data"
+  },
+  {
+   "id": "deepseek-v3.2",
+   "lab": "deepseek",
+   "name": "DeepSeek-V3.2",
+   "family": "DeepSeek-V",
+   "date": "2025-09-29",
+   "date_precision": "day",
+   "status": "released",
+   "announcement": {
+    "url": "https://www.deepseek.com/synthetic/deepseek-v3-2",
+    "title": "DeepSeek-V3.2 — synthetic launch note",
+    "quote": "DeepSeek-V3.2 is available today. (SYNTHETIC FIXTURE — not real data; this quote is fabricated.)",
+    "retrieved_at": "2026-09-06T22:00:00Z",
+    "verified": true,
+    "verified_at": "2026-09-06T22:00:00Z"
+   },
+   "scores": [
+    {
+     "benchmark": "gpqa-diamond",
+     "value": 79.4,
+     "config": "no tools, pass@1",
+     "reported_by": "official",
+     "source": {
+      "url": "https://www.deepseek.com/synthetic/deepseek-v3-2-gpqa",
+      "title": "DeepSeek-V3.2 GPQA — synthetic launch note",
+      "quote": "DeepSeek-V3.2 scores 79.4% on GPQA Diamond (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "swe-bench-verified",
+     "value": 76.7,
+     "config": "default scaffold, pass@1",
+     "reported_by": "official",
+     "source": {
+      "url": "https://www.deepseek.com/synthetic/deepseek-v3-2-swe-bench",
+      "title": "DeepSeek-V3.2 SWE-bench — synthetic launch note",
+      "quote": "DeepSeek-V3.2 scores 76.7% on SWE-bench Verified (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "aime",
+     "value": 85.3,
+     "config": "AIME 2025, no tools",
+     "reported_by": "official",
+     "source": {
+      "url": "https://www.deepseek.com/synthetic/deepseek-v3-2-aime",
+      "title": "DeepSeek-V3.2 AIME — synthetic launch note",
+      "quote": "DeepSeek-V3.2 scores 85.3% on AIME (American Invitational Mathematics Examination) (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "arc-agi-2",
+     "value": 18.2,
+     "config": "semi-private eval",
+     "reported_by": "maintainer",
+     "source": {
+      "url": "https://www.deepseek.com/synthetic/deepseek-v3-2-arc-agi-2",
+      "title": "DeepSeek-V3.2 ARC-AGI-2 — synthetic launch note",
+      "quote": "DeepSeek-V3.2 scores 18.2% on ARC-AGI-2 (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "tau2-bench",
+     "value": 73.8,
+     "config": "pass^1, mean of retail / airline / telecom",
+     "reported_by": "official",
+     "source": {
+      "url": "https://www.deepseek.com/synthetic/deepseek-v3-2-bench",
+      "title": "DeepSeek-V3.2 τ²-bench — synthetic launch note",
+      "quote": "DeepSeek-V3.2 scores 73.8% on τ²-bench (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "mmmu",
+     "value": 84.7,
+     "config": "validation split",
+     "reported_by": "official",
+     "source": {
+      "url": "https://www.deepseek.com/synthetic/deepseek-v3-2-mmmu",
+      "title": "DeepSeek-V3.2 MMMU — synthetic launch note",
+      "quote": "DeepSeek-V3.2 scores 84.7% on MMMU (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "swe-bench-pro",
+     "value": 64.2,
+     "config": "public set",
+     "reported_by": "official",
+     "source": {
+      "url": "https://www.deepseek.com/synthetic/deepseek-v3-2-swe-bench-pro",
+      "title": "DeepSeek-V3.2 SWE-bench Pro — synthetic launch note",
+      "quote": "DeepSeek-V3.2 scores 64.2% on SWE-bench Pro (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "frontiermath",
+     "value": 33,
+     "config": "Tiers 1-3",
+     "reported_by": "maintainer",
+     "source": {
+      "url": "https://www.deepseek.com/synthetic/deepseek-v3-2-frontiermath",
+      "title": "DeepSeek-V3.2 FrontierMath — synthetic launch note",
+      "quote": "DeepSeek-V3.2 scores 33% on FrontierMath (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    }
+   ],
+   "notes": "SYNTHETIC FIXTURE — not real data"
+  },
+  {
+   "id": "zhipu-glm-4.6",
+   "lab": "zhipu",
+   "name": "GLM-4.6",
+   "family": "GLM",
+   "date": "2025-09-30",
+   "date_precision": "day",
+   "status": "released",
+   "announcement": {
+    "url": "https://z.ai/synthetic/glm-4-6",
+    "title": "GLM-4.6 — synthetic launch note",
+    "quote": "GLM-4.6 is available today. (SYNTHETIC FIXTURE — not real data; this quote is fabricated.)",
+    "retrieved_at": "2026-09-06T22:00:00Z",
+    "verified": true,
+    "verified_at": "2026-09-06T22:00:00Z"
+   },
+   "scores": [
+    {
+     "benchmark": "gpqa-diamond",
+     "value": 82.5,
+     "config": "no tools, pass@1",
+     "reported_by": "official",
+     "source": {
+      "url": "https://z.ai/synthetic/glm-4-6-gpqa",
+      "title": "GLM-4.6 GPQA — synthetic launch note",
+      "quote": "GLM-4.6 scores 82.5% on GPQA Diamond (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "swe-bench-verified",
+     "value": 78.8,
+     "config": "default scaffold, pass@1",
+     "reported_by": "official",
+     "source": {
+      "url": "https://z.ai/synthetic/glm-4-6-swe-bench",
+      "title": "GLM-4.6 SWE-bench — synthetic launch note",
+      "quote": "GLM-4.6 scores 78.8% on SWE-bench Verified (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "mmlu-pro",
+     "value": 87.8,
+     "config": "CoT, 0-shot",
+     "reported_by": "official",
+     "source": {
+      "url": "https://z.ai/synthetic/glm-4-6-mmlu-pro",
+      "title": "GLM-4.6 MMLU-Pro — synthetic launch note",
+      "quote": "GLM-4.6 scores 87.8% on MMLU-Pro (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "arc-agi-2",
+     "value": 17.4,
+     "config": "semi-private eval",
+     "reported_by": "maintainer",
+     "source": {
+      "url": "https://z.ai/synthetic/glm-4-6-arc-agi-2",
+      "title": "GLM-4.6 ARC-AGI-2 — synthetic launch note",
+      "quote": "GLM-4.6 scores 17.4% on ARC-AGI-2 (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "tau2-bench",
+     "value": 73.7,
+     "config": "pass^1, mean of retail / airline / telecom",
+     "reported_by": "official",
+     "source": {
+      "url": "https://z.ai/synthetic/glm-4-6-bench",
+      "title": "GLM-4.6 τ²-bench — synthetic launch note",
+      "quote": "GLM-4.6 scores 73.7% on τ²-bench (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "mmmu",
+     "value": 87.2,
+     "config": "validation split",
+     "reported_by": "official",
+     "source": {
+      "url": "https://z.ai/synthetic/glm-4-6-mmmu",
+      "title": "GLM-4.6 MMMU — synthetic launch note",
+      "quote": "GLM-4.6 scores 87.2% on MMMU (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "livecodebench",
+     "value": 75.9,
+     "config": "pass@1, v6",
+     "reported_by": "official",
+     "source": {
+      "url": "https://z.ai/synthetic/glm-4-6-livecodebench",
+      "title": "GLM-4.6 LiveCodeBench — synthetic launch note",
+      "quote": "GLM-4.6 scores 75.9% on LiveCodeBench (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "math",
+     "value": 63.1,
+     "config": "MATH-500",
+     "reported_by": "official",
+     "source": {
+      "url": "https://z.ai/synthetic/glm-4-6-math",
+      "title": "GLM-4.6 MATH — synthetic launch note",
+      "quote": "GLM-4.6 scores 63.1% on MATH (Hendrycks) (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "swe-bench-pro",
+     "value": 65.2,
+     "config": "public set",
+     "reported_by": "official",
+     "source": {
+      "url": "https://z.ai/synthetic/glm-4-6-swe-bench-pro",
+      "title": "GLM-4.6 SWE-bench Pro — synthetic launch note",
+      "quote": "GLM-4.6 scores 65.2% on SWE-bench Pro (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "browsecomp",
+     "value": 46.9,
+     "config": "with browsing tools",
+     "reported_by": "official",
+     "source": {
+      "url": "https://z.ai/synthetic/glm-4-6-browsecomp",
+      "title": "GLM-4.6 BrowseComp — synthetic launch note",
+      "quote": "GLM-4.6 scores 46.9% on BrowseComp (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    }
+   ],
+   "notes": "SYNTHETIC FIXTURE — not real data"
+  },
+  {
+   "id": "google-gemini-3-pro",
+   "lab": "google",
+   "name": "Gemini 3 Pro",
+   "family": "Gemini Pro",
+   "date": "2025-11-18",
+   "date_precision": "day",
+   "status": "released",
+   "announcement": {
+    "url": "https://deepmind.google/synthetic/gemini-3-pro",
+    "title": "Gemini 3 Pro — synthetic launch note",
+    "quote": "Gemini 3 Pro is available today. (SYNTHETIC FIXTURE — not real data; this quote is fabricated.)",
+    "retrieved_at": "2026-09-06T22:00:00Z",
+    "verified": true,
+    "verified_at": "2026-09-06T22:00:00Z"
+   },
+   "scores": [
+    {
+     "benchmark": "swe-bench-verified",
+     "value": 81,
+     "config": "default scaffold, pass@1",
+     "reported_by": "official",
+     "source": {
+      "url": "https://deepmind.google/synthetic/gemini-3-pro-swe-bench",
+      "title": "Gemini 3 Pro SWE-bench — synthetic launch note",
+      "quote": "Gemini 3 Pro scores 81% on SWE-bench Verified (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "aime",
+     "value": 88.5,
+     "config": "AIME 2025, no tools",
+     "reported_by": "official",
+     "source": {
+      "url": "https://deepmind.google/synthetic/gemini-3-pro-aime",
+      "title": "Gemini 3 Pro AIME — synthetic launch note",
+      "quote": "Gemini 3 Pro scores 88.5% on AIME (American Invitational Mathematics Examination) (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "mmlu-pro",
+     "value": 89.5,
+     "config": "CoT, 0-shot",
+     "reported_by": "official",
+     "source": {
+      "url": "https://deepmind.google/synthetic/gemini-3-pro-mmlu-pro",
+      "title": "Gemini 3 Pro MMLU-Pro — synthetic launch note",
+      "quote": "Gemini 3 Pro scores 89.5% on MMLU-Pro (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "hle",
+     "value": 34,
+     "config": "no tools, full set",
+     "reported_by": "official",
+     "source": {
+      "url": "https://deepmind.google/synthetic/gemini-3-pro-hle",
+      "title": "Gemini 3 Pro HLE — synthetic launch note",
+      "quote": "Gemini 3 Pro scores 34% on Humanity's Last Exam (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "mmmu",
+     "value": 86.5,
+     "config": "validation split",
+     "reported_by": "official",
+     "source": {
+      "url": "https://deepmind.google/synthetic/gemini-3-pro-mmmu",
+      "title": "Gemini 3 Pro MMMU — synthetic launch note",
+      "quote": "Gemini 3 Pro scores 86.5% on MMMU (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "livecodebench",
+     "value": 84.7,
+     "config": "pass@1, v6",
+     "reported_by": "official",
+     "source": {
+      "url": "https://deepmind.google/synthetic/gemini-3-pro-livecodebench",
+      "title": "Gemini 3 Pro LiveCodeBench — synthetic launch note",
+      "quote": "Gemini 3 Pro scores 84.7% on LiveCodeBench (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "humaneval",
+     "value": 94,
+     "config": "pass@1, 0-shot",
+     "reported_by": "official",
+     "source": {
+      "url": "https://deepmind.google/synthetic/gemini-3-pro-humaneval",
+      "title": "Gemini 3 Pro HumanEval — synthetic launch note",
+      "quote": "Gemini 3 Pro scores 94% on HumanEval (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "swe-bench-pro",
+     "value": 57.2,
+     "config": "public set",
+     "reported_by": "official",
+     "source": {
+      "url": "https://deepmind.google/synthetic/gemini-3-pro-swe-bench-pro",
+      "title": "Gemini 3 Pro SWE-bench Pro — synthetic launch note",
+      "quote": "Gemini 3 Pro scores 57.2% on SWE-bench Pro (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z"
+     }
+    }
+   ],
+   "notes": "SYNTHETIC FIXTURE — not real data"
+  },
+  {
+   "id": "anthropic-claude-4.5-opus",
+   "lab": "anthropic",
+   "name": "Claude Opus 4.5",
+   "family": "Claude Opus",
+   "date": "2025-11-24",
+   "date_precision": "day",
+   "status": "released",
+   "announcement": {
+    "url": "https://www.anthropic.com/synthetic/claude-opus-4-5",
+    "title": "Claude Opus 4.5 — synthetic launch note",
+    "quote": "Claude Opus 4.5 is available today. (SYNTHETIC FIXTURE — not real data; this quote is fabricated.)",
+    "retrieved_at": "2026-09-06T22:00:00Z",
+    "verified": true,
+    "verified_at": "2026-09-06T22:00:00Z"
+   },
+   "scores": [
+    {
+     "benchmark": "gpqa-diamond",
+     "value": 86.4,
+     "config": "no tools, pass@1",
+     "reported_by": "official",
+     "source": {
+      "url": "https://www.anthropic.com/synthetic/claude-opus-4-5-gpqa",
+      "title": "Claude Opus 4.5 GPQA — synthetic launch note",
+      "quote": "Claude Opus 4.5 scores 86.4% on GPQA Diamond (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "swe-bench-verified",
+     "value": 80.7,
+     "config": "default scaffold, pass@1",
+     "reported_by": "official",
+     "source": {
+      "url": "https://www.anthropic.com/synthetic/claude-opus-4-5-swe-bench",
+      "title": "Claude Opus 4.5 SWE-bench — synthetic launch note",
+      "quote": "Claude Opus 4.5 scores 80.7% on SWE-bench Verified (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "aime",
+     "value": 87.6,
+     "config": "AIME 2025, no tools",
+     "reported_by": "official",
+     "source": {
+      "url": "https://www.anthropic.com/synthetic/claude-opus-4-5-aime",
+      "title": "Claude Opus 4.5 AIME — synthetic launch note",
+      "quote": "Claude Opus 4.5 scores 87.6% on AIME (American Invitational Mathematics Examination) (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "mmlu-pro",
+     "value": 91.4,
+     "config": "CoT, 0-shot",
+     "reported_by": "official",
+     "source": {
+      "url": "https://www.anthropic.com/synthetic/claude-opus-4-5-mmlu-pro",
+      "title": "Claude Opus 4.5 MMLU-Pro — synthetic launch note",
+      "quote": "Claude Opus 4.5 scores 91.4% on MMLU-Pro (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "mmmu",
+     "value": 90.3,
+     "config": "validation split",
+     "reported_by": "official",
+     "source": {
+      "url": "https://www.anthropic.com/synthetic/claude-opus-4-5-mmmu",
+      "title": "Claude Opus 4.5 MMMU — synthetic launch note",
+      "quote": "Claude Opus 4.5 scores 90.3% on MMMU (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "livecodebench",
+     "value": 80.2,
+     "config": "pass@1, v6",
+     "reported_by": "official",
+     "source": {
+      "url": "https://www.anthropic.com/synthetic/claude-opus-4-5-livecodebench",
+      "title": "Claude Opus 4.5 LiveCodeBench — synthetic launch note",
+      "quote": "Claude Opus 4.5 scores 80.2% on LiveCodeBench (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "swe-bench-pro",
+     "value": 69,
+     "config": "public set",
+     "reported_by": "official",
+     "source": {
+      "url": "https://www.anthropic.com/synthetic/claude-opus-4-5-swe-bench-pro",
+      "title": "Claude Opus 4.5 SWE-bench Pro — synthetic launch note",
+      "quote": "Claude Opus 4.5 scores 69% on SWE-bench Pro (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    }
+   ],
+   "notes": "SYNTHETIC FIXTURE — not real data"
+  },
+  {
+   "id": "mistral-large-3",
+   "lab": "mistral",
+   "name": "Mistral Large 3",
+   "family": "Mistral Large",
+   "date": "2025-12-02",
+   "date_precision": "day",
+   "status": "released",
+   "announcement": {
+    "url": "https://mistral.ai/synthetic/mistral-large-3",
+    "title": "Mistral Large 3 — synthetic launch note",
+    "quote": "Mistral Large 3 is available today. (SYNTHETIC FIXTURE — not real data; this quote is fabricated.)",
+    "retrieved_at": "2026-09-06T22:00:00Z",
+    "verified": true,
+    "verified_at": "2026-09-06T22:00:00Z"
+   },
+   "scores": [
+    {
+     "benchmark": "gpqa-diamond",
+     "value": 77,
+     "config": "no tools, pass@1",
+     "reported_by": "official",
+     "source": {
+      "url": "https://mistral.ai/synthetic/mistral-large-3-gpqa",
+      "title": "Mistral Large 3 GPQA — synthetic launch note",
+      "quote": "Mistral Large 3 scores 77% on GPQA Diamond (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "swe-bench-verified",
+     "value": 72.8,
+     "config": "default scaffold, pass@1",
+     "reported_by": "official",
+     "source": {
+      "url": "https://mistral.ai/synthetic/mistral-large-3-swe-bench",
+      "title": "Mistral Large 3 SWE-bench — synthetic launch note",
+      "quote": "Mistral Large 3 scores 72.8% on SWE-bench Verified (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "aime",
+     "value": 81.7,
+     "config": "AIME 2025, no tools",
+     "reported_by": "official",
+     "source": {
+      "url": "https://mistral.ai/synthetic/mistral-large-3-aime",
+      "title": "Mistral Large 3 AIME — synthetic launch note",
+      "quote": "Mistral Large 3 scores 81.7% on AIME (American Invitational Mathematics Examination) (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "mmlu-pro",
+     "value": 85.4,
+     "config": "CoT, 0-shot",
+     "reported_by": "official",
+     "source": {
+      "url": "https://mistral.ai/synthetic/mistral-large-3-mmlu-pro",
+      "title": "Mistral Large 3 MMLU-Pro — synthetic launch note",
+      "quote": "Mistral Large 3 scores 85.4% on MMLU-Pro (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "hle",
+     "value": 28.3,
+     "config": "no tools, full set",
+     "reported_by": "official",
+     "source": {
+      "url": "https://mistral.ai/synthetic/mistral-large-3-hle",
+      "title": "Mistral Large 3 HLE — synthetic launch note",
+      "quote": "Mistral Large 3 scores 28.3% on Humanity's Last Exam (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "arc-agi-2",
+     "value": 18.8,
+     "config": "semi-private eval",
+     "reported_by": "official",
+     "source": {
+      "url": "https://mistral.ai/synthetic/mistral-large-3-arc-agi-2",
+      "title": "Mistral Large 3 ARC-AGI-2 — synthetic launch note",
+      "quote": "Mistral Large 3 scores 18.8% on ARC-AGI-2 (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "terminal-bench-2",
+     "value": 52.3,
+     "config": "Terminus-2 harness",
+     "reported_by": "official",
+     "source": {
+      "url": "https://mistral.ai/synthetic/mistral-large-3-terminal-bench",
+      "title": "Mistral Large 3 Terminal-Bench — synthetic launch note",
+      "quote": "Mistral Large 3 scores 52.3% on Terminal-Bench 2.0 (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "tau2-bench",
+     "value": 72.1,
+     "config": "pass^1, mean of retail / airline / telecom",
+     "reported_by": "official",
+     "source": {
+      "url": "https://mistral.ai/synthetic/mistral-large-3-bench",
+      "title": "Mistral Large 3 τ²-bench — synthetic launch note",
+      "quote": "Mistral Large 3 scores 72.1% on τ²-bench (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "mmmu",
+     "value": 79.8,
+     "config": "validation split",
+     "reported_by": "official",
+     "source": {
+      "url": "https://mistral.ai/synthetic/mistral-large-3-mmmu",
+      "title": "Mistral Large 3 MMMU — synthetic launch note",
+      "quote": "Mistral Large 3 scores 79.8% on MMMU (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "mmlu",
+     "value": 93.8,
+     "config": "5-shot",
+     "reported_by": "official",
+     "source": {
+      "url": "https://mistral.ai/synthetic/mistral-large-3-mmlu",
+      "title": "Mistral Large 3 MMLU — synthetic launch note",
+      "quote": "Mistral Large 3 scores 93.8% on MMLU (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z"
+     }
+    }
+   ],
+   "notes": "SYNTHETIC FIXTURE — not real data"
+  },
+  {
+   "id": "meta-llama-5-behemoth",
+   "lab": "meta",
+   "name": "Llama 5 Behemoth",
+   "family": "Llama",
+   "date": "2026-02-01",
+   "date_precision": "quarter",
+   "status": "cancelled",
+   "announcement": {
+    "url": "https://ai.meta.com/synthetic/llama-5-behemoth",
+    "title": "Llama 5 Behemoth — synthetic launch note",
+    "quote": "Llama 5 Behemoth is available today. (SYNTHETIC FIXTURE — not real data; this quote is fabricated.)",
+    "retrieved_at": "2026-09-06T22:00:00Z",
+    "verified": true,
+    "verified_at": "2026-09-06T22:00:00Z"
+   },
+   "scores": [],
+   "notes": "SYNTHETIC FIXTURE — not real data"
+  },
+  {
+   "id": "moonshot-kimi-k2.5",
+   "lab": "moonshot",
+   "name": "Kimi K2.5",
+   "family": "Kimi K",
+   "date": "2026-02-10",
+   "date_precision": "day",
+   "status": "released",
+   "announcement": {
+    "url": "https://www.moonshot.ai/synthetic/kimi-k2-5",
+    "title": "Kimi K2.5 — synthetic launch note",
+    "quote": "Kimi K2.5 is available today. (SYNTHETIC FIXTURE — not real data; this quote is fabricated.)",
+    "retrieved_at": "2026-09-06T22:00:00Z",
+    "verified": true,
+    "verified_at": "2026-09-06T22:00:00Z"
+   },
+   "scores": [
+    {
+     "benchmark": "swe-bench-verified",
+     "value": 78.5,
+     "config": "default scaffold, pass@1",
+     "reported_by": "official",
+     "source": {
+      "url": "https://www.moonshot.ai/synthetic/kimi-k2-5-swe-bench",
+      "title": "Kimi K2.5 SWE-bench — synthetic launch note",
+      "quote": "Kimi K2.5 scores 78.5% on SWE-bench Verified (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "aime",
+     "value": 89.7,
+     "config": "AIME 2025, no tools",
+     "reported_by": "official",
+     "source": {
+      "url": "https://www.moonshot.ai/synthetic/kimi-k2-5-aime",
+      "title": "Kimi K2.5 AIME — synthetic launch note",
+      "quote": "Kimi K2.5 scores 89.7% on AIME (American Invitational Mathematics Examination) (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "mmlu-pro",
+     "value": 86.3,
+     "config": "CoT, 0-shot",
+     "reported_by": "official",
+     "source": {
+      "url": "https://www.moonshot.ai/synthetic/kimi-k2-5-mmlu-pro",
+      "title": "Kimi K2.5 MMLU-Pro — synthetic launch note",
+      "quote": "Kimi K2.5 scores 86.3% on MMLU-Pro (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "hle",
+     "value": 29.5,
+     "config": "no tools, full set",
+     "reported_by": "official",
+     "source": {
+      "url": "https://www.moonshot.ai/synthetic/kimi-k2-5-hle",
+      "title": "Kimi K2.5 HLE — synthetic launch note",
+      "quote": "Kimi K2.5 scores 29.5% on Humanity's Last Exam (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "arc-agi-2",
+     "value": 16.6,
+     "config": "semi-private eval",
+     "reported_by": "maintainer",
+     "source": {
+      "url": "https://www.moonshot.ai/synthetic/kimi-k2-5-arc-agi-2",
+      "title": "Kimi K2.5 ARC-AGI-2 — synthetic launch note",
+      "quote": "Kimi K2.5 scores 16.6% on ARC-AGI-2 (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "tau2-bench",
+     "value": 80.5,
+     "config": "pass^1, mean of retail / airline / telecom",
+     "reported_by": "official",
+     "source": {
+      "url": "https://www.moonshot.ai/synthetic/kimi-k2-5-bench",
+      "title": "Kimi K2.5 τ²-bench — synthetic launch note",
+      "quote": "Kimi K2.5 scores 80.5% on τ²-bench (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z"
+     }
+    }
+   ],
+   "notes": "SYNTHETIC FIXTURE — not real data"
+  },
+  {
+   "id": "openai-gpt-5.5",
+   "lab": "openai",
+   "name": "GPT-5.5",
+   "family": "GPT",
+   "date": "2026-03-19",
+   "date_precision": "day",
+   "status": "released",
+   "announcement": {
+    "url": "https://openai.com/synthetic/gpt-5-5",
+    "title": "GPT-5.5 — synthetic launch note",
+    "quote": "GPT-5.5 is available today. (SYNTHETIC FIXTURE — not real data; this quote is fabricated.)",
+    "retrieved_at": "2026-09-06T22:00:00Z",
+    "verified": true,
+    "verified_at": "2026-09-06T22:00:00Z"
+   },
+   "scores": [
+    {
+     "benchmark": "gpqa-diamond",
+     "value": 88,
+     "config": "no tools, pass@1",
+     "reported_by": "official",
+     "source": {
+      "url": "https://openai.com/synthetic/gpt-5-5-gpqa",
+      "title": "GPT-5.5 GPQA — synthetic launch note",
+      "quote": "GPT-5.5 scores 88% on GPQA Diamond (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "swe-bench-verified",
+     "value": 85.4,
+     "config": "default scaffold, pass@1",
+     "reported_by": "official",
+     "source": {
+      "url": "https://openai.com/synthetic/gpt-5-5-swe-bench",
+      "title": "GPT-5.5 SWE-bench — synthetic launch note",
+      "quote": "GPT-5.5 scores 85.4% on SWE-bench Verified (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "aime",
+     "value": 90.7,
+     "config": "AIME 2025, no tools",
+     "reported_by": "official",
+     "source": {
+      "url": "https://openai.com/synthetic/gpt-5-5-aime",
+      "title": "GPT-5.5 AIME — synthetic launch note",
+      "quote": "GPT-5.5 scores 90.7% on AIME (American Invitational Mathematics Examination) (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "mmlu-pro",
+     "value": 88.2,
+     "config": "CoT, 0-shot",
+     "reported_by": "official",
+     "source": {
+      "url": "https://openai.com/synthetic/gpt-5-5-mmlu-pro",
+      "title": "GPT-5.5 MMLU-Pro — synthetic launch note",
+      "quote": "GPT-5.5 scores 88.2% on MMLU-Pro (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "hle",
+     "value": 37.3,
+     "config": "no tools, full set",
+     "reported_by": "official",
+     "source": {
+      "url": "https://openai.com/synthetic/gpt-5-5-hle",
+      "title": "GPT-5.5 HLE — synthetic launch note",
+      "quote": "GPT-5.5 scores 37.3% on Humanity's Last Exam (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "tau2-bench",
+     "value": 82.1,
+     "config": "pass^1, mean of retail / airline / telecom",
+     "reported_by": "official",
+     "source": {
+      "url": "https://openai.com/synthetic/gpt-5-5-bench",
+      "title": "GPT-5.5 τ²-bench — synthetic launch note",
+      "quote": "GPT-5.5 scores 82.1% on τ²-bench (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "livecodebench",
+     "value": 82.1,
+     "config": "pass@1, v6",
+     "reported_by": "official",
+     "source": {
+      "url": "https://openai.com/synthetic/gpt-5-5-livecodebench",
+      "title": "GPT-5.5 LiveCodeBench — synthetic launch note",
+      "quote": "GPT-5.5 scores 82.1% on LiveCodeBench (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "browsecomp",
+     "value": 58.8,
+     "config": "with browsing tools",
+     "reported_by": "official",
+     "source": {
+      "url": "https://openai.com/synthetic/gpt-5-5-browsecomp",
+      "title": "GPT-5.5 BrowseComp — synthetic launch note",
+      "quote": "GPT-5.5 scores 58.8% on BrowseComp (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "frontiermath",
+     "value": 31.8,
+     "config": "Tiers 1-3",
+     "reported_by": "maintainer",
+     "source": {
+      "url": "https://openai.com/synthetic/gpt-5-5-frontiermath",
+      "title": "GPT-5.5 FrontierMath — synthetic launch note",
+      "quote": "GPT-5.5 scores 31.8% on FrontierMath (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    }
+   ],
+   "notes": "SYNTHETIC FIXTURE — not real data"
+  },
+  {
+   "id": "zhipu-glm-5",
+   "lab": "zhipu",
+   "name": "GLM-5",
+   "family": "GLM",
+   "date": "2026-04-02",
+   "date_precision": "day",
+   "status": "released",
+   "announcement": {
+    "url": "https://z.ai/synthetic/glm-5",
+    "title": "GLM-5 — synthetic launch note",
+    "quote": "GLM-5 is available today. (SYNTHETIC FIXTURE — not real data; this quote is fabricated.)",
+    "retrieved_at": "2026-09-06T22:00:00Z",
+    "verified": true,
+    "verified_at": "2026-09-06T22:00:00Z"
+   },
+   "scores": [
+    {
+     "benchmark": "swe-bench-verified",
+     "value": 79.6,
+     "config": "default scaffold, pass@1",
+     "reported_by": "official",
+     "source": {
+      "url": "https://z.ai/synthetic/glm-5-swe-bench",
+      "title": "GLM-5 SWE-bench — synthetic launch note",
+      "quote": "GLM-5 scores 79.6% on SWE-bench Verified (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "aime",
+     "value": 90.1,
+     "config": "AIME 2025, no tools",
+     "reported_by": "official",
+     "source": {
+      "url": "https://z.ai/synthetic/glm-5-aime",
+      "title": "GLM-5 AIME — synthetic launch note",
+      "quote": "GLM-5 scores 90.1% on AIME (American Invitational Mathematics Examination) (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "hle",
+     "value": 39.1,
+     "config": "no tools, full set",
+     "reported_by": "official",
+     "source": {
+      "url": "https://z.ai/synthetic/glm-5-hle",
+      "title": "GLM-5 HLE — synthetic launch note",
+      "quote": "GLM-5 scores 39.1% on Humanity's Last Exam (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "arc-agi-2",
+     "value": 18.1,
+     "config": "semi-private eval",
+     "reported_by": "official",
+     "source": {
+      "url": "https://z.ai/synthetic/glm-5-arc-agi-2",
+      "title": "GLM-5 ARC-AGI-2 — synthetic launch note",
+      "quote": "GLM-5 scores 18.1% on ARC-AGI-2 (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "terminal-bench-2",
+     "value": 63.9,
+     "config": "Terminus-2 harness",
+     "reported_by": "official",
+     "source": {
+      "url": "https://z.ai/synthetic/glm-5-terminal-bench",
+      "title": "GLM-5 Terminal-Bench — synthetic launch note",
+      "quote": "GLM-5 scores 63.9% on Terminal-Bench 2.0 (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "tau2-bench",
+     "value": 75.7,
+     "config": "pass^1, mean of retail / airline / telecom",
+     "reported_by": "official",
+     "source": {
+      "url": "https://z.ai/synthetic/glm-5-bench",
+      "title": "GLM-5 τ²-bench — synthetic launch note",
+      "quote": "GLM-5 scores 75.7% on τ²-bench (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "mmmu",
+     "value": 87,
+     "config": "validation split",
+     "reported_by": "official",
+     "source": {
+      "url": "https://z.ai/synthetic/glm-5-mmmu",
+      "title": "GLM-5 MMMU — synthetic launch note",
+      "quote": "GLM-5 scores 87% on MMMU (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "livecodebench",
+     "value": 83.8,
+     "config": "pass@1, v6",
+     "reported_by": "official",
+     "source": {
+      "url": "https://z.ai/synthetic/glm-5-livecodebench",
+      "title": "GLM-5 LiveCodeBench — synthetic launch note",
+      "quote": "GLM-5 scores 83.8% on LiveCodeBench (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "mmlu",
+     "value": 96.8,
+     "config": "5-shot",
+     "reported_by": "official",
+     "source": {
+      "url": "https://z.ai/synthetic/glm-5-mmlu",
+      "title": "GLM-5 MMLU — synthetic launch note",
+      "quote": "GLM-5 scores 96.8% on MMLU (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "browsecomp",
+     "value": 59.9,
+     "config": "with browsing tools",
+     "reported_by": "official",
+     "source": {
+      "url": "https://z.ai/synthetic/glm-5-browsecomp",
+      "title": "GLM-5 BrowseComp — synthetic launch note",
+      "quote": "GLM-5 scores 59.9% on BrowseComp (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "osworld",
+     "value": 61.2,
+     "config": "OSWorld-Verified, 100 steps",
+     "reported_by": "official",
+     "source": {
+      "url": "https://z.ai/synthetic/glm-5-osworld",
+      "title": "GLM-5 OSWorld — synthetic launch note",
+      "quote": "GLM-5 scores 61.2% on OSWorld / OSWorld-Verified (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z"
+     }
+    }
+   ],
+   "notes": "SYNTHETIC FIXTURE — not real data"
+  },
+  {
+   "id": "xai-grok-5",
+   "lab": "xai",
+   "name": "Grok 5",
+   "family": "Grok",
+   "date": "2026-04-21",
+   "date_precision": "day",
+   "status": "released",
+   "announcement": {
+    "url": "https://x.ai/synthetic/grok-5",
+    "title": "Grok 5 — synthetic launch note",
+    "quote": "Grok 5 is available today. (SYNTHETIC FIXTURE — not real data; this quote is fabricated.)",
+    "retrieved_at": "2026-09-06T22:00:00Z",
+    "verified": true,
+    "verified_at": "2026-09-06T22:00:00Z"
+   },
+   "scores": [
+    {
+     "benchmark": "gpqa-diamond",
+     "value": 84,
+     "config": "no tools, pass@1",
+     "reported_by": "official",
+     "source": {
+      "url": "https://x.ai/synthetic/grok-5-gpqa",
+      "title": "Grok 5 GPQA — synthetic launch note",
+      "quote": "Grok 5 scores 84% on GPQA Diamond (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "swe-bench-verified",
+     "value": 85.9,
+     "config": "default scaffold, pass@1",
+     "reported_by": "official",
+     "source": {
+      "url": "https://x.ai/synthetic/grok-5-swe-bench",
+      "title": "Grok 5 SWE-bench — synthetic launch note",
+      "quote": "Grok 5 scores 85.9% on SWE-bench Verified (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "aime",
+     "value": 89.6,
+     "config": "AIME 2025, no tools",
+     "reported_by": "official",
+     "source": {
+      "url": "https://x.ai/synthetic/grok-5-aime",
+      "title": "Grok 5 AIME — synthetic launch note",
+      "quote": "Grok 5 scores 89.6% on AIME (American Invitational Mathematics Examination) (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "mmlu-pro",
+     "value": 89.4,
+     "config": "CoT, 0-shot",
+     "reported_by": "official",
+     "source": {
+      "url": "https://x.ai/synthetic/grok-5-mmlu-pro",
+      "title": "Grok 5 MMLU-Pro — synthetic launch note",
+      "quote": "Grok 5 scores 89.4% on MMLU-Pro (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "hle",
+     "value": 33.6,
+     "config": "no tools, full set",
+     "reported_by": "official",
+     "source": {
+      "url": "https://x.ai/synthetic/grok-5-hle",
+      "title": "Grok 5 HLE — synthetic launch note",
+      "quote": "Grok 5 scores 33.6% on Humanity's Last Exam (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "arc-agi-2",
+     "value": 21,
+     "config": "semi-private eval",
+     "reported_by": "maintainer",
+     "source": {
+      "url": "https://x.ai/synthetic/grok-5-arc-agi-2",
+      "title": "Grok 5 ARC-AGI-2 — synthetic launch note",
+      "quote": "Grok 5 scores 21% on ARC-AGI-2 (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "terminal-bench-2",
+     "value": 57.6,
+     "config": "Terminus-2 harness",
+     "reported_by": "official",
+     "source": {
+      "url": "https://x.ai/synthetic/grok-5-terminal-bench",
+      "title": "Grok 5 Terminal-Bench — synthetic launch note",
+      "quote": "Grok 5 scores 57.6% on Terminal-Bench 2.0 (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "mmmu",
+     "value": 89.2,
+     "config": "validation split",
+     "reported_by": "official",
+     "source": {
+      "url": "https://x.ai/synthetic/grok-5-mmmu",
+      "title": "Grok 5 MMMU — synthetic launch note",
+      "quote": "Grok 5 scores 89.2% on MMMU (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "livecodebench",
+     "value": 86.2,
+     "config": "pass@1, v6",
+     "reported_by": "official",
+     "source": {
+      "url": "https://x.ai/synthetic/grok-5-livecodebench",
+      "title": "Grok 5 LiveCodeBench — synthetic launch note",
+      "quote": "Grok 5 scores 86.2% on LiveCodeBench (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    }
+   ],
+   "notes": "SYNTHETIC FIXTURE — not real data"
+  },
+  {
+   "id": "deepseek-v4",
+   "lab": "deepseek",
+   "name": "DeepSeek-V4",
+   "family": "DeepSeek-V",
+   "date": "2026-05-11",
+   "date_precision": "day",
+   "status": "released",
+   "announcement": {
+    "url": "https://www.deepseek.com/synthetic/deepseek-v4",
+    "title": "DeepSeek-V4 — synthetic launch note",
+    "quote": "DeepSeek-V4 is available today. (SYNTHETIC FIXTURE — not real data; this quote is fabricated.)",
+    "retrieved_at": "2026-09-06T22:00:00Z",
+    "verified": true,
+    "verified_at": "2026-09-06T22:00:00Z"
+   },
+   "scores": [
+    {
+     "benchmark": "gpqa-diamond",
+     "value": 78.9,
+     "config": "no tools, pass@1",
+     "reported_by": "official",
+     "source": {
+      "url": "https://www.deepseek.com/synthetic/deepseek-v4-gpqa",
+      "title": "DeepSeek-V4 GPQA — synthetic launch note",
+      "quote": "DeepSeek-V4 scores 78.9% on GPQA Diamond (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "swe-bench-verified",
+     "value": 82.9,
+     "config": "default scaffold, pass@1",
+     "reported_by": "official",
+     "source": {
+      "url": "https://www.deepseek.com/synthetic/deepseek-v4-swe-bench",
+      "title": "DeepSeek-V4 SWE-bench — synthetic launch note",
+      "quote": "DeepSeek-V4 scores 82.9% on SWE-bench Verified (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "mmlu-pro",
+     "value": 88,
+     "config": "CoT, 0-shot",
+     "reported_by": "official",
+     "source": {
+      "url": "https://www.deepseek.com/synthetic/deepseek-v4-mmlu-pro",
+      "title": "DeepSeek-V4 MMLU-Pro — synthetic launch note",
+      "quote": "DeepSeek-V4 scores 88% on MMLU-Pro (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "hle",
+     "value": 27.2,
+     "config": "no tools, full set",
+     "reported_by": "official",
+     "source": {
+      "url": "https://www.deepseek.com/synthetic/deepseek-v4-hle",
+      "title": "DeepSeek-V4 HLE — synthetic launch note",
+      "quote": "DeepSeek-V4 scores 27.2% on Humanity's Last Exam (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "terminal-bench-2",
+     "value": 62.6,
+     "config": "Terminus-2 harness",
+     "reported_by": "official",
+     "source": {
+      "url": "https://www.deepseek.com/synthetic/deepseek-v4-terminal-bench",
+      "title": "DeepSeek-V4 Terminal-Bench — synthetic launch note",
+      "quote": "DeepSeek-V4 scores 62.6% on Terminal-Bench 2.0 (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "mmmu",
+     "value": 88.1,
+     "config": "validation split",
+     "reported_by": "official",
+     "source": {
+      "url": "https://www.deepseek.com/synthetic/deepseek-v4-mmmu",
+      "title": "DeepSeek-V4 MMMU — synthetic launch note",
+      "quote": "DeepSeek-V4 scores 88.1% on MMMU (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "livecodebench",
+     "value": 83.7,
+     "config": "pass@1, v6",
+     "reported_by": "official",
+     "source": {
+      "url": "https://www.deepseek.com/synthetic/deepseek-v4-livecodebench",
+      "title": "DeepSeek-V4 LiveCodeBench — synthetic launch note",
+      "quote": "DeepSeek-V4 scores 83.7% on LiveCodeBench (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    }
+   ],
+   "notes": "SYNTHETIC FIXTURE — not real data"
+  },
+  {
+   "id": "anthropic-claude-5-opus",
+   "lab": "anthropic",
+   "name": "Claude Opus 5",
+   "family": "Claude Opus",
+   "date": "2026-06-02",
+   "date_precision": "day",
+   "status": "released",
+   "announcement": {
+    "url": "https://www.anthropic.com/synthetic/claude-opus-5",
+    "title": "Claude Opus 5 — synthetic launch note",
+    "quote": "Claude Opus 5 is available today. (SYNTHETIC FIXTURE — not real data; this quote is fabricated.)",
+    "retrieved_at": "2026-09-06T22:00:00Z",
+    "verified": true,
+    "verified_at": "2026-09-06T22:00:00Z"
+   },
+   "scores": [
+    {
+     "benchmark": "gpqa-diamond",
+     "value": 89.4,
+     "config": "no tools, pass@1",
+     "reported_by": "official",
+     "source": {
+      "url": "https://www.anthropic.com/synthetic/claude-opus-5-gpqa",
+      "title": "Claude Opus 5 GPQA — synthetic launch note",
+      "quote": "Claude Opus 5 scores 89.4% on GPQA Diamond (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "swe-bench-verified",
+     "value": 85,
+     "config": "default scaffold, pass@1",
+     "reported_by": "official",
+     "source": {
+      "url": "https://www.anthropic.com/synthetic/claude-opus-5-swe-bench",
+      "title": "Claude Opus 5 SWE-bench — synthetic launch note",
+      "quote": "Claude Opus 5 scores 85% on SWE-bench Verified (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "aime",
+     "value": 92.7,
+     "config": "AIME 2025, no tools",
+     "reported_by": "official",
+     "source": {
+      "url": "https://www.anthropic.com/synthetic/claude-opus-5-aime",
+      "title": "Claude Opus 5 AIME — synthetic launch note",
+      "quote": "Claude Opus 5 scores 92.7% on AIME (American Invitational Mathematics Examination) (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "hle",
+     "value": 45.1,
+     "config": "no tools, full set",
+     "reported_by": "official",
+     "source": {
+      "url": "https://www.anthropic.com/synthetic/claude-opus-5-hle",
+      "title": "Claude Opus 5 HLE — synthetic launch note",
+      "quote": "Claude Opus 5 scores 45.1% on Humanity's Last Exam (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "terminal-bench-2",
+     "value": 65.9,
+     "config": "Terminus-2 harness",
+     "reported_by": "official",
+     "source": {
+      "url": "https://www.anthropic.com/synthetic/claude-opus-5-terminal-bench",
+      "title": "Claude Opus 5 Terminal-Bench — synthetic launch note",
+      "quote": "Claude Opus 5 scores 65.9% on Terminal-Bench 2.0 (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "tau2-bench",
+     "value": 83.7,
+     "config": "pass^1, mean of retail / airline / telecom",
+     "reported_by": "official",
+     "source": {
+      "url": "https://www.anthropic.com/synthetic/claude-opus-5-bench",
+      "title": "Claude Opus 5 τ²-bench — synthetic launch note",
+      "quote": "Claude Opus 5 scores 83.7% on τ²-bench (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "browsecomp",
+     "value": 48.2,
+     "config": "with browsing tools",
+     "reported_by": "official",
+     "source": {
+      "url": "https://www.anthropic.com/synthetic/claude-opus-5-browsecomp",
+      "title": "Claude Opus 5 BrowseComp — synthetic launch note",
+      "quote": "Claude Opus 5 scores 48.2% on BrowseComp (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "frontiermath",
+     "value": 36.6,
+     "config": "Tiers 1-3",
+     "reported_by": "maintainer",
+     "source": {
+      "url": "https://www.anthropic.com/synthetic/claude-opus-5-frontiermath",
+      "title": "Claude Opus 5 FrontierMath — synthetic launch note",
+      "quote": "Claude Opus 5 scores 36.6% on FrontierMath (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    }
+   ],
+   "notes": "SYNTHETIC FIXTURE — not real data"
+  },
+  {
+   "id": "google-gemini-3.5-pro",
+   "lab": "google",
+   "name": "Gemini 3.5 Pro",
+   "family": "Gemini Pro",
+   "date": "2026-06-24",
+   "date_precision": "day",
+   "status": "released",
+   "announcement": {
+    "url": "https://deepmind.google/synthetic/gemini-3-5-pro",
+    "title": "Gemini 3.5 Pro — synthetic launch note",
+    "quote": "Gemini 3.5 Pro is available today. (SYNTHETIC FIXTURE — not real data; this quote is fabricated.)",
+    "retrieved_at": "2026-09-06T22:00:00Z",
+    "verified": true,
+    "verified_at": "2026-09-06T22:00:00Z"
+   },
+   "scores": [
+    {
+     "benchmark": "gpqa-diamond",
+     "value": 86.9,
+     "config": "no tools, pass@1",
+     "reported_by": "official",
+     "source": {
+      "url": "https://deepmind.google/synthetic/gemini-3-5-pro-gpqa",
+      "title": "Gemini 3.5 Pro GPQA — synthetic launch note",
+      "quote": "Gemini 3.5 Pro scores 86.9% on GPQA Diamond (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "swe-bench-verified",
+     "value": 86.5,
+     "config": "default scaffold, pass@1",
+     "reported_by": "official",
+     "source": {
+      "url": "https://deepmind.google/synthetic/gemini-3-5-pro-swe-bench",
+      "title": "Gemini 3.5 Pro SWE-bench — synthetic launch note",
+      "quote": "Gemini 3.5 Pro scores 86.5% on SWE-bench Verified (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "aime",
+     "value": 91.8,
+     "config": "AIME 2025, no tools",
+     "reported_by": "official",
+     "source": {
+      "url": "https://deepmind.google/synthetic/gemini-3-5-pro-aime",
+      "title": "Gemini 3.5 Pro AIME — synthetic launch note",
+      "quote": "Gemini 3.5 Pro scores 91.8% on AIME (American Invitational Mathematics Examination) (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "mmlu-pro",
+     "value": 91.8,
+     "config": "CoT, 0-shot",
+     "reported_by": "official",
+     "source": {
+      "url": "https://deepmind.google/synthetic/gemini-3-5-pro-mmlu-pro",
+      "title": "Gemini 3.5 Pro MMLU-Pro — synthetic launch note",
+      "quote": "Gemini 3.5 Pro scores 91.8% on MMLU-Pro (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "terminal-bench-2",
+     "value": 69.3,
+     "config": "Terminus-2 harness",
+     "reported_by": "official",
+     "source": {
+      "url": "https://deepmind.google/synthetic/gemini-3-5-pro-terminal-bench",
+      "title": "Gemini 3.5 Pro Terminal-Bench — synthetic launch note",
+      "quote": "Gemini 3.5 Pro scores 69.3% on Terminal-Bench 2.0 (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z",
+      "verified": true,
+      "verified_at": "2026-09-06T22:00:00Z"
+     }
+    },
+    {
+     "benchmark": "mmlu",
+     "value": 96.8,
+     "config": "5-shot",
+     "reported_by": "official",
+     "source": {
+      "url": "https://deepmind.google/synthetic/gemini-3-5-pro-mmlu",
+      "title": "Gemini 3.5 Pro MMLU — synthetic launch note",
+      "quote": "Gemini 3.5 Pro scores 96.8% on MMLU (SYNTHETIC FIXTURE — not real data; this quote is fabricated).",
+      "retrieved_at": "2026-09-06T22:00:00Z"
+     }
+    }
+   ],
+   "notes": "SYNTHETIC FIXTURE — not real data"
+  },
+  {
+   "id": "anthropic-claude-5.5-opus",
+   "lab": "anthropic",
+   "name": "Claude Opus 5.5",
+   "family": "Claude Opus",
+   "date": "2026-11-10",
+   "date_precision": "month",
+   "status": "announced",
+   "announcement": {
+    "url": "https://www.anthropic.com/synthetic/claude-opus-5-5",
+    "title": "Claude Opus 5.5 — synthetic launch note",
+    "quote": "Claude Opus 5.5 is available today. (SYNTHETIC FIXTURE — not real data; this quote is fabricated.)",
+    "retrieved_at": "2026-09-06T22:00:00Z",
+    "verified": true,
+    "verified_at": "2026-09-06T22:00:00Z"
+   },
+   "scores": [],
+   "notes": "SYNTHETIC FIXTURE — not real data",
+   "expected_window": {
+    "start": "2026-10-20",
+    "end": "2026-12-20",
+    "source": {
+     "url": "https://www.anthropic.com/synthetic/claude-opus-5-5-window",
+     "title": "Claude Opus 5.5 window — synthetic launch note",
+     "quote": "We expect Claude Opus 5.5 between 2026-10-20 and 2026-12-20. (SYNTHETIC FIXTURE — not real data)",
+     "retrieved_at": "2026-09-06T22:00:00Z"
+    }
+   }
+  },
+  {
+   "id": "google-gemini-4-ultra",
+   "lab": "google",
+   "name": "Gemini 4 Ultra",
+   "family": "Gemini Ultra",
+   "date": "2026-11-15",
+   "date_precision": "quarter",
+   "status": "rumored",
+   "announcement": {
+    "url": "https://deepmind.google/synthetic/gemini-4-ultra",
+    "title": "Gemini 4 Ultra — synthetic launch note",
+    "quote": "Gemini 4 Ultra is available today. (SYNTHETIC FIXTURE — not real data; this quote is fabricated.)",
+    "retrieved_at": "2026-09-06T22:00:00Z",
+    "verified": true,
+    "verified_at": "2026-09-06T22:00:00Z"
+   },
+   "scores": [],
+   "notes": "SYNTHETIC FIXTURE — not real data"
+  },
+  {
+   "id": "openai-gpt-6",
+   "lab": "openai",
+   "name": "GPT-6",
+   "family": "GPT",
+   "date": "2026-12-10",
+   "date_precision": "month",
+   "status": "announced",
+   "announcement": {
+    "url": "https://openai.com/synthetic/gpt-6",
+    "title": "GPT-6 — synthetic launch note",
+    "quote": "GPT-6 is available today. (SYNTHETIC FIXTURE — not real data; this quote is fabricated.)",
+    "retrieved_at": "2026-09-06T22:00:00Z",
+    "verified": true,
+    "verified_at": "2026-09-06T22:00:00Z"
+   },
+   "scores": [],
+   "notes": "SYNTHETIC FIXTURE — not real data",
+   "expected_window": {
+    "start": "2026-11-15",
+    "end": "2027-01-31",
+    "source": {
+     "url": "https://openai.com/synthetic/gpt-6-window",
+     "title": "GPT-6 window — synthetic launch note",
+     "quote": "We expect GPT-6 between 2026-11-15 and 2027-01-31. (SYNTHETIC FIXTURE — not real data)",
+     "retrieved_at": "2026-09-06T22:00:00Z"
+    }
+   }
+  }
+ ],
+ "recent_changes": [
+  {
+   "at": "2026-09-06T21:40:00Z",
+   "actor": "manual",
+   "lab": "openai",
+   "release_id": "openai-gpt-6",
+   "kind": "release_added",
+   "summary": "Added GPT-6 (2026-12-10) as a released flagship. [SYNTHETIC FIXTURE — not real data]",
+   "source_url": "https://openai.com/synthetic/gpt-6"
+  },
+  {
+   "at": "2026-09-06T12:40:00Z",
+   "actor": "worker",
+   "lab": "google",
+   "release_id": "google-gemini-4-ultra",
+   "kind": "score_added",
+   "summary": "Recorded a benchmark for Gemini 4 Ultra. [SYNTHETIC FIXTURE — not real data]",
+   "source_url": "https://deepmind.google/synthetic/gemini-4-ultra"
+  },
+  {
+   "at": "2026-09-06T05:40:00Z",
+   "actor": "worker",
+   "lab": "anthropic",
+   "release_id": "anthropic-claude-5.5-opus",
+   "kind": "score_updated",
+   "summary": "Corrected the benchmark configuration for Claude Opus 5.5. [SYNTHETIC FIXTURE — not real data]",
+   "source_url": "https://www.anthropic.com/synthetic/claude-opus-5-5"
+  },
+  {
+   "at": "2026-09-06T02:40:00Z",
+   "actor": "worker",
+   "lab": "google",
+   "release_id": "google-gemini-3.5-pro",
+   "kind": "verified",
+   "summary": "Re-verified the launch quote for Gemini 3.5 Pro. [SYNTHETIC FIXTURE — not real data]",
+   "source_url": "https://deepmind.google/synthetic/gemini-3-5-pro"
+  },
+  {
+   "at": "2026-09-05T20:40:00Z",
+   "actor": "worker",
+   "lab": "anthropic",
+   "release_id": "anthropic-claude-5-opus",
+   "kind": "status_changed",
+   "summary": "Claude Opus 5 moved to released. [SYNTHETIC FIXTURE — not real data]",
+   "source_url": "https://www.anthropic.com/synthetic/claude-opus-5"
+  },
+  {
+   "at": "2026-09-05T13:40:00Z",
+   "actor": "manual",
+   "lab": "deepseek",
+   "release_id": "deepseek-v4",
+   "kind": "release_updated",
+   "summary": "Refreshed sources for DeepSeek-V4. [SYNTHETIC FIXTURE — not real data]",
+   "source_url": "https://www.deepseek.com/synthetic/deepseek-v4"
+  },
+  {
+   "at": "2026-09-05T08:40:00Z",
+   "actor": "worker",
+   "lab": "xai",
+   "release_id": "xai-grok-5",
+   "kind": "release_added",
+   "summary": "Added Grok 5 (2026-04-21) as a released flagship. [SYNTHETIC FIXTURE — not real data]",
+   "source_url": "https://x.ai/synthetic/grok-5"
+  },
+  {
+   "at": "2026-09-05T01:40:00Z",
+   "actor": "seed",
+   "lab": "zhipu",
+   "release_id": "zhipu-glm-5",
+   "kind": "score_added",
+   "summary": "Recorded LiveCodeBench for GLM-5. [SYNTHETIC FIXTURE — not real data]",
+   "source_url": "https://z.ai/synthetic/glm-5"
+  },
+  {
+   "at": "2026-09-04T18:40:00Z",
+   "actor": "worker",
+   "lab": "openai",
+   "release_id": "openai-gpt-5.5",
+   "kind": "score_updated",
+   "summary": "Corrected the FrontierMath configuration for GPT-5.5. [SYNTHETIC FIXTURE — not real data]",
+   "source_url": "https://openai.com/synthetic/gpt-5-5"
+  },
+  {
+   "at": "2026-09-04T16:40:00Z",
+   "actor": "worker",
+   "lab": "moonshot",
+   "release_id": "moonshot-kimi-k2.5",
+   "kind": "verified",
+   "summary": "Re-verified the launch quote for Kimi K2.5. [SYNTHETIC FIXTURE — not real data]",
+   "source_url": "https://www.moonshot.ai/synthetic/kimi-k2-5"
+  },
+  {
+   "at": "2026-09-04T14:40:00Z",
+   "actor": "manual",
+   "lab": "meta",
+   "release_id": "meta-llama-5-behemoth",
+   "kind": "status_changed",
+   "summary": "Llama 5 Behemoth moved to cancelled. [SYNTHETIC FIXTURE — not real data]",
+   "source_url": "https://ai.meta.com/synthetic/llama-5-behemoth"
+  },
+  {
+   "at": "2026-09-04T12:40:00Z",
+   "actor": "worker",
+   "lab": "mistral",
+   "release_id": "mistral-large-3",
+   "kind": "release_updated",
+   "summary": "Refreshed sources for Mistral Large 3. [SYNTHETIC FIXTURE — not real data]",
+   "source_url": "https://mistral.ai/synthetic/mistral-large-3"
+  },
+  {
+   "at": "2026-09-04T09:40:00Z",
+   "actor": "worker",
+   "lab": "anthropic",
+   "release_id": "anthropic-claude-4.5-opus",
+   "kind": "release_added",
+   "summary": "Added Claude Opus 4.5 (2025-11-24) as a released flagship. [SYNTHETIC FIXTURE — not real data]",
+   "source_url": "https://www.anthropic.com/synthetic/claude-opus-4-5"
+  },
+  {
+   "at": "2026-09-04T06:40:00Z",
+   "actor": "worker",
+   "lab": "google",
+   "release_id": "google-gemini-3-pro",
+   "kind": "score_added",
+   "summary": "Recorded LiveCodeBench for Gemini 3 Pro. [SYNTHETIC FIXTURE — not real data]",
+   "source_url": "https://deepmind.google/synthetic/gemini-3-pro"
+  },
+  {
+   "at": "2026-09-03T22:40:00Z",
+   "actor": "seed",
+   "lab": "openai",
+   "release_id": "openai-gpt-6",
+   "kind": "score_updated",
+   "summary": "Corrected the benchmark configuration for GPT-6. [SYNTHETIC FIXTURE — not real data]",
+   "source_url": "https://openai.com/synthetic/gpt-6"
+  },
+  {
+   "at": "2026-09-03T20:40:00Z",
+   "actor": "manual",
+   "lab": "google",
+   "release_id": "google-gemini-4-ultra",
+   "kind": "verified",
+   "summary": "Re-verified the launch quote for Gemini 4 Ultra. [SYNTHETIC FIXTURE — not real data]",
+   "source_url": "https://deepmind.google/synthetic/gemini-4-ultra"
+  },
+  {
+   "at": "2026-09-03T15:40:00Z",
+   "actor": "worker",
+   "lab": "anthropic",
+   "release_id": "anthropic-claude-5.5-opus",
+   "kind": "status_changed",
+   "summary": "Claude Opus 5.5 moved to announced. [SYNTHETIC FIXTURE — not real data]",
+   "source_url": "https://www.anthropic.com/synthetic/claude-opus-5-5"
+  },
+  {
+   "at": "2026-09-03T12:40:00Z",
+   "actor": "worker",
+   "lab": "google",
+   "release_id": "google-gemini-3.5-pro",
+   "kind": "release_updated",
+   "summary": "Refreshed sources for Gemini 3.5 Pro. [SYNTHETIC FIXTURE — not real data]",
+   "source_url": "https://deepmind.google/synthetic/gemini-3-5-pro"
+  },
+  {
+   "at": "2026-09-03T10:40:00Z",
+   "actor": "worker",
+   "lab": "anthropic",
+   "release_id": "anthropic-claude-5-opus",
+   "kind": "release_added",
+   "summary": "Added Claude Opus 5 (2026-06-02) as a released flagship. [SYNTHETIC FIXTURE — not real data]",
+   "source_url": "https://www.anthropic.com/synthetic/claude-opus-5"
+  },
+  {
+   "at": "2026-09-03T08:40:00Z",
+   "actor": "worker",
+   "lab": "deepseek",
+   "release_id": "deepseek-v4",
+   "kind": "score_added",
+   "summary": "Recorded MMMU for DeepSeek-V4. [SYNTHETIC FIXTURE — not real data]",
+   "source_url": "https://www.deepseek.com/synthetic/deepseek-v4"
+  }
+ ],
+ "worker": {
+  "last_run_at": "2026-09-06T22:00:00Z",
+  "last_success_at": "2026-09-06T22:00:00Z",
+  "pages_polled": 27,
+  "pages_changed": 2,
+  "llm_model": "synthetic-fixture/no-llm"
+ }
+}

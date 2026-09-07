@@ -9,7 +9,7 @@
     "preview": "vite preview",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "lint": "tsc --noEmit -p tsconfig.json",
-    "test": "bun test"
+    "test": "echo \"web: no unit tests; covered by typecheck + build\""
   },
   "dependencies": {
     "@agi/shared": "workspace:*",

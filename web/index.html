@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>AGI Frontier — the living chart of flagship AI</title>
+    <meta
+      name="description"
+      content="Every flagship LLM on one never-ending chart, scored on a fixed basket of official benchmarks, with a calibrated forecast of when each lab ships next. Every number links to a primary source."
+    />
+    <meta name="theme-color" content="#ffffff" />
+    <meta name="color-scheme" content="light" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="canonical" href="https://agi.pablogfx.com/" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="AGI Frontier" />
+    <meta property="og:url" content="https://agi.pablogfx.com/" />
+    <meta property="og:title" content="AGI Frontier — the living chart of flagship AI" />
+    <meta
+      property="og:description"
+      content="One index for every frontier model, fitted from the labs' own benchmark numbers — plus a calibrated forecast of the next release."
+    />
+    <meta property="og:image" content="https://agi.pablogfx.com/og.svg" />
+    <meta property="og:image:type" content="image/svg+xml" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="AGI Frontier — a rising capability curve with a yellow forecast fan." />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="AGI Frontier — the living chart of flagship AI" />
+    <meta
+      name="twitter:description"
+      content="One index for every frontier model, fitted from the labs' own benchmark numbers — plus a calibrated forecast of the next release."
+    />
+    <meta name="twitter:image" content="https://agi.pablogfx.com/og.svg" />
+
+    <script type="module" src="/src/main.ts"></script>
+  </head>
+
+  <body>
+    <a class="skip-link" href="#chart">Skip to the chart</a>
+
+    <div class="page-glow" aria-hidden="true"></div>
+
+    <header class="site-header">
+      <div class="shell site-header__inner">
+        <a class="wordmark" href="#top" aria-label="AGI Frontier, home">
+          <span class="wordmark__mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="18" height="18" focusable="false">
+              <circle cx="12" cy="12" r="9.25" fill="none" stroke="currentColor" stroke-width="1" />
+              <circle cx="12" cy="12" r="2.1" fill="currentColor" />
+            </svg>
+          </span>
+          <span class="wordmark__text">AGI Frontier</span>
+        </a>
+
+        <p class="site-header__stamp" data-generated>
+          <span class="dot" aria-hidden="true"></span>
+          <span data-generated-text>loading…</span>
+        </p>
+
+        <nav class="site-nav" aria-label="Sections">
+          <a href="#chart">Chart</a>
+          <span aria-hidden="true">·</span>
+          <a href="#watch">Release watch</a>
+          <span aria-hidden="true">·</span>
+          <a href="#rankings">Rankings</a>
+          <span aria-hidden="true">·</span>
+          <a href="#method">Method</a>
+          <span aria-hidden="true">·</span>
+          <a href="#data">Data</a>
+        </nav>
+      </div>
+    </header>
+
+    <main id="top">
+      <!-- 1 · Intro ------------------------------------------------------ -->
+      <section class="section section--intro" id="intro" aria-labelledby="intro-h">
+        <div class="shell">
+          <h1 id="intro-h" class="lede">
+            Every flagship model, one index, and an honest guess at what comes next.
+          </h1>
+          <p class="intro-copy">
+            Labs publish benchmark scores in a different mix every time, so raw percentages are not
+            comparable. AGI Frontier fits a single 0–100 <strong>Frontier&nbsp;Index</strong> per model
+            from the numbers each lab reported itself, then models each lab's release cadence to
+            forecast when — and how capable — the next flagship will be. Everything on this page is
+            recomputed in your browser from one auditable file.
+          </p>
+
+          <div class="statbar" data-stats>
+            <article class="stat">
+              <h2 class="stat__label">Frontier Index today</h2>
+              <p class="stat__value" data-stat="index"><span class="stat__skeleton"></span></p>
+              <p class="stat__meta" data-stat="index-meta">&nbsp;</p>
+            </article>
+            <article class="stat">
+              <h2 class="stat__label">Frontier velocity</h2>
+              <p class="stat__value" data-stat="velocity"><span class="stat__skeleton"></span></p>
+              <p class="stat__meta" data-stat="velocity-meta">&nbsp;</p>
+            </article>
+            <article class="stat">
+              <h2 class="stat__label">Most likely next release</h2>
+              <p class="stat__value" data-stat="next"><span class="stat__skeleton"></span></p>
+              <p class="stat__meta" data-stat="next-meta">&nbsp;</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2 · The chart -------------------------------------------------- -->
+      <section class="section section--chart" id="chart" aria-labelledby="chart-h">
+        <div class="shell chart-head">
+          <h2 id="chart-h" class="section-title">The frontier</h2>
+          <div class="chart-tools">
+            <button type="button" class="pill" data-fit aria-pressed="false">Fit to data</button>
+            <button type="button" class="pill" data-reset-zoom>Reset zoom</button>
+            <button type="button" class="pill pill--accent" data-today hidden>Back to today</button>
+          </div>
+        </div>
+
+        <figure class="chart-figure" data-chart-figure>
+          <div class="chart-canvas" data-chart-canvas>
+            <div class="chart-status" data-chart-status role="status">Loading the frontier…</div>
+          </div>
+          <figcaption class="visually-hidden">
+            Frontier Index of every flagship model over time, per lab, with yellow forecast fans and
+            release-window circles for predicted releases. A table of the same data is under Rankings.
+          </figcaption>
+        </figure>
+
+        <div class="shell chart-controls">
+          <div class="scrubber">
+            <label class="scrubber__label" for="scrub">Time scrubber — recompute everything as of</label>
+            <div class="scrubber__row">
+              <input
+                id="scrub"
+                class="scrubber__input"
+                type="range"
+                min="0"
+                max="100"
+                step="1"
+                value="100"
+                aria-valuetext="today"
+              />
+              <output class="scrubber__value" for="scrub" data-scrub-value>today</output>
+            </div>
+          </div>
+          <div class="legend" data-legend role="group" aria-label="Labs — toggle visibility">
+            <button type="button" class="chip chip--all" data-legend-all>All</button>
+          </div>
+        </div>
+
+        <div class="shell chart-key">
+          <p class="key">
+            <span class="key__swatch key__swatch--point" aria-hidden="true"></span> released flagship
+            <span class="key__sep" aria-hidden="true">·</span>
+            <span class="key__swatch key__swatch--announced" aria-hidden="true"></span> announced
+            <span class="key__sep" aria-hidden="true">·</span>
+            <span class="key__swatch key__swatch--rumored" aria-hidden="true"></span> rumored
+            <span class="key__sep" aria-hidden="true">·</span>
+            <span class="key__swatch key__swatch--fan" aria-hidden="true"></span> forecast fan (10th–90th pct)
+            <span class="key__sep" aria-hidden="true">·</span>
+            <span class="key__swatch key__swatch--circle" aria-hidden="true"></span> circle diameter = 68 % release window
+            <span class="key__sep" aria-hidden="true">·</span>
+            <span class="key__swatch key__swatch--frontier" aria-hidden="true"></span> running maximum
+          </p>
+        </div>
+      </section>
+
+      <!-- 3 · Release watch ---------------------------------------------- -->
+      <section class="section" id="watch" aria-labelledby="watch-h">
+        <div class="shell">
+          <h2 id="watch-h" class="section-title">Release watch</h2>
+          <p class="section-note">
+            Per lab, as of the scrubbed date: how long since the last flagship, and the log-normal
+            cadence model's probability that the next one lands inside 30 and 90 days.
+          </p>
+          <div class="watch-grid" data-watch></div>
+        </div>
+      </section>
+
+      <!-- 4 · Rankings ---------------------------------------------------- -->
+      <section class="section" id="rankings" aria-labelledby="rankings-h">
+        <div class="shell">
+          <h2 id="rankings-h" class="section-title">Current flagships</h2>
+          <p class="section-note">
+            The newest released flagship per lab, ranked by Frontier Index. Coverage is how many of
+            the index benchmarks the lab reported. Select a row to open its audit.
+          </p>
+          <div class="table-wrap">
+            <table class="rank-table" data-rankings>
+              <caption class="visually-hidden">Current flagship models ranked by Frontier Index</caption>
+              <thead>
+                <tr>
+                  <th scope="col" class="num">#</th>
+                  <th scope="col">Model</th>
+                  <th scope="col">Released</th>
+                  <th scope="col" class="num">Index</th>
+                  <th scope="col" class="num">Coverage</th>
+                  <th scope="col">Benchmarks</th>
+                  <th scope="col" class="num">Sources</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- 5 · What changed ------------------------------------------------ -->
+      <section class="section" id="feed" aria-labelledby="changes-h">
+        <div class="shell">
+          <h2 id="changes-h" class="section-title">What changed</h2>
+          <p class="section-note">The tail of the append-only audit log — every edit the worker or a human made.</p>
+          <ol class="changes" data-changes></ol>
+        </div>
+      </section>
+
+      <!-- 6 · Method + data ----------------------------------------------- -->
+      <section class="section section--method" aria-labelledby="method-h">
+        <div class="shell method-grid">
+          <div id="method">
+            <h2 id="method-h" class="section-title">Method</h2>
+            <p class="method-copy">
+              A flagship is the most capable tier a lab offers at launch; mini, flash and lite tiers
+              are excluded. Only numbers a lab published itself count as official, and every score
+              carries a URL and a verbatim quote that a worker re-checks. Averaging raw percentages
+              would reward a model for reporting only easy benchmarks, so instead a one-parameter
+              logistic (Rasch) model is fitted jointly over every official score:
+              <em>logit(score) = θ<sub>model</sub> − δ<sub>benchmark</sub></em>. The
+              <strong>Frontier Index</strong> is 100·σ(θ) — the score a model would be expected to get
+              on a benchmark of average difficulty in the basket — so it is comparable even when two
+              models reported different subsets. Release timing comes from a log-normal fit of each
+              lab's inter-release intervals, shrunk toward the cross-lab prior so a lab with two
+              releases does not get absurd certainty. The yellow circle is centred on the median
+              predicted date and its diameter is the 16th–84th percentile window; the fan is the
+              10th–90th percentile of extrapolated capability. Scrubbing back in time re-runs the
+              whole fit as of that date, which is how you check whether the forecast would have
+              called what actually happened.
+            </p>
+            <p>
+              <a
+                class="link-out"
+                href="https://github.com/lazniak/agi-frontier/blob/main/docs/METHODOLOGY.md"
+                rel="noopener"
+                >Full methodology on GitHub</a
+              >
+            </p>
+          </div>
+
+          <div id="data">
+            <h2 class="section-title">Data</h2>
+            <p class="method-copy">
+              The site loads exactly one file and computes the rest in your browser. Nothing else is
+              fetched — fonts are self-hosted, there is no analytics and no third-party script.
+            </p>
+            <ul class="data-links">
+              <li><a class="link-out" href="/latest.json" download>Download latest.json</a></li>
+              <li>
+                <a class="link-out" href="https://github.com/lazniak/agi-frontier" rel="noopener"
+                  >Source and dataset on GitHub</a
+                >
+              </li>
+            </ul>
+            <dl class="worker-health" data-worker>
+              <div><dt>Last worker run</dt><dd data-worker="last_run">—</dd></div>
+              <div><dt>Last success</dt><dd data-worker="last_success">—</dd></div>
+              <div><dt>Pages polled</dt><dd data-worker="polled">—</dd></div>
+              <div><dt>Extractor model</dt><dd data-worker="llm">—</dd></div>
+            </dl>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="shell">
+        <p>
+          AGI Frontier · <a href="https://agi.pablogfx.com">agi.pablogfx.com</a> · data CC BY 4.0 ·
+          code MIT
+        </p>
+      </div>
+    </footer>
+
+    <!-- Audit drawer (desktop side panel / mobile bottom sheet) ----------- -->
+    <div class="drawer-scrim" data-drawer-scrim hidden></div>
+    <aside
+      class="drawer"
+      id="drawer"
+      data-drawer
+      role="dialog"
+      aria-modal="false"
+      aria-labelledby="drawer-title"
+      hidden
+    >
+      <div class="drawer__grab" aria-hidden="true"></div>
+      <header class="drawer__head">
+        <div>
+          <p class="drawer__eyebrow" data-drawer-eyebrow></p>
+          <h2 class="drawer__title" id="drawer-title"></h2>
+        </div>
+        <button type="button" class="drawer__close" data-drawer-close aria-label="Close audit">
+          <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false">
+            <path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="1.25" fill="none" />
+          </svg>
+        </button>
+      </header>
+      <div class="drawer__body" data-drawer-body tabindex="-1"></div>
+    </aside>
+
+    <div class="tooltip" data-tooltip role="tooltip" aria-hidden="true" hidden></div>
+    <div class="visually-hidden" role="status" aria-live="polite" data-live></div>
+  </body>
+</html>
