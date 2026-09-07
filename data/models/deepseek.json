@@ -1,0 +1,877 @@
+{
+  "lab": "deepseek",
+  "updated_at": "2026-09-07T03:30:00Z",
+  "releases": [
+    {
+      "id": "deepseek-llm-67b",
+      "lab": "deepseek",
+      "name": "DeepSeek LLM 67B",
+      "family": "DeepSeek-V",
+      "date": "2023-11-01",
+      "date_precision": "month",
+      "status": "released",
+      "announcement": {
+        "url": "https://github.com/deepseek-ai/DeepSeek-LLM",
+        "title": "DeepSeek LLM: Let there be answers",
+        "quote": "We release the DeepSeek LLM 7B/67B, including both base and chat models, to the public.",
+        "retrieved_at": "2026-09-07T03:30:00Z"
+      },
+      "scores": [
+        {
+          "benchmark": "mmlu",
+          "value": 71.1,
+          "config": "0-shot, Chat model",
+          "reported_by": "official",
+          "source": {
+            "url": "https://github.com/deepseek-ai/DeepSeek-LLM",
+            "title": "DeepSeek LLM README",
+            "quote": "| DeepSeek LLM 67B Chat | 81.5     | 71.1 | 84.1  | 73.8      | 71.7 | 65.2   | 67.8  |  85.1 |",
+            "retrieved_at": "2026-09-07T03:30:00Z"
+          }
+        },
+        {
+          "benchmark": "humaneval",
+          "value": 73.8,
+          "config": "pass@1, Chat model",
+          "reported_by": "official",
+          "source": {
+            "url": "https://github.com/deepseek-ai/DeepSeek-LLM",
+            "title": "DeepSeek LLM README",
+            "quote": "| DeepSeek LLM 67B Chat | 81.5     | 71.1 | 84.1  | 73.8      | 71.7 | 65.2   | 67.8  |  85.1 |",
+            "retrieved_at": "2026-09-07T03:30:00Z"
+          }
+        },
+        {
+          "benchmark": "math",
+          "value": 32.6,
+          "config": "0-shot, Chat model",
+          "reported_by": "official",
+          "source": {
+            "url": "https://github.com/deepseek-ai/DeepSeek-LLM",
+            "title": "DeepSeek LLM README",
+            "quote": "DeepSeek LLM 67B Chat exhibits outstanding performance in coding (HumanEval Pass@1: 73.78) and mathematics (GSM8K 0-shot: 84.1, Math 0-shot: 32.6).",
+            "retrieved_at": "2026-09-07T03:30:00Z"
+          }
+        }
+      ],
+      "notes": "DeepSeek's first-generation dense (non-MoE) model, 7B and 67B released together; 67B is the flagship. Exact release day not confirmed from a primary DeepSeek source, so recorded at month precision (widely reported as Nov 29, 2023)."
+    },
+    {
+      "id": "deepseek-v2",
+      "lab": "deepseek",
+      "name": "DeepSeek-V2",
+      "family": "DeepSeek-V",
+      "date": "2024-05-06",
+      "date_precision": "day",
+      "status": "released",
+      "announcement": {
+        "url": "https://github.com/deepseek-ai/DeepSeek-V2",
+        "title": "DeepSeek-V2",
+        "quote": "2024.05.06: We released the DeepSeek-V2.",
+        "retrieved_at": "2026-09-07T03:30:00Z"
+      },
+      "scores": [
+        {
+          "benchmark": "mmlu",
+          "value": 77.8,
+          "config": "Chat (RL)",
+          "reported_by": "official",
+          "source": {
+            "url": "https://huggingface.co/deepseek-ai/DeepSeek-V2/raw/main/README.md",
+            "title": "DeepSeek-V2 model card",
+            "quote": "| **MMLU**      | English        | 76.2             | 77.8          | 80.3                | 71.1        | 78.4                 | 77.8                 |",
+            "retrieved_at": "2026-09-07T03:30:00Z"
+          }
+        },
+        {
+          "benchmark": "humaneval",
+          "value": 81.1,
+          "config": "Chat (RL)",
+          "reported_by": "official",
+          "source": {
+            "url": "https://huggingface.co/deepseek-ai/DeepSeek-V2/raw/main/README.md",
+            "title": "DeepSeek-V2 model card",
+            "quote": "| **HumanEval** | Code           | 68.9             | 75.0          | 76.2                | 73.8        | 76.8                 | 81.1                 |",
+            "retrieved_at": "2026-09-07T03:30:00Z"
+          }
+        },
+        {
+          "benchmark": "math",
+          "value": 53.9,
+          "config": "Chat (RL)",
+          "reported_by": "official",
+          "source": {
+            "url": "https://huggingface.co/deepseek-ai/DeepSeek-V2/raw/main/README.md",
+            "title": "DeepSeek-V2 model card",
+            "quote": "| **Math**      | Math           | 40.6             | 49.8          | 48.5                | 32.6        | 52.7                 | 53.9                 |",
+            "retrieved_at": "2026-09-07T03:30:00Z"
+          }
+        }
+      ]
+    },
+    {
+      "id": "deepseek-v2.5",
+      "lab": "deepseek",
+      "name": "DeepSeek-V2.5",
+      "family": "DeepSeek-V",
+      "date": "2024-09-05",
+      "date_precision": "day",
+      "status": "released",
+      "announcement": {
+        "url": "https://huggingface.co/deepseek-ai/DeepSeek-V2.5/raw/main/README.md",
+        "title": "DeepSeek-V2.5",
+        "quote": "DeepSeek-V2.5 is an upgraded version that combines DeepSeek-V2-Chat and DeepSeek-Coder-V2-Instruct. The new model integrates the general and coding abilities of the two previous versions.",
+        "retrieved_at": "2026-09-07T03:30:00Z"
+      },
+      "sources": [
+        {
+          "url": "https://api-docs.deepseek.com/news/news250120",
+          "title": "DeepSeek API news index (lists DeepSeek-V2.5 Release 2024/09/05)",
+          "retrieved_at": "2026-09-07T03:30:00Z"
+        }
+      ],
+      "scores": [
+        {
+          "benchmark": "humaneval",
+          "value": 89,
+          "config": "HumanEval python",
+          "reported_by": "official",
+          "source": {
+            "url": "https://huggingface.co/deepseek-ai/DeepSeek-V2.5/raw/main/README.md",
+            "title": "DeepSeek-V2.5 model card",
+            "quote": "| HumanEval python       | 84.5             | 87.2                   | 89            |",
+            "retrieved_at": "2026-09-07T03:30:00Z"
+          }
+        },
+        {
+          "benchmark": "livecodebench",
+          "value": 41.8,
+          "config": "window 01-09",
+          "reported_by": "official",
+          "source": {
+            "url": "https://huggingface.co/deepseek-ai/DeepSeek-V2.5/raw/main/README.md",
+            "title": "DeepSeek-V2.5 model card",
+            "quote": "| LiveCodeBench(01-09)   | 36.6             | 39.7                   | 41.8          |",
+            "retrieved_at": "2026-09-07T03:30:00Z"
+          }
+        }
+      ],
+      "notes": "No MMLU/GPQA/MATH figures were published in this model card (it focuses on deltas over DeepSeek-V2-Chat and DeepSeek-Coder-V2-Instruct)."
+    },
+    {
+      "id": "deepseek-v3",
+      "lab": "deepseek",
+      "name": "DeepSeek-V3",
+      "family": "DeepSeek-V",
+      "date": "2024-12-26",
+      "date_precision": "day",
+      "status": "released",
+      "announcement": {
+        "url": "https://huggingface.co/deepseek-ai/DeepSeek-V3/raw/main/README.md",
+        "title": "DeepSeek-V3",
+        "quote": "We present DeepSeek-V3, a strong Mixture-of-Experts (MoE) language model with 671B total parameters with 37B activated for each token.",
+        "retrieved_at": "2026-09-07T03:30:00Z"
+      },
+      "sources": [
+        {
+          "url": "https://api-docs.deepseek.com/news/news250120",
+          "title": "DeepSeek API news index (lists \"Introducing DeepSeek-V3\" 2024/12/26)",
+          "retrieved_at": "2026-09-07T03:30:00Z"
+        }
+      ],
+      "scores": [
+        {
+          "benchmark": "mmlu",
+          "value": 88.5,
+          "config": "Chat model",
+          "reported_by": "official",
+          "source": {
+            "url": "https://huggingface.co/deepseek-ai/DeepSeek-V3/raw/main/README.md",
+            "title": "DeepSeek-V3 model card",
+            "quote": "| English | MMLU (EM) | 78.2 | 80.6 | 85.3 | **88.6** | **88.3** | 87.2 | **88.5** |",
+            "retrieved_at": "2026-09-07T03:30:00Z"
+          }
+        },
+        {
+          "benchmark": "gpqa-diamond",
+          "value": 59.1,
+          "config": "pass@1, Chat model",
+          "reported_by": "official",
+          "source": {
+            "url": "https://huggingface.co/deepseek-ai/DeepSeek-V3/raw/main/README.md",
+            "title": "DeepSeek-V3 model card",
+            "quote": "| | GPQA-Diamond (Pass@1) | 35.3 | 41.3 | 49.0 | 51.1 | **65.0** | 49.9 | 59.1 |",
+            "retrieved_at": "2026-09-07T03:30:00Z"
+          }
+        },
+        {
+          "benchmark": "math",
+          "value": 90.2,
+          "config": "MATH-500, EM, Chat model",
+          "reported_by": "official",
+          "source": {
+            "url": "https://huggingface.co/deepseek-ai/DeepSeek-V3/raw/main/README.md",
+            "title": "DeepSeek-V3 model card",
+            "quote": "| | MATH-500 (EM) | 56.3 | 74.7 | 80.0 | 73.8 | 78.3 | 74.6 | **90.2** |",
+            "retrieved_at": "2026-09-07T03:30:00Z"
+          }
+        },
+        {
+          "benchmark": "aime",
+          "value": 39.2,
+          "config": "AIME 2024, pass@1, Chat model",
+          "reported_by": "official",
+          "source": {
+            "url": "https://huggingface.co/deepseek-ai/DeepSeek-V3/raw/main/README.md",
+            "title": "DeepSeek-V3 model card",
+            "quote": "| Math | AIME 2024 (Pass@1) | 4.6 | 16.7 | 23.3 | 23.3 | 16.0 | 9.3 | **39.2** |",
+            "retrieved_at": "2026-09-07T03:30:00Z"
+          }
+        },
+        {
+          "benchmark": "humaneval",
+          "value": 65.2,
+          "config": "0-shot, pass@1, Base (pretrained) model",
+          "note": "The Chat model card reports \"HumanEval-Mul\" (a multilingual variant) instead of plain HumanEval; this value is from the Base model table.",
+          "reported_by": "official",
+          "source": {
+            "url": "https://huggingface.co/deepseek-ai/DeepSeek-V3/raw/main/README.md",
+            "title": "DeepSeek-V3 model card",
+            "quote": "| Code | HumanEval (Pass@1) | 0-shot | 43.3 | 53.0 | 54.9 | **65.2** |",
+            "retrieved_at": "2026-09-07T03:30:00Z"
+          }
+        }
+      ]
+    },
+    {
+      "id": "deepseek-r1",
+      "lab": "deepseek",
+      "name": "DeepSeek-R1",
+      "family": "DeepSeek-R",
+      "date": "2025-01-20",
+      "date_precision": "day",
+      "status": "released",
+      "announcement": {
+        "url": "https://huggingface.co/deepseek-ai/DeepSeek-R1/raw/main/README.md",
+        "title": "DeepSeek-R1",
+        "quote": "We introduce our first-generation reasoning models, DeepSeek-R1-Zero and DeepSeek-R1.",
+        "retrieved_at": "2026-09-07T03:30:00Z"
+      },
+      "sources": [
+        {
+          "url": "https://www.deepseek.com/en/news/deepseek-r1/",
+          "title": "DeepSeek | DeepSeek-R1 Release",
+          "retrieved_at": "2026-09-07T03:30:00Z"
+        }
+      ],
+      "scores": [
+        {
+          "benchmark": "mmlu",
+          "value": 90.8,
+          "config": "pass@1",
+          "reported_by": "official",
+          "source": {
+            "url": "https://huggingface.co/deepseek-ai/DeepSeek-R1/raw/main/README.md",
+            "title": "DeepSeek-R1 model card",
+            "quote": "| English | MMLU (Pass@1) | 88.3 | 87.2 | 88.5 | 85.2 | **91.8** | 90.8 |",
+            "retrieved_at": "2026-09-07T03:30:00Z"
+          }
+        },
+        {
+          "benchmark": "gpqa-diamond",
+          "value": 71.5,
+          "config": "pass@1",
+          "reported_by": "official",
+          "source": {
+            "url": "https://huggingface.co/deepseek-ai/DeepSeek-R1/raw/main/README.md",
+            "title": "DeepSeek-R1 model card",
+            "quote": "| | GPQA-Diamond (Pass@1) | 65.0 | 49.9 | 59.1 | 60.0 | **75.7** | 71.5 |",
+            "retrieved_at": "2026-09-07T03:30:00Z"
+          }
+        },
+        {
+          "benchmark": "math",
+          "value": 97.3,
+          "config": "MATH-500, pass@1",
+          "reported_by": "official",
+          "source": {
+            "url": "https://huggingface.co/deepseek-ai/DeepSeek-R1/raw/main/README.md",
+            "title": "DeepSeek-R1 model card",
+            "quote": "| | MATH-500 (Pass@1) | 78.3 | 74.6 | 90.2 | 90.0 | 96.4 | **97.3** |",
+            "retrieved_at": "2026-09-07T03:30:00Z"
+          }
+        },
+        {
+          "benchmark": "aime",
+          "value": 79.8,
+          "config": "AIME 2024, pass@1",
+          "reported_by": "official",
+          "source": {
+            "url": "https://huggingface.co/deepseek-ai/DeepSeek-R1/raw/main/README.md",
+            "title": "DeepSeek-R1 model card",
+            "quote": "| Math | AIME 2024 (Pass@1) | 16.0 | 9.3 | 39.2 | 63.6 | 79.2 | **79.8** |",
+            "retrieved_at": "2026-09-07T03:30:00Z"
+          }
+        },
+        {
+          "benchmark": "swe-bench-verified",
+          "value": 49.2,
+          "config": "Resolved",
+          "reported_by": "official",
+          "source": {
+            "url": "https://huggingface.co/deepseek-ai/DeepSeek-R1/raw/main/README.md",
+            "title": "DeepSeek-R1 model card",
+            "quote": "| | SWE Verified (Resolved) | **50.8** | 38.8 | 42.0 | 41.6 | 48.9 | 49.2 |",
+            "retrieved_at": "2026-09-07T03:30:00Z"
+          }
+        }
+      ]
+    },
+    {
+      "id": "deepseek-v3-0324",
+      "lab": "deepseek",
+      "name": "DeepSeek-V3-0324",
+      "family": "DeepSeek-V",
+      "date": "2025-03-25",
+      "date_precision": "day",
+      "status": "released",
+      "announcement": {
+        "url": "https://huggingface.co/deepseek-ai/DeepSeek-V3-0324/raw/main/README.md",
+        "title": "DeepSeek-V3-0324",
+        "quote": "DeepSeek-V3-0324 demonstrates notable improvements over its predecessor, DeepSeek-V3, in several key aspects.",
+        "retrieved_at": "2026-09-07T03:30:00Z"
+      },
+      "sources": [
+        {
+          "url": "https://api-docs.deepseek.com/news/news250325/",
+          "title": "DeepSeek-V3-0324 Release",
+          "retrieved_at": "2026-09-07T03:30:00Z"
+        }
+      ],
+      "scores": [
+        {
+          "benchmark": "mmlu-pro",
+          "value": 81.2,
+          "config": "as reported in the 0324 release notes",
+          "reported_by": "official",
+          "source": {
+            "url": "https://huggingface.co/deepseek-ai/DeepSeek-V3-0324/raw/main/README.md",
+            "title": "DeepSeek-V3-0324 model card",
+            "quote": "MMLU-Pro: 75.9 → 81.2 (+5.3)",
+            "retrieved_at": "2026-09-07T03:30:00Z"
+          }
+        },
+        {
+          "benchmark": "gpqa-diamond",
+          "value": 68.4,
+          "config": "labeled \"GPQA\" in the release notes (variant not spelled out)",
+          "note": "The release notes just say \"GPQA\"; the baseline value cited (59.1) matches DeepSeek-V3's official GPQA-Diamond score, so this is recorded as GPQA Diamond.",
+          "reported_by": "official",
+          "source": {
+            "url": "https://huggingface.co/deepseek-ai/DeepSeek-V3-0324/raw/main/README.md",
+            "title": "DeepSeek-V3-0324 model card",
+            "quote": "GPQA: 59.1 → 68.4 (+9.3)",
+            "retrieved_at": "2026-09-07T03:30:00Z"
+          }
+        },
+        {
+          "benchmark": "livecodebench",
+          "value": 49.2,
+          "config": "as reported in the 0324 release notes",
+          "reported_by": "official",
+          "source": {
+            "url": "https://huggingface.co/deepseek-ai/DeepSeek-V3-0324/raw/main/README.md",
+            "title": "DeepSeek-V3-0324 model card",
+            "quote": "LiveCodeBench: 39.2 → 49.2 (+10.0)",
+            "retrieved_at": "2026-09-07T03:30:00Z"
+          }
+        }
+      ],
+      "notes": "Point update to DeepSeek-V3's weights (same architecture/size); released under the MIT license."
+    },
+    {
+      "id": "deepseek-r1-0528",
+      "lab": "deepseek",
+      "name": "DeepSeek-R1-0528",
+      "family": "DeepSeek-R",
+      "date": "2025-05-28",
+      "date_precision": "day",
+      "status": "released",
+      "announcement": {
+        "url": "https://huggingface.co/deepseek-ai/DeepSeek-R1-0528/raw/main/README.md",
+        "title": "DeepSeek-R1-0528",
+        "quote": "The DeepSeek R1 model has undergone a minor version upgrade, with the current version being DeepSeek-R1-0528.",
+        "retrieved_at": "2026-09-07T03:30:00Z"
+      },
+      "sources": [
+        {
+          "url": "https://api-docs.deepseek.com/news/news250528/",
+          "title": "DeepSeek-R1-0528 Release",
+          "retrieved_at": "2026-09-07T03:30:00Z"
+        }
+      ],
+      "scores": [
+        {
+          "benchmark": "mmlu-pro",
+          "value": 85.0,
+          "config": "EM",
+          "reported_by": "official",
+          "source": {
+            "url": "https://huggingface.co/deepseek-ai/DeepSeek-R1-0528/raw/main/README.md",
+            "title": "DeepSeek-R1-0528 model card",
+            "quote": "|          | MMLU-Pro (EM)                     | 84.0            | 85.0",
+            "retrieved_at": "2026-09-07T03:30:00Z"
+          }
+        },
+        {
+          "benchmark": "gpqa-diamond",
+          "value": 81.0,
+          "config": "pass@1",
+          "reported_by": "official",
+          "source": {
+            "url": "https://huggingface.co/deepseek-ai/DeepSeek-R1-0528/raw/main/README.md",
+            "title": "DeepSeek-R1-0528 model card",
+            "quote": "|          | GPQA-Diamond (Pass@1)             | 71.5            | 81.0",
+            "retrieved_at": "2026-09-07T03:30:00Z"
+          }
+        },
+        {
+          "benchmark": "hle",
+          "value": 17.7,
+          "config": "pass@1",
+          "reported_by": "official",
+          "source": {
+            "url": "https://huggingface.co/deepseek-ai/DeepSeek-R1-0528/raw/main/README.md",
+            "title": "DeepSeek-R1-0528 model card",
+            "quote": "|          | Humanity's Last Exam (Pass@1)                     | 8.5            | 17.7",
+            "retrieved_at": "2026-09-07T03:30:00Z"
+          }
+        },
+        {
+          "benchmark": "swe-bench-verified",
+          "value": 57.6,
+          "config": "Resolved",
+          "reported_by": "official",
+          "source": {
+            "url": "https://huggingface.co/deepseek-ai/DeepSeek-R1-0528/raw/main/README.md",
+            "title": "DeepSeek-R1-0528 model card",
+            "quote": "|          | SWE Verified (Resolved)           | 49.2            | 57.6",
+            "retrieved_at": "2026-09-07T03:30:00Z"
+          }
+        },
+        {
+          "benchmark": "aime",
+          "value": 87.5,
+          "config": "AIME 2025, pass@1",
+          "reported_by": "official",
+          "source": {
+            "url": "https://huggingface.co/deepseek-ai/DeepSeek-R1-0528/raw/main/README.md",
+            "title": "DeepSeek-R1-0528 model card",
+            "quote": "|          | AIME 2025 (Pass@1)                     | 70.0           | 87.5",
+            "retrieved_at": "2026-09-07T03:30:00Z"
+          }
+        }
+      ],
+      "notes": "Minor version upgrade of DeepSeek-R1 (same architecture/size), with increased post-training compute."
+    },
+    {
+      "id": "deepseek-v3.1",
+      "lab": "deepseek",
+      "name": "DeepSeek-V3.1",
+      "family": "DeepSeek-V",
+      "date": "2025-08-21",
+      "date_precision": "day",
+      "status": "released",
+      "announcement": {
+        "url": "https://huggingface.co/deepseek-ai/DeepSeek-V3.1/raw/main/README.md",
+        "title": "DeepSeek-V3.1",
+        "quote": "DeepSeek-V3.1 is a hybrid model that supports both thinking mode and non-thinking mode.",
+        "retrieved_at": "2026-09-07T03:30:00Z"
+      },
+      "sources": [
+        {
+          "url": "https://api-docs.deepseek.com/news/news250821/",
+          "title": "DeepSeek-V3.1 Release",
+          "retrieved_at": "2026-09-07T03:30:00Z"
+        }
+      ],
+      "scores": [
+        {
+          "benchmark": "mmlu-pro",
+          "value": 84.8,
+          "config": "EM, thinking mode",
+          "reported_by": "official",
+          "source": {
+            "url": "https://huggingface.co/deepseek-ai/DeepSeek-V3.1/raw/main/README.md",
+            "title": "DeepSeek-V3.1 model card",
+            "quote": "|          | MMLU-Pro (EM)                  | 83.7  | 81.2    | 84.8          | 85.0",
+            "retrieved_at": "2026-09-07T03:30:00Z"
+          }
+        },
+        {
+          "benchmark": "gpqa-diamond",
+          "value": 80.1,
+          "config": "pass@1, thinking mode",
+          "reported_by": "official",
+          "source": {
+            "url": "https://huggingface.co/deepseek-ai/DeepSeek-V3.1/raw/main/README.md",
+            "title": "DeepSeek-V3.1 model card",
+            "quote": "|          | GPQA-Diamond (Pass@1)           | 74.9   | 68.4   | 80.1            | 81.0",
+            "retrieved_at": "2026-09-07T03:30:00Z"
+          }
+        },
+        {
+          "benchmark": "hle",
+          "value": 15.9,
+          "config": "pass@1, thinking mode",
+          "reported_by": "official",
+          "source": {
+            "url": "https://huggingface.co/deepseek-ai/DeepSeek-V3.1/raw/main/README.md",
+            "title": "DeepSeek-V3.1 model card",
+            "quote": "|          | Humanity's Last Exam (Pass@1)   | -    |       -            | 15.9         | 17.7",
+            "retrieved_at": "2026-09-07T03:30:00Z"
+          }
+        },
+        {
+          "benchmark": "livecodebench",
+          "value": 74.8,
+          "config": "window 2408-2505, pass@1, thinking mode",
+          "reported_by": "official",
+          "source": {
+            "url": "https://huggingface.co/deepseek-ai/DeepSeek-V3.1/raw/main/README.md",
+            "title": "DeepSeek-V3.1 model card",
+            "quote": "|          | LiveCodeBench (2408-2505) (Pass@1)     | 56.4    | 43.0    | 74.8          | 73.3",
+            "retrieved_at": "2026-09-07T03:30:00Z"
+          }
+        },
+        {
+          "benchmark": "aime",
+          "value": 88.4,
+          "config": "AIME 2025, pass@1, thinking mode",
+          "reported_by": "official",
+          "source": {
+            "url": "https://huggingface.co/deepseek-ai/DeepSeek-V3.1/raw/main/README.md",
+            "title": "DeepSeek-V3.1 model card",
+            "quote": "|          | AIME 2025 (Pass@1)                     | 49.8  | 51.3 | 88.4          | 87.5",
+            "retrieved_at": "2026-09-07T03:30:00Z"
+          }
+        }
+      ],
+      "notes": "First hybrid think/non-think DeepSeek-V model; scores recorded here are the thinking-mode configuration."
+    },
+    {
+      "id": "deepseek-v3.2-exp",
+      "lab": "deepseek",
+      "name": "DeepSeek-V3.2-Exp",
+      "family": "DeepSeek-V",
+      "date": "2025-09-29",
+      "date_precision": "day",
+      "status": "released",
+      "announcement": {
+        "url": "https://huggingface.co/deepseek-ai/DeepSeek-V3.2-Exp/raw/main/README.md",
+        "title": "DeepSeek-V3.2-Exp",
+        "quote": "We are excited to announce the official release of DeepSeek-V3.2-Exp, an experimental version of our model.",
+        "retrieved_at": "2026-09-07T03:30:00Z"
+      },
+      "sources": [
+        {
+          "url": "https://api-docs.deepseek.com/news/news250929/",
+          "title": "Introducing DeepSeek-V3.2-Exp",
+          "retrieved_at": "2026-09-07T03:30:00Z"
+        }
+      ],
+      "scores": [
+        {
+          "benchmark": "mmlu-pro",
+          "value": 85.0,
+          "config": "reasoning mode w/o tool use",
+          "reported_by": "official",
+          "source": {
+            "url": "https://huggingface.co/deepseek-ai/DeepSeek-V3.2-Exp/raw/main/README.md",
+            "title": "DeepSeek-V3.2-Exp model card",
+            "quote": "| MMLU-Pro | 85.0 | 85.0 |",
+            "retrieved_at": "2026-09-07T03:30:00Z"
+          }
+        },
+        {
+          "benchmark": "gpqa-diamond",
+          "value": 79.9,
+          "config": "reasoning mode w/o tool use",
+          "reported_by": "official",
+          "source": {
+            "url": "https://huggingface.co/deepseek-ai/DeepSeek-V3.2-Exp/raw/main/README.md",
+            "title": "DeepSeek-V3.2-Exp model card",
+            "quote": "| GPQA-Diamond | 80.7 | 79.9 |",
+            "retrieved_at": "2026-09-07T03:30:00Z"
+          }
+        },
+        {
+          "benchmark": "hle",
+          "value": 19.8,
+          "config": "reasoning mode w/o tool use",
+          "reported_by": "official",
+          "source": {
+            "url": "https://huggingface.co/deepseek-ai/DeepSeek-V3.2-Exp/raw/main/README.md",
+            "title": "DeepSeek-V3.2-Exp model card",
+            "quote": "| Humanity's Last Exam | 21.7 | 19.8 |",
+            "retrieved_at": "2026-09-07T03:30:00Z"
+          }
+        },
+        {
+          "benchmark": "livecodebench",
+          "value": 74.1,
+          "config": "reasoning mode w/o tool use",
+          "reported_by": "official",
+          "source": {
+            "url": "https://huggingface.co/deepseek-ai/DeepSeek-V3.2-Exp/raw/main/README.md",
+            "title": "DeepSeek-V3.2-Exp model card",
+            "quote": "| LiveCodeBench | 74.9 | 74.1 |",
+            "retrieved_at": "2026-09-07T03:30:00Z"
+          }
+        },
+        {
+          "benchmark": "aime",
+          "value": 89.3,
+          "config": "AIME 2025, reasoning mode w/o tool use",
+          "reported_by": "official",
+          "source": {
+            "url": "https://huggingface.co/deepseek-ai/DeepSeek-V3.2-Exp/raw/main/README.md",
+            "title": "DeepSeek-V3.2-Exp model card",
+            "quote": "| AIME 2025 | 88.4 | 89.3 |",
+            "retrieved_at": "2026-09-07T03:30:00Z"
+          }
+        },
+        {
+          "benchmark": "swe-bench-verified",
+          "value": 67.8,
+          "config": "agentic tool use",
+          "reported_by": "official",
+          "source": {
+            "url": "https://huggingface.co/deepseek-ai/DeepSeek-V3.2-Exp/raw/main/README.md",
+            "title": "DeepSeek-V3.2-Exp model card",
+            "quote": "| SWE Verified | 68.4 | 67.8 |",
+            "retrieved_at": "2026-09-07T03:30:00Z"
+          }
+        }
+      ],
+      "notes": "Experimental release introducing DeepSeek Sparse Attention (DSA); DeepSeek deliberately aligned its training configuration with V3.1-Terminus to isolate the effect of sparse attention, so scores are close to V3.1's."
+    },
+    {
+      "id": "deepseek-v3.2",
+      "lab": "deepseek",
+      "name": "DeepSeek-V3.2",
+      "family": "DeepSeek-V",
+      "date": "2025-12-01",
+      "date_precision": "day",
+      "status": "released",
+      "announcement": {
+        "url": "https://huggingface.co/deepseek-ai/DeepSeek-V3.2/raw/main/README.md",
+        "title": "DeepSeek-V3.2",
+        "quote": "We introduce DeepSeek-V3.2, a model that harmonizes high computational efficiency with superior reasoning and agent performance.",
+        "retrieved_at": "2026-09-07T03:30:00Z"
+      },
+      "sources": [
+        {
+          "url": "https://api-docs.deepseek.com/news/news251201/",
+          "title": "DeepSeek-V3.2 Release",
+          "retrieved_at": "2026-09-07T03:30:00Z"
+        },
+        {
+          "url": "https://arxiv.org/abs/2512.02556",
+          "title": "DeepSeek-V3.2: Pushing the Frontier of Open Large Language Models (technical report)",
+          "retrieved_at": "2026-09-07T03:30:00Z"
+        }
+      ],
+      "scores": [
+        {
+          "benchmark": "mmlu-pro",
+          "value": 85.0,
+          "config": "EM, thinking-in-tool-use mode",
+          "reported_by": "official",
+          "source": {
+            "url": "https://arxiv.org/html/2512.02556v1",
+            "title": "DeepSeek-V3.2 technical report, Table 2",
+            "quote": "MMLU-Pro (EM) 88.2 87.5 90.1 84.6 82.0 85.0",
+            "retrieved_at": "2026-09-07T03:30:00Z"
+          }
+        },
+        {
+          "benchmark": "gpqa-diamond",
+          "value": 82.4,
+          "config": "pass@1, thinking-in-tool-use mode",
+          "reported_by": "official",
+          "source": {
+            "url": "https://arxiv.org/html/2512.02556v1",
+            "title": "DeepSeek-V3.2 technical report, Table 2",
+            "quote": "GPQA Diamond (Pass@1) 83.4 85.7 91.9 84.5 77.7 82.4",
+            "retrieved_at": "2026-09-07T03:30:00Z"
+          }
+        },
+        {
+          "benchmark": "hle",
+          "value": 25.1,
+          "config": "pass@1, thinking-in-tool-use mode",
+          "reported_by": "official",
+          "source": {
+            "url": "https://arxiv.org/html/2512.02556v1",
+            "title": "DeepSeek-V3.2 technical report, Table 2",
+            "quote": "HLE (Pass@1) 13.7 26.3 37.7 23.9 12.5 25.1",
+            "retrieved_at": "2026-09-07T03:30:00Z"
+          }
+        },
+        {
+          "benchmark": "livecodebench",
+          "value": 83.3,
+          "config": "Pass@1-COT",
+          "reported_by": "official",
+          "source": {
+            "url": "https://arxiv.org/html/2512.02556v1",
+            "title": "DeepSeek-V3.2 technical report, Table 2",
+            "quote": "LiveCodeBench (Pass@1-COT) 64.0 84.5 90.7 82.6 83.0 83.3",
+            "retrieved_at": "2026-09-07T03:30:00Z"
+          }
+        },
+        {
+          "benchmark": "aime",
+          "value": 93.1,
+          "config": "AIME 2025, pass@1",
+          "reported_by": "official",
+          "source": {
+            "url": "https://arxiv.org/html/2512.02556v1",
+            "title": "DeepSeek-V3.2 technical report, Table 2",
+            "quote": "AIME 2025 (Pass@1) 87.0 94.6 95.0 94.5 78.3 93.1",
+            "retrieved_at": "2026-09-07T03:30:00Z"
+          }
+        },
+        {
+          "benchmark": "swe-bench-verified",
+          "value": 73.1,
+          "config": "Resolved",
+          "reported_by": "official",
+          "source": {
+            "url": "https://arxiv.org/html/2512.02556v1",
+            "title": "DeepSeek-V3.2 technical report, Table 2",
+            "quote": "SWE Verified (Resolved) 77.2 74.9 76.2 71.3 69.4 73.1",
+            "retrieved_at": "2026-09-07T03:30:00Z"
+          }
+        },
+        {
+          "benchmark": "terminal-bench-2",
+          "value": 46.4,
+          "config": "Acc",
+          "reported_by": "official",
+          "source": {
+            "url": "https://arxiv.org/html/2512.02556v1",
+            "title": "DeepSeek-V3.2 technical report, Table 2",
+            "quote": "Terminal Bench 2.0 (Acc) 42.8 35.2 54.2 35.7 30.0 46.4",
+            "retrieved_at": "2026-09-07T03:30:00Z"
+          }
+        }
+      ],
+      "notes": "Official successor to V3.2-Exp; DeepSeek-V3.2-Speciale (API-only, maximum reasoning) was launched the same day as a separate reasoning-maximized variant, not recorded here as it targets research/eval use rather than general availability."
+    },
+    {
+      "id": "deepseek-v4-pro",
+      "lab": "deepseek",
+      "name": "DeepSeek-V4-Pro",
+      "family": "DeepSeek-V",
+      "date": "2026-04-24",
+      "date_precision": "day",
+      "status": "released",
+      "announcement": {
+        "url": "https://api-docs.deepseek.com/news/news260424/",
+        "title": "DeepSeek V4 Preview Release",
+        "quote": "DeepSeek-V4 Preview is officially live & open-sourced! Welcome to the era of cost-effective 1M context length.",
+        "retrieved_at": "2026-09-07T03:30:00Z"
+      },
+      "sources": [
+        {
+          "url": "https://api-docs.deepseek.com/news/news260813/",
+          "title": "DeepSeek-V4-Pro GA Release",
+          "retrieved_at": "2026-09-07T03:30:00Z"
+        },
+        {
+          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro/raw/main/README.md",
+          "title": "DeepSeek-V4-Pro model card",
+          "retrieved_at": "2026-09-07T03:30:00Z"
+        }
+      ],
+      "scores": [
+        {
+          "benchmark": "mmlu-pro",
+          "value": 87.5,
+          "config": "EM, Think Max reasoning mode",
+          "note": "Scores are from the current (post-GA, V4-Pro-0813) model card, which reports the DeepSeek-V4-Pro-Max configuration; the model was first made available at preview on 2026-04-24 and reached GA as V4-Pro-0813 on 2026-08-13.",
+          "reported_by": "official",
+          "source": {
+            "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro/raw/main/README.md",
+            "title": "DeepSeek-V4-Pro model card",
+            "quote": "| MMLU-Pro (EM) | 89.1 | 87.5 | **91.0** | 87.1 | 86.0 | 87.5 |",
+            "retrieved_at": "2026-09-07T03:30:00Z"
+          }
+        },
+        {
+          "benchmark": "gpqa-diamond",
+          "value": 90.1,
+          "config": "pass@1, Think Max reasoning mode",
+          "reported_by": "official",
+          "source": {
+            "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro/raw/main/README.md",
+            "title": "DeepSeek-V4-Pro model card",
+            "quote": "| GPQA Diamond (Pass@1) | 91.3 | 93.0 | **94.3** | 90.5 | 86.2 | 90.1 |",
+            "retrieved_at": "2026-09-07T03:30:00Z"
+          }
+        },
+        {
+          "benchmark": "hle",
+          "value": 37.7,
+          "config": "pass@1, Think Max reasoning mode",
+          "reported_by": "official",
+          "source": {
+            "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro/raw/main/README.md",
+            "title": "DeepSeek-V4-Pro model card",
+            "quote": "| HLE (Pass@1) | 40.0 | 39.8 | **44.4** | 36.4 | 34.7 | 37.7 |",
+            "retrieved_at": "2026-09-07T03:30:00Z"
+          }
+        },
+        {
+          "benchmark": "livecodebench",
+          "value": 93.5,
+          "config": "pass@1, Think Max reasoning mode",
+          "reported_by": "official",
+          "source": {
+            "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro/raw/main/README.md",
+            "title": "DeepSeek-V4-Pro model card",
+            "quote": "| LiveCodeBench (Pass@1) | 88.8 | - | 91.7 | 89.6 | - | **93.5** |",
+            "retrieved_at": "2026-09-07T03:30:00Z"
+          }
+        },
+        {
+          "benchmark": "terminal-bench-2",
+          "value": 67.9,
+          "config": "Acc, Think Max reasoning mode",
+          "reported_by": "official",
+          "source": {
+            "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro/raw/main/README.md",
+            "title": "DeepSeek-V4-Pro model card",
+            "quote": "| Terminal Bench 2.0 (Acc) | 65.4 | **75.1** | 68.5 | 66.7 | 63.5 | 67.9 |",
+            "retrieved_at": "2026-09-07T03:30:00Z"
+          }
+        },
+        {
+          "benchmark": "swe-bench-verified",
+          "value": 80.6,
+          "config": "Resolved, Think Max reasoning mode",
+          "reported_by": "official",
+          "source": {
+            "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro/raw/main/README.md",
+            "title": "DeepSeek-V4-Pro model card",
+            "quote": "| SWE Verified (Resolved) | **80.8** | - | 80.6 | 80.2 | - | 80.6 |",
+            "retrieved_at": "2026-09-07T03:30:00Z"
+          }
+        }
+      ],
+      "notes": "1.6T-parameter (49B active) MoE model; DeepSeek-V4-Flash (284B/13B active) launched the same day as a smaller tier and is excluded here. Preview weights went live and open-sourced 2026-04-24; reasoning-effort modes (low/high/max) and the V4-Pro-0813 checkpoint shipped at GA on 2026-08-13. deepseek-chat/deepseek-reasoner API aliases were retired in favor of deepseek-v4-* on 2026-07-24."
+    }
+  ]
+}

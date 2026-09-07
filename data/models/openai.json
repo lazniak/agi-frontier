@@ -1,0 +1,784 @@
+{
+  "lab": "openai",
+  "updated_at": "2026-09-07T03:30:00Z",
+  "releases": [
+    {
+      "id": "openai-gpt-4",
+      "lab": "openai",
+      "name": "GPT-4",
+      "family": "GPT",
+      "date": "2023-03-14",
+      "date_precision": "day",
+      "status": "released",
+      "announcement": {
+        "url": "https://openai.com/index/gpt-4-research/",
+        "title": "GPT-4",
+        "quote": "We are releasing GPT‑4's text input capability via ChatGPT and the API (with a waitlist).",
+        "retrieved_at": "2026-09-07T03:30:00Z",
+        "via": "r.jina.ai"
+      },
+      "scores": [
+        {
+          "benchmark": "mmlu",
+          "value": 86.4,
+          "config": "5-shot, GPT-4 Technical Report Table 2",
+          "reported_by": "official",
+          "source": {
+            "url": "https://arxiv.org/abs/2303.08774",
+            "title": "GPT-4 Technical Report",
+            "quote": "86.4%",
+            "retrieved_at": "2026-09-07T03:30:00Z",
+            "via": "ar5iv.labs.arxiv.org"
+          }
+        },
+        {
+          "benchmark": "humaneval",
+          "value": 67.0,
+          "config": "0-shot, GPT-4 Technical Report Table 2",
+          "reported_by": "official",
+          "source": {
+            "url": "https://arxiv.org/abs/2303.08774",
+            "title": "GPT-4 Technical Report",
+            "quote": "67.0%",
+            "retrieved_at": "2026-09-07T03:30:00Z",
+            "via": "ar5iv.labs.arxiv.org"
+          }
+        }
+      ],
+      "notes": "Launch date (March 14, 2023) is not stated in the announcement post's body text; corroborated by the pinned API model version string 'gpt-4-0314' quoted on the same page and by widely reported press coverage of the launch. MMLU/HumanEval figures are from Table 2 of the GPT-4 Technical Report (arXiv:2303.08774), fetched via the ar5iv HTML mirror since the announcement page renders its benchmark comparison as an image chart with no extractable text."
+    },
+    {
+      "id": "openai-gpt-4-turbo",
+      "lab": "openai",
+      "name": "GPT-4 Turbo",
+      "family": "GPT",
+      "date": "2023-11-06",
+      "date_precision": "day",
+      "status": "released",
+      "announcement": {
+        "url": "https://openai.com/index/new-models-and-developer-products-announced-at-devday/",
+        "title": "New models and developer products announced at DevDay",
+        "quote": "Today we're launching a preview of the next generation of this model, GPT‑4 Turbo.",
+        "retrieved_at": "2026-09-07T03:30:00Z",
+        "via": "r.jina.ai"
+      },
+      "scores": [],
+      "notes": "Announced at OpenAI DevDay (November 6, 2023) as gpt-4-1106-preview, immediately available via the API. No separate academic benchmark scores were published at launch; the post focuses on context length (128k), pricing and knowledge cutoff (April 2023) rather than a benchmark table."
+    },
+    {
+      "id": "openai-gpt-4o",
+      "lab": "openai",
+      "name": "GPT-4o",
+      "family": "GPT",
+      "date": "2024-05-13",
+      "date_precision": "day",
+      "status": "released",
+      "announcement": {
+        "url": "https://openai.com/index/hello-gpt-4o/",
+        "title": "Hello GPT-4o",
+        "quote": "GPT‑4o's text and image capabilities are starting to roll out today in ChatGPT.",
+        "retrieved_at": "2026-09-07T03:30:00Z",
+        "via": "r.jina.ai"
+      },
+      "scores": [
+        {
+          "benchmark": "mmlu",
+          "value": 88.7,
+          "config": "0-shot, chart from launch post",
+          "reported_by": "official",
+          "source": {
+            "url": "https://openai.com/index/hello-gpt-4o/",
+            "quote": "GPT-4o, Accuracy (%): 88.7",
+            "retrieved_at": "2026-09-07T03:30:00Z",
+            "via": "r.jina.ai"
+          },
+          "note": "Value read from the SVG accessibility label (aria-label) of the MMLU bar in the launch post's benchmark chart (class \"bar-mmlu\")."
+        },
+        {
+          "benchmark": "humaneval",
+          "value": 90.2,
+          "config": "chart from launch post",
+          "reported_by": "official",
+          "source": {
+            "url": "https://openai.com/index/hello-gpt-4o/",
+            "quote": "GPT-4o, Accuracy (%): 90.2",
+            "retrieved_at": "2026-09-07T03:30:00Z",
+            "via": "r.jina.ai"
+          },
+          "note": "Value read from the SVG accessibility label of the HumanEval bar (class \"bar-humaneval\")."
+        },
+        {
+          "benchmark": "math",
+          "value": 76.6,
+          "config": "chart from launch post",
+          "reported_by": "official",
+          "source": {
+            "url": "https://openai.com/index/hello-gpt-4o/",
+            "quote": "GPT-4o, Accuracy (%): 76.6",
+            "retrieved_at": "2026-09-07T03:30:00Z",
+            "via": "r.jina.ai"
+          },
+          "note": "Value read from the SVG accessibility label of the MATH bar (class \"bar-math\")."
+        },
+        {
+          "benchmark": "gpqa-diamond",
+          "value": 53.6,
+          "config": "reported simply as \"GPQA\"",
+          "note": "OpenAI's chart labels this bar just \"GPQA\"; recorded here as the Diamond subset per standard convention at the time. Value read from the SVG accessibility label of the GPQA bar (class \"bar-gpqa\").",
+          "reported_by": "official",
+          "source": {
+            "url": "https://openai.com/index/hello-gpt-4o/",
+            "quote": "GPT-4o, Accuracy (%): 53.6",
+            "retrieved_at": "2026-09-07T03:30:00Z",
+            "via": "r.jina.ai"
+          }
+        }
+      ],
+      "notes": "Launch date (May 13, 2024, OpenAI Spring Update) is well documented in press coverage but not stated in the post's own body text. Benchmark values are not present as page text; they were recovered from aria-label accessibility attributes on the SVG bar chart in the page's raw HTML, which are part of the page as served."
+    },
+    {
+      "id": "openai-o1-preview",
+      "lab": "openai",
+      "name": "OpenAI o1-preview",
+      "family": "o-series",
+      "date": "2024-09-12",
+      "date_precision": "day",
+      "status": "released",
+      "announcement": {
+        "url": "https://openai.com/index/introducing-openai-o1-preview/",
+        "title": "Introducing OpenAI o1-preview",
+        "quote": "Today, we are releasing the first of this series in ChatGPT and our API.",
+        "retrieved_at": "2026-09-07T03:30:00Z",
+        "via": "r.jina.ai"
+      },
+      "scores": [
+        {
+          "benchmark": "swe-bench-verified",
+          "value": 41.3,
+          "config": "pre- and post-mitigation, o1-preview",
+          "reported_by": "official",
+          "source": {
+            "url": "https://openai.com/index/openai-o1-system-card/",
+            "title": "OpenAI o1 System Card",
+            "quote": "o1‑preview (Pre-Mitigation and Post-Mitigation) performs the best on SWE-bench Verified at 41.3%",
+            "retrieved_at": "2026-09-07T03:30:00Z",
+            "via": "r.jina.ai"
+          }
+        }
+      ],
+      "notes": "Public launch date (September 12, 2024) is stated on the announcement page itself. AIME/GPQA Diamond figures for o1-preview are shown only as image charts in both the launch post and the companion technical post (openai.com/index/learning-to-reason-with-llms/); no extractable text values were found for those within the research budget, so only the SWE-bench Verified figure (from the o1 system card's text) is recorded."
+    },
+    {
+      "id": "openai-o3",
+      "lab": "openai",
+      "name": "OpenAI o3",
+      "family": "o-series",
+      "date": "2025-04-16",
+      "date_precision": "day",
+      "status": "released",
+      "announcement": {
+        "url": "https://openai.com/index/introducing-o3-and-o4-mini/",
+        "title": "Introducing OpenAI o3 and o4-mini",
+        "quote": "ChatGPT Plus, Pro, and Team users will see o3, o4-mini, and o4-mini-high in the model selector starting today, replacing o1, o3‑mini, and o3‑mini‑high.",
+        "retrieved_at": "2026-09-07T03:30:00Z",
+        "via": "r.jina.ai"
+      },
+      "scores": [
+        {
+          "benchmark": "gpqa-diamond",
+          "value": 83.3,
+          "config": "no tools",
+          "reported_by": "official",
+          "source": {
+            "url": "https://openai.com/index/introducing-o3-and-o4-mini/",
+            "quote": "{\"model\":\"o3 (no tools)\",\"value\":83.3,\"labelValue\":83.3,\"color\":\"theme3_yellow\",\"top\":true}",
+            "retrieved_at": "2026-09-07T03:30:00Z",
+            "via": "r.jina.ai"
+          },
+          "note": "Value read from an embedded Vega-Lite chart specification (\"GPQA Diamond\") in the page's raw HTML."
+        },
+        {
+          "benchmark": "aime",
+          "value": 88.9,
+          "config": "AIME 2025, no tools",
+          "reported_by": "official",
+          "source": {
+            "url": "https://openai.com/index/introducing-o3-and-o4-mini/",
+            "quote": "{\"model\":\"o3 (no tools)\",\"value\":88.9,\"labelValue\":88.9,\"color\":\"theme3_yellow\",\"top\":true}",
+            "retrieved_at": "2026-09-07T03:30:00Z",
+            "via": "r.jina.ai"
+          },
+          "note": "Value read from an embedded Vega-Lite chart specification (\"AIME 2025\") in the page's raw HTML."
+        },
+        {
+          "benchmark": "swe-bench-verified",
+          "value": 69.1,
+          "config": "n=477 verified subset, no custom scaffold",
+          "reported_by": "official",
+          "source": {
+            "url": "https://openai.com/index/introducing-o3-and-o4-mini/",
+            "quote": "{\"model\":\"o3\",\"value\":69.1,\"labelValue\":69.1,\"color\":\"theme3_yellow\",\"top\":true}",
+            "retrieved_at": "2026-09-07T03:30:00Z",
+            "via": "r.jina.ai"
+          },
+          "note": "Value read from an embedded Vega-Lite chart specification (\"SWE-Bench Verified (n=477)\") in the page's raw HTML."
+        },
+        {
+          "benchmark": "mmmu",
+          "value": 82.9,
+          "config": "validation split",
+          "reported_by": "official",
+          "source": {
+            "url": "https://openai.com/index/introducing-o3-and-o4-mini/",
+            "quote": "{\"model\":\"o3\",\"value\":82.9,\"labelValue\":82.9,\"color\":\"theme3_yellow\",\"top\":true}",
+            "retrieved_at": "2026-09-07T03:30:00Z",
+            "via": "r.jina.ai"
+          },
+          "note": "Value read from an embedded Vega-Lite chart specification (\"MMMU\") in the page's raw HTML."
+        },
+        {
+          "benchmark": "hle",
+          "value": 20.32,
+          "config": "no tools",
+          "reported_by": "official",
+          "source": {
+            "url": "https://openai.com/index/introducing-o3-and-o4-mini/",
+            "quote": "{\"model\":\"o3 (no tools)\",\"value\":20.32,\"labelValue\":20.32,\"color\":\"theme3_yellow\",\"top\":true}",
+            "retrieved_at": "2026-09-07T03:30:00Z",
+            "via": "r.jina.ai"
+          },
+          "note": "Value read from an embedded Vega-Lite chart specification (\"Humanity's Last Exam\") in the page's raw HTML."
+        }
+      ],
+      "notes": "The launch post's benchmark charts are rendered client-side from Vega-Lite JSON specifications embedded in the page's React payload; scores above were read from that embedded JSON (the page's own served content), not from an image."
+    },
+    {
+      "id": "openai-gpt-4.5",
+      "lab": "openai",
+      "name": "GPT-4.5",
+      "family": "GPT",
+      "date": "2025-02-27",
+      "date_precision": "day",
+      "status": "released",
+      "announcement": {
+        "url": "https://openai.com/index/introducing-gpt-4-5/",
+        "title": "Introducing GPT-4.5",
+        "quote": "We're releasing a research preview of GPT‑4.5—our largest and best model for chat yet.",
+        "retrieved_at": "2026-09-07T03:30:00Z",
+        "via": "r.jina.ai"
+      },
+      "scores": [
+        {
+          "benchmark": "gpqa-diamond",
+          "value": 71.4,
+          "config": "reported as \"GPQA (science)\"",
+          "reported_by": "official",
+          "source": {
+            "url": "https://openai.com/index/introducing-gpt-4-5/",
+            "quote": "GPQA (science)71.4%53.6%79.7%",
+            "retrieved_at": "2026-09-07T03:30:00Z",
+            "via": "r.jina.ai"
+          },
+          "note": "Table row 'GPQA (science)' with columns GPT-4.5 / GPT-4o / OpenAI o3-mini (high); 71.4% is GPT-4.5's value."
+        },
+        {
+          "benchmark": "aime",
+          "value": 36.7,
+          "config": "AIME 2024",
+          "reported_by": "official",
+          "source": {
+            "url": "https://openai.com/index/introducing-gpt-4-5/",
+            "quote": "AIME ‘24 (math)36.7%9.3%87.3%",
+            "retrieved_at": "2026-09-07T03:30:00Z",
+            "via": "r.jina.ai"
+          },
+          "note": "Table row 'AIME '24 (math)' with columns GPT-4.5 / GPT-4o / OpenAI o3-mini (high); 36.7% is GPT-4.5's value."
+        },
+        {
+          "benchmark": "mmmu",
+          "value": 74.4,
+          "config": "multimodal eval table",
+          "reported_by": "official",
+          "source": {
+            "url": "https://openai.com/index/introducing-gpt-4-5/",
+            "quote": "MMMU (multimodal)74.4%69.1%-",
+            "retrieved_at": "2026-09-07T03:30:00Z",
+            "via": "r.jina.ai"
+          }
+        },
+        {
+          "benchmark": "swe-bench-verified",
+          "value": 38.0,
+          "config": "best internal performance",
+          "note": "Table footnote: 'Numbers shown represent best internal performance.'",
+          "reported_by": "official",
+          "source": {
+            "url": "https://openai.com/index/introducing-gpt-4-5/",
+            "quote": "SWE-Bench Verified (coding)*38.0%30.7%61.0%",
+            "retrieved_at": "2026-09-07T03:30:00Z",
+            "via": "r.jina.ai"
+          }
+        }
+      ],
+      "notes": "Available at launch to ChatGPT Pro subscribers and developers (research preview), which counts as public availability under this project's rules. Date corroborated by the OpenAI system card filename ('gpt-4-5-system-card-2272025.pdf') and CNBC's same-day report (https://www.cnbc.com/2025/02/27/openai-launching-gpt-4point5-general-purpose-large-language-model.html)."
+    },
+    {
+      "id": "openai-gpt-5",
+      "lab": "openai",
+      "name": "GPT-5",
+      "family": "GPT",
+      "date": "2025-08-07",
+      "date_precision": "day",
+      "status": "released",
+      "announcement": {
+        "url": "https://openai.com/index/introducing-gpt-5/",
+        "title": "Introducing GPT-5",
+        "quote": "GPT‑5 is available to all users, with Plus subscribers getting more usage, and Pro subscribers getting access to GPT‑5 pro, a version with extended reasoning for even more comprehensive and accurate answers.",
+        "retrieved_at": "2026-09-07T03:30:00Z",
+        "via": "r.jina.ai"
+      },
+      "scores": [
+        {
+          "benchmark": "aime",
+          "value": 94.6,
+          "config": "AIME 2025, no tools",
+          "reported_by": "official",
+          "source": {
+            "url": "https://openai.com/index/introducing-gpt-5/",
+            "quote": "It sets a new state of the art across math (94.6% on AIME 2025 without tools), real-world coding (74.9% on SWE-bench Verified, 88% on Aider Polyglot), multimodal understanding (84.2% on MMMU), and health (46.2% on HealthBench Hard)",
+            "retrieved_at": "2026-09-07T03:30:00Z",
+            "via": "r.jina.ai"
+          }
+        },
+        {
+          "benchmark": "swe-bench-verified",
+          "value": 74.9,
+          "config": "n=477 verified subset",
+          "reported_by": "official",
+          "source": {
+            "url": "https://openai.com/index/introducing-gpt-5/",
+            "quote": "It sets a new state of the art across math (94.6% on AIME 2025 without tools), real-world coding (74.9% on SWE-bench Verified, 88% on Aider Polyglot), multimodal understanding (84.2% on MMMU), and health (46.2% on HealthBench Hard)",
+            "retrieved_at": "2026-09-07T03:30:00Z",
+            "via": "r.jina.ai"
+          }
+        },
+        {
+          "benchmark": "mmmu",
+          "value": 84.2,
+          "config": "validation split",
+          "reported_by": "official",
+          "source": {
+            "url": "https://openai.com/index/introducing-gpt-5/",
+            "quote": "It sets a new state of the art across math (94.6% on AIME 2025 without tools), real-world coding (74.9% on SWE-bench Verified, 88% on Aider Polyglot), multimodal understanding (84.2% on MMMU), and health (46.2% on HealthBench Hard)",
+            "retrieved_at": "2026-09-07T03:30:00Z",
+            "via": "r.jina.ai"
+          }
+        },
+        {
+          "benchmark": "gpqa-diamond",
+          "value": 88.4,
+          "config": "GPT-5 pro, extended reasoning, no tools",
+          "reported_by": "official",
+          "source": {
+            "url": "https://openai.com/index/introducing-gpt-5/",
+            "quote": "With GPT‑5 pro's extended reasoning, the model also sets a new SOTA on GPQA, scoring 88.4% without tools.",
+            "retrieved_at": "2026-09-07T03:30:00Z",
+            "via": "r.jina.ai"
+          }
+        }
+      ],
+      "notes": "GPT-5 launched as a unified system (Instant/Thinking/Pro routed automatically); GPQA Diamond figure of 88.4% is specifically GPT-5 pro's extended-reasoning score, the highest in the family at launch. Launch date corroborated by extensive same-day press coverage (August 7, 2025)."
+    },
+    {
+      "id": "openai-gpt-5.1",
+      "lab": "openai",
+      "name": "GPT-5.1",
+      "family": "GPT",
+      "date": "2025-11-12",
+      "date_precision": "day",
+      "status": "released",
+      "announcement": {
+        "url": "https://openai.com/index/gpt-5-1/",
+        "title": "GPT-5.1: A smarter, more conversational ChatGPT",
+        "quote": "GPT‑5.1 Instant and Thinking begin rolling out today, starting with paid (Pro, Plus, Go, Business) users and then to free and logged-out users.",
+        "retrieved_at": "2026-09-07T03:30:00Z",
+        "via": "r.jina.ai"
+      },
+      "sources": [
+        {
+          "url": "https://openai.com/index/gpt-5-1-for-developers/",
+          "title": "Introducing GPT-5.1 for developers",
+          "retrieved_at": "2026-09-07T03:30:00Z",
+          "via": "r.jina.ai"
+        }
+      ],
+      "scores": [
+        {
+          "benchmark": "swe-bench-verified",
+          "value": 76.3,
+          "config": "high reasoning effort, all 500 problems",
+          "reported_by": "official",
+          "source": {
+            "url": "https://openai.com/index/gpt-5-1-for-developers/",
+            "quote": "SWE-bench Verified (all 500 problems)76.3%72.8%",
+            "retrieved_at": "2026-09-07T03:30:00Z",
+            "via": "r.jina.ai"
+          },
+          "note": "Appendix table, columns GPT-5.1 (high) / GPT-5 (high)."
+        },
+        {
+          "benchmark": "gpqa-diamond",
+          "value": 88.1,
+          "config": "high reasoning effort, no tools",
+          "reported_by": "official",
+          "source": {
+            "url": "https://openai.com/index/gpt-5-1-for-developers/",
+            "quote": "GPQA Diamond (no tools)88.1%85.7%",
+            "retrieved_at": "2026-09-07T03:30:00Z",
+            "via": "r.jina.ai"
+          }
+        },
+        {
+          "benchmark": "aime",
+          "value": 94.0,
+          "config": "AIME 2025, high reasoning effort, no tools",
+          "reported_by": "official",
+          "source": {
+            "url": "https://openai.com/index/gpt-5-1-for-developers/",
+            "quote": "AIME 2025(no tools)94.0%94.6%",
+            "retrieved_at": "2026-09-07T03:30:00Z",
+            "via": "r.jina.ai"
+          }
+        },
+        {
+          "benchmark": "mmmu",
+          "value": 85.4,
+          "config": "high reasoning effort",
+          "reported_by": "official",
+          "source": {
+            "url": "https://openai.com/index/gpt-5-1-for-developers/",
+            "quote": "MMMU 85.4%84.2%",
+            "retrieved_at": "2026-09-07T03:30:00Z",
+            "via": "r.jina.ai"
+          }
+        }
+      ],
+      "notes": "Consumer rollout announced on openai.com/index/gpt-5-1/ (November 12, 2025); developer/API scores are from the companion openai.com/index/gpt-5-1-for-developers/ post's evaluation appendix (GPT-5.1 (high) vs GPT-5 (high))."
+    },
+    {
+      "id": "openai-gpt-5.2",
+      "lab": "openai",
+      "name": "GPT-5.2",
+      "family": "GPT",
+      "date": "2025-12-11",
+      "date_precision": "day",
+      "status": "released",
+      "announcement": {
+        "url": "https://openai.com/index/introducing-gpt-5-2/",
+        "title": "Introducing GPT-5.2",
+        "quote": "In ChatGPT, GPT‑5.2 Instant, Thinking, and Pro will begin rolling out today, starting with paid plans.",
+        "retrieved_at": "2026-09-07T03:30:00Z",
+        "via": "r.jina.ai"
+      },
+      "scores": [
+        {
+          "benchmark": "swe-bench-verified",
+          "value": 80.0,
+          "config": "GPT-5.2 Thinking",
+          "reported_by": "official",
+          "source": {
+            "url": "https://openai.com/index/introducing-gpt-5-2/",
+            "quote": "| SWE-bench Verified | 80.0% | - | 76.3% |",
+            "retrieved_at": "2026-09-07T03:30:00Z",
+            "via": "r.jina.ai"
+          },
+          "note": "Appendix table, columns GPT-5.2 Thinking / GPT-5.2 Pro / GPT-5.1 Thinking."
+        },
+        {
+          "benchmark": "gpqa-diamond",
+          "value": 92.4,
+          "config": "GPT-5.2 Thinking, no tools",
+          "reported_by": "official",
+          "source": {
+            "url": "https://openai.com/index/introducing-gpt-5-2/",
+            "quote": "GPT‑5.2 Pro achieves 93.2%, followed closely by GPT‑5.2 Thinking at 92.4%.",
+            "retrieved_at": "2026-09-07T03:30:00Z",
+            "via": "r.jina.ai"
+          }
+        },
+        {
+          "benchmark": "aime",
+          "value": 100.0,
+          "config": "AIME 2025, GPT-5.2 Thinking, no tools",
+          "reported_by": "official",
+          "source": {
+            "url": "https://openai.com/index/introducing-gpt-5-2/",
+            "quote": "| AIME 2025 (no tools) | 100.0% | 100.0% | 94.0% |",
+            "retrieved_at": "2026-09-07T03:30:00Z",
+            "via": "r.jina.ai"
+          }
+        },
+        {
+          "benchmark": "hle",
+          "value": 34.5,
+          "config": "GPT-5.2 Thinking, no tools",
+          "reported_by": "official",
+          "source": {
+            "url": "https://openai.com/index/introducing-gpt-5-2/",
+            "quote": "| HLE (no tools) | 34.5% | 36.6% | 25.7% |",
+            "retrieved_at": "2026-09-07T03:30:00Z",
+            "via": "r.jina.ai"
+          }
+        },
+        {
+          "benchmark": "mmmu",
+          "value": 80.4,
+          "config": "MMMU-Pro, with Python tool",
+          "reported_by": "official",
+          "source": {
+            "url": "https://openai.com/index/introducing-gpt-5-2/",
+            "quote": "| MMMU Pro (w/ Python) | 80.4% | - | 79.0% |",
+            "retrieved_at": "2026-09-07T03:30:00Z",
+            "via": "r.jina.ai"
+          }
+        }
+      ],
+      "notes": "GPT-5.2 Thinking is the top general-purpose reasoning tier at launch (GPT-5.2 Pro scores marginally higher on some evals, e.g. GPQA Diamond 93.2%, and is recorded in config text where relevant)."
+    },
+    {
+      "id": "openai-gpt-5.4",
+      "lab": "openai",
+      "name": "GPT-5.4",
+      "family": "GPT",
+      "date": "2026-03-05",
+      "date_precision": "day",
+      "status": "released",
+      "announcement": {
+        "url": "https://openai.com/index/introducing-gpt-5-4/",
+        "title": "Introducing GPT-5.4",
+        "quote": "GPT‑5.4 is rolling out gradually today across ChatGPT and Codex.",
+        "retrieved_at": "2026-09-07T03:30:00Z",
+        "via": "r.jina.ai"
+      },
+      "scores": [
+        {
+          "benchmark": "gpqa-diamond",
+          "value": 92.8,
+          "config": "no tools",
+          "reported_by": "official",
+          "source": {
+            "url": "https://openai.com/index/introducing-gpt-5-4/",
+            "quote": "GPQA Diamond 92.8%94.4%92.6%92.4%93.2%",
+            "retrieved_at": "2026-09-07T03:30:00Z",
+            "via": "r.jina.ai"
+          },
+          "note": "Table columns: GPT-5.4 / GPT-5.4 Pro / GPT-5.3-Codex / GPT-5.2 / GPT-5.2 Pro."
+        },
+        {
+          "benchmark": "hle",
+          "value": 39.8,
+          "config": "no tools",
+          "reported_by": "official",
+          "source": {
+            "url": "https://openai.com/index/introducing-gpt-5-4/",
+            "quote": "Humanity's Last Exam (no tools)39.8%42.7%—34.5%36.6%",
+            "retrieved_at": "2026-09-07T03:30:00Z",
+            "via": "r.jina.ai"
+          }
+        },
+        {
+          "benchmark": "mmmu",
+          "value": 81.2,
+          "config": "MMMU-Pro, no tools",
+          "reported_by": "official",
+          "source": {
+            "url": "https://openai.com/index/introducing-gpt-5-4/",
+            "quote": "On MMMU-Pro, a test of a model's visual understanding and reasoning, GPT‑5.4 achieves an 81.2% success rate without tool use, an improvement over GPT‑5.2's 79.5%.",
+            "retrieved_at": "2026-09-07T03:30:00Z",
+            "via": "r.jina.ai"
+          }
+        },
+        {
+          "benchmark": "terminal-bench-2",
+          "value": 75.1,
+          "config": "Terminal-Bench 2.0",
+          "reported_by": "official",
+          "source": {
+            "url": "https://openai.com/index/introducing-gpt-5-4/",
+            "quote": "Terminal-Bench 2.0 75.1%—77.3%62.2%—",
+            "retrieved_at": "2026-09-07T03:30:00Z",
+            "via": "r.jina.ai"
+          },
+          "note": "Table columns: GPT-5.4 / GPT-5.4 Pro / GPT-5.3-Codex / GPT-5.2 / GPT-5.2 Pro."
+        }
+      ],
+      "notes": "First mainline GPT-5.x reasoning model to incorporate GPT-5.3-Codex's coding capabilities; classic AIME/SWE-bench Verified were not reported in this launch post's appendix (GDPval, SWE-Bench Pro and OSWorld-Verified were emphasized instead)."
+    },
+    {
+      "id": "openai-gpt-5.5",
+      "lab": "openai",
+      "name": "GPT-5.5",
+      "family": "GPT",
+      "date": "2026-04-23",
+      "date_precision": "day",
+      "status": "released",
+      "announcement": {
+        "url": "https://openai.com/index/introducing-gpt-5-5/",
+        "title": "Introducing GPT-5.5",
+        "quote": "Today, GPT‑5.5 is rolling out to Plus, Pro, Business, and Enterprise users in ChatGPT and Codex, and GPT‑5.5 Pro is rolling out to Pro, Business, and Enterprise users in ChatGPT.",
+        "retrieved_at": "2026-09-07T03:30:00Z",
+        "via": "r.jina.ai"
+      },
+      "scores": [
+        {
+          "benchmark": "terminal-bench-2",
+          "value": 82.7,
+          "config": "Terminal-Bench 2.0",
+          "reported_by": "official",
+          "source": {
+            "url": "https://openai.com/index/introducing-gpt-5-5/",
+            "quote": "On Terminal-Bench 2.0, which tests complex command-line workflows requiring planning, iteration, and tool coordination, it achieves a state-of-the-art accuracy of 82.7%.",
+            "retrieved_at": "2026-09-07T03:30:00Z",
+            "via": "r.jina.ai"
+          }
+        },
+        {
+          "benchmark": "gpqa-diamond",
+          "value": 93.6,
+          "config": "no tools",
+          "reported_by": "official",
+          "source": {
+            "url": "https://openai.com/index/introducing-gpt-5-5/",
+            "quote": "GPQA Diamond 93.6%92.8%—94.4%94.2%94.3%",
+            "retrieved_at": "2026-09-07T03:30:00Z",
+            "via": "r.jina.ai"
+          }
+        },
+        {
+          "benchmark": "hle",
+          "value": 41.4,
+          "config": "no tools",
+          "reported_by": "official",
+          "source": {
+            "url": "https://openai.com/index/introducing-gpt-5-5/",
+            "quote": "Humanity's Last Exam (no tools)41.4%39.8%43.1%42.7%46.9%44.4%",
+            "retrieved_at": "2026-09-07T03:30:00Z",
+            "via": "r.jina.ai"
+          }
+        },
+        {
+          "benchmark": "mmmu",
+          "value": 81.2,
+          "config": "MMMU-Pro, no tools",
+          "reported_by": "official",
+          "source": {
+            "url": "https://openai.com/index/introducing-gpt-5-5/",
+            "quote": "MMMU Pro (no tools)81.2%81.2%——80.5%",
+            "retrieved_at": "2026-09-07T03:30:00Z",
+            "via": "r.jina.ai"
+          }
+        }
+      ],
+      "notes": "Launch post's evaluation table lists competing models including 'Opus 4.6' as a comparison column, corroborating Anthropic's Opus 4.x line was still current in April 2026."
+    },
+    {
+      "id": "openai-gpt-5.6",
+      "lab": "openai",
+      "name": "GPT-5.6 Sol",
+      "family": "GPT",
+      "date": "2026-07-09",
+      "date_precision": "day",
+      "status": "released",
+      "announcement": {
+        "url": "https://openai.com/index/gpt-5-6/",
+        "title": "GPT-5.6: Frontier intelligence that scales with your ambition",
+        "quote": "GPT‑5.6 is available starting today across ChatGPT, Codex, and the OpenAI API.",
+        "retrieved_at": "2026-09-07T03:30:00Z",
+        "via": "r.jina.ai"
+      },
+      "scores": [
+        {
+          "benchmark": "gpqa-diamond",
+          "value": 94.6,
+          "config": "GPT-5.6 Sol, no tools",
+          "reported_by": "official",
+          "source": {
+            "url": "https://openai.com/index/gpt-5-6/",
+            "quote": "GPQA Diamond 94.6%92.9%92.3%93.6%94.1%94.6%92.6%92%94.3%",
+            "retrieved_at": "2026-09-07T03:30:00Z",
+            "via": "r.jina.ai"
+          },
+          "note": "First value (94.6%) is GPT-5.6 Sol; table also includes Terra, Luna, GPT-5.5 and third-party models for comparison."
+        },
+        {
+          "benchmark": "mmmu",
+          "value": 83,
+          "config": "MMMU-Pro, no tools",
+          "reported_by": "official",
+          "source": {
+            "url": "https://openai.com/index/gpt-5-6/",
+            "quote": "MMMU Pro (no tools)83%80.7%78.4%81.2%——80.5%",
+            "retrieved_at": "2026-09-07T03:30:00Z",
+            "via": "r.jina.ai"
+          }
+        }
+      ],
+      "notes": "GPT-5.6 ships as a family (Sol/Terra/Luna); Sol is the flagship recorded here. Launch post's Terminal-Bench score is versioned 2.1, not the basket's 2.0, so it is intentionally omitted for cross-release comparability. General-availability date (July 9, 2026) is not stated in the post's own text (which only carries later 'Update on ...' price-change notes); corroborated by Engadget (https://www.engadget.com/2210308/openai-rolls-out-gpt5-6-july-9/) and CNBC (https://www.cnbc.com/2026/07/08/openai-expanding-gpt-5point6-ai-model-release-ending-government-limits.html)."
+    },
+    {
+      "id": "openai-gpt-6-astra",
+      "lab": "openai",
+      "name": "GPT-6 Astra",
+      "family": "GPT",
+      "date": "2026-09-04",
+      "date_precision": "day",
+      "status": "released",
+      "announcement": {
+        "url": "https://openai.com/index/gpt-6-astra/",
+        "title": "GPT-6 Astra: A new generation of intelligence",
+        "quote": "GPT‑6 Astra is rolling out today to a limited set of organizations and over the coming days will become available to all ChatGPT Plus, Pro, Business, and Enterprise users, as well as through the OpenAI API, Microsoft Azure, and AWS Bedrock.",
+        "retrieved_at": "2026-09-07T03:30:00Z",
+        "via": "r.jina.ai"
+      },
+      "scores": [
+        {
+          "benchmark": "gpqa-diamond",
+          "value": 96.0,
+          "config": "no tools",
+          "reported_by": "official",
+          "source": {
+            "url": "https://openai.com/index/gpt-6-astra/",
+            "quote": "GPQA Diamond tests graduate-level scientific reasoning in biology, chemistry, and physics. GPT‑6 Astra reaches a new high in the comparison shown at 96.0%.",
+            "retrieved_at": "2026-09-07T03:30:00Z",
+            "via": "r.jina.ai"
+          }
+        },
+        {
+          "benchmark": "arc-agi-2",
+          "value": 95.0,
+          "config": "ARC Prize verified set",
+          "reported_by": "official",
+          "source": {
+            "url": "https://openai.com/index/gpt-6-astra/",
+            "quote": "ARC-AGI-2 95.0%92.5%90.0%89.2%90.4%-",
+            "retrieved_at": "2026-09-07T03:30:00Z",
+            "via": "r.jina.ai"
+          }
+        },
+        {
+          "benchmark": "hle",
+          "value": 57.2,
+          "config": "with tools",
+          "reported_by": "official",
+          "source": {
+            "url": "https://openai.com/index/gpt-6-astra/",
+            "quote": "Humanity's Last Exam (w/ tools)57.2%-65.0%63.8%63.6%-",
+            "retrieved_at": "2026-09-07T03:30:00Z",
+            "via": "r.jina.ai"
+          }
+        }
+      ],
+      "notes": "Announced September 3, 2026 as a limited preview to trusted organizations; recorded date (September 4, 2026) is when OpenAI made a restricted version publicly available to paid ChatGPT users, per Al Jazeera (https://www.aljazeera.com/economy/2026/9/4/openai-unveils-gpt-6-astra-amid-rising-scrutiny-and-safety) and CNBC (https://www.cnbc.com/2026/09/03/open-ai-astra-gpt-6-cyber.html); not stated as a date in the announcement page's own body text. This is the newest confirmed OpenAI flagship as of this file's updated_at."
+    }
+  ]
+}

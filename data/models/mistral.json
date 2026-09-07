@@ -1,0 +1,260 @@
+{
+  "lab": "mistral",
+  "updated_at": "2026-09-07T03:26:49Z",
+  "releases": [
+    {
+      "id": "mistral-mistral-large",
+      "lab": "mistral",
+      "name": "Mistral Large",
+      "family": "Mistral Large",
+      "date": "2024-02-26",
+      "date_precision": "day",
+      "status": "released",
+      "announcement": {
+        "url": "https://mistral.ai/news/mistral-large/",
+        "retrieved_at": "2026-09-07T03:26:49Z",
+        "title": "Au Large",
+        "quote": "We are releasing Mistral Large, our latest and most advanced language model."
+      },
+      "scores": [
+        {
+          "benchmark": "mmlu",
+          "value": 81.2,
+          "reported_by": "official",
+          "source": {
+            "url": "http://web.archive.org/web/20240229181230/https://docs.mistral.ai/platform/endpoints/",
+            "retrieved_at": "2026-09-07T03:26:49Z",
+            "title": "Mistral AI docs — Benchmark results (archived, Feb 2024)",
+            "via": "web.archive.org",
+            "note": "Table columns: MMLU, HellaSwag (10-shot), WinoGrande (5-shot), ARC-Challenge (25-shot), TriviaQA (5-shot), TruthfulQA. Current docs.mistral.ai/platform/endpoints page has been replaced; Wayback Machine snapshot from just after the Mistral Large launch used instead.",
+            "quote": "Mistral Small 72.2% 86.9% 84.7% 86.9% 79.5% 51.7% Mistral Medium 75.3% 88.0% 88% 89.9% 81.1% 47% Mistral Large 81.2% 89.2% 86.7% 94.0% 82.7% 50.6%"
+          },
+          "config": "5-shot"
+        },
+        {
+          "benchmark": "humaneval",
+          "value": 45.1,
+          "reported_by": "official",
+          "source": {
+            "url": "http://web.archive.org/web/20240229181230/https://docs.mistral.ai/platform/endpoints/",
+            "retrieved_at": "2026-09-07T03:26:49Z",
+            "title": "Mistral AI docs — Benchmark results (archived, Feb 2024)",
+            "via": "web.archive.org",
+            "quote": "Model HumanE pass@1 MBPP pass@1 Mistral 7B 26.2% 50.2% Mistral 8x7B 40.2% 60.7% Mistral Small 44.5% 61.5% Mistral Medium 38.4% 62.3% Mistral Large 45.1% 73.2%"
+          },
+          "config": "pass@1"
+        }
+      ]
+    },
+    {
+      "id": "mistral-mistral-large-2",
+      "lab": "mistral",
+      "name": "Mistral Large 2",
+      "family": "Mistral Large",
+      "date": "2024-07-24",
+      "date_precision": "day",
+      "status": "released",
+      "announcement": {
+        "url": "https://mistral.ai/news/mistral-large-2407/",
+        "retrieved_at": "2026-09-07T03:26:49Z",
+        "title": "Large Enough",
+        "quote": "Mistral Large 2 is exposed on la Plateforme and enriched with new features to facilitate building innovative AI applications."
+      },
+      "scores": [
+        {
+          "benchmark": "mmlu",
+          "value": 84,
+          "reported_by": "official",
+          "source": {
+            "url": "https://mistral.ai/news/mistral-large-2407/",
+            "retrieved_at": "2026-09-07T03:26:49Z",
+            "title": "Large Enough",
+            "quote": "on MMLU, the pretrained version achieves an accuracy of 84.0%"
+          },
+          "config": "pretrained model"
+        }
+      ],
+      "notes": "Mistral Large 2411 (the Nov 2024 24.11 point release, 'Mistral Large 2.1') is not recorded as a separate entry: it shipped alongside the Pixtral Large announcement without its own dedicated launch post, only a model-card page."
+    },
+    {
+      "id": "mistral-mistral-medium-3",
+      "lab": "mistral",
+      "name": "Mistral Medium 3",
+      "family": "Mistral Large",
+      "date": "2025-05-07",
+      "date_precision": "day",
+      "status": "released",
+      "announcement": {
+        "url": "https://mistral.ai/news/mistral-medium-3/",
+        "retrieved_at": "2026-09-07T03:26:49Z",
+        "title": "Medium is the new large.",
+        "quote": "And today, we are excited to announce Mistral Medium 3, pushing efficiency and usability of language models even further."
+      },
+      "scores": [
+        {
+          "benchmark": "aime",
+          "value": 21.2,
+          "reported_by": "official",
+          "source": {
+            "url": "https://arxiv.org/abs/2506.10910",
+            "retrieved_at": "2026-09-07T03:26:49Z",
+            "title": "Magistral (Mistral AI technical report) — Table 2",
+            "quote": "AIME'25 21.2 / 30.0 64.9 / 83.3 28.8 - 70.0",
+            "note": "Table 2 row 'AIME'25', shown as pass@1 / maj@64. Column order: Mistral Medium 3, Magistral Medium, DeepSeek-V3, DeepSeek-R1-Zero, DeepSeek-R1. Value used here is Mistral Medium 3's pass@1 (21.2)."
+          },
+          "config": "AIME 2025, pass@1"
+        },
+        {
+          "benchmark": "math",
+          "value": 91,
+          "reported_by": "official",
+          "source": {
+            "url": "https://arxiv.org/abs/2506.10910",
+            "retrieved_at": "2026-09-07T03:26:49Z",
+            "title": "Magistral (Mistral AI technical report) — Table 2",
+            "quote": "MATH-500 91.0 94.3 90.2 95.9 97.3",
+            "note": "Table 2 row 'MATH-500'. Column order: Mistral Medium 3, Magistral Medium, DeepSeek-V3, DeepSeek-R1-Zero, DeepSeek-R1."
+          },
+          "config": "MATH-500"
+        },
+        {
+          "benchmark": "gpqa-diamond",
+          "value": 59.6,
+          "reported_by": "official",
+          "source": {
+            "url": "https://arxiv.org/abs/2506.10910",
+            "retrieved_at": "2026-09-07T03:26:49Z",
+            "title": "Magistral (Mistral AI technical report) — Table 2",
+            "quote": "GPQA 59.6 70.8 59.1 73.3 71.5",
+            "note": "Table 2 row 'GPQA'; Diamond subset not explicitly specified. Column order: Mistral Medium 3, Magistral Medium, DeepSeek-V3, DeepSeek-R1-Zero, DeepSeek-R1."
+          }
+        },
+        {
+          "benchmark": "livecodebench",
+          "value": 30,
+          "reported_by": "official",
+          "source": {
+            "url": "https://arxiv.org/abs/2506.10910",
+            "retrieved_at": "2026-09-07T03:26:49Z",
+            "title": "Magistral (Mistral AI technical report) — Table 2",
+            "quote": "LiveCodeBench (v6) 30.0 50.3 - - -",
+            "note": "Table 2 row 'LiveCodeBench (v6)'. Column order: Mistral Medium 3, Magistral Medium, DeepSeek-V3, DeepSeek-R1-Zero, DeepSeek-R1."
+          },
+          "config": "v6"
+        },
+        {
+          "benchmark": "hle",
+          "value": 4.4,
+          "reported_by": "official",
+          "source": {
+            "url": "https://arxiv.org/abs/2506.10910",
+            "retrieved_at": "2026-09-07T03:26:49Z",
+            "title": "Magistral (Mistral AI technical report) — Table 2",
+            "quote": "Humanity's Last Exam 4.4 9.0 - - 8.6",
+            "note": "Table 2 row 'Humanity's Last Exam', text subset only (per Table 2 caption). Column order: Mistral Medium 3, Magistral Medium, DeepSeek-V3, DeepSeek-R1-Zero, DeepSeek-R1."
+          },
+          "config": "text-only"
+        }
+      ],
+      "notes": "Included as the period's flagship because Mistral Large was not refreshed between Large 2.1 (Nov 2024) and Large 3 (Dec 2025); Medium 3 was Mistral's highest publicly available tier in this window. Scores are baseline numbers for Mistral Medium 3 as reported in Mistral's own Magistral technical report (arXiv:2506.10910), since the Mistral Medium 3 launch post itself renders all benchmark tables as images."
+    },
+    {
+      "id": "mistral-magistral-medium",
+      "lab": "mistral",
+      "name": "Magistral Medium",
+      "family": "Magistral",
+      "date": "2025-06-10",
+      "date_precision": "day",
+      "status": "released",
+      "announcement": {
+        "url": "https://mistral.ai/news/magistral/",
+        "retrieved_at": "2026-09-07T03:26:49Z",
+        "title": "Magistral",
+        "quote": "Today, we're excited to announce our latest contribution to AI research with Magistral — our first reasoning model."
+      },
+      "scores": [
+        {
+          "benchmark": "aime",
+          "value": 73.6,
+          "reported_by": "official",
+          "source": {
+            "url": "https://mistral.ai/news/magistral/",
+            "retrieved_at": "2026-09-07T03:26:49Z",
+            "title": "Magistral",
+            "quote": "Magistral Medium scored 73.6% on AIME2024, and 90% with majority voting @64."
+          },
+          "config": "AIME 2024, pass@1"
+        },
+        {
+          "benchmark": "math",
+          "value": 94.3,
+          "reported_by": "official",
+          "source": {
+            "url": "https://arxiv.org/abs/2506.10910",
+            "retrieved_at": "2026-09-07T03:26:49Z",
+            "title": "Magistral (Mistral AI technical report) — Table 2",
+            "quote": "MATH-500 91.0 94.3 90.2 95.9 97.3",
+            "note": "Table 2 row 'MATH-500'. Column order: Mistral Medium 3, Magistral Medium, DeepSeek-V3, DeepSeek-R1-Zero, DeepSeek-R1."
+          },
+          "config": "MATH-500"
+        },
+        {
+          "benchmark": "gpqa-diamond",
+          "value": 70.8,
+          "reported_by": "official",
+          "source": {
+            "url": "https://arxiv.org/abs/2506.10910",
+            "retrieved_at": "2026-09-07T03:26:49Z",
+            "title": "Magistral (Mistral AI technical report) — Table 2",
+            "quote": "GPQA 59.6 70.8 59.1 73.3 71.5",
+            "note": "Table 2 row 'GPQA'; Diamond subset not explicitly specified. Column order: Mistral Medium 3, Magistral Medium, DeepSeek-V3, DeepSeek-R1-Zero, DeepSeek-R1."
+          }
+        },
+        {
+          "benchmark": "livecodebench",
+          "value": 50.3,
+          "reported_by": "official",
+          "source": {
+            "url": "https://arxiv.org/abs/2506.10910",
+            "retrieved_at": "2026-09-07T03:26:49Z",
+            "title": "Magistral (Mistral AI technical report) — Table 2",
+            "quote": "LiveCodeBench (v6) 30.0 50.3 - - -",
+            "note": "Table 2 row 'LiveCodeBench (v6)'. Column order: Mistral Medium 3, Magistral Medium, DeepSeek-V3, DeepSeek-R1-Zero, DeepSeek-R1."
+          },
+          "config": "v6"
+        },
+        {
+          "benchmark": "hle",
+          "value": 9,
+          "reported_by": "official",
+          "source": {
+            "url": "https://arxiv.org/abs/2506.10910",
+            "retrieved_at": "2026-09-07T03:26:49Z",
+            "title": "Magistral (Mistral AI technical report) — Table 2",
+            "quote": "Humanity's Last Exam 4.4 9.0 - - 8.6",
+            "note": "Table 2 row 'Humanity's Last Exam', text subset only (per Table 2 caption). Column order: Mistral Medium 3, Magistral Medium, DeepSeek-V3, DeepSeek-R1-Zero, DeepSeek-R1."
+          },
+          "config": "text-only"
+        }
+      ],
+      "notes": "Reasoning-specialised flagship (family 'Magistral'), trained with RL on top of Mistral Medium 3 and released alongside the open-weight Magistral Small; included per the brief as the reasoning-flagship entry for this period."
+    },
+    {
+      "id": "mistral-mistral-large-3",
+      "lab": "mistral",
+      "name": "Mistral Large 3",
+      "family": "Mistral Large",
+      "date": "2025-12-02",
+      "date_precision": "day",
+      "status": "released",
+      "announcement": {
+        "url": "https://mistral.ai/news/mistral-3/",
+        "retrieved_at": "2026-09-07T03:26:49Z",
+        "title": "Introducing Mistral 3",
+        "quote": "Mistral 3 includes three state-of-the-art small, dense models (14B, 8B, and 3B) and Mistral Large 3 – our most capable model to date – a sparse mixture-of-experts trained with 41B active and 675B total parameters."
+      },
+      "scores": [],
+      "notes": "No official numeric benchmark scores could be sourced: the launch post's performance comparisons are rendered as images only, the model's Hugging Face README has an empty 'Benchmark Results' section, and no dedicated technical report for Mistral Large 3 was found as of the retrieval date."
+    }
+  ]
+}
