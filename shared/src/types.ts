@@ -53,11 +53,22 @@ export interface Benchmark {
   /** What the benchmark measures, one sentence, for the audit drawer. */
   description: string;
   url: string;
-  /** All index benchmarks are percentages 0–100, higher is better. Kept explicit for auditability. */
-  unit: '%';
-  min: 0;
-  max: 100;
+  /**
+   * `%` — a pass rate 0–100. `elo` — a rating on an Elo scale (LMArena); converted to the
+   * probability of beating `elo_reference` before the logit (REDESIGN §1.1).
+   */
+  unit: '%' | 'elo';
+  min: number;
+  max: number;
   higher_is_better: true;
+  /** Required when `unit === 'elo'`: the rating that maps to p = 0.5. */
+  elo_reference?: number | undefined;
+  /** Observation weight in the Rasch fit (default 1; LMArena 2). */
+  weight: number;
+  /** Benchmark generation 1..n — the overlapping tiers that chain the rating across eras (REDESIGN §1.3). */
+  generation: number;
+  /** True when the number comes from human votes rather than a test (LMArena). Display flag. */
+  community?: boolean | undefined;
   /** Included in the Frontier Index fit. Non-index benchmarks are still recorded and displayed. */
   in_index: boolean;
   /** Saturated / historical benchmark: still fitted (it anchors 2023–2024 models) but shown as "legacy". */
@@ -116,6 +127,12 @@ export type ReleaseStatus =
 
 export type DatePrecision = 'day' | 'month' | 'quarter' | 'year' | 'unknown';
 
+/** Size tier within a lab's lineup. Absent on a release means `flagship`. */
+export type ModelTier = 'flagship' | 'mid' | 'small';
+
+/** Who put the release in the published dataset: the human-curated seed, or the OpenRouter researcher. */
+export type DataOrigin = 'gold' | 'researcher';
+
 export interface ModelRelease {
   /** Stable slug: `<lab>-<model>`, e.g. `openai-gpt-5`. */
   id: string;
@@ -131,6 +148,10 @@ export interface ModelRelease {
   date: ISODate;
   date_precision: DatePrecision;
   status: ReleaseStatus;
+  /** Lineup tier (REDESIGN §3). Absent ⇒ flagship. Only flagships form the frontier and the cadence. */
+  tier?: ModelTier | undefined;
+  /** Absent ⇒ gold (seed). The researcher writes `researcher`. */
+  origin?: DataOrigin | undefined;
   /** For announced/rumored models: expected release window if the lab or reporting gave one. */
   expected_window?: { start: ISODate; end: ISODate; source: Source };
   /** The launch post / model card proving the release and its date. */
@@ -160,6 +181,159 @@ export interface ChangeEvent {
   source_url?: string;
 }
 
+/* ------------------------------------------------------------ researcher */
+
+/** How well the OpenRouter researcher reproduces the frozen gold set (REDESIGN §6.1, `eval`). */
+export interface ResearcherEval {
+  evaluated_at: ISOTimestamp;
+  gold_releases: number;
+  found_releases: number;
+  matched_releases: number;
+  precision_releases: number;
+  recall_releases: number;
+  gold_scores: number;
+  matched_scores: number;
+  score_recall: number;
+  /** Mean |Δ| over matched scores, in the benchmark's unit. */
+  score_mae: number;
+  quotes_total: number;
+  quotes_verified: number;
+  quote_verified_rate: number;
+  by_lab: Record<LabId, { gold: number; found: number; matched: number; scores_gold: number; scores_matched: number }>;
+}
+
+export interface ResearcherBudget {
+  calls: number;
+  tokens_in: number;
+  tokens_out: number;
+  usd_estimate: number;
+}
+
+/** Worker health + researcher status, published in the bundle (REDESIGN §6.3). */
+export interface WorkerState {
+  last_run_at: ISOTimestamp | null;
+  last_success_at: ISOTimestamp | null;
+  pages_polled: number;
+  pages_changed: number;
+  llm_model: string | null;
+  /** When the loop will wake next — drives the "next research in …" progress bar. */
+  next_run_at: ISOTimestamp | null;
+  run_status: 'idle' | 'running';
+  /** Human-readable current step while running (e.g. "poll · anthropic"). */
+  run_step: string | null;
+  interval_minutes: number;
+  last_run_summary: string | null;
+  researcher: {
+    version: string;
+    last_backfill_at: ISOTimestamp | null;
+    last_arena_at: ISOTimestamp | null;
+    last_eval_at: ISOTimestamp | null;
+    eval: ResearcherEval | null;
+    budget: ResearcherBudget | null;
+  };
+}
+
+/* ------------------------------------------------------------- analytics */
+/* Types of the derived quantities the shared maths produces (REDESIGN §2–5). The functions live
+   in stages.ts / lineup.ts / backtest.ts; the shapes are part of the contract. */
+
+/** Least-squares trend of the frontier's θ over a trailing window. */
+export interface FrontierTrend {
+  slopePerDay: number;
+  /** θ at day number 0 (see timeline.dateToDayNumber). */
+  intercept: number;
+  slopeSe: number;
+  residualSigma: number;
+  n: number;
+  windowDays: number;
+  /** Day number the OLS was centred on (asOf). */
+  refDay: number;
+}
+
+export type LevelKind = 'human' | 'saturation' | 'generation' | 'ceiling';
+
+/** A rung of the y-axis ladder: a θ (and rating) with a meaning derived from the fit. */
+export interface Level {
+  id: string;
+  kind: LevelKind;
+  label: string;
+  theta: number;
+  rating: number;
+  benchmark?: string;
+  generation?: number;
+}
+
+/** When the frontier crossed (past) or is expected to cross (predicted) a level. */
+export interface Crossing {
+  level: Level;
+  kind: 'past' | 'predicted';
+  date: ISODate;
+  p05?: ISODate;
+  p16?: ISODate;
+  p84?: ISODate;
+  p95?: ISODate;
+  release_id?: string;
+  lab?: LabId;
+}
+
+export type PaceRegime = 'dormant' | 'climb' | 'acceleration' | 'takeoff';
+
+/** A stretch of months in which the trailing-year pace stayed in one regime. */
+export interface Era {
+  start: ISODate;
+  /** null = open (the current era). */
+  end: ISODate | null;
+  regime: PaceRegime;
+  meanPace: number;
+  maxPace: number;
+}
+
+/** One knot of a lab's lineup band: the flagship on top, the smallest current tier below. */
+export interface BandPoint {
+  date: ISODate;
+  hiTheta: number;
+  loTheta: number;
+  hiId: string;
+  loId: string;
+}
+
+/** One lab's k = 1 prediction made as of a date, against what then happened. */
+export interface BacktestRow {
+  asOf: ISODate;
+  lab: LabId;
+  predictedMedian: ISODate | null;
+  p05: ISODate | null;
+  p16: ISODate | null;
+  p84: ISODate | null;
+  p95: ISODate | null;
+  predictedTheta: number | null;
+  actual: { release_id: string; date: ISODate; theta: number | null } | null;
+  /** actual − predicted median, days. */
+  errorDays: number | null;
+  in68: boolean | null;
+  in90: boolean | null;
+  /** actual θ − predicted θ (null when either is missing). */
+  thetaError: number | null;
+}
+
+export interface BacktestReport {
+  from: ISODate;
+  to: ISODate;
+  stepDays: number;
+  /** Rows with an actual release (the ones that count). */
+  n: number;
+  coverage68: number;
+  coverage90: number;
+  maeDays: number;
+  medianAbsDays: number;
+  biasDays: number;
+  thetaMae: number | null;
+  byLab: Record<LabId, { n: number; coverage68: number; coverage90: number; maeDays: number }>;
+  /** Share of actual dates at or before the nominal-quantile date; perfect ⇒ observed = nominal. */
+  calibration: { nominal: number; observed: number }[];
+  rows: BacktestRow[];
+}
+
 /** The single JSON document the website loads: `data/public/latest.json`. */
 export interface Bundle {
   generated_at: ISOTimestamp;
@@ -169,8 +343,10 @@ export interface Bundle {
   releases: ModelRelease[];
   /** Tail of the audit log for the "what changed" feed. */
   recent_changes: ChangeEvent[];
+  /** Backtest of the forecast over the whole history (REDESIGN §5); written by `bundle`. */
+  backtest?: BacktestReport;
   /** Worker health for the footer. */
-  worker: {
+  worker: WorkerState & {
     last_run_at: ISOTimestamp | null;
     last_success_at: ISOTimestamp | null;
     pages_polled: number;

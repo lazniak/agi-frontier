@@ -21,10 +21,19 @@ every number links to a primary source and a verbatim quote.
 
 - `status: released` only for models actually available to the public (API or product). Announced = grey, rumored = grey dashed, never on the index.
 - Every score carries `source.url` + `source.quote` (verbatim, ≤300 chars). `worker verify` re-fetches and marks `verified`.
-- Official lab numbers only (`reported_by: official`). Benchmark-maintainer leaderboards are allowed as `maintainer` and are flagged in the UI.
-- Flagship = the lab's top tier at launch. No mini/flash/lite/haiku/scout tiers.
+- Official lab numbers only (`reported_by: official`). Benchmark-maintainer leaderboards are allowed as `maintainer` and are flagged in the UI. **LMArena** (community Elo) is the one non-test benchmark: `maintainer`, unit `elo`, weight 2 (user decision 2026-09-07).
+- Every lineup tier may be recorded (`tier: flagship | mid | small`, absent = flagship). Only flagships form the frontier line, the rankings lead and the release cadence; the other tiers feed the fit and the family bands.
+- **Publication rule (user decision 2026-09-07):** the site shows only what the OpenRouter researcher produced (`data/models/`). Human/Claude research goes to `data/gold/` — the frozen answer key the researcher is evaluated against — and is never published directly. See `docs/REDESIGN.md` §6.
 - Dates are the public launch date (`date_precision` says how sure we are). Never guess a day; use `month`/`quarter` precision instead.
 - Never delete history. Corrections are new commits + a `changes.jsonl` row.
+
+## Delegation (user decision 2026-09-07, this repo)
+
+Implementation tasks are delegated to **GLM-5.3-Flash** workers (skill `glm-code`, effort max),
+one task per worker with an exclusive file scope from `docs/REDESIGN.md` §10. Claude designs the
+spec and contracts, writes the briefs, reviews every diff, runs CI and integrates. At most three
+workers run at once; the launcher retries 429s with backoff. This overrides the global
+"write code yourself" rule for this repository.
 
 ## Git
 

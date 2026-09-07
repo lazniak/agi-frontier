@@ -6,7 +6,7 @@
  */
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import type { WorkerState } from '@agi/shared';
+import { EMPTY_WORKER_STATE, type WorkerState } from '@agi/shared';
 import { isoNow } from './fetcher';
 
 export interface RunState extends WorkerState {
@@ -25,11 +25,7 @@ export interface SourceState {
 export type HashState = Record<string, SourceState>;
 
 export const EMPTY_RUN_STATE: RunState = {
-  last_run_at: null,
-  last_success_at: null,
-  pages_polled: 0,
-  pages_changed: 0,
-  llm_model: null,
+  ...EMPTY_WORKER_STATE,
   last_discover_at: null,
 };
 
@@ -60,15 +56,10 @@ export class StateStore {
     writeJson(join(this.dir, 'hashes.json'), hashes);
   }
 
-  /** Only the five fields the public bundle exposes. */
+  /** The public bundle exposes everything except the loop-internal bookkeeping. */
   static toWorkerState(run: RunState): WorkerState {
-    return {
-      last_run_at: run.last_run_at,
-      last_success_at: run.last_success_at,
-      pages_polled: run.pages_polled,
-      pages_changed: run.pages_changed,
-      llm_model: run.llm_model,
-    };
+    const { last_discover_at: _discover, ...pub } = run;
+    return pub;
   }
 }
 

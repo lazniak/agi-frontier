@@ -25,3 +25,10 @@ Status: `todo` · `doing` · `review` · `done` · `parked`. Claim = set `claime
 | T19 | Z.ai `docs.z.ai/release-notes` html parser sees 34 items — confirm the poller detects a new GLM post end-to-end (dry run against a synthetic change) | worker | todo | |
 | T20 | Deep history: legacy benchmark tier (LAMBADA, ARC-C, HellaSwag, WinoGrande, GSM8K) + releases back to GPT-1/GPT-2 for all 10 labs (102 releases, 413 scores), anchor recentring on the non-legacy basket | shared, data | done | sonnet-data ×3 |
 | T21 | Web: logit y axis (default) with linear toggle, spotlight forecasts (3 labs + focus) with whiskers for the rest, legend-hover focus, pace strip + odds-doubling stat, timeline ticks for unscored releases | shared, web | done | main-session |
+| T30 | Redesign · shared maths I: Frontier Rating, weighted Rasch, Elo→p, generations, levels ladder, frontier trend + fan, level crossings, pace eras (REDESIGN §1–2, §9) | shared | todo | glm-worker |
+| T31 | Redesign · shared maths II: lineup bands, tier filter, infinite forecast/fan, backtest & calibration (REDESIGN §3–5, §9) | shared | todo | glm-worker |
+| T32 | Redesign · worker: researcher v2 — backfill, arena, eval, promote; retry/backoff + concurrency; state/progress fields; weekly loop steps (REDESIGN §6) | worker | todo | glm-worker |
+| T33 | Redesign · web chart core: rating axis + ladder, 2-D zoom, family bands, infinite fans + frontier fan, crossings circles, backtest overlay, tier markers (REDESIGN §7.1) | web | todo | glm-worker |
+| T34 | Redesign · web UI: control bar + shortcuts + tour, next-run progress bar, Stages / Backtest / Researcher panels, rankings with rating + tiers, paper page build (REDESIGN §7.2–7.3) | web | todo | glm-worker |
+| T35 | Redesign · docs: PAPER.md (the standard, in the user's name), METHODOLOGY/DATA-GUIDE/README updates | docs | todo | main-session |
+| T36 | Redesign · contract + data: types/schema/bundle, benchmarks generations + weights + lmarena, gold freeze, CLAUDE.md rules | shared, data | done | main-session |

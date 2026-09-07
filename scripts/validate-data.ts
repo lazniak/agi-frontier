@@ -6,7 +6,7 @@
  */
 import { readdirSync } from 'node:fs';
 import { join, basename } from 'node:path';
-import { LabSchema, BenchmarkSchema, LabFileSchema, findUnknownBenchmarks } from '../shared/src/schema';
+import { LabSchema, BenchmarkSchema, LabFileSchema, findOutOfRangeScores, findUnknownBenchmarks } from '../shared/src/schema';
 
 const root = join(import.meta.dir, '..');
 const args = process.argv.slice(2);
@@ -39,6 +39,7 @@ for (const file of files) {
   if (name !== `${f.lab}.json` && !name.startsWith('_')) err(`${name}: file name must be ${f.lab}.json`);
   const unknown = findUnknownBenchmarks(f.releases, bmIds);
   if (unknown.length) err(`${name}: unknown benchmark ids: ${unknown.join(', ')}`);
+  for (const o of findOutOfRangeScores(f.releases, bms)) err(`${name} ${o.release_id} ${o.benchmark}: value ${o.value} outside the benchmark range`);
   for (const rel of f.releases) {
     releases++;
     if (rel.status === 'released' && rel.scores.length === 0) warn(`${name} ${rel.id}: released model with no scores`);

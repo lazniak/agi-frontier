@@ -83,14 +83,12 @@ describe('StateStore', () => {
     expect(store.readHashes()['openai|u']?.hash).toBe('h');
   });
 
-  test('exposes only the five public worker fields to the bundle', () => {
+  test('exposes the public worker state to the bundle, minus the loop bookkeeping', () => {
     const run = { ...EMPTY_RUN_STATE, last_discover_at: '2026-09-07T01:00:00Z', pages_polled: 3 };
-    expect(StateStore.toWorkerState(run)).toEqual({
-      last_run_at: null,
-      last_success_at: null,
-      pages_polled: 3,
-      pages_changed: 0,
-      llm_model: null,
-    });
+    const pub = StateStore.toWorkerState(run);
+    expect(pub).not.toHaveProperty('last_discover_at');
+    expect(pub.pages_polled).toBe(3);
+    expect(pub.run_status).toBe('idle');
+    expect(pub.researcher.eval).toBeNull();
   });
 });

@@ -21,7 +21,8 @@ export const SourceSchema = z.object({
 
 export const ScoreSchema = z.object({
   benchmark: z.string().min(1),
-  value: z.number().min(0).max(100),
+  /** Range is checked per benchmark unit by `findOutOfRangeScores`; 4000 admits Elo ratings. */
+  value: z.number().min(0).max(4000),
   config: z.string().optional(),
   note: z.string().optional(),
   reported_by: z.enum(['official', 'maintainer']),
@@ -39,6 +40,8 @@ export const ModelReleaseSchema = z.object({
   date: isoDate,
   date_precision: DatePrecisionSchema,
   status: ReleaseStatusSchema,
+  tier: z.enum(['flagship', 'mid', 'small']).optional(),
+  origin: z.enum(['gold', 'researcher']).optional(),
   expected_window: z.object({ start: isoDate, end: isoDate, source: SourceSchema }).strict().optional(),
   announcement: SourceSchema,
   sources: z.array(SourceSchema).optional(),
@@ -90,17 +93,29 @@ export const BenchmarkSchema = z.object({
   short: z.string(),
   description: z.string(),
   url: z.string().url(),
-  unit: z.literal('%'),
-  min: z.literal(0),
-  max: z.literal(100),
+  unit: z.enum(['%', 'elo']),
+  min: z.number(),
+  max: z.number(),
   higher_is_better: z.literal(true),
+  elo_reference: z.number().optional(),
+  weight: z.number().positive(),
+  generation: z.number().int().min(1),
+  community: z.boolean().optional(),
   in_index: z.boolean(),
   legacy: z.boolean(),
   preferred_config: z.string(),
   human_baseline: z.number().nullable(),
   human_baseline_note: z.string().nullable(),
   introduced: z.number().int().min(2016).max(2030),
-}).strict();
+}).strict().superRefine((b, ctx) => {
+  if (b.unit === 'elo' && typeof b.elo_reference !== 'number') {
+    ctx.addIssue({ code: 'custom', path: ['elo_reference'], message: 'elo benchmarks need elo_reference' });
+  }
+  if (b.unit === '%' && (b.min !== 0 || b.max !== 100)) {
+    ctx.addIssue({ code: 'custom', path: ['max'], message: 'percentage benchmarks are 0–100' });
+  }
+  if (!(b.max > b.min)) ctx.addIssue({ code: 'custom', path: ['max'], message: 'max must exceed min' });
+});
 
 export const ChangeEventSchema = z.object({
   at: isoTs,
@@ -119,12 +134,26 @@ export const BundleSchema = z.object({
   benchmarks: z.array(BenchmarkSchema),
   releases: z.array(ModelReleaseSchema),
   recent_changes: z.array(ChangeEventSchema),
+  backtest: z.any().optional(),
   worker: z.object({
     last_run_at: isoTs.nullable(),
     last_success_at: isoTs.nullable(),
     pages_polled: z.number().int(),
     pages_changed: z.number().int(),
     llm_model: z.string().nullable(),
+    next_run_at: isoTs.nullable(),
+    run_status: z.enum(['idle', 'running']),
+    run_step: z.string().nullable(),
+    interval_minutes: z.number(),
+    last_run_summary: z.string().nullable(),
+    researcher: z.object({
+      version: z.string(),
+      last_backfill_at: isoTs.nullable(),
+      last_arena_at: isoTs.nullable(),
+      last_eval_at: isoTs.nullable(),
+      eval: z.any().nullable(),
+      budget: z.any().nullable(),
+    }).strict(),
   }).strict(),
 }).strict();
 
@@ -136,4 +165,20 @@ export function findUnknownBenchmarks(
   const unknown = new Set<string>();
   for (const r of releases) for (const s of r.scores) if (!benchmarkIds.has(s.benchmark)) unknown.add(s.benchmark);
   return [...unknown].sort();
+}
+
+/** Cross-file check: every score must sit inside its benchmark's [min, max]. */
+export function findOutOfRangeScores(
+  releases: { id: string; scores: { benchmark: string; value: number }[] }[],
+  benchmarks: { id: string; min: number; max: number }[],
+): { release_id: string; benchmark: string; value: number }[] {
+  const range = new Map(benchmarks.map((b) => [b.id, b] as const));
+  const out: { release_id: string; benchmark: string; value: number }[] = [];
+  for (const r of releases) {
+    for (const s of r.scores) {
+      const b = range.get(s.benchmark);
+      if (b && (s.value < b.min || s.value > b.max)) out.push({ release_id: r.id, benchmark: s.benchmark, value: s.value });
+    }
+  }
+  return out;
 }

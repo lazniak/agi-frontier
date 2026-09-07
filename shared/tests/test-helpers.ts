@@ -12,7 +12,7 @@ export function source(url = 'https://example.com/post'): Source {
 
 export function benchmark(
   id: string,
-  opts: { inIndex?: boolean; preferredConfig?: string; legacy?: boolean } = {},
+  opts: { inIndex?: boolean; preferredConfig?: string; legacy?: boolean; weight?: number; generation?: number } = {},
 ): Benchmark {
   return {
     id,
@@ -24,6 +24,8 @@ export function benchmark(
     min: 0,
     max: 100,
     higher_is_better: true,
+    weight: opts.weight ?? 1,
+    generation: opts.generation ?? 3,
     in_index: opts.inIndex ?? true,
     legacy: opts.legacy ?? false,
     preferred_config: opts.preferredConfig ?? 'no tools, pass@1',

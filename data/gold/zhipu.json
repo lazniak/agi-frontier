@@ -1,0 +1,977 @@
+{
+  "lab": "zhipu",
+  "updated_at": "2026-09-07T09:36:07Z",
+  "releases": [
+    {
+      "id": "zhipu-glm-130b",
+      "lab": "zhipu",
+      "name": "GLM-130B",
+      "family": "GLM",
+      "date": "2022-08-01",
+      "date_precision": "month",
+      "status": "released",
+      "announcement": {
+        "url": "https://raw.githubusercontent.com/THUDM/GLM-130B/main/README.md",
+        "title": "THUDM/GLM-130B GitHub README",
+        "quote": "GLM-130B is an open bilingual (English & Chinese) bidirectional dense model with 130 billion parameters, pre-trained using the algorithm of General Language Model (GLM).",
+        "retrieved_at": "2026-09-07T05:30:00Z",
+        "verified": true,
+        "verified_at": "2026-09-07T09:36:07Z",
+        "note": "Weights were released for research access via an application form in Aug 2022 (commonly cited as Aug 4, 2022); this exact day is not confirmed by the GitHub README's own changelog (which starts at 2022.08.24, a later quantization update), so recorded at month precision. Training itself ran May 6 - Jul 3, 2022 per the paper (arXiv 2210.02414)."
+      },
+      "scores": [
+        {
+          "benchmark": "lambada",
+          "value": 80.2,
+          "config": "zero-shot",
+          "reported_by": "official",
+          "source": {
+            "url": "https://ar5iv.labs.arxiv.org/html/2210.02414",
+            "title": "GLM-130B: An Open Bilingual Pre-trained Model",
+            "quote": "GLM-130B offers a record-high accuracy of 80.2% on zero-shot LAMBADA by outperforming both GPT-3 and PaLM 540B in Figure 2.",
+            "retrieved_at": "2026-09-07T05:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:36:07Z",
+            "note": "A companion table (Table 2) gives the more precise FP16 value 80.21, rounded to 80.2 in this prose sentence."
+          }
+        },
+        {
+          "benchmark": "mmlu",
+          "value": 44.8,
+          "config": "5-shot",
+          "reported_by": "official",
+          "source": {
+            "url": "https://ar5iv.labs.arxiv.org/html/2210.02414",
+            "title": "GLM-130B: An Open Bilingual Pre-trained Model",
+            "quote": "It continues moving up as the training proceeds, achieving an accuracy of 44.8 when the training has to end (i.e., viewing 400B tokens in total).",
+            "retrieved_at": "2026-09-07T05:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:36:07Z",
+            "note": "Sentence follows 'GLM-130B's few-shot (5-shot) performance on MMLU approaches GPT-3 (43.9)...'; a companion table (Table 2) gives the more precise FP16 value 44.75, rounded to 44.8 in this prose sentence."
+          }
+        }
+      ],
+      "notes": "GLM-130B was Zhipu/Tsinghua's flagship open-weights model before ChatGLM-6B; MMLU and LAMBADA are the only two index/legacy benchmarks the paper reports in a form directly comparable to this dataset's basket (most other reported results are on Chinese-specific or held-out benchmarks)."
+    },
+    {
+      "id": "zhipu-chatglm-6b",
+      "lab": "zhipu",
+      "name": "ChatGLM-6B",
+      "family": "GLM",
+      "date": "2023-03-14",
+      "date_precision": "day",
+      "status": "released",
+      "announcement": {
+        "url": "https://raw.githubusercontent.com/THUDM/GLM-130B/main/README.md",
+        "title": "THUDM/GLM-130B GitHub README (changelog)",
+        "quote": "[2023.03.14] We are happy to introduce ChatGLM, a bilingual dialogue language model based on GLM-130B, and its open-sourced version ChatGLM-6B which can be run under only 6GB GPU memory!",
+        "retrieved_at": "2026-09-07T05:30:00Z",
+        "verified": true,
+        "verified_at": "2026-09-07T09:36:07Z"
+      },
+      "scores": [],
+      "notes": "ChatGLM-6B (6.2B parameters) was not Zhipu's largest model at the time — GLM-130B (130B) predates it by seven months — but GLM-130B was a research-access checkpoint requiring an 8-GPU server, with no public chat product. ChatGLM-6B was Zhipu's first publicly accessible flagship chat product (ran locally on a single consumer GPU, and via a public web demo). Recorded here as a timeline tick with no basket scores: the model's GitHub README does not report legacy-basket benchmark numbers for this checkpoint (only for its June 2023 successor, ChatGLM2-6B)."
+    },
+    {
+      "id": "zhipu-glm-4",
+      "lab": "zhipu",
+      "name": "GLM-4",
+      "family": "GLM",
+      "date": "2024-01-16",
+      "date_precision": "day",
+      "status": "released",
+      "announcement": {
+        "url": "https://www.zhipuai.cn/devday",
+        "title": "智谱AI · 发展历程 (DevDay)",
+        "quote": "发布新一代基座大模型 GLM-4，国内率先对标GPT4",
+        "retrieved_at": "2026-09-07T03:26:49Z",
+        "verified": false,
+        "verified_at": "2026-09-07T09:36:07Z",
+        "note": "Exact day (Jan 16, 2024) corroborated by contemporaneous press (MarkTechPost, Maginative); the lab's own timeline entry gives only month precision."
+      },
+      "scores": [
+        {
+          "benchmark": "mmlu",
+          "value": 81.5,
+          "config": "GLM-4 (0116) API model",
+          "note": "Table 2 columns in order: MMLU, GSM8K, MATH, BBH, GPQA, HumanEval. Row is the closed API model shipped 2024-01-16 (version tag '0116'). PDF source: the ar5iv HTML rendering of this 71-page paper is truncated/unreliable, so this and the sibling scores below cite the PDF instead of the (non-quotable) arXiv abstract page previously used.",
+          "reported_by": "official",
+          "source": {
+            "url": "https://arxiv.org/pdf/2406.12793",
+            "title": "ChatGLM: A Family of Large Language Models from GLM-130B to GLM-4 All Tools — Table 2",
+            "quote": "GLM-4 (0116) 81.5 87.6 47.9 82.3 35.7 72.0",
+            "retrieved_at": "2026-09-07T05:30:00Z",
+            "verified": false,
+            "verified_at": "2026-09-07T09:36:07Z",
+            "note": "PDF source"
+          }
+        },
+        {
+          "benchmark": "math",
+          "value": 47.9,
+          "config": "GLM-4 (0116) API model",
+          "note": "Table 2 columns in order: MMLU, GSM8K, MATH, BBH, GPQA, HumanEval. Row is the closed API model shipped 2024-01-16 (version tag '0116').",
+          "reported_by": "official",
+          "source": {
+            "url": "https://arxiv.org/pdf/2406.12793",
+            "title": "ChatGLM: A Family of Large Language Models from GLM-130B to GLM-4 All Tools — Table 2",
+            "quote": "GLM-4 (0116) 81.5 87.6 47.9 82.3 35.7 72.0",
+            "retrieved_at": "2026-09-07T05:30:00Z",
+            "verified": false,
+            "verified_at": "2026-09-07T09:36:07Z",
+            "note": "PDF source"
+          }
+        },
+        {
+          "benchmark": "gpqa-diamond",
+          "value": 35.7,
+          "config": "GLM-4 (0116) API model",
+          "note": "Paper reports this simply as 'GPQA' (Rein et al. 2023); Diamond-subset vs. full-set is not specified. Table 2 columns in order: MMLU, GSM8K, MATH, BBH, GPQA, HumanEval.",
+          "reported_by": "official",
+          "source": {
+            "url": "https://arxiv.org/pdf/2406.12793",
+            "title": "ChatGLM: A Family of Large Language Models from GLM-130B to GLM-4 All Tools — Table 2",
+            "quote": "GLM-4 (0116) 81.5 87.6 47.9 82.3 35.7 72.0",
+            "retrieved_at": "2026-09-07T05:30:00Z",
+            "verified": false,
+            "verified_at": "2026-09-07T09:36:07Z",
+            "note": "PDF source"
+          }
+        },
+        {
+          "benchmark": "humaneval",
+          "value": 72,
+          "config": "GLM-4 (0116) API model, pass@1",
+          "note": "Table 2 columns in order: MMLU, GSM8K, MATH, BBH, GPQA, HumanEval. Row is the closed API model shipped 2024-01-16 (version tag '0116').",
+          "reported_by": "official",
+          "source": {
+            "url": "https://arxiv.org/pdf/2406.12793",
+            "title": "ChatGLM: A Family of Large Language Models from GLM-130B to GLM-4 All Tools — Table 2",
+            "quote": "GLM-4 (0116) 81.5 87.6 47.9 82.3 35.7 72.0",
+            "retrieved_at": "2026-09-07T05:30:00Z",
+            "verified": false,
+            "verified_at": "2026-09-07T09:36:07Z",
+            "note": "PDF source"
+          }
+        },
+        {
+          "benchmark": "gsm8k",
+          "value": 87.6,
+          "config": "GLM-4 (0116) API model",
+          "note": "Table 2 columns in order: MMLU, GSM8K, MATH, BBH, GPQA, HumanEval. Row is the closed API model shipped 2024-01-16 (version tag '0116').",
+          "reported_by": "official",
+          "source": {
+            "url": "https://arxiv.org/pdf/2406.12793",
+            "title": "ChatGLM: A Family of Large Language Models from GLM-130B to GLM-4 All Tools — Table 2",
+            "quote": "GLM-4 (0116) 81.5 87.6 47.9 82.3 35.7 72.0",
+            "retrieved_at": "2026-09-07T05:30:00Z",
+            "verified": false,
+            "verified_at": "2026-09-07T09:36:07Z",
+            "note": "PDF source"
+          }
+        }
+      ]
+    },
+    {
+      "id": "zhipu-glm-4-plus",
+      "lab": "zhipu",
+      "name": "GLM-4-Plus",
+      "family": "GLM",
+      "date": "2024-08-29",
+      "date_precision": "day",
+      "status": "released",
+      "announcement": {
+        "url": "https://www.zhipuai.cn/zh/news/69",
+        "title": "智谱携基座大模型GLM-4-Plus 亮相KDD",
+        "quote": "在 KDD 国际数据挖掘与知识发现大会上，智谱 GLM 团队介绍了新一代基座大模型GLM-4-Plus。",
+        "retrieved_at": "2026-09-07T03:26:49Z",
+        "verified": true,
+        "verified_at": "2026-09-07T09:36:07Z"
+      },
+      "scores": [
+        {
+          "benchmark": "mmlu",
+          "value": 86.8,
+          "reported_by": "official",
+          "source": {
+            "url": "https://docs.bigmodel.cn/cn/guide/models/text/glm-4",
+            "title": "GLM-4 系列模型 — 智谱AI开放平台文档",
+            "quote": "| GLM-4-Plus | 83.2 | 86.8 | 74.2 | 50.7 | *45.8 | 50.4 | 79.5 |",
+            "retrieved_at": "2026-09-07T03:26:49Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:36:07Z",
+            "note": "Row columns: AlignBench, MMLU, MATH, GPQA, LiveCodeBench(*reproduced by Zhipu), NaturalCodeBench, IFEval."
+          }
+        },
+        {
+          "benchmark": "math",
+          "value": 74.2,
+          "reported_by": "official",
+          "source": {
+            "url": "https://docs.bigmodel.cn/cn/guide/models/text/glm-4",
+            "title": "GLM-4 系列模型 — 智谱AI开放平台文档",
+            "quote": "| GLM-4-Plus | 83.2 | 86.8 | 74.2 | 50.7 | *45.8 | 50.4 | 79.5 |",
+            "retrieved_at": "2026-09-07T03:26:49Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:36:07Z",
+            "note": "Row columns: AlignBench, MMLU, MATH, GPQA, LiveCodeBench(*reproduced by Zhipu), NaturalCodeBench, IFEval."
+          }
+        },
+        {
+          "benchmark": "gpqa-diamond",
+          "value": 50.7,
+          "note": "Column labeled 'GPQA' in source; Diamond subset not explicitly specified.",
+          "reported_by": "official",
+          "source": {
+            "url": "https://docs.bigmodel.cn/cn/guide/models/text/glm-4",
+            "title": "GLM-4 系列模型 — 智谱AI开放平台文档",
+            "quote": "| GLM-4-Plus | 83.2 | 86.8 | 74.2 | 50.7 | *45.8 | 50.4 | 79.5 |",
+            "retrieved_at": "2026-09-07T03:26:49Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:36:07Z",
+            "note": "Row columns: AlignBench, MMLU, MATH, GPQA, LiveCodeBench(*reproduced by Zhipu), NaturalCodeBench, IFEval."
+          }
+        },
+        {
+          "benchmark": "livecodebench",
+          "value": 45.8,
+          "config": "reproduced by Zhipu (marked * in source table)",
+          "reported_by": "official",
+          "source": {
+            "url": "https://docs.bigmodel.cn/cn/guide/models/text/glm-4",
+            "title": "GLM-4 系列模型 — 智谱AI开放平台文档",
+            "quote": "| GLM-4-Plus | 83.2 | 86.8 | 74.2 | 50.7 | *45.8 | 50.4 | 79.5 |",
+            "retrieved_at": "2026-09-07T03:26:49Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:36:07Z",
+            "note": "Row columns: AlignBench, MMLU, MATH, GPQA, LiveCodeBench(*reproduced by Zhipu), NaturalCodeBench, IFEval."
+          }
+        }
+      ]
+    },
+    {
+      "id": "zhipu-glm-4.5",
+      "lab": "zhipu",
+      "name": "GLM-4.5",
+      "family": "GLM",
+      "date": "2025-07-28",
+      "date_precision": "day",
+      "status": "released",
+      "announcement": {
+        "url": "http://web.archive.org/web/20250801163650/https://z.ai/blog/glm-4.5",
+        "title": "GLM-4.5: Reasoning, Coding, and Agentic Abilities",
+        "quote": "Today, we introduce two new GLM family members: GLM-4.5 and GLM-4.5-Air — our latest flagship models.",
+        "retrieved_at": "2026-09-07T03:26:49Z",
+        "verified": true,
+        "verified_at": "2026-09-07T09:36:07Z",
+        "note": "z.ai/blog/glm-4.5 currently mis-renders unrelated cached content; Wayback Machine snapshot from shortly after launch used instead."
+      },
+      "scores": [
+        {
+          "benchmark": "mmlu-pro",
+          "value": 84.6,
+          "config": "thinking mode",
+          "reported_by": "official",
+          "source": {
+            "url": "http://web.archive.org/web/20250801163650/https://z.ai/blog/glm-4.5",
+            "title": "GLM-4.5: Reasoning, Coding, and Agentic Abilities",
+            "quote": "MMLU Pro 84.6 81.4 85.3 87.3 86.2 84.9 84.5 86.6",
+            "retrieved_at": "2026-09-07T03:26:49Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:36:07Z",
+            "note": "Row order: GLM-4.5, GLM-4.5-Air, o3, Claude 4 Opus, Gemini 2.5 Pro, DeepSeek-R1-0528, Qwen3-235B-Thinking 2507, Grok 4."
+          }
+        },
+        {
+          "benchmark": "aime",
+          "value": 91,
+          "config": "AIME 2024, avg@32",
+          "reported_by": "official",
+          "source": {
+            "url": "http://web.archive.org/web/20250801163650/https://z.ai/blog/glm-4.5",
+            "title": "GLM-4.5: Reasoning, Coding, and Agentic Abilities",
+            "quote": "AIME24 91.0 89.4 90.3 75.7 88.7 89.3 94.1 94.3",
+            "retrieved_at": "2026-09-07T03:26:49Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:36:07Z",
+            "note": "Same row order as MMLU-Pro."
+          }
+        },
+        {
+          "benchmark": "gpqa-diamond",
+          "value": 79.1,
+          "config": "avg@8",
+          "reported_by": "official",
+          "source": {
+            "url": "http://web.archive.org/web/20250801163650/https://z.ai/blog/glm-4.5",
+            "title": "GLM-4.5: Reasoning, Coding, and Agentic Abilities",
+            "quote": "GPQA 79.1 75.0 82.7 79.6 84.4 81.3 81.1 87.7",
+            "retrieved_at": "2026-09-07T03:26:49Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:36:07Z",
+            "note": "Same row order as MMLU-Pro; reported as 'GPQA' (avg@8), Diamond subset not explicitly specified."
+          }
+        },
+        {
+          "benchmark": "hle",
+          "value": 14.4,
+          "config": "text-only",
+          "reported_by": "official",
+          "source": {
+            "url": "http://web.archive.org/web/20250801163650/https://z.ai/blog/glm-4.5",
+            "title": "GLM-4.5: Reasoning, Coding, and Agentic Abilities",
+            "quote": "HLE 14.4 10.6 20.0 11.7 21.1 14.9 15.8 23.9",
+            "retrieved_at": "2026-09-07T03:26:49Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:36:07Z",
+            "note": "'For the HLE benchmark, only the text-based questions were evaluated, with correctness judged by gpt-4o.'"
+          }
+        },
+        {
+          "benchmark": "livecodebench",
+          "value": 72.9,
+          "config": "2407-2501 window",
+          "reported_by": "official",
+          "source": {
+            "url": "http://web.archive.org/web/20250801163650/https://z.ai/blog/glm-4.5",
+            "title": "GLM-4.5: Reasoning, Coding, and Agentic Abilities",
+            "quote": "LiveCodeBench (2407-2501) 72.9 70.7 78.4 63.6 80.1 77.0 78.2 81.9",
+            "retrieved_at": "2026-09-07T03:26:49Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:36:07Z",
+            "note": "z.ai/blog/glm-4.5 currently mis-renders unrelated cached content; Wayback Machine snapshot from shortly after launch used instead."
+          }
+        },
+        {
+          "benchmark": "swe-bench-verified",
+          "value": 64.2,
+          "config": "OpenHands v0.34.0, 100 iterations, temperature=0.6",
+          "reported_by": "official",
+          "source": {
+            "url": "http://web.archive.org/web/20250801163650/https://z.ai/blog/glm-4.5",
+            "title": "GLM-4.5: Reasoning, Coding, and Agentic Abilities",
+            "quote": "SWE-bench Verified 1 64.2 57.6 69.1 48.6 67.8 70.4 49.0 41.4 65.4",
+            "retrieved_at": "2026-09-07T03:26:49Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:36:07Z",
+            "note": "Row order: GLM-4.5, GLM-4.5-Air, o3, GPT-4.1, Claude 4 Opus, Claude 4 Sonnet, Gemini 2.5 Pro, DeepSeek-R1-0528, Kimi K2."
+          }
+        }
+      ]
+    },
+    {
+      "id": "zhipu-glm-4.6",
+      "lab": "zhipu",
+      "name": "GLM-4.6",
+      "family": "GLM",
+      "date": "2025-09-30",
+      "date_precision": "day",
+      "status": "released",
+      "announcement": {
+        "url": "https://z.ai/blog/glm-4.6",
+        "title": "GLM-4.6: Advanced Agentic, Reasoning and Coding Capabilities",
+        "quote": "Today, we are releasing the latest version of our flagship model: GLM-4.6.",
+        "retrieved_at": "2026-09-07T03:26:49Z",
+        "verified": true,
+        "verified_at": "2026-09-07T09:36:07Z",
+        "via": "r.jina.ai"
+      },
+      "scores": [
+        {
+          "benchmark": "mmlu-pro",
+          "value": 83.2,
+          "reported_by": "official",
+          "source": {
+            "url": "https://z.ai/blog/glm-4.7",
+            "title": "GLM-4.7: Advancing the Coding Capability",
+            "quote": "| MMLU-Pro | 84.3 | 83.2 | 84.6 | 85.0 | 90.1 | 88.2 | 87.5 | 87.0 |",
+            "retrieved_at": "2026-09-07T03:26:49Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:36:07Z",
+            "via": "r.jina.ai",
+            "note": "17-benchmark comparison table published in the GLM-4.7 launch post; columns are GLM-4.7, GLM-4.6, Kimi K2 Thinking, DeepSeek-V3.2, Gemini 3.0 Pro, Claude Sonnet 4.5, GPT-5 High, GPT-5.1 High."
+          }
+        },
+        {
+          "benchmark": "gpqa-diamond",
+          "value": 81,
+          "reported_by": "official",
+          "source": {
+            "url": "https://z.ai/blog/glm-4.7",
+            "title": "GLM-4.7: Advancing the Coding Capability",
+            "quote": "| GPQA-Diamond | 85.7 | 81.0 | 84.5 | 82.4 | 91.9 | 83.4 | 85.7 | 88.1 |",
+            "retrieved_at": "2026-09-07T03:26:49Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:36:07Z",
+            "via": "r.jina.ai",
+            "note": "17-benchmark comparison table published in the GLM-4.7 launch post; columns are GLM-4.7, GLM-4.6, Kimi K2 Thinking, DeepSeek-V3.2, Gemini 3.0 Pro, Claude Sonnet 4.5, GPT-5 High, GPT-5.1 High."
+          }
+        },
+        {
+          "benchmark": "hle",
+          "value": 17.2,
+          "config": "text-only",
+          "reported_by": "official",
+          "source": {
+            "url": "https://z.ai/blog/glm-4.7",
+            "title": "GLM-4.7: Advancing the Coding Capability",
+            "quote": "| HLE | 24.8 | 17.2 | 23.9 | 25.1 | 37.5 | 13.7 | 26.3 | 25.7 |",
+            "retrieved_at": "2026-09-07T03:26:49Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:36:07Z",
+            "via": "r.jina.ai",
+            "note": "17-benchmark comparison table published in the GLM-4.7 launch post; columns are GLM-4.7, GLM-4.6, Kimi K2 Thinking, DeepSeek-V3.2, Gemini 3.0 Pro, Claude Sonnet 4.5, GPT-5 High, GPT-5.1 High."
+          }
+        },
+        {
+          "benchmark": "aime",
+          "value": 93.9,
+          "config": "AIME 2025",
+          "reported_by": "official",
+          "source": {
+            "url": "https://z.ai/blog/glm-4.7",
+            "title": "GLM-4.7: Advancing the Coding Capability",
+            "quote": "| AIME 2025 | 95.7 | 93.9 | 94.5 | 93.1 | 95.0 | 87.0 | 94.6 | 94.0 |",
+            "retrieved_at": "2026-09-07T03:26:49Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:36:07Z",
+            "via": "r.jina.ai",
+            "note": "17-benchmark comparison table published in the GLM-4.7 launch post; columns are GLM-4.7, GLM-4.6, Kimi K2 Thinking, DeepSeek-V3.2, Gemini 3.0 Pro, Claude Sonnet 4.5, GPT-5 High, GPT-5.1 High."
+          }
+        },
+        {
+          "benchmark": "livecodebench",
+          "value": 82.8,
+          "config": "v6",
+          "reported_by": "official",
+          "source": {
+            "url": "https://z.ai/blog/glm-4.7",
+            "title": "GLM-4.7: Advancing the Coding Capability",
+            "quote": "| LiveCodeBench-v6 | 84.9 | 82.8 | 83.1 | 83.3 | 90.7 | 64.0 | 87.0 | 87.0 |",
+            "retrieved_at": "2026-09-07T03:26:49Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:36:07Z",
+            "via": "r.jina.ai",
+            "note": "17-benchmark comparison table published in the GLM-4.7 launch post; columns are GLM-4.7, GLM-4.6, Kimi K2 Thinking, DeepSeek-V3.2, Gemini 3.0 Pro, Claude Sonnet 4.5, GPT-5 High, GPT-5.1 High."
+          }
+        },
+        {
+          "benchmark": "swe-bench-verified",
+          "value": 68,
+          "reported_by": "official",
+          "source": {
+            "url": "https://z.ai/blog/glm-4.7",
+            "title": "GLM-4.7: Advancing the Coding Capability",
+            "quote": "| SWE-bench Verified | 73.8 | 68.0 | 71.3 | 73.1 | 76.2 | 77.2 | 74.9 | 76.3 |",
+            "retrieved_at": "2026-09-07T03:26:49Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:36:07Z",
+            "via": "r.jina.ai",
+            "note": "17-benchmark comparison table published in the GLM-4.7 launch post; columns are GLM-4.7, GLM-4.6, Kimi K2 Thinking, DeepSeek-V3.2, Gemini 3.0 Pro, Claude Sonnet 4.5, GPT-5 High, GPT-5.1 High."
+          }
+        },
+        {
+          "benchmark": "terminal-bench-2",
+          "value": 24.5,
+          "reported_by": "official",
+          "source": {
+            "url": "https://z.ai/blog/glm-4.7",
+            "title": "GLM-4.7: Advancing the Coding Capability",
+            "quote": "| Terminal Bench 2.0 | 41.0 | 24.5 | 35.7 | 46.4 | 54.2 | 42.8 | 35.2 | 47.6 |",
+            "retrieved_at": "2026-09-07T03:26:49Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:36:07Z",
+            "via": "r.jina.ai",
+            "note": "17-benchmark comparison table published in the GLM-4.7 launch post; columns are GLM-4.7, GLM-4.6, Kimi K2 Thinking, DeepSeek-V3.2, Gemini 3.0 Pro, Claude Sonnet 4.5, GPT-5 High, GPT-5.1 High."
+          }
+        },
+        {
+          "benchmark": "tau2-bench",
+          "value": 75.2,
+          "reported_by": "official",
+          "source": {
+            "url": "https://z.ai/blog/glm-4.7",
+            "title": "GLM-4.7: Advancing the Coding Capability",
+            "quote": "| τ²-Bench | 87.4 | 75.2 | 74.3 | 85.3 | 90.7 | 87.2 | 82.4 | 82.7 |",
+            "retrieved_at": "2026-09-07T03:26:49Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:36:07Z",
+            "via": "r.jina.ai",
+            "note": "17-benchmark comparison table published in the GLM-4.7 launch post; columns are GLM-4.7, GLM-4.6, Kimi K2 Thinking, DeepSeek-V3.2, Gemini 3.0 Pro, Claude Sonnet 4.5, GPT-5 High, GPT-5.1 High."
+          }
+        }
+      ],
+      "notes": "Scores sourced from the later GLM-4.7 launch post's official comparison table (Z.ai's own re-reported numbers for GLM-4.6), since the GLM-4.6 launch post itself renders its benchmark chart as an image only."
+    },
+    {
+      "id": "zhipu-glm-4.7",
+      "lab": "zhipu",
+      "name": "GLM-4.7",
+      "family": "GLM",
+      "date": "2025-12-22",
+      "date_precision": "day",
+      "status": "released",
+      "announcement": {
+        "url": "https://z.ai/blog/glm-4.7",
+        "title": "GLM-4.7: Advancing the Coding Capability",
+        "quote": "GLM-4.7, your new coding partner, is coming with the following features:",
+        "retrieved_at": "2026-09-07T03:26:49Z",
+        "verified": true,
+        "verified_at": "2026-09-07T09:36:07Z",
+        "via": "r.jina.ai"
+      },
+      "scores": [
+        {
+          "benchmark": "mmlu-pro",
+          "value": 84.3,
+          "reported_by": "official",
+          "source": {
+            "url": "https://z.ai/blog/glm-4.7",
+            "title": "GLM-4.7: Advancing the Coding Capability",
+            "quote": "| MMLU-Pro | 84.3 | 83.2 | 84.6 | 85.0 | 90.1 | 88.2 | 87.5 | 87.0 |",
+            "retrieved_at": "2026-09-07T03:26:49Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:36:07Z",
+            "via": "r.jina.ai",
+            "note": "17-benchmark comparison table published in the GLM-4.7 launch post; columns are GLM-4.7, GLM-4.6, Kimi K2 Thinking, DeepSeek-V3.2, Gemini 3.0 Pro, Claude Sonnet 4.5, GPT-5 High, GPT-5.1 High."
+          }
+        },
+        {
+          "benchmark": "gpqa-diamond",
+          "value": 85.7,
+          "reported_by": "official",
+          "source": {
+            "url": "https://z.ai/blog/glm-4.7",
+            "title": "GLM-4.7: Advancing the Coding Capability",
+            "quote": "| GPQA-Diamond | 85.7 | 81.0 | 84.5 | 82.4 | 91.9 | 83.4 | 85.7 | 88.1 |",
+            "retrieved_at": "2026-09-07T03:26:49Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:36:07Z",
+            "via": "r.jina.ai",
+            "note": "17-benchmark comparison table published in the GLM-4.7 launch post; columns are GLM-4.7, GLM-4.6, Kimi K2 Thinking, DeepSeek-V3.2, Gemini 3.0 Pro, Claude Sonnet 4.5, GPT-5 High, GPT-5.1 High."
+          }
+        },
+        {
+          "benchmark": "hle",
+          "value": 24.8,
+          "config": "text-only",
+          "reported_by": "official",
+          "source": {
+            "url": "https://z.ai/blog/glm-4.7",
+            "title": "GLM-4.7: Advancing the Coding Capability",
+            "quote": "| HLE | 24.8 | 17.2 | 23.9 | 25.1 | 37.5 | 13.7 | 26.3 | 25.7 |",
+            "retrieved_at": "2026-09-07T03:26:49Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:36:07Z",
+            "via": "r.jina.ai",
+            "note": "17-benchmark comparison table published in the GLM-4.7 launch post; columns are GLM-4.7, GLM-4.6, Kimi K2 Thinking, DeepSeek-V3.2, Gemini 3.0 Pro, Claude Sonnet 4.5, GPT-5 High, GPT-5.1 High."
+          }
+        },
+        {
+          "benchmark": "aime",
+          "value": 95.7,
+          "config": "AIME 2025",
+          "reported_by": "official",
+          "source": {
+            "url": "https://z.ai/blog/glm-4.7",
+            "title": "GLM-4.7: Advancing the Coding Capability",
+            "quote": "| AIME 2025 | 95.7 | 93.9 | 94.5 | 93.1 | 95.0 | 87.0 | 94.6 | 94.0 |",
+            "retrieved_at": "2026-09-07T03:26:49Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:36:07Z",
+            "via": "r.jina.ai",
+            "note": "17-benchmark comparison table published in the GLM-4.7 launch post; columns are GLM-4.7, GLM-4.6, Kimi K2 Thinking, DeepSeek-V3.2, Gemini 3.0 Pro, Claude Sonnet 4.5, GPT-5 High, GPT-5.1 High."
+          }
+        },
+        {
+          "benchmark": "livecodebench",
+          "value": 84.9,
+          "config": "v6",
+          "reported_by": "official",
+          "source": {
+            "url": "https://z.ai/blog/glm-4.7",
+            "title": "GLM-4.7: Advancing the Coding Capability",
+            "quote": "| LiveCodeBench-v6 | 84.9 | 82.8 | 83.1 | 83.3 | 90.7 | 64.0 | 87.0 | 87.0 |",
+            "retrieved_at": "2026-09-07T03:26:49Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:36:07Z",
+            "via": "r.jina.ai",
+            "note": "17-benchmark comparison table published in the GLM-4.7 launch post; columns are GLM-4.7, GLM-4.6, Kimi K2 Thinking, DeepSeek-V3.2, Gemini 3.0 Pro, Claude Sonnet 4.5, GPT-5 High, GPT-5.1 High."
+          }
+        },
+        {
+          "benchmark": "swe-bench-verified",
+          "value": 73.8,
+          "reported_by": "official",
+          "source": {
+            "url": "https://z.ai/blog/glm-4.7",
+            "title": "GLM-4.7: Advancing the Coding Capability",
+            "quote": "| SWE-bench Verified | 73.8 | 68.0 | 71.3 | 73.1 | 76.2 | 77.2 | 74.9 | 76.3 |",
+            "retrieved_at": "2026-09-07T03:26:49Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:36:07Z",
+            "via": "r.jina.ai",
+            "note": "17-benchmark comparison table published in the GLM-4.7 launch post; columns are GLM-4.7, GLM-4.6, Kimi K2 Thinking, DeepSeek-V3.2, Gemini 3.0 Pro, Claude Sonnet 4.5, GPT-5 High, GPT-5.1 High."
+          }
+        },
+        {
+          "benchmark": "terminal-bench-2",
+          "value": 41,
+          "reported_by": "official",
+          "source": {
+            "url": "https://z.ai/blog/glm-4.7",
+            "title": "GLM-4.7: Advancing the Coding Capability",
+            "quote": "| Terminal Bench 2.0 | 41.0 | 24.5 | 35.7 | 46.4 | 54.2 | 42.8 | 35.2 | 47.6 |",
+            "retrieved_at": "2026-09-07T03:26:49Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:36:07Z",
+            "via": "r.jina.ai",
+            "note": "17-benchmark comparison table published in the GLM-4.7 launch post; columns are GLM-4.7, GLM-4.6, Kimi K2 Thinking, DeepSeek-V3.2, Gemini 3.0 Pro, Claude Sonnet 4.5, GPT-5 High, GPT-5.1 High."
+          }
+        },
+        {
+          "benchmark": "tau2-bench",
+          "value": 87.4,
+          "reported_by": "official",
+          "source": {
+            "url": "https://z.ai/blog/glm-4.7",
+            "title": "GLM-4.7: Advancing the Coding Capability",
+            "quote": "| τ²-Bench | 87.4 | 75.2 | 74.3 | 85.3 | 90.7 | 87.2 | 82.4 | 82.7 |",
+            "retrieved_at": "2026-09-07T03:26:49Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:36:07Z",
+            "via": "r.jina.ai",
+            "note": "17-benchmark comparison table published in the GLM-4.7 launch post; columns are GLM-4.7, GLM-4.6, Kimi K2 Thinking, DeepSeek-V3.2, Gemini 3.0 Pro, Claude Sonnet 4.5, GPT-5 High, GPT-5.1 High."
+          }
+        }
+      ]
+    },
+    {
+      "id": "zhipu-glm-5",
+      "lab": "zhipu",
+      "name": "GLM-5",
+      "family": "GLM",
+      "date": "2026-02-11",
+      "date_precision": "day",
+      "status": "released",
+      "announcement": {
+        "url": "https://z.ai/blog/glm-5",
+        "title": "GLM-5: From Vibe Coding to Agentic Engineering",
+        "quote": "We are launching GLM-5, targeting complex systems engineering and long-horizon agentic tasks.",
+        "retrieved_at": "2026-09-07T03:26:49Z",
+        "verified": true,
+        "verified_at": "2026-09-07T09:36:07Z",
+        "via": "r.jina.ai"
+      },
+      "sources": [
+        {
+          "url": "https://www.reuters.com/technology/chinas-ai-startup-zhipu-releases-new-flagship-model-glm-5-2026-02-11/",
+          "title": "Chinese AI startup Zhipu releases new flagship model GLM-5 (Reuters, 11 Feb 2026)",
+          "retrieved_at": "2026-09-07T03:26:49Z",
+          "note": "Used to pin exact launch day; article URL itself is dated 2026-02-11."
+        }
+      ],
+      "scores": [
+        {
+          "benchmark": "hle",
+          "value": 30.5,
+          "config": "text-only",
+          "reported_by": "official",
+          "source": {
+            "url": "https://z.ai/blog/glm-5",
+            "title": "GLM-5: From Vibe Coding to Agentic Engineering",
+            "quote": "| Humanity's Last Exam | 30.5 | 24.8 | 25.1 | 31.5 | 28.4 | 37.2 | 35.4 |",
+            "retrieved_at": "2026-09-07T03:26:49Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:36:07Z",
+            "via": "r.jina.ai"
+          }
+        },
+        {
+          "benchmark": "gpqa-diamond",
+          "value": 86,
+          "reported_by": "official",
+          "source": {
+            "url": "https://z.ai/blog/glm-5",
+            "title": "GLM-5: From Vibe Coding to Agentic Engineering",
+            "quote": "| GPQA-Diamond | 86.0 | 85.7 | 82.4 | 87.6 | 87.0 | 91.9 | 92.4 |",
+            "retrieved_at": "2026-09-07T03:26:49Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:36:07Z",
+            "via": "r.jina.ai"
+          }
+        },
+        {
+          "benchmark": "aime",
+          "value": 92.7,
+          "config": "AIME 2026 I",
+          "reported_by": "official",
+          "source": {
+            "url": "https://z.ai/blog/glm-5",
+            "title": "GLM-5: From Vibe Coding to Agentic Engineering",
+            "quote": "| AIME 2026 I | 92.7 | 92.9 | 92.7 | 92.5 | 93.3 | 90.6 | - |",
+            "retrieved_at": "2026-09-07T03:26:49Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:36:07Z",
+            "via": "r.jina.ai"
+          }
+        },
+        {
+          "benchmark": "swe-bench-verified",
+          "value": 77.8,
+          "reported_by": "official",
+          "source": {
+            "url": "https://z.ai/blog/glm-5",
+            "title": "GLM-5: From Vibe Coding to Agentic Engineering",
+            "quote": "| SWE-bench Verified | 77.8 | 73.8 | 73.1 | 76.8 | 80.9 | 76.2 | 80.0 |",
+            "retrieved_at": "2026-09-07T03:26:49Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:36:07Z",
+            "via": "r.jina.ai"
+          }
+        },
+        {
+          "benchmark": "terminal-bench-2",
+          "value": 56.2,
+          "config": "Terminus-2 harness",
+          "reported_by": "official",
+          "source": {
+            "url": "https://z.ai/blog/glm-5",
+            "title": "GLM-5: From Vibe Coding to Agentic Engineering",
+            "quote": "| Terminal-Bench 2.0 Terminus-2 | 56.2 / 60.7† | 41.0 | 39.3 | 50.8 | 59.3 | 54.2 | 54.0 |",
+            "retrieved_at": "2026-09-07T03:26:49Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:36:07Z",
+            "via": "r.jina.ai",
+            "note": "Standard Terminus-2 harness score; a lab-verified variant of the benchmark (fixing ambiguous instructions) scored 60.7."
+          }
+        },
+        {
+          "benchmark": "tau2-bench",
+          "value": 89.7,
+          "reported_by": "official",
+          "source": {
+            "url": "https://z.ai/blog/glm-5",
+            "title": "GLM-5: From Vibe Coding to Agentic Engineering",
+            "quote": "| τ²-Bench | 89.7 | 87.4 | 85.3 | 80.2 | 91.6 | 90.7 | 85.5 |",
+            "retrieved_at": "2026-09-07T03:26:49Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:36:07Z",
+            "via": "r.jina.ai"
+          }
+        }
+      ]
+    },
+    {
+      "id": "zhipu-glm-5.1",
+      "lab": "zhipu",
+      "name": "GLM-5.1",
+      "family": "GLM",
+      "date": "2026-04-07",
+      "date_precision": "day",
+      "status": "released",
+      "announcement": {
+        "url": "https://z.ai/blog/glm-5.1",
+        "title": "GLM-5.1: Towards Long-Horizon Tasks",
+        "quote": "GLM-5.1 is our next-generation flagship model for agentic engineering, with significantly stronger coding capabilities than its predecessor.",
+        "retrieved_at": "2026-09-07T03:26:49Z",
+        "verified": true,
+        "verified_at": "2026-09-07T09:36:07Z",
+        "via": "r.jina.ai"
+      },
+      "scores": [
+        {
+          "benchmark": "hle",
+          "value": 31,
+          "config": "text-only",
+          "reported_by": "official",
+          "source": {
+            "url": "https://z.ai/blog/glm-5.1",
+            "title": "GLM-5.1: Towards Long-Horizon Tasks",
+            "quote": "| HLE | 31.0 | 30.5 | 28.8 | 28.0 | 25.1 | 31.5 | 36.7 | 45.0 | 39.8 |",
+            "retrieved_at": "2026-09-07T03:26:49Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:36:07Z",
+            "via": "r.jina.ai",
+            "note": "Row order: GLM-5.1, GLM-5, Qwen3.6-Plus, MiniMax M2.7, DeepSeek-V3.2, Kimi K2.5, Claude Opus 4.6, Gemini 3.1 Pro, GPT-5.4."
+          }
+        },
+        {
+          "benchmark": "aime",
+          "value": 95.3,
+          "config": "AIME 2026",
+          "reported_by": "official",
+          "source": {
+            "url": "https://z.ai/blog/glm-5.1",
+            "title": "GLM-5.1: Towards Long-Horizon Tasks",
+            "quote": "| AIME 2026 | 95.3 | 95.4 | 95.1 | 89.8 | 95.1 | 94.5 | 95.6 | 98.2 | 98.7 |",
+            "retrieved_at": "2026-09-07T03:26:49Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:36:07Z",
+            "via": "r.jina.ai"
+          }
+        },
+        {
+          "benchmark": "gpqa-diamond",
+          "value": 86.2,
+          "reported_by": "official",
+          "source": {
+            "url": "https://z.ai/blog/glm-5.1",
+            "title": "GLM-5.1: Towards Long-Horizon Tasks",
+            "quote": "| GPQA-Diamond | 86.2 | 86.0 | 90.4 | 87.0 | 82.4 | 87.6 | 91.3 | 94.3 | 92.0 |",
+            "retrieved_at": "2026-09-07T03:26:49Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:36:07Z",
+            "via": "r.jina.ai"
+          }
+        },
+        {
+          "benchmark": "terminal-bench-2",
+          "value": 63.5,
+          "config": "Terminus-2 harness",
+          "reported_by": "official",
+          "source": {
+            "url": "https://z.ai/blog/glm-5.1",
+            "title": "GLM-5.1: Towards Long-Horizon Tasks",
+            "quote": "| Terminal-Bench 2.0 Terminus-2 | 63.5 | 56.2 | 61.6 | - | 39.3 | 50.8 | 65.4 | 68.5 | - |",
+            "retrieved_at": "2026-09-07T03:26:49Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:36:07Z",
+            "via": "r.jina.ai"
+          }
+        },
+        {
+          "benchmark": "swe-bench-pro",
+          "value": 58.4,
+          "reported_by": "official",
+          "source": {
+            "url": "https://z.ai/blog/glm-5.1",
+            "title": "GLM-5.1: Towards Long-Horizon Tasks",
+            "quote": "| SWE-Bench Pro | 58.4 | 55.1 | 56.6 | 56.2 | - | 53.8 | 57.3 | 54.2 | 57.7 |",
+            "retrieved_at": "2026-09-07T03:26:49Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:36:07Z",
+            "via": "r.jina.ai"
+          }
+        }
+      ]
+    },
+    {
+      "id": "zhipu-glm-5.2",
+      "lab": "zhipu",
+      "name": "GLM-5.2",
+      "family": "GLM",
+      "date": "2026-06-16",
+      "date_precision": "day",
+      "status": "released",
+      "announcement": {
+        "url": "https://z.ai/blog/glm-5.2",
+        "title": "GLM-5.2: Built for Long-Horizon Tasks",
+        "quote": "GLM-5.2, our latest flagship model for long-horizon tasks. It marks a substantial leap in long-horizon task capability over its predecessor GLM-5.1 and, for the first time, delivers that capability on a solid 1M-token context.",
+        "retrieved_at": "2026-09-07T03:26:49Z",
+        "verified": true,
+        "verified_at": "2026-09-07T09:36:07Z",
+        "via": "r.jina.ai"
+      },
+      "scores": [
+        {
+          "benchmark": "hle",
+          "value": 40.5,
+          "config": "text-only",
+          "reported_by": "official",
+          "source": {
+            "url": "https://z.ai/blog/glm-5.2",
+            "title": "GLM-5.2: Built for Long-Horizon Tasks",
+            "quote": "| HLE | 40.5 | 31.0 | 41.4 | 37.0 | 37.7 | 49.8* | 41.4* | 45.0 |",
+            "retrieved_at": "2026-09-07T03:26:49Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:36:07Z",
+            "via": "r.jina.ai",
+            "note": "Row order: GLM-5.2, GLM-5.1, Qwen3.7-Max, MiniMax M3, DeepSeek-V4-Pro, Claude Opus 4.8, GPT-5.5, Gemini 3.1 Pro."
+          }
+        },
+        {
+          "benchmark": "aime",
+          "value": 99.2,
+          "config": "AIME 2026",
+          "reported_by": "official",
+          "source": {
+            "url": "https://z.ai/blog/glm-5.2",
+            "title": "GLM-5.2: Built for Long-Horizon Tasks",
+            "quote": "| AIME 2026 | 99.2 | 95.3 | 97.0 | - | 94.6 | 95.7 | 98.3 | 98.2 |",
+            "retrieved_at": "2026-09-07T03:26:49Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:36:07Z",
+            "via": "r.jina.ai"
+          }
+        },
+        {
+          "benchmark": "gpqa-diamond",
+          "value": 91.2,
+          "reported_by": "official",
+          "source": {
+            "url": "https://z.ai/blog/glm-5.2",
+            "title": "GLM-5.2: Built for Long-Horizon Tasks",
+            "quote": "| GPQA-Diamond | 91.2 | 86.2 | 90.0 | 93.0 | 90.1 | 93.6 | 93.6 | 94.3 |",
+            "retrieved_at": "2026-09-07T03:26:49Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:36:07Z",
+            "via": "r.jina.ai"
+          }
+        },
+        {
+          "benchmark": "swe-bench-pro",
+          "value": 62.1,
+          "reported_by": "official",
+          "source": {
+            "url": "https://z.ai/blog/glm-5.2",
+            "title": "GLM-5.2: Built for Long-Horizon Tasks",
+            "quote": "| SWE-bench Pro | 62.1 | 58.4 | 60.6 | 59.0 | 55.4 | 69.2 | 58.6 | 54.2 |",
+            "retrieved_at": "2026-09-07T03:26:49Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:36:07Z",
+            "via": "r.jina.ai"
+          }
+        }
+      ],
+      "notes": "GLM-5.2 reports 'Terminal Bench 2.1' rather than the 2.0 version tracked in this dataset's basket, so that score is not recorded here."
+    },
+    {
+      "id": "zhipu-glm-5.3",
+      "lab": "zhipu",
+      "name": "GLM-5.3",
+      "family": "GLM",
+      "date": "2026-08-14",
+      "date_precision": "day",
+      "status": "released",
+      "announcement": {
+        "url": "https://z.ai/blog/glm-5.3",
+        "title": "GLM-5.3",
+        "quote": "GLM-5.3 uses the same base model as GLM-5.2 — every gain comes from post-training.",
+        "retrieved_at": "2026-09-07T03:26:49Z",
+        "verified": false,
+        "verified_at": "2026-09-07T09:36:07Z",
+        "via": "r.jina.ai"
+      },
+      "scores": [
+        {
+          "benchmark": "hle",
+          "value": 62.5,
+          "config": "with tools",
+          "reported_by": "official",
+          "source": {
+            "url": "https://z.ai/blog/glm-5.3",
+            "title": "GLM-5.3",
+            "quote": "| HLE w/ Tools | 62.5 | 54.7 | 59.8 | 60.0 | 56.2 | 57.9 | 63.9 | 64.5 |",
+            "retrieved_at": "2026-09-07T03:26:49Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:36:07Z",
+            "via": "r.jina.ai",
+            "note": "Row order: GLM-5.3, GLM-5.2, Kimi K3, DeepSeek-V4 Pro-0813, Qwen3.8-Max, Opus 4.8, Fable 5 (w/ fallback), GPT-5.6 Sol."
+          }
+        }
+      ],
+      "notes": "GLM-5.3 is a post-training-only update on the GLM-5.2 base model; the launch post re-reports only coding/agentic/cyber benchmarks and HLE-with-tools, not the general reasoning basket (GPQA, plain HLE, AIME)."
+    }
+  ]
+}
