@@ -3,5 +3,7 @@ export * from './schema';
 export * from './stats';
 export * from './timeline';
 export * from './frontier-index';
+export * from './rating';
+export * from './stages';
 export * from './prediction';
 export * from './bundle';

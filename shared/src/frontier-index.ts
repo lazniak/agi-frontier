@@ -4,8 +4,9 @@
  *
  * API is frozen (web and worker code against it). Implementation: shared-math task.
  */
-import type { Benchmark, ISODate, LabId, ModelRelease, Score } from './types';
+import type { Benchmark, ISODate, LabId, ModelRelease, ModelTier, Score } from './types';
 import { dateToDayNumber } from './timeline';
+import { ratingFromTheta, scoreToProbability } from './rating';
 
 export interface IndexFitOptions {
   /** Ridge penalty λ applied to θ and δ (default 0.05). */
@@ -44,6 +45,10 @@ export interface ModelIndex {
   /** 100·σ(θ ∓ se). */
   indexLow: number;
   indexHigh: number;
+  /** Lineup tier of the release (REDESIGN §3); absent on the release ⇒ 'flagship'. */
+  tier: ModelTier;
+  /** Frontier Rating = 1000 + (400 / ln 10)·θ (REDESIGN §1.2). */
+  rating: number;
   /** Number of index benchmarks used. */
   n: number;
   /** n / number of index benchmarks (0–1). */
@@ -149,12 +154,6 @@ export function selectIndexScores(release: ModelRelease, benchmarks: Benchmark[]
   return out;
 }
 
-function clipPercent(value: number, clip: [number, number]): number {
-  const lo = Math.min(clip[0], clip[1]);
-  const hi = Math.max(clip[0], clip[1]);
-  return value < lo ? lo : value > hi ? hi : value;
-}
-
 function byDateThenId(a: { date: ISODate; id: string }, b: { date: ISODate; id: string }): number {
   return a.date < b.date ? -1 : a.date > b.date ? 1 : a.id.localeCompare(b.id);
 }
@@ -187,6 +186,7 @@ export function fitFrontierIndex(
   const obsM: number[] = [];
   const obsB: number[] = [];
   const obsY: number[] = [];
+  const obsW: number[] = [];
   const obsScore: Score[] = [];
 
   for (const r of eligible) {
@@ -197,9 +197,11 @@ export function fitFrontierIndex(
     for (const s of picked) {
       const slot = benchmarkSlot.get(s.benchmark);
       if (slot === undefined) continue;
+      const b = indexBenchmarks[slot]!;
       obsM.push(m);
       obsB.push(slot);
-      obsY.push(logit(clipPercent(s.value, clip) / 100));
+      obsY.push(logit(scoreToProbability(b, s.value, clip)));
+      obsW.push(b.weight > 0 ? b.weight : 1);
       obsScore.push(s);
     }
   }
@@ -221,23 +223,24 @@ export function fitFrontierIndex(
     };
   }
 
-  // --- alternating least squares with ridge λ ----------------------------------------
+  // --- alternating least squares with ridge λ and per-benchmark weights (REDESIGN §1.1)
   const theta = new Float64Array(M);
   const delta = new Float64Array(B);
   const prevTheta = new Float64Array(M);
   const prevDelta = new Float64Array(B);
   const accT = new Float64Array(M);
   const accB = new Float64Array(B);
-  const nM = new Float64Array(M);
-  const nB = new Float64Array(B);
+  const wM = new Float64Array(M); // Σw per model
+  const wB = new Float64Array(B); // Σw per benchmark
   for (let k = 0; k < N; k++) {
     const m = obsM[k]!;
     const b = obsB[k]!;
-    nM[m] = nM[m]! + 1;
-    nB[b] = nB[b]! + 1;
+    const w = obsW[k]!;
+    wM[m] = wM[m]! + w;
+    wB[b] = wB[b]! + w;
   }
   const observedB: number[] = [];
-  for (let b = 0; b < B; b++) if (nB[b]! > 0) observedB.push(b);
+  for (let b = 0; b < B; b++) if (wB[b]! > 0) observedB.push(b);
   const bObs = observedB.length;
   // The anchor set fixes the origin of the scale: the current (non-legacy) basket. Legacy
   // benchmarks are fitted like any other but do not pull the zero of δ around (METHODOLOGY §3).
@@ -251,21 +254,21 @@ export function fitFrontierIndex(
     prevTheta.set(theta);
     prevDelta.set(delta);
 
-    // θ_m = Σ_b (y_mb + δ_b) / (n_m + λ)
+    // θ_m = Σ_b w_b (y_mb + δ_b) / (Σ_b w_b + λ)   (REDESIGN §1.1)
     accT.fill(0);
     for (let k = 0; k < N; k++) {
       const m = obsM[k]!;
-      accT[m] = accT[m]! + obsY[k]! + delta[obsB[k]!]!;
+      accT[m] = accT[m]! + obsW[k]! * (obsY[k]! + delta[obsB[k]!]!);
     }
-    for (let m = 0; m < M; m++) theta[m] = accT[m]! / (nM[m]! + ridge);
+    for (let m = 0; m < M; m++) theta[m] = accT[m]! / (wM[m]! + ridge);
 
-    // δ_b = Σ_m (θ_m − y_mb) / (n_b + λ); benchmarks with no observation stay at 0.
+    // δ_b = Σ_m w_b (θ_m − y_mb) / (Σ_m w_b + λ); benchmarks with no observation stay at 0.
     accB.fill(0);
     for (let k = 0; k < N; k++) {
       const b = obsB[k]!;
-      accB[b] = accB[b]! + theta[obsM[k]!]! - obsY[k]!;
+      accB[b] = accB[b]! + obsW[k]! * (theta[obsM[k]!]! - obsY[k]!);
     }
-    for (let b = 0; b < B; b++) delta[b] = nB[b]! > 0 ? accB[b]! / (nB[b]! + ridge) : 0;
+    for (let b = 0; b < B; b++) delta[b] = wB[b]! > 0 ? accB[b]! / (wB[b]! + ridge) : 0;
 
     // Re-centre δ over the anchor benchmarks and shift every δ and θ by the same amount,
     // which leaves every prediction θ_m − δ_b unchanged (METHODOLOGY §3).
@@ -290,14 +293,19 @@ export function fitFrontierIndex(
 
   for (let b = 0; b < B; b++) difficulties[benchmarksInIndex[b]!] = delta[b]!;
 
-  // --- residual σ ---------------------------------------------------------------------
-  let ss = 0;
+  // --- residual σ (weighted, REDESIGN §1.1) --------------------------------------------
+  const cM = new Float64Array(M); // observation count per model (for n / se / qualified)
+  let sw = 0; // Σw over all observations
+  let ss = 0; // Σ w·r²
   for (let k = 0; k < N; k++) {
-    const r = obsY[k]! - (theta[obsM[k]!]! - delta[obsB[k]!]!);
-    ss += r * r;
+    const m = obsM[k]!;
+    const r = obsY[k]! - (theta[m]! - delta[obsB[k]!]!);
+    cM[m] = cM[m]! + 1;
+    sw += obsW[k]!;
+    ss += obsW[k]! * r * r;
   }
   // Free parameters: M abilities + bObs difficulties − 1 (the mean(δ)=0 constraint).
-  const dof = Math.max(1, N - (M + bObs - 1));
+  const dof = Math.max(1, sw - (M + bObs - 1));
   const residualSigma = Math.sqrt(ss / dof);
 
   // --- per-model output ---------------------------------------------------------------
@@ -321,14 +329,16 @@ export function fitFrontierIndex(
   for (let m = 0; m < M; m++) {
     const r = modelRefs[m]!;
     const th = theta[m]!;
-    const n = nM[m]!;
+    const n = cM[m]!;
     const se = n > 0 ? residualSigma / Math.sqrt(n) : 0;
     models[r.id] = {
       release_id: r.id,
       lab: r.lab,
       date: r.date,
+      tier: r.tier ?? 'flagship',
       theta: th,
       index: indexFromTheta(th),
+      rating: ratingFromTheta(th),
       se,
       indexLow: indexFromTheta(th - se),
       indexHigh: indexFromTheta(th + se),
@@ -353,10 +363,16 @@ export interface FrontierPoint {
  * Running maximum of the index over released, qualified models, sorted by date.
  * Returns only the points where the maximum increases (step function knots).
  * Pass `includeProvisional: true` to let single-score models onto the frontier.
+ * `tiers` (REDESIGN §3) limits which line-up tiers may form the line; default `['flagship']`.
  */
-export function frontierLine(fit: IndexFit, opts: { includeProvisional?: boolean } = {}): FrontierPoint[] {
+export function frontierLine(
+  fit: IndexFit,
+  opts: { includeProvisional?: boolean; tiers?: ModelTier[] } = {},
+): FrontierPoint[] {
+  const tiers = opts.tiers ?? ['flagship'];
+  const tierSet = new Set<ModelTier>(tiers);
   const models = Object.values(fit.models)
-    .filter((m) => opts.includeProvisional === true || m.qualified)
+    .filter((m) => (opts.includeProvisional === true || m.qualified) && tierSet.has(m.tier))
     .sort((a, b) => byDateThenId(
     { date: a.date, id: a.release_id },
     { date: b.date, id: b.release_id },

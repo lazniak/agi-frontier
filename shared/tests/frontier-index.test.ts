@@ -487,3 +487,95 @@ describe('frontierGains', () => {
     expect(h[1]!.end).toBe('2025-01-01');
   });
 });
+
+describe('weighted fit (REDESIGN §1.1)', () => {
+  test('weight = 1 everywhere reproduces the unweighted fit', () => {
+    const next = rng(5);
+    const fx = raschFixture({
+      thetas: linspace(-1.5, 2, 8),
+      deltas: linspace(-1, 1, 5),
+      noise: () => 0.1 * gaussian(next),
+    });
+    const weighted = fitFrontierIndex(fx.releases, fx.benchmarks);
+    const unweighted = fitFrontierIndex(fx.releases, fx.benchmarks);
+    for (const id of fx.ids) {
+      expect(weighted.models[id]!.theta).toBeCloseTo(unweighted.models[id]!.theta, 12);
+    }
+    expect(weighted.iterations).toBe(unweighted.iterations);
+    expect(weighted.converged).toBe(unweighted.converged);
+    expect(weighted.residualSigma).toBeCloseTo(unweighted.residualSigma, 12);
+  });
+
+  test('a weight-2 benchmark pulls θ per the closed form on a 1-model fixture', () => {
+    // One model, two benchmarks; δ is fixed by the anchor (mean of observed δ = 0), so
+    // θ = Σ w(y+δ) / (Σw + λ). With y0 = y1 = y: θ = 2y / 3 when w = (2, 1).
+    const mk = (w: { a: number; b: number }) => {
+      const bms = [benchmark('a', { weight: w.a }), benchmark('b', { weight: w.b })];
+      const releases = [release('m1', 'openai', '2025-01-01', [score('a', 70), score('b', 70)])];
+      return fitFrontierIndex(releases, bms, { ridge: 0, tolerance: 1e-14, maxIter: 500 });
+    };
+    const fit = mk({ a: 2, b: 1 });
+    const y = logit(0.7);
+    // Anchor: with a single model and λ = 0, δ_a = θ − y and δ_b = θ − y up to the
+    // recentring (mean δ = 0 ⇒ both equal 0). Hence θ = (2y + y) / 3.
+    expect(fit.models['m1']!.theta).toBeCloseTo((2 * y + 1 * y) / (2 + 1), 8);
+    // Symmetric weights give the plain average.
+    const even = mk({ a: 1, b: 1 });
+    expect(even.models['m1']!.theta).toBeCloseTo(y, 8);
+  });
+
+  test('an elo benchmark enters the fit through scoreToProbability', () => {
+    const arena = { ...benchmark('arena'), unit: 'elo' as const, max: 4000, elo_reference: 1200 };
+    // 400 Elo apart = one order of magnitude of odds = ln 10 logits of θ gap.
+    const releases = [
+      release('m1', 'openai', '2025-01-01', [score('arena', 1200)]),
+      release('m2', 'openai', '2025-02-01', [score('arena', 1600)]),
+    ];
+    const fit = fitFrontierIndex(releases, [arena], { ridge: 0, tolerance: 1e-14, maxIter: 500 });
+    expect(fit.models['m2']!.theta - fit.models['m1']!.theta).toBeCloseTo(Math.LN10, 6);
+    // The same two releases scored on a percent-unit benchmark at 50 % vs 51 % give a far
+    // smaller logit gap — the Elo → probability conversion is what produces ln 10.
+    const pctB = benchmark('pct');
+    const pctReleases = [
+      release('m1', 'openai', '2025-01-01', [score('pct', 50)]),
+      release('m2', 'openai', '2025-02-01', [score('pct', 60)]),
+    ];
+    const fitPct = fitFrontierIndex(pctReleases, [pctB], { ridge: 0, tolerance: 1e-14, maxIter: 500 });
+    expect(fitPct.models['m2']!.theta - fitPct.models['m1']!.theta).toBeCloseTo(logit(0.6) - logit(0.5), 9);
+  });
+});
+
+describe('ModelIndex.tier / rating and frontierLine tiers', () => {
+  const bms = [benchmark('a'), benchmark('b'), benchmark('c')];
+  // Each release dated after (and stronger than) the previous one, so every tier can actually
+  // reach the running maximum when its tier is allowed.
+  const releases = [
+    release('flag-1', 'openai', '2025-01-01', [score('a', 60), score('b', 50), score('c', 40)]),
+    release('mid-1', 'openai', '2025-02-01', [score('a', 65), score('b', 55), score('c', 45)]),
+    release('small-1', 'openai', '2025-03-01', [score('a', 68), score('b', 58), score('c', 48)]),
+    release('flag-2', 'anthropic', '2025-04-01', [score('a', 70), score('b', 60), score('c', 50)]),
+    release('mid-2', 'anthropic', '2025-05-01', [score('a', 75), score('b', 65), score('c', 55)]),
+  ];
+  const withTiers = releases.map((r, i) => ({ ...r, tier: (['flagship', 'mid', 'small'] as const)[i % 3] }));
+
+  test('tier defaults to flagship; rating matches ratingFromTheta(theta)', () => {
+    const fit = fitFrontierIndex(releases, bms);
+    for (const m of Object.values(fit.models)) {
+      expect(m.tier).toBe('flagship');
+      expect(m.rating).toBeCloseTo(1000 + (400 / Math.LN10) * m.theta, 10);
+    }
+    const fitT = fitFrontierIndex(withTiers, bms);
+    expect(fitT.models['mid-1']!.tier).toBe('mid');
+    expect(fitT.models['small-1']!.tier).toBe('small');
+    expect(fitT.models['flag-2']!.tier).toBe('flagship');
+  });
+
+  test('frontierLine ignores non-flagship tiers by default and honours the tiers option', () => {
+    const fit = fitFrontierIndex(withTiers, bms);
+    expect(frontierLine(fit).map((p) => p.release_id)).toEqual(['flag-1', 'flag-2']);
+    const all = frontierLine(fit, { tiers: ['flagship', 'mid', 'small'] });
+    expect(all.map((p) => p.release_id)).toEqual(['flag-1', 'mid-1', 'small-1', 'flag-2', 'mid-2']);
+    const midOnly = frontierLine(fit, { tiers: ['mid'] });
+    expect(midOnly.map((p) => p.release_id)).toEqual(['mid-1', 'mid-2']);
+  });
+});

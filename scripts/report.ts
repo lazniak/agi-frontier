@@ -27,13 +27,13 @@ console.log('\nAll fitted models (date, lab, name, index ± se, n):');
 const rows = Object.values(fit.models).sort((a, b) => a.date.localeCompare(b.date));
 for (const m of rows) {
   const r = releases.find((x) => x.id === m.release_id)!;
-  console.log(`  ${m.date} ${m.lab.padEnd(9)} ${r.name.padEnd(28)} ${m.index.toFixed(1).padStart(5)} ± ${m.se.toFixed(2)}  n=${m.n}${m.qualified ? "" : "  (provisional)"}`);
+  console.log(`  ${m.date} ${m.lab.padEnd(9)} ${r.name.padEnd(28)} R ${m.rating.toFixed(0).padStart(5)}  idx ${m.index.toFixed(1).padStart(5)} ± ${m.se.toFixed(2)}  n=${m.n} ${m.tier}${m.qualified ? "" : "  (provisional)"}`);
 }
 
 console.log('\nRanking of current flagships:');
 rankCurrentFlagships(fit, releases, asOf).forEach((m, i) => {
   const r = releases.find((x) => x.id === m.release_id)!;
-  console.log(`  ${String(i + 1).padStart(2)}. ${r.name.padEnd(28)} ${m.lab.padEnd(9)} ${m.index.toFixed(1)}  cov=${(m.coverage * 100).toFixed(0)}%${m.qualified ? "" : "  provisional"}`);
+  console.log(`  ${String(i + 1).padStart(2)}. ${r.name.padEnd(28)} ${m.lab.padEnd(9)} R ${m.rating.toFixed(0)}  idx ${m.index.toFixed(1)}  cov=${(m.coverage * 100).toFixed(0)}%${m.qualified ? "" : "  provisional"}`);
 });
 
 const line = frontierLine(fit);
