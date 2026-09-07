@@ -1,6 +1,6 @@
 {
   "lab": "meta",
-  "updated_at": "2026-09-07T04:20:42Z",
+  "updated_at": "2026-09-07T09:29:10Z",
   "releases": [
     {
       "id": "meta-llama-1-65b",
@@ -16,7 +16,7 @@
         "quote": "As part of Meta's commitment to open science, today we are publicly releasing LLaMA (Large Language Model Meta AI), a state-of-the-art foundational large language model designed to help researchers advance their work in this subfield of AI.",
         "retrieved_at": "2026-09-07T03:30:00Z",
         "verified": true,
-        "verified_at": "2026-09-07T03:42:43Z",
+        "verified_at": "2026-09-07T09:29:10Z",
         "via": "r.jina.ai"
       },
       "scores": [
@@ -31,7 +31,82 @@
             "quote": "|Llama 1|65B|30.7|70.7|60.5|68.6|30.8|63.4|43.5|47.6|",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:46:46Z"
+            "verified_at": "2026-09-07T09:29:10Z"
+          }
+        },
+        {
+          "benchmark": "hellaswag",
+          "value": 84.2,
+          "config": "0-shot",
+          "reported_by": "official",
+          "source": {
+            "url": "https://ar5iv.labs.arxiv.org/html/2302.13971",
+            "title": "LLaMA: Open and Efficient Foundation Language Models (arXiv:2302.13971, Table 3)",
+            "quote": "65B 85.3 82.8 52.3 84.2 77.0 78.9 56.0 60.2",
+            "retrieved_at": "2026-09-07T10:00:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:29:10Z",
+            "note": "Table 3 row for the 65B model. Columns: BoolQ, PIQA, SIQA, HellaSwag, WinoGrande, ARC-e, ARC-c, OBQA."
+          }
+        },
+        {
+          "benchmark": "winogrande",
+          "value": 77,
+          "config": "0-shot",
+          "reported_by": "official",
+          "source": {
+            "url": "https://ar5iv.labs.arxiv.org/html/2302.13971",
+            "title": "LLaMA: Open and Efficient Foundation Language Models (arXiv:2302.13971, Table 3)",
+            "quote": "65B 85.3 82.8 52.3 84.2 77.0 78.9 56.0 60.2",
+            "retrieved_at": "2026-09-07T10:00:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:29:10Z",
+            "note": "Table 3 row for the 65B model. Columns: BoolQ, PIQA, SIQA, HellaSwag, WinoGrande, ARC-e, ARC-c, OBQA."
+          }
+        },
+        {
+          "benchmark": "arc-challenge",
+          "value": 56,
+          "config": "0-shot",
+          "reported_by": "official",
+          "source": {
+            "url": "https://ar5iv.labs.arxiv.org/html/2302.13971",
+            "title": "LLaMA: Open and Efficient Foundation Language Models (arXiv:2302.13971, Table 3)",
+            "quote": "65B 85.3 82.8 52.3 84.2 77.0 78.9 56.0 60.2",
+            "retrieved_at": "2026-09-07T10:00:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:29:10Z",
+            "note": "Table 3 row for the 65B model. Columns: BoolQ, PIQA, SIQA, HellaSwag, WinoGrande, ARC-e, ARC-c (this is ARC-Challenge), OBQA."
+          }
+        },
+        {
+          "benchmark": "gsm8k",
+          "value": 50.9,
+          "config": "pass@1, no maj1@k",
+          "reported_by": "official",
+          "source": {
+            "url": "https://ar5iv.labs.arxiv.org/html/2302.13971",
+            "title": "LLaMA: Open and Efficient Foundation Language Models (arXiv:2302.13971, Table 7)",
+            "quote": "65B 10.6 20.5 50.9 69.7",
+            "retrieved_at": "2026-09-07T10:00:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:29:10Z",
+            "note": "Table 7 row for the 65B model. Columns: MATH, MATH+maj1@k, GSM8K, GSM8K+maj1@k. Value used is the no-majority-voting GSM8K column (50.9); cross-checked against the same figure reproduced in the Llama 2 paper's Table 25 (arXiv:2307.09288)."
+          }
+        },
+        {
+          "benchmark": "humaneval",
+          "value": 23.7,
+          "config": "0-shot, pass@1 (temperature 0.1)",
+          "reported_by": "official",
+          "source": {
+            "url": "https://ar5iv.labs.arxiv.org/html/2302.13971",
+            "title": "LLaMA: Open and Efficient Foundation Language Models (arXiv:2302.13971, Table 8)",
+            "quote": "65B 23.7 79.3 37.7 76.8",
+            "retrieved_at": "2026-09-07T10:00:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:29:10Z",
+            "note": "Table 8 row for the 65B model. Columns: HumanEval pass@1, HumanEval pass@100, MBPP pass@1, MBPP pass@80."
           }
         }
       ],
@@ -50,8 +125,8 @@
         "title": "Meta and Microsoft Introduce the Next Generation of Llama",
         "quote": "We're now ready to open source the next version of Llama 2 and are making it available free of charge for research and commercial use.",
         "retrieved_at": "2026-09-07T03:30:00Z",
-        "verified": true,
-        "verified_at": "2026-09-07T03:42:43Z",
+        "verified": false,
+        "verified_at": "2026-09-07T09:29:10Z",
         "via": "r.jina.ai"
       },
       "scores": [
@@ -66,7 +141,97 @@
             "quote": "|Llama 2|70B|**37.5**|**71.9**|**63.6**|**69.4**|**35.2**|**68.9**|**51.2**|**54.2**|",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:46:46Z"
+            "verified_at": "2026-09-07T09:29:10Z"
+          }
+        },
+        {
+          "benchmark": "hellaswag",
+          "value": 85.3,
+          "config": "0-shot",
+          "reported_by": "official",
+          "source": {
+            "url": "https://ar5iv.labs.arxiv.org/html/2307.09288",
+            "title": "Llama 2: Open Foundation and Fine-Tuned Chat Models (arXiv:2307.09288, Table 20)",
+            "quote": "70B 85.0 82.8 50.7 85.3 80.2 80.2 57.4 60.2 78.5 68.9",
+            "retrieved_at": "2026-09-07T10:00:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:29:10Z",
+            "note": "Appendix Table 20 row for the pretrained Llama 2 70B model. Columns: BoolQ, PIQA, SIQA, HellaSwag, WinoGrande, ARC-e, ARC-c, OBQA, CSQA, MMLU. The MMLU value here (68.9) matches the score already recorded from the model card."
+          }
+        },
+        {
+          "benchmark": "winogrande",
+          "value": 80.2,
+          "config": "0-shot",
+          "reported_by": "official",
+          "source": {
+            "url": "https://ar5iv.labs.arxiv.org/html/2307.09288",
+            "title": "Llama 2: Open Foundation and Fine-Tuned Chat Models (arXiv:2307.09288, Table 20)",
+            "quote": "70B 85.0 82.8 50.7 85.3 80.2 80.2 57.4 60.2 78.5 68.9",
+            "retrieved_at": "2026-09-07T10:00:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:29:10Z",
+            "note": "Appendix Table 20 row for the pretrained Llama 2 70B model. Columns: BoolQ, PIQA, SIQA, HellaSwag, WinoGrande, ARC-e, ARC-c, OBQA, CSQA, MMLU."
+          }
+        },
+        {
+          "benchmark": "arc-challenge",
+          "value": 57.4,
+          "config": "0-shot",
+          "reported_by": "official",
+          "source": {
+            "url": "https://ar5iv.labs.arxiv.org/html/2307.09288",
+            "title": "Llama 2: Open Foundation and Fine-Tuned Chat Models (arXiv:2307.09288, Table 20)",
+            "quote": "70B 85.0 82.8 50.7 85.3 80.2 80.2 57.4 60.2 78.5 68.9",
+            "retrieved_at": "2026-09-07T10:00:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:29:10Z",
+            "note": "Appendix Table 20 row for the pretrained Llama 2 70B model. Columns: BoolQ, PIQA, SIQA, HellaSwag, WinoGrande, ARC-e, ARC-c (this is ARC-Challenge), OBQA, CSQA, MMLU."
+          }
+        },
+        {
+          "benchmark": "gsm8k",
+          "value": 56.8,
+          "config": "8-shot, maj1@1",
+          "reported_by": "official",
+          "source": {
+            "url": "https://ar5iv.labs.arxiv.org/html/2307.09288",
+            "title": "Llama 2: Open Foundation and Fine-Tuned Chat Models (arXiv:2307.09288, Table 25)",
+            "quote": "70B 56.8 13.5",
+            "retrieved_at": "2026-09-07T10:00:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:29:10Z",
+            "note": "Table 25 row for the pretrained Llama 2 70B model (GSM8K, MATH), maj1@1. Same GSM8K figure (56.8) also appears in the main-text Table 4 closed-source comparison."
+          }
+        },
+        {
+          "benchmark": "math",
+          "value": 13.5,
+          "config": "4-shot, maj1@1",
+          "reported_by": "official",
+          "source": {
+            "url": "https://ar5iv.labs.arxiv.org/html/2307.09288",
+            "title": "Llama 2: Open Foundation and Fine-Tuned Chat Models (arXiv:2307.09288, Table 25)",
+            "quote": "70B 56.8 13.5",
+            "retrieved_at": "2026-09-07T10:00:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:29:10Z",
+            "note": "Table 25 row for the pretrained Llama 2 70B model (GSM8K, MATH), maj1@1."
+          }
+        },
+        {
+          "benchmark": "humaneval",
+          "value": 29.9,
+          "config": "0-shot, pass@1 (temperature 0.1)",
+          "reported_by": "official",
+          "source": {
+            "url": "https://ar5iv.labs.arxiv.org/html/2307.09288",
+            "title": "Llama 2: Open Foundation and Fine-Tuned Chat Models (arXiv:2307.09288, Table 21)",
+            "quote": "70B 29.9 89.0 45.0 81.4",
+            "retrieved_at": "2026-09-07T10:00:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:29:10Z",
+            "note": "Appendix Table 21 row for the pretrained Llama 2 70B model. Columns: HumanEval pass@1, HumanEval pass@100, MBPP pass@1, MBPP pass@80."
           }
         }
       ]
@@ -85,7 +250,7 @@
         "quote": "Today, we're excited to share the first two models of the next generation of Llama, Meta Llama 3, available for broad use. This release features pretrained and instruction-fine-tuned language models with 8B and 70B parameters.",
         "retrieved_at": "2026-09-07T03:30:00Z",
         "verified": false,
-        "verified_at": "2026-09-07T04:20:42Z",
+        "verified_at": "2026-09-07T09:29:10Z",
         "via": "r.jina.ai"
       },
       "scores": [
@@ -100,7 +265,7 @@
             "quote": "MMLU (5-shot) | 68.4 | 34.1 | 47.8 | 82.0 | 52.9",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:46:46Z"
+            "verified_at": "2026-09-07T09:29:10Z"
           }
         },
         {
@@ -115,7 +280,7 @@
             "quote": "GPQA (0-shot) | 34.2 | 21.7 | 22.3 | 39.5 | 21.0",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:46:46Z"
+            "verified_at": "2026-09-07T09:29:10Z"
           }
         },
         {
@@ -129,7 +294,7 @@
             "quote": "HumanEval (0-shot) | 62.2 | 7.9 | 14.0 | 81.7 | 25.6",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:46:46Z"
+            "verified_at": "2026-09-07T09:29:10Z"
           }
         },
         {
@@ -143,7 +308,22 @@
             "quote": "MATH (4-shot, CoT) | 30.0 | 3.8 | 6.7 | 50.4 | 11.6",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:46:46Z"
+            "verified_at": "2026-09-07T09:29:10Z"
+          }
+        },
+        {
+          "benchmark": "gsm8k",
+          "value": 93,
+          "config": "8-shot, CoT, Instruct model",
+          "reported_by": "official",
+          "source": {
+            "url": "https://github.com/meta-llama/llama-models/blob/main/models/llama3/MODEL_CARD.md",
+            "title": "Llama 3 Model Card (Meta)",
+            "quote": "GSM-8K (8-shot, CoT)79.6 25.7 41.2 93.0 57.5",
+            "retrieved_at": "2026-09-07T10:00:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:29:10Z",
+            "note": "Instruct-model benchmark table row. Columns: Llama 3 8B, Llama 2 7B, Llama 2 13B, Llama 3 70B (this value), Llama 2 70B."
           }
         }
       ]
@@ -161,8 +341,8 @@
         "title": "Introducing Llama 3.1: Our most capable models to date",
         "quote": "Llama 3.1 405B is the first openly available model that rivals the top AI models when it comes to state-of-the-art capabilities in general knowledge, steerability, math, tool use, and multilingual translation.",
         "retrieved_at": "2026-09-07T03:30:00Z",
-        "verified": true,
-        "verified_at": "2026-09-07T04:20:42Z",
+        "verified": false,
+        "verified_at": "2026-09-07T09:29:10Z",
         "via": "r.jina.ai"
       },
       "scores": [
@@ -177,7 +357,7 @@
             "quote": "General | MMLU | 5 | macro_avg/acc | 68.5 | 69.4 | 82.0 | 83.6 | 87.3",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:46:46Z"
+            "verified_at": "2026-09-07T09:29:10Z"
           }
         },
         {
@@ -192,7 +372,7 @@
             "quote": "GPQA | 0 | em | 34.6 | 30.4 | 39.5 | 46.7 | 50.7",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:46:46Z"
+            "verified_at": "2026-09-07T09:29:10Z"
           }
         },
         {
@@ -206,7 +386,7 @@
             "quote": "Code | HumanEval | 0 | pass@1 | 60.4 | 72.6 | 81.7 | 80.5 | 89.0",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:46:46Z"
+            "verified_at": "2026-09-07T09:29:10Z"
           }
         },
         {
@@ -220,7 +400,37 @@
             "quote": "MATH (CoT) | 0 | final_em | 29.1 | 51.9 | 51.0 | 68.0 | 73.8",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:46:46Z"
+            "verified_at": "2026-09-07T09:29:10Z"
+          }
+        },
+        {
+          "benchmark": "gsm8k",
+          "value": 96.8,
+          "config": "8-shot, em_maj1@1, Instruct model",
+          "reported_by": "official",
+          "source": {
+            "url": "https://github.com/meta-llama/llama-models/blob/main/models/llama3_1/MODEL_CARD.md",
+            "title": "Llama 3.1 Model Card (Meta)",
+            "quote": "Math GSM-8K (CoT)8 em_maj1@1 80.6 84.5 93.0 95.1 96.8",
+            "retrieved_at": "2026-09-07T10:00:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:29:10Z",
+            "note": "Instruct-model benchmark table row. Columns: Llama 3 8B, Llama 3.1 8B, Llama 3 70B, Llama 3.1 70B, Llama 3.1 405B (this value)."
+          }
+        },
+        {
+          "benchmark": "arc-challenge",
+          "value": 96.9,
+          "config": "0-shot, acc, Instruct model",
+          "reported_by": "official",
+          "source": {
+            "url": "https://github.com/meta-llama/llama-models/blob/main/models/llama3_1/MODEL_CARD.md",
+            "title": "Llama 3.1 Model Card (Meta)",
+            "quote": "Reasoning ARC-C 0 acc 82.4 83.4 94.4 94.8 96.9",
+            "retrieved_at": "2026-09-07T10:00:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:29:10Z",
+            "note": "Instruct-model benchmark table row ('ARC-C'). Columns: Llama 3 8B, Llama 3.1 8B, Llama 3 70B, Llama 3.1 70B, Llama 3.1 405B (this value)."
           }
         }
       ]
@@ -239,7 +449,7 @@
         "quote": "We also trained a teacher model, Llama 4 Behemoth, that outperforms GPT-4.5, Claude Sonnet 3.7, and Gemini 2.0 Pro on STEM-focused benchmarks such as MATH-500 and GPQA Diamond.",
         "retrieved_at": "2026-09-07T03:30:00Z",
         "verified": true,
-        "verified_at": "2026-09-07T03:42:43Z",
+        "verified_at": "2026-09-07T09:29:10Z",
         "via": "r.jina.ai"
       },
       "sources": [
@@ -271,7 +481,7 @@
         "quote": "We're introducing Llama 4 Scout and Llama 4 Maverick, the first open-weight natively multimodal models with unprecedented context length support and our first built using a mixture-of-experts (MoE) architecture.",
         "retrieved_at": "2026-09-07T03:30:00Z",
         "verified": true,
-        "verified_at": "2026-09-07T03:42:43Z",
+        "verified_at": "2026-09-07T09:29:10Z",
         "via": "r.jina.ai"
       },
       "scores": [
@@ -287,7 +497,7 @@
             "quote": "Reasoning & Knowledge | MMLU | 5 | macro_avg/acc_char | 79.3 | 85.2 | 79.6 | 85.5",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:46:46Z"
+            "verified_at": "2026-09-07T09:29:10Z"
           }
         },
         {
@@ -301,7 +511,7 @@
             "quote": "Reasoning & Knowledge | MMLU Pro | 0 | macro_avg/acc | 68.9 | 73.4 | 74.3 | 80.5",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:46:46Z"
+            "verified_at": "2026-09-07T09:29:10Z"
           }
         },
         {
@@ -315,7 +525,7 @@
             "quote": "GPQA Diamond | 0 | accuracy | 50.5 | 49.0 | 57.2 | 69.8",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:46:46Z"
+            "verified_at": "2026-09-07T09:29:10Z"
           }
         },
         {
@@ -329,7 +539,7 @@
             "quote": "Image Reasoning | MMMU | 0 | accuracy | No multimodal support | 69.4 | 73.4",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:46:46Z"
+            "verified_at": "2026-09-07T09:29:10Z"
           }
         },
         {
@@ -343,7 +553,7 @@
             "quote": "Code | LiveCodeBench\n(10/01/2024-02/01/2025) | 0 | pass@1 | 33.3 | 27.7 | 32.8 | 43.4",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:46:46Z"
+            "verified_at": "2026-09-07T09:29:10Z"
           }
         }
       ],
@@ -363,7 +573,7 @@
         "quote": "Today, we're excited to introduce Muse Spark, the first in the Muse family of models developed by Meta Superintelligence Labs. Muse Spark is a natively multimodal reasoning model with support for tool-use, visual chain of thought, and multi-agent orchestration.",
         "retrieved_at": "2026-09-07T03:30:00Z",
         "verified": true,
-        "verified_at": "2026-09-07T03:42:43Z",
+        "verified_at": "2026-09-07T09:29:10Z",
         "via": "r.jina.ai"
       },
       "sources": [
@@ -404,7 +614,7 @@
             "quote": "Contemplating mode provides significant capability improvements in challenging tasks, achieving 58% in Humanity's Last Exam and 38% in FrontierScience Research.",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:42:43Z",
+            "verified_at": "2026-09-07T09:29:10Z",
             "via": "r.jina.ai"
           }
         }

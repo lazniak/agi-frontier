@@ -1,7 +1,317 @@
 {
   "lab": "openai",
-  "updated_at": "2026-09-07T04:20:42Z",
+  "updated_at": "2026-09-07T09:33:07Z",
   "releases": [
+    {
+      "id": "openai-gpt-1",
+      "lab": "openai",
+      "name": "GPT-1",
+      "family": "GPT",
+      "date": "2018-06-11",
+      "date_precision": "day",
+      "status": "released",
+      "announcement": {
+        "url": "https://github.com/openai/finetune-transformer-lm",
+        "title": "finetune-transformer-lm",
+        "quote": "Code and model for the paper \"Improving Language Understanding by Generative Pre-Training\"",
+        "retrieved_at": "2026-09-07T09:30:00Z",
+        "verified": true,
+        "verified_at": "2026-09-07T09:33:07Z"
+      },
+      "sources": [
+        {
+          "url": "https://openai.com/index/language-unsupervised/",
+          "title": "Improving language understanding with unsupervised learning",
+          "quote": "Our system works in two stages; first we train a transformer model on a very large amount of data in an unsupervised manner",
+          "retrieved_at": "2026-09-07T09:30:00Z",
+          "verified": true,
+          "verified_at": "2026-09-07T09:33:07Z"
+        }
+      ],
+      "scores": [],
+      "notes": "Open-weights research release (paper 'Improving Language Understanding by Generative Pre-Training', Radford et al.) with code and model published on GitHub; no self-serve product or API. Neither the GitHub README nor the OpenAI blog post states a publication date in their own extracted text; the exact date is corroborated by the GitHub repository's earliest commits, all timestamped 2018-06-11T06:04–07:00 UTC per the GitHub API. No index-basket benchmark scores were officially reported for GPT-1 (its evaluation suite predates MMLU/HellaSwag/GSM8K-era benchmarks); recorded with zero scores so it still appears as a timeline tick."
+    },
+    {
+      "id": "openai-gpt-2",
+      "lab": "openai",
+      "name": "GPT-2",
+      "family": "GPT",
+      "date": "2019-11-05",
+      "date_precision": "day",
+      "status": "released",
+      "announcement": {
+        "url": "https://openai.com/index/gpt-2-1-5b-release/",
+        "title": "GPT-2: 1.5B release",
+        "quote": "As the final model release of GPT‑2's staged release, we're releasing the largest version (1.5B parameters) of GPT‑2 along with code and model weights to facilitate detection of outputs of GPT‑2 models.",
+        "retrieved_at": "2026-09-07T09:30:00Z",
+        "verified": true,
+        "verified_at": "2026-09-07T09:33:07Z"
+      },
+      "sources": [
+        {
+          "url": "https://openai.com/index/better-language-models/",
+          "title": "Better language models and their implications",
+          "quote": "LAMBADA accuracy (+)63.24%59.23%95%+",
+          "retrieved_at": "2026-09-07T09:30:00Z",
+          "verified": true,
+          "verified_at": "2026-09-07T09:33:07Z"
+        }
+      ],
+      "scores": [
+        {
+          "benchmark": "lambada",
+          "value": 63.24,
+          "config": "zero-shot, full 1.5B model",
+          "note": "Value is for the full 1.5B model as reported in the original Feb 2019 announcement post and its companion technical paper, prior to the staged public release of the weights themselves on Nov 5, 2019.",
+          "reported_by": "official",
+          "source": {
+            "url": "https://openai.com/index/better-language-models/",
+            "title": "Better language models and their implications",
+            "quote": "LAMBADA accuracy (+)63.24%59.23%95%+",
+            "retrieved_at": "2026-09-07T09:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:33:07Z"
+          }
+        }
+      ],
+      "notes": "Flagship = the 1.5B-parameter model, released in full (weights + code) on November 5, 2019 as the final stage of GPT‑2's staged release strategy (an initial 117M 'small' version was released in Feb 2019, citing misuse concerns; 345M followed in May 2019, 774M in Aug 2019). Announcement quote and date are from the Nov 5, 2019 final-release post; the LAMBADA score was reported earlier, in the original Feb 14, 2019 post and paper, for the full model prior to its staged public release."
+    },
+    {
+      "id": "openai-gpt-3",
+      "lab": "openai",
+      "name": "GPT-3",
+      "family": "GPT",
+      "date": "2020-06-11",
+      "date_precision": "day",
+      "status": "released",
+      "announcement": {
+        "url": "https://openai.com/index/openai-api/",
+        "title": "OpenAI API",
+        "quote": "We’re releasing an API for accessing new AI models developed by OpenAI.",
+        "retrieved_at": "2026-09-07T09:30:00Z",
+        "verified": true,
+        "verified_at": "2026-09-07T09:33:07Z"
+      },
+      "sources": [
+        {
+          "url": "https://ar5iv.labs.arxiv.org/html/2005.14165",
+          "title": "Language Models are Few-Shot Learners",
+          "retrieved_at": "2026-09-07T09:30:00Z"
+        },
+        {
+          "url": "https://ar5iv.labs.arxiv.org/html/2107.03374",
+          "title": "Evaluating Large Language Models Trained on Code",
+          "retrieved_at": "2026-09-07T09:30:00Z"
+        }
+      ],
+      "scores": [
+        {
+          "benchmark": "lambada",
+          "value": 76,
+          "config": "zero-shot, 175B",
+          "note": "Paper text rounds to 76%; Table 3.2 gives a more precise 76.2% but that table did not render as extractable text in this fetch.",
+          "reported_by": "official",
+          "source": {
+            "url": "https://ar5iv.labs.arxiv.org/html/2005.14165",
+            "title": "Language Models are Few-Shot Learners",
+            "quote": "in a zero-shot setting GPT-3 achieves 76% on LAMBADA, a gain of 8% over the previous state of the art.",
+            "retrieved_at": "2026-09-07T09:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:33:07Z"
+          }
+        },
+        {
+          "benchmark": "hellaswag",
+          "value": 79.3,
+          "config": "few-shot, 175B",
+          "reported_by": "official",
+          "source": {
+            "url": "https://ar5iv.labs.arxiv.org/html/2005.14165",
+            "title": "Language Models are Few-Shot Learners",
+            "quote": "GPT-3 achieves 78.1% accuracy in the one-shot setting and 79.3% accuracy in the few-shot setting",
+            "retrieved_at": "2026-09-07T09:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:33:07Z"
+          }
+        },
+        {
+          "benchmark": "arc-challenge",
+          "value": 51.5,
+          "config": "few-shot, 175B, Challenge set",
+          "reported_by": "official",
+          "source": {
+            "url": "https://ar5iv.labs.arxiv.org/html/2005.14165",
+            "title": "Language Models are Few-Shot Learners",
+            "quote": "GPT-3 achieves 51.4% accuracy in the zero-shot setting, 53.2% in the one-shot setting, and 51.5% in the few-shot setting.",
+            "retrieved_at": "2026-09-07T09:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:33:07Z"
+          }
+        },
+        {
+          "benchmark": "winogrande",
+          "value": 77.7,
+          "config": "few-shot, 175B",
+          "reported_by": "official",
+          "source": {
+            "url": "https://ar5iv.labs.arxiv.org/html/2005.14165",
+            "title": "Language Models are Few-Shot Learners",
+            "quote": "GPT-3 achieves 70.2% in the zero-shot setting, 73.2% in the one-shot setting, and 77.7% in the few-shot setting.",
+            "retrieved_at": "2026-09-07T09:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:33:07Z"
+          }
+        },
+        {
+          "benchmark": "humaneval",
+          "value": 0,
+          "config": "0-shot, 175B",
+          "note": "GPT-3's own paper does not evaluate code generation; this baseline figure is from OpenAI's companion Codex paper, which re-ran GPT-3 on HumanEval as a baseline.",
+          "reported_by": "official",
+          "source": {
+            "url": "https://ar5iv.labs.arxiv.org/html/2107.03374",
+            "title": "Evaluating Large Language Models Trained on Code",
+            "quote": "our model solves 28.8% of the problems, while GPT-3 solves 0% and GPT-J solves 11.4%.",
+            "retrieved_at": "2026-09-07T09:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:33:07Z"
+          }
+        },
+        {
+          "benchmark": "mmlu",
+          "value": 43.9,
+          "config": "few-shot, 175B (X-Large)",
+          "note": "MMLU postdates the GPT-3 paper; this number is from the MMLU benchmark authors' own paper (Hendrycks et al.), which evaluated GPT-3 via the OpenAI API, not from an OpenAI publication.",
+          "reported_by": "maintainer",
+          "source": {
+            "url": "https://arxiv.org/pdf/2009.03300",
+            "title": "Measuring Massive Multitask Language Understanding",
+            "quote": "the X-Large 175 billion parameter GPT-3 model performs substantially better than random, with an accuracy of 43.9%.",
+            "retrieved_at": "2026-09-07T09:30:00Z",
+            "verified": false,
+            "verified_at": "2026-09-07T09:33:07Z"
+          }
+        }
+      ],
+      "notes": "Public API beta launched June 11, 2020 ('launching today in a private beta rather than general availability' per the announcement); general availability followed later (Nov 18, 2021). GSM8K is not recorded: OpenAI's own GSM8K paper (arXiv:2110.14168) only reports fine-tuned/verifier results for GPT-3 175B, not a plain few-shot number. MATH is not recorded: the Hendrycks MATH paper reports only fine-tuned MATH accuracy for GPT-3 (Curie/Davinci), not a clean few-shot baseline comparable to this project's convention."
+    },
+    {
+      "id": "openai-gpt-3.5",
+      "lab": "openai",
+      "name": "GPT-3.5 (ChatGPT)",
+      "family": "GPT",
+      "date": "2022-11-30",
+      "date_precision": "day",
+      "status": "released",
+      "announcement": {
+        "url": "https://openai.com/index/chatgpt/",
+        "title": "Introducing ChatGPT",
+        "quote": "We are excited to introduce ChatGPT to get users’ feedback and learn about its strengths and weaknesses. During the research preview, usage of ChatGPT is free.",
+        "retrieved_at": "2026-09-07T09:30:00Z",
+        "verified": true,
+        "verified_at": "2026-09-07T09:33:07Z"
+      },
+      "sources": [
+        {
+          "url": "https://ar5iv.labs.arxiv.org/html/2303.08774",
+          "title": "GPT-4 Technical Report",
+          "retrieved_at": "2026-09-07T09:30:00Z"
+        }
+      ],
+      "scores": [
+        {
+          "benchmark": "mmlu",
+          "value": 70,
+          "config": "5-shot, GPT-4 Technical Report Table 2",
+          "note": "Table 2, columns GPT-4/GPT-3.5/best-LM-SOTA/best-overall-SOTA; 70.0% is GPT-3.5's value.",
+          "reported_by": "official",
+          "source": {
+            "url": "https://ar5iv.labs.arxiv.org/html/2303.08774",
+            "title": "GPT-4 Technical Report",
+            "quote": "86.4%70.0%70.7%75.2%",
+            "retrieved_at": "2026-09-07T09:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:33:07Z"
+          }
+        },
+        {
+          "benchmark": "hellaswag",
+          "value": 85.5,
+          "config": "10-shot, GPT-4 Technical Report Table 2",
+          "note": "Table 2, columns GPT-4/GPT-3.5/best-LM-SOTA/best-overall-SOTA; 85.5% is GPT-3.5's value.",
+          "reported_by": "official",
+          "source": {
+            "url": "https://ar5iv.labs.arxiv.org/html/2303.08774",
+            "title": "GPT-4 Technical Report",
+            "quote": "95.3%85.5%84.2%85.6",
+            "retrieved_at": "2026-09-07T09:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:33:07Z"
+          }
+        },
+        {
+          "benchmark": "arc-challenge",
+          "value": 85.2,
+          "config": "25-shot, GPT-4 Technical Report Table 2",
+          "note": "Table 2, columns GPT-4/GPT-3.5/best-LM-SOTA/best-overall-SOTA; 85.2% is GPT-3.5's value.",
+          "reported_by": "official",
+          "source": {
+            "url": "https://ar5iv.labs.arxiv.org/html/2303.08774",
+            "title": "GPT-4 Technical Report",
+            "quote": "96.3%85.2%85.2%86.5%",
+            "retrieved_at": "2026-09-07T09:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:33:07Z"
+          }
+        },
+        {
+          "benchmark": "winogrande",
+          "value": 81.6,
+          "config": "5-shot, GPT-4 Technical Report Table 2",
+          "note": "Table 2, columns GPT-4/GPT-3.5/best-LM-SOTA/best-overall-SOTA; 81.6% is GPT-3.5's value.",
+          "reported_by": "official",
+          "source": {
+            "url": "https://ar5iv.labs.arxiv.org/html/2303.08774",
+            "title": "GPT-4 Technical Report",
+            "quote": "87.5%81.6%85.1%85.1%",
+            "retrieved_at": "2026-09-07T09:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:33:07Z"
+          }
+        },
+        {
+          "benchmark": "humaneval",
+          "value": 48.1,
+          "config": "0-shot, GPT-4 Technical Report Table 2",
+          "note": "Table 2, columns GPT-4/GPT-3.5/best-LM-SOTA/best-overall-SOTA; 48.1% is GPT-3.5's value.",
+          "reported_by": "official",
+          "source": {
+            "url": "https://ar5iv.labs.arxiv.org/html/2303.08774",
+            "title": "GPT-4 Technical Report",
+            "quote": "67.0%48.1%26.2%65.8%",
+            "retrieved_at": "2026-09-07T09:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:33:07Z"
+          }
+        },
+        {
+          "benchmark": "gsm8k",
+          "value": 57.1,
+          "config": "5-shot, GPT-4 Technical Report Table 2",
+          "note": "Table 2, columns GPT-4/GPT-3.5/best-LM-SOTA/best-overall-SOTA; 57.1% is GPT-3.5's value (GPT-4's own value carries a footnote asterisk not reproduced here).",
+          "reported_by": "official",
+          "source": {
+            "url": "https://ar5iv.labs.arxiv.org/html/2303.08774",
+            "title": "GPT-4 Technical Report",
+            "quote": "57.1%58.8%87.3%",
+            "retrieved_at": "2026-09-07T09:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:33:07Z"
+          }
+        }
+      ],
+      "notes": "ChatGPT is a research preview (free during initial rollout) fine-tuned from a model in the GPT-3.5 series ('ChatGPT is fine-tuned from a model in the GPT‑3.5 series, which finished training in early 2022', per the launch post). Launch date (November 30, 2022) is not stated in the post's own extracted text but is one of the most widely and consistently reported dates in contemporaneous tech press. No benchmark table was published alongside the ChatGPT launch post itself; scores here are OpenAI's own 'GPT-3.5' comparison column from Table 2 of the GPT-4 Technical Report (arXiv:2303.08774), the same table used for this file's GPT-4 legacy scores."
+    },
     {
       "id": "openai-gpt-4",
       "lab": "openai",
@@ -16,7 +326,7 @@
         "quote": "We are releasing GPT‑4's text input capability via ChatGPT and the API (with a waitlist).",
         "retrieved_at": "2026-09-07T03:30:00Z",
         "verified": true,
-        "verified_at": "2026-09-07T03:42:43Z"
+        "verified_at": "2026-09-07T09:33:07Z"
       },
       "scores": [
         {
@@ -30,7 +340,7 @@
             "quote": "86.4%",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": false,
-            "verified_at": "2026-09-07T04:20:42Z"
+            "verified_at": "2026-09-07T09:33:07Z"
           }
         },
         {
@@ -44,11 +354,68 @@
             "quote": "67.0%",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": false,
-            "verified_at": "2026-09-07T04:20:42Z"
+            "verified_at": "2026-09-07T09:33:07Z"
+          }
+        },
+        {
+          "benchmark": "gsm8k",
+          "value": 92,
+          "config": "5-shot chain-of-thought, GPT-4 Technical Report Table 2",
+          "note": "OpenAI includes part of the GSM8K training set in GPT-4's pre-training mix (see the report's Appendix E), so this figure sits between true few-shot transfer and full benchmark-specific tuning, per the report's own caveat.",
+          "reported_by": "official",
+          "source": {
+            "url": "https://ar5iv.labs.arxiv.org/html/2303.08774",
+            "title": "GPT-4 Technical Report",
+            "quote": "92.0%",
+            "retrieved_at": "2026-09-07T09:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:33:07Z"
+          }
+        },
+        {
+          "benchmark": "hellaswag",
+          "value": 95.3,
+          "config": "10-shot, GPT-4 Technical Report Table 2",
+          "reported_by": "official",
+          "source": {
+            "url": "https://ar5iv.labs.arxiv.org/html/2303.08774",
+            "title": "GPT-4 Technical Report",
+            "quote": "95.3%85.5%84.2%85.6",
+            "retrieved_at": "2026-09-07T09:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:33:07Z"
+          }
+        },
+        {
+          "benchmark": "arc-challenge",
+          "value": 96.3,
+          "config": "25-shot, GPT-4 Technical Report Table 2",
+          "reported_by": "official",
+          "source": {
+            "url": "https://ar5iv.labs.arxiv.org/html/2303.08774",
+            "title": "GPT-4 Technical Report",
+            "quote": "96.3%85.2%85.2%86.5%",
+            "retrieved_at": "2026-09-07T09:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:33:07Z"
+          }
+        },
+        {
+          "benchmark": "winogrande",
+          "value": 87.5,
+          "config": "5-shot, GPT-4 Technical Report Table 2",
+          "reported_by": "official",
+          "source": {
+            "url": "https://ar5iv.labs.arxiv.org/html/2303.08774",
+            "title": "GPT-4 Technical Report",
+            "quote": "87.5%81.6%85.1%85.1%",
+            "retrieved_at": "2026-09-07T09:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:33:07Z"
           }
         }
       ],
-      "notes": "Launch date (March 14, 2023) is not stated in the announcement post's body text; corroborated by the pinned API model version string 'gpt-4-0314' quoted on the same page and by widely reported press coverage of the launch. MMLU/HumanEval figures are from Table 2 of the GPT-4 Technical Report (arXiv:2303.08774), fetched via the ar5iv HTML mirror since the announcement page renders its benchmark comparison as an image chart with no extractable text."
+      "notes": "Launch date (March 14, 2023) is not stated in the announcement post's body text; corroborated by the pinned API model version string 'gpt-4-0314' quoted on the same page and by widely reported press coverage of the launch. MMLU/HumanEval figures are from Table 2 of the GPT-4 Technical Report (arXiv:2303.08774), fetched via the ar5iv HTML mirror since the announcement page renders its benchmark comparison as an image chart with no extractable text. GSM8K/HellaSwag/ARC-Challenge/WinoGrande legacy scores added from the same Table 2."
     },
     {
       "id": "openai-gpt-4-turbo",
@@ -64,10 +431,67 @@
         "quote": "Today we're launching a preview of the next generation of this model, GPT‑4 Turbo.",
         "retrieved_at": "2026-09-07T03:30:00Z",
         "verified": true,
-        "verified_at": "2026-09-07T03:42:43Z"
+        "verified_at": "2026-09-07T09:33:07Z"
       },
-      "scores": [],
-      "notes": "Announced at OpenAI DevDay (November 6, 2023) as gpt-4-1106-preview, immediately available via the API. No separate academic benchmark scores were published at launch; the post focuses on context length (128k), pricing and knowledge cutoff (April 2023) rather than a benchmark table."
+      "scores": [
+        {
+          "benchmark": "mmlu",
+          "value": 86.7,
+          "config": "OpenAI simple-evals harness, gpt-4-turbo-2024-04-09",
+          "reported_by": "official",
+          "source": {
+            "url": "https://github.com/openai/simple-evals",
+            "title": "openai/simple-evals",
+            "quote": "gpt-4-turbo-2024-04-09 | assistant | 86.7 | 49.3 | 73.4 | 88.2",
+            "retrieved_at": "2026-09-07T09:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:33:07Z"
+          }
+        },
+        {
+          "benchmark": "gpqa-diamond",
+          "value": 49.3,
+          "config": "OpenAI simple-evals harness, gpt-4-turbo-2024-04-09",
+          "reported_by": "official",
+          "source": {
+            "url": "https://github.com/openai/simple-evals",
+            "title": "openai/simple-evals",
+            "quote": "gpt-4-turbo-2024-04-09 | assistant | 86.7 | 49.3 | 73.4 | 88.2",
+            "retrieved_at": "2026-09-07T09:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:33:07Z"
+          }
+        },
+        {
+          "benchmark": "math",
+          "value": 73.4,
+          "config": "OpenAI simple-evals harness, gpt-4-turbo-2024-04-09",
+          "reported_by": "official",
+          "source": {
+            "url": "https://github.com/openai/simple-evals",
+            "title": "openai/simple-evals",
+            "quote": "gpt-4-turbo-2024-04-09 | assistant | 86.7 | 49.3 | 73.4 | 88.2",
+            "retrieved_at": "2026-09-07T09:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:33:07Z"
+          }
+        },
+        {
+          "benchmark": "humaneval",
+          "value": 88.2,
+          "config": "OpenAI simple-evals harness, gpt-4-turbo-2024-04-09",
+          "reported_by": "official",
+          "source": {
+            "url": "https://github.com/openai/simple-evals",
+            "title": "openai/simple-evals",
+            "quote": "gpt-4-turbo-2024-04-09 | assistant | 86.7 | 49.3 | 73.4 | 88.2",
+            "retrieved_at": "2026-09-07T09:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:33:07Z"
+          }
+        }
+      ],
+      "notes": "Announced at OpenAI DevDay (November 6, 2023) as gpt-4-1106-preview, immediately available via the API. No separate academic benchmark scores were published at launch; the post focuses on context length (128k), pricing and knowledge cutoff (April 2023) rather than a benchmark table. Scores above are for the later gpt-4-turbo-2024-04-09 snapshot (same 'GPT-4 Turbo' product line, per OpenAI's own naming in the simple-evals table), taken from OpenAI's own open-sourced simple-evals results table on GitHub since no benchmark numbers were published for the original Nov 2023 preview snapshot itself."
     },
     {
       "id": "openai-gpt-4o",
@@ -83,7 +507,7 @@
         "quote": "GPT‑4o's text and image capabilities are starting to roll out today in ChatGPT.",
         "retrieved_at": "2026-09-07T03:30:00Z",
         "verified": true,
-        "verified_at": "2026-09-07T03:42:43Z"
+        "verified_at": "2026-09-07T09:33:07Z"
       },
       "scores": [
         {
@@ -97,7 +521,7 @@
             "quote": "GPT-4o, Accuracy (%): 88.7",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": false,
-            "verified_at": "2026-09-07T04:20:42Z"
+            "verified_at": "2026-09-07T09:33:07Z"
           }
         },
         {
@@ -111,7 +535,7 @@
             "quote": "GPT-4o, Accuracy (%): 90.2",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": false,
-            "verified_at": "2026-09-07T04:20:42Z"
+            "verified_at": "2026-09-07T09:33:07Z"
           }
         },
         {
@@ -125,7 +549,7 @@
             "quote": "GPT-4o, Accuracy (%): 76.6",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": false,
-            "verified_at": "2026-09-07T04:20:42Z"
+            "verified_at": "2026-09-07T09:33:07Z"
           }
         },
         {
@@ -139,7 +563,7 @@
             "quote": "GPT-4o, Accuracy (%): 53.6",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": false,
-            "verified_at": "2026-09-07T04:20:42Z"
+            "verified_at": "2026-09-07T09:33:07Z"
           }
         }
       ],
@@ -159,7 +583,7 @@
         "quote": "Today, we are releasing the first of this series in ChatGPT and our API.",
         "retrieved_at": "2026-09-07T03:30:00Z",
         "verified": true,
-        "verified_at": "2026-09-07T03:42:43Z"
+        "verified_at": "2026-09-07T09:33:07Z"
       },
       "scores": [
         {
@@ -173,7 +597,7 @@
             "quote": "o1‑preview (Pre-Mitigation and Post-Mitigation) performs the best on SWE-bench Verified at 41.3%",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:42:43Z"
+            "verified_at": "2026-09-07T09:33:07Z"
           }
         }
       ],
@@ -193,7 +617,7 @@
         "quote": "We're releasing a research preview of GPT‑4.5—our largest and best model for chat yet.",
         "retrieved_at": "2026-09-07T03:30:00Z",
         "verified": true,
-        "verified_at": "2026-09-07T03:42:43Z"
+        "verified_at": "2026-09-07T09:33:07Z"
       },
       "scores": [
         {
@@ -207,7 +631,7 @@
             "quote": "GPQA (science)71.4%53.6%79.7%",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:42:43Z"
+            "verified_at": "2026-09-07T09:33:07Z"
           }
         },
         {
@@ -221,7 +645,7 @@
             "quote": "AIME ‘24 (math)36.7%9.3%87.3%",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:42:43Z"
+            "verified_at": "2026-09-07T09:33:07Z"
           }
         },
         {
@@ -234,7 +658,7 @@
             "quote": "MMMU (multimodal)74.4%69.1%-",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:42:43Z"
+            "verified_at": "2026-09-07T09:33:07Z"
           }
         },
         {
@@ -248,7 +672,7 @@
             "quote": "SWE-Bench Verified (coding)*38.0%30.7%61.0%",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:42:43Z"
+            "verified_at": "2026-09-07T09:33:07Z"
           }
         }
       ],
@@ -268,7 +692,7 @@
         "quote": "ChatGPT Plus, Pro, and Team users will see o3, o4-mini, and o4-mini-high in the model selector starting today, replacing o1, o3‑mini, and o3‑mini‑high.",
         "retrieved_at": "2026-09-07T03:30:00Z",
         "verified": true,
-        "verified_at": "2026-09-07T03:42:43Z"
+        "verified_at": "2026-09-07T09:33:07Z"
       },
       "scores": [
         {
@@ -282,7 +706,7 @@
             "quote": "{\"model\":\"o3 (no tools)\",\"value\":83.3,\"labelValue\":83.3,\"color\":\"theme3_yellow\",\"top\":true}",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": false,
-            "verified_at": "2026-09-07T04:20:42Z"
+            "verified_at": "2026-09-07T09:33:07Z"
           }
         },
         {
@@ -296,7 +720,7 @@
             "quote": "{\"model\":\"o3 (no tools)\",\"value\":88.9,\"labelValue\":88.9,\"color\":\"theme3_yellow\",\"top\":true}",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": false,
-            "verified_at": "2026-09-07T04:20:42Z"
+            "verified_at": "2026-09-07T09:33:07Z"
           }
         },
         {
@@ -310,7 +734,7 @@
             "quote": "{\"model\":\"o3\",\"value\":69.1,\"labelValue\":69.1,\"color\":\"theme3_yellow\",\"top\":true}",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": false,
-            "verified_at": "2026-09-07T04:20:42Z"
+            "verified_at": "2026-09-07T09:33:07Z"
           }
         },
         {
@@ -324,7 +748,7 @@
             "quote": "{\"model\":\"o3\",\"value\":82.9,\"labelValue\":82.9,\"color\":\"theme3_yellow\",\"top\":true}",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": false,
-            "verified_at": "2026-09-07T04:20:42Z"
+            "verified_at": "2026-09-07T09:33:07Z"
           }
         },
         {
@@ -338,7 +762,7 @@
             "quote": "{\"model\":\"o3 (no tools)\",\"value\":20.32,\"labelValue\":20.32,\"color\":\"theme3_yellow\",\"top\":true}",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": false,
-            "verified_at": "2026-09-07T04:20:42Z"
+            "verified_at": "2026-09-07T09:33:07Z"
           }
         }
       ],
@@ -358,7 +782,7 @@
         "quote": "GPT‑5 is available to all users, with Plus subscribers getting more usage, and Pro subscribers getting access to GPT‑5 pro, a version with extended reasoning for even more comprehensive and accurate answers.",
         "retrieved_at": "2026-09-07T03:30:00Z",
         "verified": true,
-        "verified_at": "2026-09-07T03:42:43Z"
+        "verified_at": "2026-09-07T09:33:07Z"
       },
       "scores": [
         {
@@ -371,7 +795,7 @@
             "quote": "It sets a new state of the art across math (94.6% on AIME 2025 without tools), real-world coding (74.9% on SWE-bench Verified, 88% on Aider Polyglot), multimodal understanding (84.2% on MMMU), and health (46.2% on HealthBench Hard)",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:42:43Z"
+            "verified_at": "2026-09-07T09:33:07Z"
           }
         },
         {
@@ -384,7 +808,7 @@
             "quote": "It sets a new state of the art across math (94.6% on AIME 2025 without tools), real-world coding (74.9% on SWE-bench Verified, 88% on Aider Polyglot), multimodal understanding (84.2% on MMMU), and health (46.2% on HealthBench Hard)",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:42:43Z"
+            "verified_at": "2026-09-07T09:33:07Z"
           }
         },
         {
@@ -397,7 +821,7 @@
             "quote": "It sets a new state of the art across math (94.6% on AIME 2025 without tools), real-world coding (74.9% on SWE-bench Verified, 88% on Aider Polyglot), multimodal understanding (84.2% on MMMU), and health (46.2% on HealthBench Hard)",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:42:43Z"
+            "verified_at": "2026-09-07T09:33:07Z"
           }
         },
         {
@@ -410,7 +834,7 @@
             "quote": "With GPT‑5 pro's extended reasoning, the model also sets a new SOTA on GPQA, scoring 88.4% without tools.",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:42:43Z"
+            "verified_at": "2026-09-07T09:33:07Z"
           }
         }
       ],
@@ -430,7 +854,7 @@
         "quote": "GPT‑5.1 Instant and Thinking begin rolling out today, starting with paid (Pro, Plus, Go, Business) users and then to free and logged-out users.",
         "retrieved_at": "2026-09-07T03:30:00Z",
         "verified": true,
-        "verified_at": "2026-09-07T03:42:43Z"
+        "verified_at": "2026-09-07T09:33:07Z"
       },
       "sources": [
         {
@@ -452,7 +876,7 @@
             "quote": "SWE-bench Verified (all 500 problems)76.3%72.8%",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:42:43Z"
+            "verified_at": "2026-09-07T09:33:07Z"
           }
         },
         {
@@ -465,7 +889,7 @@
             "quote": "GPQA Diamond (no tools)88.1%85.7%",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:42:43Z"
+            "verified_at": "2026-09-07T09:33:07Z"
           }
         },
         {
@@ -478,7 +902,7 @@
             "quote": "AIME 2025(no tools)94.0%94.6%",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:42:43Z"
+            "verified_at": "2026-09-07T09:33:07Z"
           }
         },
         {
@@ -491,7 +915,7 @@
             "quote": "MMMU 85.4%84.2%",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:42:43Z"
+            "verified_at": "2026-09-07T09:33:07Z"
           }
         }
       ],
@@ -511,7 +935,7 @@
         "quote": "In ChatGPT, GPT‑5.2 Instant, Thinking, and Pro will begin rolling out today, starting with paid plans.",
         "retrieved_at": "2026-09-07T03:30:00Z",
         "verified": true,
-        "verified_at": "2026-09-07T03:42:43Z"
+        "verified_at": "2026-09-07T09:33:07Z"
       },
       "scores": [
         {
@@ -525,7 +949,7 @@
             "quote": "| SWE-bench Verified | 80.0% | - | 76.3% |",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:46:46Z"
+            "verified_at": "2026-09-07T09:33:07Z"
           }
         },
         {
@@ -538,7 +962,7 @@
             "quote": "GPT‑5.2 Pro achieves 93.2%, followed closely by GPT‑5.2 Thinking at 92.4%.",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:42:43Z"
+            "verified_at": "2026-09-07T09:33:07Z"
           }
         },
         {
@@ -551,7 +975,7 @@
             "quote": "| AIME 2025 (no tools) | 100.0% | 100.0% | 94.0% |",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:46:46Z"
+            "verified_at": "2026-09-07T09:33:07Z"
           }
         },
         {
@@ -564,7 +988,7 @@
             "quote": "| HLE (no tools) | 34.5% | 36.6% | 25.7% |",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:46:46Z"
+            "verified_at": "2026-09-07T09:33:07Z"
           }
         },
         {
@@ -577,7 +1001,7 @@
             "quote": "| MMMU Pro (w/ Python) | 80.4% | - | 79.0% |",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:46:46Z"
+            "verified_at": "2026-09-07T09:33:07Z"
           }
         }
       ],
@@ -597,7 +1021,7 @@
         "quote": "GPT‑5.4 is rolling out gradually today across ChatGPT and Codex.",
         "retrieved_at": "2026-09-07T03:30:00Z",
         "verified": true,
-        "verified_at": "2026-09-07T03:42:43Z"
+        "verified_at": "2026-09-07T09:33:07Z"
       },
       "scores": [
         {
@@ -611,7 +1035,7 @@
             "quote": "GPQA Diamond 92.8%94.4%92.6%92.4%93.2%",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:42:43Z"
+            "verified_at": "2026-09-07T09:33:07Z"
           }
         },
         {
@@ -624,7 +1048,7 @@
             "quote": "Humanity's Last Exam (no tools)39.8%42.7%—34.5%36.6%",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:42:43Z"
+            "verified_at": "2026-09-07T09:33:07Z"
           }
         },
         {
@@ -637,7 +1061,7 @@
             "quote": "On MMMU-Pro, a test of a model's visual understanding and reasoning, GPT‑5.4 achieves an 81.2% success rate without tool use, an improvement over GPT‑5.2's 79.5%.",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:42:43Z"
+            "verified_at": "2026-09-07T09:33:07Z"
           }
         },
         {
@@ -651,7 +1075,7 @@
             "quote": "Terminal-Bench 2.0 75.1%—77.3%62.2%—",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:42:43Z"
+            "verified_at": "2026-09-07T09:33:07Z"
           }
         }
       ],
@@ -671,7 +1095,7 @@
         "quote": "Today, GPT‑5.5 is rolling out to Plus, Pro, Business, and Enterprise users in ChatGPT and Codex, and GPT‑5.5 Pro is rolling out to Pro, Business, and Enterprise users in ChatGPT.",
         "retrieved_at": "2026-09-07T03:30:00Z",
         "verified": true,
-        "verified_at": "2026-09-07T03:42:43Z"
+        "verified_at": "2026-09-07T09:33:07Z"
       },
       "scores": [
         {
@@ -684,7 +1108,7 @@
             "quote": "On Terminal-Bench 2.0, which tests complex command-line workflows requiring planning, iteration, and tool coordination, it achieves a state-of-the-art accuracy of 82.7%.",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:42:43Z"
+            "verified_at": "2026-09-07T09:33:07Z"
           }
         },
         {
@@ -697,7 +1121,7 @@
             "quote": "GPQA Diamond 93.6%92.8%—94.4%94.2%94.3%",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:42:43Z"
+            "verified_at": "2026-09-07T09:33:07Z"
           }
         },
         {
@@ -710,7 +1134,7 @@
             "quote": "Humanity's Last Exam (no tools)41.4%39.8%43.1%42.7%46.9%44.4%",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:42:43Z"
+            "verified_at": "2026-09-07T09:33:07Z"
           }
         },
         {
@@ -723,7 +1147,7 @@
             "quote": "MMMU Pro (no tools)81.2%81.2%——80.5%",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:46:46Z"
+            "verified_at": "2026-09-07T09:33:07Z"
           }
         }
       ],
@@ -743,7 +1167,7 @@
         "quote": "GPT‑5.6 is available starting today across ChatGPT, Codex, and the OpenAI API.",
         "retrieved_at": "2026-09-07T03:30:00Z",
         "verified": true,
-        "verified_at": "2026-09-07T03:42:43Z"
+        "verified_at": "2026-09-07T09:33:07Z"
       },
       "scores": [
         {
@@ -757,7 +1181,7 @@
             "quote": "GPQA Diamond 94.6%92.9%92.3%93.6%94.1%94.6%92.6%92%94.3%",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:42:43Z"
+            "verified_at": "2026-09-07T09:33:07Z"
           }
         },
         {
@@ -770,7 +1194,7 @@
             "quote": "MMMU Pro (no tools)83%80.7%78.4%81.2%——80.5%",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:42:43Z"
+            "verified_at": "2026-09-07T09:33:07Z"
           }
         }
       ],
@@ -790,7 +1214,7 @@
         "quote": "GPT‑6 Astra is rolling out today to a limited set of organizations and over the coming days will become available to all ChatGPT Plus, Pro, Business, and Enterprise users, as well as through the OpenAI API, Microsoft Azure, and AWS Bedrock.",
         "retrieved_at": "2026-09-07T03:30:00Z",
         "verified": true,
-        "verified_at": "2026-09-07T03:42:43Z"
+        "verified_at": "2026-09-07T09:33:07Z"
       },
       "scores": [
         {
@@ -803,7 +1227,7 @@
             "quote": "GPQA Diamond tests graduate-level scientific reasoning in biology, chemistry, and physics. GPT‑6 Astra reaches a new high in the comparison shown at 96.0%.",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:42:43Z"
+            "verified_at": "2026-09-07T09:33:07Z"
           }
         },
         {
@@ -816,7 +1240,7 @@
             "quote": "ARC-AGI-2 95.0%92.5%90.0%89.2%90.4%-",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:42:43Z"
+            "verified_at": "2026-09-07T09:33:07Z"
           }
         },
         {
@@ -829,7 +1253,7 @@
             "quote": "Humanity's Last Exam (w/ tools)57.2%-65.0%63.8%63.6%-",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:42:43Z"
+            "verified_at": "2026-09-07T09:33:07Z"
           }
         }
       ],

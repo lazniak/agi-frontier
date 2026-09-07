@@ -1,7 +1,273 @@
 {
   "lab": "mistral",
-  "updated_at": "2026-09-07T04:20:42Z",
+  "updated_at": "2026-09-07T09:30:07Z",
   "releases": [
+    {
+      "id": "mistral-mistral-7b",
+      "lab": "mistral",
+      "name": "Mistral 7B",
+      "family": "Mistral 7B",
+      "date": "2023-09-27",
+      "date_precision": "day",
+      "status": "released",
+      "announcement": {
+        "url": "https://mistral.ai/news/announcing-mistral-7b/",
+        "title": "Mistral 7B",
+        "quote": "Mistral AI team is proud to release Mistral 7B, the most powerful language model for its size to date.",
+        "retrieved_at": "2026-09-07T10:00:00Z",
+        "verified": true,
+        "verified_at": "2026-09-07T09:30:07Z"
+      },
+      "sources": [
+        {
+          "url": "https://ar5iv.labs.arxiv.org/html/2310.06825",
+          "title": "Mistral 7B (arXiv:2310.06825)",
+          "retrieved_at": "2026-09-07T10:00:00Z",
+          "note": "The Mistral 7B paper reports all benchmark comparisons only as bar-chart figures (Figures 4/5), with no extractable numeric text table for individual benchmarks."
+        }
+      ],
+      "scores": [
+        {
+          "benchmark": "mmlu",
+          "value": 62.5,
+          "config": "5-shot",
+          "reported_by": "official",
+          "source": {
+            "url": "https://arxiv.org/html/2401.04088v1",
+            "title": "Mixtral of Experts (arXiv:2401.04088, Table 2)",
+            "quote": "Mistral 7B 7B 62.5%81.0%74.2%82.2%80.5%54.9%23.2%62.5%26.2%50.2%12.7%50.0%",
+            "retrieved_at": "2026-09-07T10:00:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:30:07Z",
+            "note": "Mistral's own Mistral 7B blog post and paper render benchmarks only as images; this is the same Mistral 7B baseline row Mistral AI republished as text in its later Mixtral technical report. Table 2 columns: Model, Active Params, MMLU, HellaSwag, WinoGrande, PIQA, ARC-e, ARC-c, NQ, TriviaQA, HumanEval, MBPP, MATH, GSM8K (rendered without separators between cells in this fetch)."
+          }
+        },
+        {
+          "benchmark": "hellaswag",
+          "value": 81,
+          "config": "0-shot",
+          "reported_by": "official",
+          "source": {
+            "url": "https://arxiv.org/html/2401.04088v1",
+            "title": "Mixtral of Experts (arXiv:2401.04088, Table 2)",
+            "quote": "Mistral 7B 7B 62.5%81.0%74.2%82.2%80.5%54.9%23.2%62.5%26.2%50.2%12.7%50.0%",
+            "retrieved_at": "2026-09-07T10:00:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:30:07Z",
+            "note": "See MMLU score note for table/column details."
+          }
+        },
+        {
+          "benchmark": "winogrande",
+          "value": 74.2,
+          "config": "0-shot",
+          "reported_by": "official",
+          "source": {
+            "url": "https://arxiv.org/html/2401.04088v1",
+            "title": "Mixtral of Experts (arXiv:2401.04088, Table 2)",
+            "quote": "Mistral 7B 7B 62.5%81.0%74.2%82.2%80.5%54.9%23.2%62.5%26.2%50.2%12.7%50.0%",
+            "retrieved_at": "2026-09-07T10:00:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:30:07Z",
+            "note": "See MMLU score note for table/column details."
+          }
+        },
+        {
+          "benchmark": "arc-challenge",
+          "value": 54.9,
+          "config": "0-shot",
+          "reported_by": "official",
+          "source": {
+            "url": "https://arxiv.org/html/2401.04088v1",
+            "title": "Mixtral of Experts (arXiv:2401.04088, Table 2)",
+            "quote": "Mistral 7B 7B 62.5%81.0%74.2%82.2%80.5%54.9%23.2%62.5%26.2%50.2%12.7%50.0%",
+            "retrieved_at": "2026-09-07T10:00:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:30:07Z",
+            "note": "Arc-c column (ARC-Challenge). See MMLU score note for table/column details."
+          }
+        },
+        {
+          "benchmark": "gsm8k",
+          "value": 50,
+          "config": "8-shot",
+          "reported_by": "official",
+          "source": {
+            "url": "https://arxiv.org/html/2401.04088v1",
+            "title": "Mixtral of Experts (arXiv:2401.04088, Table 2)",
+            "quote": "Mistral 7B 7B 62.5%81.0%74.2%82.2%80.5%54.9%23.2%62.5%26.2%50.2%12.7%50.0%",
+            "retrieved_at": "2026-09-07T10:00:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:30:07Z",
+            "note": "Final (rightmost) column, GSM8K, 8-shot with maj@8 per the paper's stated methodology. See MMLU score note for table/column details."
+          }
+        },
+        {
+          "benchmark": "math",
+          "value": 12.7,
+          "config": "4-shot",
+          "reported_by": "official",
+          "source": {
+            "url": "https://arxiv.org/html/2401.04088v1",
+            "title": "Mixtral of Experts (arXiv:2401.04088, Table 2)",
+            "quote": "Mistral 7B 7B 62.5%81.0%74.2%82.2%80.5%54.9%23.2%62.5%26.2%50.2%12.7%50.0%",
+            "retrieved_at": "2026-09-07T10:00:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:30:07Z",
+            "note": "Math column, 4-shot with maj@4 per the paper's stated methodology. See MMLU score note for table/column details."
+          }
+        },
+        {
+          "benchmark": "humaneval",
+          "value": 26.2,
+          "config": "0-shot, pass@1",
+          "reported_by": "official",
+          "source": {
+            "url": "https://arxiv.org/html/2401.04088v1",
+            "title": "Mixtral of Experts (arXiv:2401.04088, Table 2)",
+            "quote": "Mistral 7B 7B 62.5%81.0%74.2%82.2%80.5%54.9%23.2%62.5%26.2%50.2%12.7%50.0%",
+            "retrieved_at": "2026-09-07T10:00:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:30:07Z",
+            "note": "HumanE column. This value (26.2%) matches the same figure Mistral separately published in its later archived docs.mistral.ai benchmarks table. See MMLU score note for table/column details."
+          }
+        }
+      ],
+      "notes": "First Mistral AI model release, 7.3B-parameter dense model under Apache 2.0 (open weights). Benchmark scores are Mistral's own re-evaluation numbers, sourced from the comparison table in the later Mixtral technical report since the original Mistral 7B blog post and paper render all benchmark results as chart images with no extractable numeric text."
+    },
+    {
+      "id": "mistral-mixtral-8x7b",
+      "lab": "mistral",
+      "name": "Mixtral 8x7B",
+      "family": "Mixtral",
+      "date": "2023-12-11",
+      "date_precision": "day",
+      "status": "released",
+      "announcement": {
+        "url": "https://mistral.ai/news/mixtral-of-experts/",
+        "title": "Mixtral of experts",
+        "quote": "Today, the team is proud to release Mixtral 8x7B, a high-quality sparse mixture of experts model (SMoE) with open weights.",
+        "retrieved_at": "2026-09-07T10:00:00Z",
+        "verified": true,
+        "verified_at": "2026-09-07T09:30:07Z"
+      },
+      "sources": [
+        {
+          "url": "https://ar5iv.labs.arxiv.org/html/2401.04088",
+          "title": "Mixtral of Experts (arXiv:2401.04088, ar5iv mirror)",
+          "retrieved_at": "2026-09-07T10:00:00Z",
+          "note": "ar5iv failed to render Table 2 as text for this paper (only a stray figure caption came through); used the arxiv.org native HTML mirror instead, which renders the same table as text."
+        }
+      ],
+      "scores": [
+        {
+          "benchmark": "mmlu",
+          "value": 70.6,
+          "config": "5-shot",
+          "reported_by": "official",
+          "source": {
+            "url": "https://arxiv.org/html/2401.04088v1",
+            "title": "Mixtral of Experts (arXiv:2401.04088, Table 2)",
+            "quote": "Mixtral 8x7B 13B 70.6%84.4%77.2%83.6%83.1%59.7%30.6%71.5%40.2%60.7%28.4%74.4%",
+            "retrieved_at": "2026-09-07T10:00:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:30:07Z",
+            "note": "Table 2 columns: Model, Active Params, MMLU, HellaSwag, WinoGrande, PIQA, ARC-e, ARC-c, NQ, TriviaQA, HumanEval, MBPP, MATH, GSM8K (rendered without separators between cells in this fetch). The official blog post's own benchmark tables are images only."
+          }
+        },
+        {
+          "benchmark": "hellaswag",
+          "value": 84.4,
+          "config": "0-shot",
+          "reported_by": "official",
+          "source": {
+            "url": "https://arxiv.org/html/2401.04088v1",
+            "title": "Mixtral of Experts (arXiv:2401.04088, Table 2)",
+            "quote": "Mixtral 8x7B 13B 70.6%84.4%77.2%83.6%83.1%59.7%30.6%71.5%40.2%60.7%28.4%74.4%",
+            "retrieved_at": "2026-09-07T10:00:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:30:07Z",
+            "note": "See MMLU score note for table/column details."
+          }
+        },
+        {
+          "benchmark": "winogrande",
+          "value": 77.2,
+          "config": "0-shot",
+          "reported_by": "official",
+          "source": {
+            "url": "https://arxiv.org/html/2401.04088v1",
+            "title": "Mixtral of Experts (arXiv:2401.04088, Table 2)",
+            "quote": "Mixtral 8x7B 13B 70.6%84.4%77.2%83.6%83.1%59.7%30.6%71.5%40.2%60.7%28.4%74.4%",
+            "retrieved_at": "2026-09-07T10:00:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:30:07Z",
+            "note": "See MMLU score note for table/column details."
+          }
+        },
+        {
+          "benchmark": "arc-challenge",
+          "value": 59.7,
+          "config": "0-shot",
+          "reported_by": "official",
+          "source": {
+            "url": "https://arxiv.org/html/2401.04088v1",
+            "title": "Mixtral of Experts (arXiv:2401.04088, Table 2)",
+            "quote": "Mixtral 8x7B 13B 70.6%84.4%77.2%83.6%83.1%59.7%30.6%71.5%40.2%60.7%28.4%74.4%",
+            "retrieved_at": "2026-09-07T10:00:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:30:07Z",
+            "note": "Arc-c column (ARC-Challenge). See MMLU score note for table/column details."
+          }
+        },
+        {
+          "benchmark": "gsm8k",
+          "value": 74.4,
+          "config": "8-shot",
+          "reported_by": "official",
+          "source": {
+            "url": "https://arxiv.org/html/2401.04088v1",
+            "title": "Mixtral of Experts (arXiv:2401.04088, Table 2)",
+            "quote": "Mixtral 8x7B 13B 70.6%84.4%77.2%83.6%83.1%59.7%30.6%71.5%40.2%60.7%28.4%74.4%",
+            "retrieved_at": "2026-09-07T10:00:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:30:07Z",
+            "note": "Final (rightmost) column, GSM8K, 8-shot with maj@8 per the paper's stated methodology. See MMLU score note for table/column details."
+          }
+        },
+        {
+          "benchmark": "math",
+          "value": 28.4,
+          "config": "4-shot",
+          "reported_by": "official",
+          "source": {
+            "url": "https://arxiv.org/html/2401.04088v1",
+            "title": "Mixtral of Experts (arXiv:2401.04088, Table 2)",
+            "quote": "Mixtral 8x7B 13B 70.6%84.4%77.2%83.6%83.1%59.7%30.6%71.5%40.2%60.7%28.4%74.4%",
+            "retrieved_at": "2026-09-07T10:00:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:30:07Z",
+            "note": "Math column, 4-shot with maj@4 per the paper's stated methodology. See MMLU score note for table/column details."
+          }
+        },
+        {
+          "benchmark": "humaneval",
+          "value": 40.2,
+          "config": "0-shot, pass@1",
+          "reported_by": "official",
+          "source": {
+            "url": "https://arxiv.org/html/2401.04088v1",
+            "title": "Mixtral of Experts (arXiv:2401.04088, Table 2)",
+            "quote": "Mixtral 8x7B 13B 70.6%84.4%77.2%83.6%83.1%59.7%30.6%71.5%40.2%60.7%28.4%74.4%",
+            "retrieved_at": "2026-09-07T10:00:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:30:07Z",
+            "note": "HumanE column. This value (40.2%) matches the same figure Mistral separately published in its archived docs.mistral.ai benchmarks table. See MMLU score note for table/column details."
+          }
+        }
+      ],
+      "notes": "Sparse mixture-of-experts model (46.7B total / 12.9B active parameters), open weights under Apache 2.0. The official blog post's benchmark tables are images only; scores here are sourced from the technical paper's text table (Table 2), fetched via the arxiv.org native HTML rendering since the ar5iv mirror did not render this paper's tables as text."
+    },
     {
       "id": "mistral-mistral-large",
       "lab": "mistral",
@@ -16,7 +282,7 @@
         "quote": "We are releasing Mistral Large, our latest and most advanced language model.",
         "retrieved_at": "2026-09-07T03:26:49Z",
         "verified": true,
-        "verified_at": "2026-09-07T03:42:43Z"
+        "verified_at": "2026-09-07T09:30:07Z"
       },
       "scores": [
         {
@@ -30,7 +296,7 @@
             "quote": "Mistral Small 72.2% 86.9% 84.7% 86.9% 79.5% 51.7% Mistral Medium 75.3% 88.0% 88% 89.9% 81.1% 47% Mistral Large 81.2% 89.2% 86.7% 94.0% 82.7% 50.6%",
             "retrieved_at": "2026-09-07T03:26:49Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:42:43Z",
+            "verified_at": "2026-09-07T09:30:07Z",
             "note": "Table columns: MMLU, HellaSwag (10-shot), WinoGrande (5-shot), ARC-Challenge (25-shot), TriviaQA (5-shot), TruthfulQA. Current docs.mistral.ai/platform/endpoints page has been replaced; Wayback Machine snapshot from just after the Mistral Large launch used instead."
           }
         },
@@ -45,7 +311,52 @@
             "quote": "Model HumanE pass@1 MBPP pass@1 Mistral 7B 26.2% 50.2% Mistral 8x7B 40.2% 60.7% Mistral Small 44.5% 61.5% Mistral Medium 38.4% 62.3% Mistral Large 45.1% 73.2%",
             "retrieved_at": "2026-09-07T03:26:49Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:42:43Z"
+            "verified_at": "2026-09-07T09:30:07Z"
+          }
+        },
+        {
+          "benchmark": "hellaswag",
+          "value": 89.2,
+          "config": "10-shot",
+          "reported_by": "official",
+          "source": {
+            "url": "http://web.archive.org/web/20240229181230/https://docs.mistral.ai/platform/endpoints/",
+            "title": "Mistral AI docs — Benchmark results (archived, Feb 2024)",
+            "quote": "Mistral Small 72.2% 86.9% 84.7% 86.9% 79.5% 51.7% Mistral Medium 75.3% 88.0% 88% 89.9% 81.1% 47% Mistral Large 81.2% 89.2% 86.7% 94.0% 82.7% 50.6%",
+            "retrieved_at": "2026-09-07T03:26:49Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:30:07Z",
+            "note": "Same row/quote already used for this release's MMLU score. Table columns: MMLU, HellaSwag (10-shot), WinoGrande (5-shot), ARC-Challenge (25-shot), TriviaQA (5-shot), TruthfulQA."
+          }
+        },
+        {
+          "benchmark": "winogrande",
+          "value": 86.7,
+          "config": "5-shot",
+          "reported_by": "official",
+          "source": {
+            "url": "http://web.archive.org/web/20240229181230/https://docs.mistral.ai/platform/endpoints/",
+            "title": "Mistral AI docs — Benchmark results (archived, Feb 2024)",
+            "quote": "Mistral Small 72.2% 86.9% 84.7% 86.9% 79.5% 51.7% Mistral Medium 75.3% 88.0% 88% 89.9% 81.1% 47% Mistral Large 81.2% 89.2% 86.7% 94.0% 82.7% 50.6%",
+            "retrieved_at": "2026-09-07T03:26:49Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:30:07Z",
+            "note": "Same row/quote already used for this release's MMLU score. Table columns: MMLU, HellaSwag (10-shot), WinoGrande (5-shot), ARC-Challenge (25-shot), TriviaQA (5-shot), TruthfulQA."
+          }
+        },
+        {
+          "benchmark": "arc-challenge",
+          "value": 94,
+          "config": "25-shot",
+          "reported_by": "official",
+          "source": {
+            "url": "http://web.archive.org/web/20240229181230/https://docs.mistral.ai/platform/endpoints/",
+            "title": "Mistral AI docs — Benchmark results (archived, Feb 2024)",
+            "quote": "Mistral Small 72.2% 86.9% 84.7% 86.9% 79.5% 51.7% Mistral Medium 75.3% 88.0% 88% 89.9% 81.1% 47% Mistral Large 81.2% 89.2% 86.7% 94.0% 82.7% 50.6%",
+            "retrieved_at": "2026-09-07T03:26:49Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:30:07Z",
+            "note": "Same row/quote already used for this release's MMLU score. Table columns: MMLU, HellaSwag (10-shot), WinoGrande (5-shot), ARC-Challenge (25-shot), TriviaQA (5-shot), TruthfulQA."
           }
         }
       ]
@@ -64,7 +375,7 @@
         "quote": "Mistral Large 2 is exposed on la Plateforme and enriched with new features to facilitate building innovative AI applications.",
         "retrieved_at": "2026-09-07T03:26:49Z",
         "verified": true,
-        "verified_at": "2026-09-07T03:42:43Z"
+        "verified_at": "2026-09-07T09:30:07Z"
       },
       "scores": [
         {
@@ -78,11 +389,11 @@
             "quote": "on MMLU, the pretrained version achieves an accuracy of 84.0%",
             "retrieved_at": "2026-09-07T03:26:49Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:42:43Z"
+            "verified_at": "2026-09-07T09:30:07Z"
           }
         }
       ],
-      "notes": "Mistral Large 2411 (the Nov 2024 24.11 point release, 'Mistral Large 2.1') is not recorded as a separate entry: it shipped alongside the Pixtral Large announcement without its own dedicated launch post, only a model-card page."
+      "notes": "Mistral Large 2411 (the Nov 2024 24.11 point release, 'Mistral Large 2.1') is not recorded as a separate entry: it shipped alongside the Pixtral Large announcement without its own dedicated launch post, only a model-card page. GSM8K, MATH and HumanEval scores could not be added: the launch post ('Large Enough') renders its code, reasoning and math benchmark results only as chart images with no extractable numeric text (re-checked 2026-09-07), and the gated Hugging Face model card (mistralai/Mistral-Large-Instruct-2407) requires authentication so its README could not be fetched anonymously."
     },
     {
       "id": "mistral-mistral-medium-3",
@@ -98,7 +409,7 @@
         "quote": "And today, we are excited to announce Mistral Medium 3, pushing efficiency and usability of language models even further.",
         "retrieved_at": "2026-09-07T03:26:49Z",
         "verified": true,
-        "verified_at": "2026-09-07T03:42:43Z"
+        "verified_at": "2026-09-07T09:30:07Z"
       },
       "scores": [
         {
@@ -112,7 +423,7 @@
             "quote": "AIME'25 21.2 / 30.0 64.9 / 83.3 28.8 - 70.0",
             "retrieved_at": "2026-09-07T03:26:49Z",
             "verified": false,
-            "verified_at": "2026-09-07T04:20:42Z",
+            "verified_at": "2026-09-07T09:30:07Z",
             "note": "Table 2 row 'AIME'25', shown as pass@1 / maj@64. Column order: Mistral Medium 3, Magistral Medium, DeepSeek-V3, DeepSeek-R1-Zero, DeepSeek-R1. Value used here is Mistral Medium 3's pass@1 (21.2)."
           }
         },
@@ -127,7 +438,7 @@
             "quote": "MATH-500 91.0 94.3 90.2 95.9 97.3",
             "retrieved_at": "2026-09-07T03:26:49Z",
             "verified": false,
-            "verified_at": "2026-09-07T04:20:42Z",
+            "verified_at": "2026-09-07T09:30:07Z",
             "note": "Table 2 row 'MATH-500'. Column order: Mistral Medium 3, Magistral Medium, DeepSeek-V3, DeepSeek-R1-Zero, DeepSeek-R1."
           }
         },
@@ -141,7 +452,7 @@
             "quote": "GPQA 59.6 70.8 59.1 73.3 71.5",
             "retrieved_at": "2026-09-07T03:26:49Z",
             "verified": false,
-            "verified_at": "2026-09-07T04:20:42Z",
+            "verified_at": "2026-09-07T09:30:07Z",
             "note": "Table 2 row 'GPQA'; Diamond subset not explicitly specified. Column order: Mistral Medium 3, Magistral Medium, DeepSeek-V3, DeepSeek-R1-Zero, DeepSeek-R1."
           }
         },
@@ -156,7 +467,7 @@
             "quote": "LiveCodeBench (v6) 30.0 50.3 - - -",
             "retrieved_at": "2026-09-07T03:26:49Z",
             "verified": false,
-            "verified_at": "2026-09-07T04:20:42Z",
+            "verified_at": "2026-09-07T09:30:07Z",
             "note": "Table 2 row 'LiveCodeBench (v6)'. Column order: Mistral Medium 3, Magistral Medium, DeepSeek-V3, DeepSeek-R1-Zero, DeepSeek-R1."
           }
         },
@@ -171,7 +482,7 @@
             "quote": "Humanity's Last Exam 4.4 9.0 - - 8.6",
             "retrieved_at": "2026-09-07T03:26:49Z",
             "verified": false,
-            "verified_at": "2026-09-07T04:20:42Z",
+            "verified_at": "2026-09-07T09:30:07Z",
             "note": "Table 2 row 'Humanity's Last Exam', text subset only (per Table 2 caption). Column order: Mistral Medium 3, Magistral Medium, DeepSeek-V3, DeepSeek-R1-Zero, DeepSeek-R1."
           }
         }
@@ -192,7 +503,7 @@
         "quote": "Today, we're excited to announce our latest contribution to AI research with Magistral — our first reasoning model.",
         "retrieved_at": "2026-09-07T03:26:49Z",
         "verified": true,
-        "verified_at": "2026-09-07T03:42:43Z"
+        "verified_at": "2026-09-07T09:30:07Z"
       },
       "scores": [
         {
@@ -206,7 +517,7 @@
             "quote": "Magistral Medium scored 73.6% on AIME2024, and 90% with majority voting @64.",
             "retrieved_at": "2026-09-07T03:26:49Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:42:43Z"
+            "verified_at": "2026-09-07T09:30:07Z"
           }
         },
         {
@@ -220,7 +531,7 @@
             "quote": "MATH-500 91.0 94.3 90.2 95.9 97.3",
             "retrieved_at": "2026-09-07T03:26:49Z",
             "verified": false,
-            "verified_at": "2026-09-07T04:20:42Z",
+            "verified_at": "2026-09-07T09:30:07Z",
             "note": "Table 2 row 'MATH-500'. Column order: Mistral Medium 3, Magistral Medium, DeepSeek-V3, DeepSeek-R1-Zero, DeepSeek-R1."
           }
         },
@@ -234,7 +545,7 @@
             "quote": "GPQA 59.6 70.8 59.1 73.3 71.5",
             "retrieved_at": "2026-09-07T03:26:49Z",
             "verified": false,
-            "verified_at": "2026-09-07T04:20:42Z",
+            "verified_at": "2026-09-07T09:30:07Z",
             "note": "Table 2 row 'GPQA'; Diamond subset not explicitly specified. Column order: Mistral Medium 3, Magistral Medium, DeepSeek-V3, DeepSeek-R1-Zero, DeepSeek-R1."
           }
         },
@@ -249,7 +560,7 @@
             "quote": "LiveCodeBench (v6) 30.0 50.3 - - -",
             "retrieved_at": "2026-09-07T03:26:49Z",
             "verified": false,
-            "verified_at": "2026-09-07T04:20:42Z",
+            "verified_at": "2026-09-07T09:30:07Z",
             "note": "Table 2 row 'LiveCodeBench (v6)'. Column order: Mistral Medium 3, Magistral Medium, DeepSeek-V3, DeepSeek-R1-Zero, DeepSeek-R1."
           }
         },
@@ -264,7 +575,7 @@
             "quote": "Humanity's Last Exam 4.4 9.0 - - 8.6",
             "retrieved_at": "2026-09-07T03:26:49Z",
             "verified": false,
-            "verified_at": "2026-09-07T04:20:42Z",
+            "verified_at": "2026-09-07T09:30:07Z",
             "note": "Table 2 row 'Humanity's Last Exam', text subset only (per Table 2 caption). Column order: Mistral Medium 3, Magistral Medium, DeepSeek-V3, DeepSeek-R1-Zero, DeepSeek-R1."
           }
         }
@@ -285,7 +596,7 @@
         "quote": "Mistral 3 includes three state-of-the-art small, dense models (14B, 8B, and 3B) and Mistral Large 3 – our most capable model to date – a sparse mixture-of-experts trained with 41B active and 675B total parameters.",
         "retrieved_at": "2026-09-07T03:26:49Z",
         "verified": true,
-        "verified_at": "2026-09-07T03:42:43Z"
+        "verified_at": "2026-09-07T09:30:07Z"
       },
       "sources": [
         {

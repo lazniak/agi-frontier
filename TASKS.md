@@ -23,5 +23,5 @@ Status: `todo` · `doing` · `review` · `done` · `parked`. Claim = set `claime
 | T17 | Chart polish: k=1 circles only by default + long-range toggle, lines through qualified points only, label de-confliction, announced markers on trend | web | done | opus-web |
 | T18 | Worker: sitemap source kind (z.ai/sitemap.xml lists blog posts; the blog index 404s) | worker, data | todo | |
 | T19 | Z.ai `docs.z.ai/release-notes` html parser sees 34 items — confirm the poller detects a new GLM post end-to-end (dry run against a synthetic change) | worker | todo | |
-| T20 | Deep history: legacy benchmark tier (LAMBADA, ARC-C, HellaSwag, WinoGrande, GSM8K) + releases back to GPT-1/GPT-2 for all 10 labs, anchor recentring on the non-legacy basket | shared, data | doing | sonnet-data ×3 |
+| T20 | Deep history: legacy benchmark tier (LAMBADA, ARC-C, HellaSwag, WinoGrande, GSM8K) + releases back to GPT-1/GPT-2 for all 10 labs (102 releases, 413 scores), anchor recentring on the non-legacy basket | shared, data | done | sonnet-data ×3 |
 | T21 | Web: logit y axis (default) with linear toggle, spotlight forecasts (3 labs + focus) with whiskers for the rest, legend-hover focus, pace strip + odds-doubling stat, timeline ticks for unscored releases | shared, web | done | main-session |

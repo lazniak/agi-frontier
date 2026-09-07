@@ -1,6 +1,6 @@
 {
   "lab": "deepseek",
-  "updated_at": "2026-09-07T03:46:46Z",
+  "updated_at": "2026-09-07T09:33:20Z",
   "releases": [
     {
       "id": "deepseek-llm-67b",
@@ -16,7 +16,7 @@
         "quote": "We release the DeepSeek LLM 7B/67B, including both base and chat models, to the public.",
         "retrieved_at": "2026-09-07T03:30:00Z",
         "verified": true,
-        "verified_at": "2026-09-07T03:42:43Z"
+        "verified_at": "2026-09-07T09:33:20Z"
       },
       "scores": [
         {
@@ -30,7 +30,7 @@
             "quote": "| DeepSeek LLM 67B Chat | 81.5     | 71.1 | 84.1  | 73.8      | 71.7 | 65.2   | 67.8  |  85.1 |",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:46:46Z"
+            "verified_at": "2026-09-07T09:33:20Z"
           }
         },
         {
@@ -44,7 +44,7 @@
             "quote": "| DeepSeek LLM 67B Chat | 81.5     | 71.1 | 84.1  | 73.8      | 71.7 | 65.2   | 67.8  |  85.1 |",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:46:46Z"
+            "verified_at": "2026-09-07T09:33:20Z"
           }
         },
         {
@@ -58,11 +58,40 @@
             "quote": "DeepSeek LLM 67B Chat exhibits outstanding performance in coding (HumanEval Pass@1: 73.78) and mathematics (GSM8K 0-shot: 84.1, Math 0-shot: 32.6).",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:42:43Z"
+            "verified_at": "2026-09-07T09:33:20Z"
+          }
+        },
+        {
+          "benchmark": "gsm8k",
+          "value": 84.1,
+          "config": "0-shot, Chat model",
+          "reported_by": "official",
+          "source": {
+            "url": "https://github.com/deepseek-ai/DeepSeek-LLM",
+            "title": "DeepSeek LLM README",
+            "quote": "| DeepSeek LLM 67B Chat | 81.5 | 71.1 | 84.1 | 73.8 | 71.7 | 65.2 | 67.8 | 85.1 |",
+            "retrieved_at": "2026-09-07T05:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:33:20Z"
+          }
+        },
+        {
+          "benchmark": "hellaswag",
+          "value": 84,
+          "config": "0-shot, Base model",
+          "note": "HellaSwag is reported only for the Base model in this table, not the Chat model used for the other legacy scores above.",
+          "reported_by": "official",
+          "source": {
+            "url": "https://github.com/deepseek-ai/DeepSeek-LLM",
+            "title": "DeepSeek LLM README",
+            "quote": "| DeepSeek LLM 67B Base | 84.0 | 78.9 | 71.3 | 63.4 | 42.7 | 68.7 | 66.1 | 70.8 | 87.6 |",
+            "retrieved_at": "2026-09-07T05:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:33:20Z"
           }
         }
       ],
-      "notes": "DeepSeek's first-generation dense (non-MoE) model, 7B and 67B released together; 67B is the flagship. Exact release day not confirmed from a primary DeepSeek source, so recorded at month precision (widely reported as Nov 29, 2023)."
+      "notes": "DeepSeek's first-generation dense (non-MoE) model, 7B and 67B released together; 67B is the flagship. Exact release day not confirmed from a primary DeepSeek source, so recorded at month precision (widely reported as Nov 29, 2023). No ARC-Challenge or WinoGrande figures were found in the official README or paper for this model."
     },
     {
       "id": "deepseek-v2",
@@ -78,7 +107,7 @@
         "quote": "2024.05.06: We released the DeepSeek-V2.",
         "retrieved_at": "2026-09-07T03:30:00Z",
         "verified": true,
-        "verified_at": "2026-09-07T03:42:43Z"
+        "verified_at": "2026-09-07T09:33:20Z"
       },
       "scores": [
         {
@@ -92,7 +121,7 @@
             "quote": "| **MMLU**      | English        | 76.2             | 77.8          | 80.3                | 71.1        | 78.4                 | 77.8                 |",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:42:43Z"
+            "verified_at": "2026-09-07T09:33:20Z"
           }
         },
         {
@@ -106,7 +135,7 @@
             "quote": "| **HumanEval** | Code           | 68.9             | 75.0          | 76.2                | 73.8        | 76.8                 | 81.1                 |",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:42:43Z"
+            "verified_at": "2026-09-07T09:33:20Z"
           }
         },
         {
@@ -120,7 +149,67 @@
             "quote": "| **Math**      | Math           | 40.6             | 49.8          | 48.5                | 32.6        | 52.7                 | 53.9                 |",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:42:43Z"
+            "verified_at": "2026-09-07T09:33:20Z"
+          }
+        },
+        {
+          "benchmark": "hellaswag",
+          "value": 87.1,
+          "config": "10-shot, Acc., Base model",
+          "note": "DeepSeek-V2's own README/paper do not report this benchmark; value taken from the base-model baseline comparison table in the later DeepSeek-V3 README (first data column, labeled 'DeepSeek-V2').",
+          "reported_by": "official",
+          "source": {
+            "url": "https://huggingface.co/deepseek-ai/DeepSeek-V3/raw/main/README.md",
+            "title": "DeepSeek-V3 model card (base-model comparison table)",
+            "quote": "| | HellaSwag (Acc.) | 10-shot | 87.1 | 84.8 | **89.2** | 88.9 |",
+            "retrieved_at": "2026-09-07T05:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:33:20Z"
+          }
+        },
+        {
+          "benchmark": "arc-challenge",
+          "value": 92.2,
+          "config": "25-shot, Acc., Base model",
+          "note": "DeepSeek-V2's own README/paper do not report this benchmark; value taken from the base-model baseline comparison table in the later DeepSeek-V3 README (first data column, labeled 'DeepSeek-V2').",
+          "reported_by": "official",
+          "source": {
+            "url": "https://huggingface.co/deepseek-ai/DeepSeek-V3/raw/main/README.md",
+            "title": "DeepSeek-V3 model card (base-model comparison table)",
+            "quote": "| | ARC-Challenge (Acc.) | 25-shot | 92.2 | 94.5 | **95.3** | **95.3** |",
+            "retrieved_at": "2026-09-07T05:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:33:20Z"
+          }
+        },
+        {
+          "benchmark": "winogrande",
+          "value": 86.3,
+          "config": "5-shot, Acc., Base model",
+          "note": "DeepSeek-V2's own README/paper do not report this benchmark; value taken from the base-model baseline comparison table in the later DeepSeek-V3 README (first data column, labeled 'DeepSeek-V2').",
+          "reported_by": "official",
+          "source": {
+            "url": "https://huggingface.co/deepseek-ai/DeepSeek-V3/raw/main/README.md",
+            "title": "DeepSeek-V3 model card (base-model comparison table)",
+            "quote": "| | WinoGrande (Acc.) | 5-shot | **86.3** | 82.3 | 85.2 | 84.9 |",
+            "retrieved_at": "2026-09-07T05:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:33:20Z"
+          }
+        },
+        {
+          "benchmark": "gsm8k",
+          "value": 81.6,
+          "config": "8-shot, EM, Base model",
+          "note": "DeepSeek-V2's own README/paper do not report this benchmark; value taken from the base-model baseline comparison table in the later DeepSeek-V3 README (first data column, labeled 'DeepSeek-V2').",
+          "reported_by": "official",
+          "source": {
+            "url": "https://huggingface.co/deepseek-ai/DeepSeek-V3/raw/main/README.md",
+            "title": "DeepSeek-V3 model card (base-model comparison table)",
+            "quote": "| Math | GSM8K (EM) | 8-shot | 81.6 | 88.3 | 83.5 | **89.3** |",
+            "retrieved_at": "2026-09-07T05:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:33:20Z"
           }
         }
       ]
@@ -139,7 +228,7 @@
         "quote": "DeepSeek-V2.5 is an upgraded version that combines DeepSeek-V2-Chat and DeepSeek-Coder-V2-Instruct. The new model integrates the general and coding abilities of the two previous versions.",
         "retrieved_at": "2026-09-07T03:30:00Z",
         "verified": true,
-        "verified_at": "2026-09-07T03:42:43Z"
+        "verified_at": "2026-09-07T09:33:20Z"
       },
       "sources": [
         {
@@ -160,7 +249,7 @@
             "quote": "| HumanEval python       | 84.5             | 87.2                   | 89            |",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:42:43Z"
+            "verified_at": "2026-09-07T09:33:20Z"
           }
         },
         {
@@ -174,7 +263,7 @@
             "quote": "| LiveCodeBench(01-09)   | 36.6             | 39.7                   | 41.8          |",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:42:43Z"
+            "verified_at": "2026-09-07T09:33:20Z"
           }
         }
       ],
@@ -194,7 +283,7 @@
         "quote": "We present DeepSeek-V3, a strong Mixture-of-Experts (MoE) language model with 671B total parameters with 37B activated for each token.",
         "retrieved_at": "2026-09-07T03:30:00Z",
         "verified": true,
-        "verified_at": "2026-09-07T03:42:43Z"
+        "verified_at": "2026-09-07T09:33:20Z"
       },
       "sources": [
         {
@@ -215,7 +304,7 @@
             "quote": "| English | MMLU (EM) | 78.2 | 80.6 | 85.3 | **88.6** | **88.3** | 87.2 | **88.5** |",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:42:43Z"
+            "verified_at": "2026-09-07T09:33:20Z"
           }
         },
         {
@@ -229,7 +318,7 @@
             "quote": "| | GPQA-Diamond (Pass@1) | 35.3 | 41.3 | 49.0 | 51.1 | **65.0** | 49.9 | 59.1 |",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:42:43Z"
+            "verified_at": "2026-09-07T09:33:20Z"
           }
         },
         {
@@ -243,7 +332,7 @@
             "quote": "| | MATH-500 (EM) | 56.3 | 74.7 | 80.0 | 73.8 | 78.3 | 74.6 | **90.2** |",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:42:43Z"
+            "verified_at": "2026-09-07T09:33:20Z"
           }
         },
         {
@@ -257,7 +346,7 @@
             "quote": "| Math | AIME 2024 (Pass@1) | 4.6 | 16.7 | 23.3 | 23.3 | 16.0 | 9.3 | **39.2** |",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:42:43Z"
+            "verified_at": "2026-09-07T09:33:20Z"
           }
         },
         {
@@ -272,7 +361,63 @@
             "quote": "| Code | HumanEval (Pass@1) | 0-shot | 43.3 | 53.0 | 54.9 | **65.2** |",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:42:43Z"
+            "verified_at": "2026-09-07T09:33:20Z"
+          }
+        },
+        {
+          "benchmark": "gsm8k",
+          "value": 89.3,
+          "config": "8-shot, EM, Base (pretrained) model",
+          "reported_by": "official",
+          "source": {
+            "url": "https://huggingface.co/deepseek-ai/DeepSeek-V3/raw/main/README.md",
+            "title": "DeepSeek-V3 model card",
+            "quote": "| Math | GSM8K (EM) | 8-shot | 81.6 | 88.3 | 83.5 | **89.3** |",
+            "retrieved_at": "2026-09-07T05:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:33:20Z"
+          }
+        },
+        {
+          "benchmark": "hellaswag",
+          "value": 88.9,
+          "config": "10-shot, Acc., Base (pretrained) model",
+          "reported_by": "official",
+          "source": {
+            "url": "https://huggingface.co/deepseek-ai/DeepSeek-V3/raw/main/README.md",
+            "title": "DeepSeek-V3 model card",
+            "quote": "| | HellaSwag (Acc.) | 10-shot | 87.1 | 84.8 | **89.2** | 88.9 |",
+            "retrieved_at": "2026-09-07T05:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:33:20Z"
+          }
+        },
+        {
+          "benchmark": "arc-challenge",
+          "value": 95.3,
+          "config": "25-shot, Acc., Base (pretrained) model",
+          "reported_by": "official",
+          "source": {
+            "url": "https://huggingface.co/deepseek-ai/DeepSeek-V3/raw/main/README.md",
+            "title": "DeepSeek-V3 model card",
+            "quote": "| | ARC-Challenge (Acc.) | 25-shot | 92.2 | 94.5 | **95.3** | **95.3** |",
+            "retrieved_at": "2026-09-07T05:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:33:20Z"
+          }
+        },
+        {
+          "benchmark": "winogrande",
+          "value": 84.9,
+          "config": "5-shot, Acc., Base (pretrained) model",
+          "reported_by": "official",
+          "source": {
+            "url": "https://huggingface.co/deepseek-ai/DeepSeek-V3/raw/main/README.md",
+            "title": "DeepSeek-V3 model card",
+            "quote": "| | WinoGrande (Acc.) | 5-shot | **86.3** | 82.3 | 85.2 | 84.9 |",
+            "retrieved_at": "2026-09-07T05:30:00Z",
+            "verified": true,
+            "verified_at": "2026-09-07T09:33:20Z"
           }
         }
       ]
@@ -291,7 +436,7 @@
         "quote": "We introduce our first-generation reasoning models, DeepSeek-R1-Zero and DeepSeek-R1.",
         "retrieved_at": "2026-09-07T03:30:00Z",
         "verified": true,
-        "verified_at": "2026-09-07T03:42:43Z"
+        "verified_at": "2026-09-07T09:33:20Z"
       },
       "sources": [
         {
@@ -312,7 +457,7 @@
             "quote": "| English | MMLU (Pass@1) | 88.3 | 87.2 | 88.5 | 85.2 | **91.8** | 90.8 |",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:42:43Z"
+            "verified_at": "2026-09-07T09:33:20Z"
           }
         },
         {
@@ -326,7 +471,7 @@
             "quote": "| | GPQA-Diamond (Pass@1) | 65.0 | 49.9 | 59.1 | 60.0 | **75.7** | 71.5 |",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:42:43Z"
+            "verified_at": "2026-09-07T09:33:20Z"
           }
         },
         {
@@ -340,7 +485,7 @@
             "quote": "| | MATH-500 (Pass@1) | 78.3 | 74.6 | 90.2 | 90.0 | 96.4 | **97.3** |",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:42:43Z"
+            "verified_at": "2026-09-07T09:33:20Z"
           }
         },
         {
@@ -354,7 +499,7 @@
             "quote": "| Math | AIME 2024 (Pass@1) | 16.0 | 9.3 | 39.2 | 63.6 | 79.2 | **79.8** |",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:42:43Z"
+            "verified_at": "2026-09-07T09:33:20Z"
           }
         },
         {
@@ -368,7 +513,7 @@
             "quote": "| | SWE Verified (Resolved) | **50.8** | 38.8 | 42.0 | 41.6 | 48.9 | 49.2 |",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:42:43Z"
+            "verified_at": "2026-09-07T09:33:20Z"
           }
         }
       ]
@@ -387,7 +532,7 @@
         "quote": "DeepSeek-V3-0324 demonstrates notable improvements over its predecessor, DeepSeek-V3, in several key aspects.",
         "retrieved_at": "2026-09-07T03:30:00Z",
         "verified": true,
-        "verified_at": "2026-09-07T03:42:43Z"
+        "verified_at": "2026-09-07T09:33:20Z"
       },
       "sources": [
         {
@@ -408,7 +553,7 @@
             "quote": "MMLU-Pro: 75.9 → 81.2 (+5.3)",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:42:43Z"
+            "verified_at": "2026-09-07T09:33:20Z"
           }
         },
         {
@@ -423,7 +568,7 @@
             "quote": "GPQA: 59.1 → 68.4 (+9.3)",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:42:43Z"
+            "verified_at": "2026-09-07T09:33:20Z"
           }
         },
         {
@@ -437,7 +582,7 @@
             "quote": "LiveCodeBench: 39.2 → 49.2 (+10.0)",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:42:43Z"
+            "verified_at": "2026-09-07T09:33:20Z"
           }
         }
       ],
@@ -457,7 +602,7 @@
         "quote": "The DeepSeek R1 model has undergone a minor version upgrade, with the current version being DeepSeek-R1-0528.",
         "retrieved_at": "2026-09-07T03:30:00Z",
         "verified": true,
-        "verified_at": "2026-09-07T03:42:43Z"
+        "verified_at": "2026-09-07T09:33:20Z"
       },
       "sources": [
         {
@@ -478,7 +623,7 @@
             "quote": "|          | MMLU-Pro (EM)                     | 84.0            | 85.0",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:42:43Z"
+            "verified_at": "2026-09-07T09:33:20Z"
           }
         },
         {
@@ -492,7 +637,7 @@
             "quote": "|          | GPQA-Diamond (Pass@1)             | 71.5            | 81.0",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:42:43Z"
+            "verified_at": "2026-09-07T09:33:20Z"
           }
         },
         {
@@ -506,7 +651,7 @@
             "quote": "|          | Humanity's Last Exam (Pass@1)                     | 8.5            | 17.7",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:42:43Z"
+            "verified_at": "2026-09-07T09:33:20Z"
           }
         },
         {
@@ -520,7 +665,7 @@
             "quote": "|          | SWE Verified (Resolved)           | 49.2            | 57.6",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:42:43Z"
+            "verified_at": "2026-09-07T09:33:20Z"
           }
         },
         {
@@ -534,7 +679,7 @@
             "quote": "|          | AIME 2025 (Pass@1)                     | 70.0           | 87.5",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:42:43Z"
+            "verified_at": "2026-09-07T09:33:20Z"
           }
         }
       ],
@@ -554,7 +699,7 @@
         "quote": "DeepSeek-V3.1 is a hybrid model that supports both thinking mode and non-thinking mode.",
         "retrieved_at": "2026-09-07T03:30:00Z",
         "verified": true,
-        "verified_at": "2026-09-07T03:42:43Z"
+        "verified_at": "2026-09-07T09:33:20Z"
       },
       "sources": [
         {
@@ -575,7 +720,7 @@
             "quote": "|          | MMLU-Pro (EM)                  | 83.7  | 81.2    | 84.8          | 85.0",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:42:43Z"
+            "verified_at": "2026-09-07T09:33:20Z"
           }
         },
         {
@@ -589,7 +734,7 @@
             "quote": "|          | GPQA-Diamond (Pass@1)           | 74.9   | 68.4   | 80.1            | 81.0",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:42:43Z"
+            "verified_at": "2026-09-07T09:33:20Z"
           }
         },
         {
@@ -603,7 +748,7 @@
             "quote": "|          | Humanity's Last Exam (Pass@1)   | -    |       -            | 15.9         | 17.7",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:42:43Z"
+            "verified_at": "2026-09-07T09:33:20Z"
           }
         },
         {
@@ -617,7 +762,7 @@
             "quote": "|          | LiveCodeBench (2408-2505) (Pass@1)     | 56.4    | 43.0    | 74.8          | 73.3",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:42:43Z"
+            "verified_at": "2026-09-07T09:33:20Z"
           }
         },
         {
@@ -631,7 +776,7 @@
             "quote": "|          | AIME 2025 (Pass@1)                     | 49.8  | 51.3 | 88.4          | 87.5",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:42:43Z"
+            "verified_at": "2026-09-07T09:33:20Z"
           }
         }
       ],
@@ -651,7 +796,7 @@
         "quote": "We are excited to announce the official release of DeepSeek-V3.2-Exp, an experimental version of our model.",
         "retrieved_at": "2026-09-07T03:30:00Z",
         "verified": true,
-        "verified_at": "2026-09-07T03:42:43Z"
+        "verified_at": "2026-09-07T09:33:20Z"
       },
       "sources": [
         {
@@ -672,7 +817,7 @@
             "quote": "| MMLU-Pro | 85.0 | 85.0 |",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:42:43Z"
+            "verified_at": "2026-09-07T09:33:20Z"
           }
         },
         {
@@ -686,7 +831,7 @@
             "quote": "| GPQA-Diamond | 80.7 | 79.9 |",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:42:43Z"
+            "verified_at": "2026-09-07T09:33:20Z"
           }
         },
         {
@@ -700,7 +845,7 @@
             "quote": "| Humanity's Last Exam | 21.7 | 19.8 |",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:42:43Z"
+            "verified_at": "2026-09-07T09:33:20Z"
           }
         },
         {
@@ -714,7 +859,7 @@
             "quote": "| LiveCodeBench | 74.9 | 74.1 |",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:42:43Z"
+            "verified_at": "2026-09-07T09:33:20Z"
           }
         },
         {
@@ -728,7 +873,7 @@
             "quote": "| AIME 2025 | 88.4 | 89.3 |",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:42:43Z"
+            "verified_at": "2026-09-07T09:33:20Z"
           }
         },
         {
@@ -742,7 +887,7 @@
             "quote": "| SWE Verified | 68.4 | 67.8 |",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:42:43Z"
+            "verified_at": "2026-09-07T09:33:20Z"
           }
         }
       ],
@@ -762,7 +907,7 @@
         "quote": "We introduce DeepSeek-V3.2, a model that harmonizes high computational efficiency with superior reasoning and agent performance.",
         "retrieved_at": "2026-09-07T03:30:00Z",
         "verified": true,
-        "verified_at": "2026-09-07T03:46:46Z"
+        "verified_at": "2026-09-07T09:33:20Z"
       },
       "sources": [
         {
@@ -788,7 +933,7 @@
             "quote": "MMLU-Pro (EM) 88.2 87.5 90.1 84.6 82.0 85.0",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:42:43Z"
+            "verified_at": "2026-09-07T09:33:20Z"
           }
         },
         {
@@ -802,7 +947,7 @@
             "quote": "GPQA Diamond (Pass@1) 83.4 85.7 91.9 84.5 77.7 82.4",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:42:43Z"
+            "verified_at": "2026-09-07T09:33:20Z"
           }
         },
         {
@@ -816,7 +961,7 @@
             "quote": "HLE (Pass@1) 13.7 26.3 37.7 23.9 12.5 25.1",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:42:43Z"
+            "verified_at": "2026-09-07T09:33:20Z"
           }
         },
         {
@@ -830,7 +975,7 @@
             "quote": "LiveCodeBench (Pass@1-COT) 64.0 84.5 90.7 82.6 83.0 83.3",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:42:43Z"
+            "verified_at": "2026-09-07T09:33:20Z"
           }
         },
         {
@@ -844,7 +989,7 @@
             "quote": "AIME 2025 (Pass@1) 87.0 94.6 95.0 94.5 78.3 93.1",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:42:43Z"
+            "verified_at": "2026-09-07T09:33:20Z"
           }
         },
         {
@@ -858,7 +1003,7 @@
             "quote": "SWE Verified (Resolved) 77.2 74.9 76.2 71.3 69.4 73.1",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:42:43Z"
+            "verified_at": "2026-09-07T09:33:20Z"
           }
         },
         {
@@ -872,7 +1017,7 @@
             "quote": "Terminal Bench 2.0 (Acc) 42.8 35.2 54.2 35.7 30.0 46.4",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:42:43Z"
+            "verified_at": "2026-09-07T09:33:20Z"
           }
         }
       ],
@@ -892,7 +1037,7 @@
         "quote": "DeepSeek-V4 Preview is officially live & open-sourced! Welcome to the era of cost-effective 1M context length.",
         "retrieved_at": "2026-09-07T03:30:00Z",
         "verified": true,
-        "verified_at": "2026-09-07T03:42:43Z"
+        "verified_at": "2026-09-07T09:33:20Z"
       },
       "sources": [
         {
@@ -919,7 +1064,7 @@
             "quote": "| MMLU-Pro (EM) | 89.1 | 87.5 | **91.0** | 87.1 | 86.0 | 87.5 |",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:42:43Z"
+            "verified_at": "2026-09-07T09:33:20Z"
           }
         },
         {
@@ -933,7 +1078,7 @@
             "quote": "| GPQA Diamond (Pass@1) | 91.3 | 93.0 | **94.3** | 90.5 | 86.2 | 90.1 |",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:42:43Z"
+            "verified_at": "2026-09-07T09:33:20Z"
           }
         },
         {
@@ -947,7 +1092,7 @@
             "quote": "| HLE (Pass@1) | 40.0 | 39.8 | **44.4** | 36.4 | 34.7 | 37.7 |",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:42:43Z"
+            "verified_at": "2026-09-07T09:33:20Z"
           }
         },
         {
@@ -961,7 +1106,7 @@
             "quote": "| LiveCodeBench (Pass@1) | 88.8 | - | 91.7 | 89.6 | - | **93.5** |",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:42:43Z"
+            "verified_at": "2026-09-07T09:33:20Z"
           }
         },
         {
@@ -975,7 +1120,7 @@
             "quote": "| Terminal Bench 2.0 (Acc) | 65.4 | **75.1** | 68.5 | 66.7 | 63.5 | 67.9 |",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:42:43Z"
+            "verified_at": "2026-09-07T09:33:20Z"
           }
         },
         {
@@ -989,7 +1134,7 @@
             "quote": "| SWE Verified (Resolved) | **80.8** | - | 80.6 | 80.2 | - | 80.6 |",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
-            "verified_at": "2026-09-07T03:42:43Z"
+            "verified_at": "2026-09-07T09:33:20Z"
           }
         }
       ],
