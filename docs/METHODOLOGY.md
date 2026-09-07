@@ -78,8 +78,17 @@ mean(δ) = 0 constraint. Coverage divides by the whole index basket, so a 2023 m
 low on it because most of the basket did not exist yet — which is exactly what the reader
 should see.
 
-The **frontier line** is the running maximum of the index over released models sorted by
-date; a point is emitted only where the maximum increases. **Velocity** is the ordinary
+**Qualified vs provisional.** A model with fewer than 3 index benchmarks (`MIN_QUALIFIED_SCORES`)
+is **provisional**: it is fitted and drawn like any other point, but with a hollow marker and a
+"provisional" badge, it is listed after the qualified flagships in the rankings, it never forms
+the frontier line and it does not feed a lab's capability trend unless the lab has fewer than two
+qualified releases. The reason is mechanical: a launch post that reports only one hard benchmark
+(say HLE) pins θ from a single logit, so a 58 % on a benchmark with δ ≈ 2.9 yields an index in the
+mid-90s with nothing to contradict it. Three benchmarks are the minimum for the residual to say
+anything about that model.
+
+The **frontier line** is the running maximum of the index over released, qualified models sorted
+by date; a point is emitted only where the maximum increases. **Velocity** is the ordinary
 least-squares slope of that step function sampled once per day over the trailing 365 days,
 expressed in index points per 30 days. Days before the first knot are excluded, and we
 report no velocity at all when fewer than two knots fall inside the window.

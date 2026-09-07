@@ -14,7 +14,7 @@ import {
 import { fitFrontierIndex, frontierLine } from '../src/frontier-index';
 import { benchmark, release, score } from './test-helpers';
 
-const BMS = [benchmark('a'), benchmark('b')];
+const BMS = [benchmark('a'), benchmark('b'), benchmark('c')];
 
 describe('date arithmetic', () => {
   test('round-trips and signed differences', () => {
@@ -30,10 +30,10 @@ describe('date arithmetic', () => {
 
 describe('leadershipStripes', () => {
   const releases = [
-    release('r1', 'openai', '2024-01-01', [score('a', 40), score('b', 30)]),
-    release('r2', 'anthropic', '2024-06-01', [score('a', 55), score('b', 45)]),
-    release('r3', 'google', '2024-09-01', [score('a', 41), score('b', 31)]), // never leads
-    release('r4', 'xai', '2025-01-01', [score('a', 70), score('b', 60)]),
+    release('r1', 'openai', '2024-01-01', [score('a', 40), score('b', 30), score('c', 25)]),
+    release('r2', 'anthropic', '2024-06-01', [score('a', 55), score('b', 45), score('c', 40)]),
+    release('r3', 'google', '2024-09-01', [score('a', 41), score('b', 31), score('c', 26)]), // never leads
+    release('r4', 'xai', '2025-01-01', [score('a', 70), score('b', 60), score('c', 55)]),
   ];
   const fit = fitFrontierIndex(releases, BMS);
 
@@ -60,14 +60,14 @@ describe('leadershipStripes', () => {
 
 describe('rankCurrentFlagships', () => {
   const releases = [
-    release('openai-old', 'openai', '2024-01-01', [score('a', 90), score('b', 85)]),
-    release('openai-new', 'openai', '2025-01-01', [score('a', 60), score('b', 50)]),
-    release('anthropic-1', 'anthropic', '2024-11-01', [score('a', 80), score('b', 70)]),
-    release('google-1', 'google', '2024-12-01', [score('a', 75), score('b', 65)]),
+    release('openai-old', 'openai', '2024-01-01', [score('a', 90), score('b', 85), score('c', 80)]),
+    release('openai-new', 'openai', '2025-01-01', [score('a', 60), score('b', 50), score('c', 45)]),
+    release('anthropic-1', 'anthropic', '2024-11-01', [score('a', 80), score('b', 70), score('c', 65)]),
+    release('google-1', 'google', '2024-12-01', [score('a', 75), score('b', 65), score('c', 60)]),
     // No index scores at all → never fitted, so the lab drops out of the ranking.
     release('meta-1', 'meta', '2024-12-15', []),
     // Not yet released as of the cut-off.
-    release('xai-1', 'xai', '2025-06-01', [score('a', 99), score('b', 98)]),
+    release('xai-1', 'xai', '2025-06-01', [score('a', 99), score('b', 98), score('c', 93)]),
   ];
   const fit = fitFrontierIndex(releases, BMS, { asOf: '2025-03-01' });
 

@@ -95,5 +95,6 @@ export function rankCurrentFlagships(fit: IndexFit, releases: ModelRelease[], as
     const m = fit.models[r.id];
     if (m) out.push(m); // labs whose flagship has no official index score are omitted
   }
-  return out.sort((a, b) => (b.index - a.index) || a.release_id.localeCompare(b.release_id));
+  // Qualified flagships first (by index), then provisional ones (by index).
+  return out.sort((a, b) => Number(b.qualified) - Number(a.qualified) || (b.index - a.index) || a.release_id.localeCompare(b.release_id));
 }

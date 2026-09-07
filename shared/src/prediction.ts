@@ -293,11 +293,14 @@ export function forecastLab(
   const p90 = lognormalConditionalProb(mu, sigma, elapsedDays, 90);
 
   // --- capability trend ----------------------------------------------------------------
-  const fitted: ModelIndex[] = [];
+  const fittedAll: ModelIndex[] = [];
   for (const r of labReleased) {
     const mi = fit.models[r.id];
-    if (mi) fitted.push(mi);
+    if (mi) fittedAll.push(mi);
   }
+  // Qualified models only, unless the lab has fewer than two of them (METHODOLOGY §4).
+  const fittedQualified = fittedAll.filter((m) => m.qualified);
+  const fitted = fittedQualified.length >= 2 ? fittedQualified : fittedAll;
   const trend = buildTrend(fitted.slice(-trendPoints), fit.residualSigma);
 
   // Labs rarely regress and no model is expected above 99.5: clamp the *central* prediction

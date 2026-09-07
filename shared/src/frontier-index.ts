@@ -48,6 +48,11 @@ export interface ModelIndex {
   n: number;
   /** n / number of index benchmarks (0–1). */
   coverage: number;
+  /**
+   * n >= MIN_QUALIFIED_SCORES. Only qualified models form the frontier line, lead the rankings and
+   * feed the capability trend; provisional ones are still fitted and displayed (METHODOLOGY §3).
+   */
+  qualified: boolean;
   used: UsedScore[];
 }
 
@@ -80,6 +85,9 @@ export function thetaFromIndex(index: number): number {
 
 /** Default percent clip applied before the logit transform (METHODOLOGY §3). */
 export const DEFAULT_CLIP: [number, number] = [0.5, 99.5];
+
+/** Minimum number of index benchmarks for a model to be `qualified` (METHODOLOGY §3). */
+export const MIN_QUALIFIED_SCORES = 3;
 
 /**
  * Words carrying no information when matching a reported `config` against a benchmark's
@@ -318,6 +326,7 @@ export function fitFrontierIndex(
       indexHigh: indexFromTheta(th + se),
       n,
       coverage: B > 0 ? n / B : 0,
+      qualified: n >= MIN_QUALIFIED_SCORES,
       used: used[m]!,
     };
   }
@@ -333,12 +342,14 @@ export interface FrontierPoint {
 }
 
 /**
- * Running maximum of the index over released models, sorted by date.
+ * Running maximum of the index over released, qualified models, sorted by date.
  * Returns only the points where the maximum increases (step function knots).
- * Implemented by the shared-math task.
+ * Pass `includeProvisional: true` to let single-score models onto the frontier.
  */
-export function frontierLine(fit: IndexFit): FrontierPoint[] {
-  const models = Object.values(fit.models).slice().sort((a, b) => byDateThenId(
+export function frontierLine(fit: IndexFit, opts: { includeProvisional?: boolean } = {}): FrontierPoint[] {
+  const models = Object.values(fit.models)
+    .filter((m) => opts.includeProvisional === true || m.qualified)
+    .sort((a, b) => byDateThenId(
     { date: a.date, id: a.release_id },
     { date: b.date, id: b.release_id },
   ));

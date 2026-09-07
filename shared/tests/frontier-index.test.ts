@@ -10,6 +10,7 @@ import {
   sigmoid,
   thetaFromIndex,
   type FrontierPoint,
+  MIN_QUALIFIED_SCORES,
 } from '../src/frontier-index';
 import { addDays } from '../src/timeline';
 import { benchmark, gaussian, linspace, raschFixture, release, rng, score } from './test-helpers';
@@ -285,8 +286,9 @@ describe('frontierLine', () => {
       release('r5', 'meta', '2025-03-01', [score('a', 50), score('b', 40)]), // below the frontier
     ];
     const fit = fitFrontierIndex(releases, bms);
-    const line = frontierLine(fit);
+    const line = frontierLine(fit, { includeProvisional: true }); // two-benchmark fixture → provisional
     expect(line.map((p) => p.release_id)).toEqual(['r1', 'r3', 'r4']);
+    expect(frontierLine(fit)).toEqual([]); // nothing qualified with only 2 index scores
     for (let i = 1; i < line.length; i++) {
       expect(line[i]!.index).toBeGreaterThan(line[i - 1]!.index);
       expect(line[i]!.date >= line[i - 1]!.date).toBe(true);
@@ -364,5 +366,23 @@ describe('performance', () => {
     expect(Object.keys(fit.models)).toHaveLength(300);
     // Target is < 30 ms; the assertion leaves headroom for a loaded CI machine.
     expect(ms).toBeLessThan(150);
+  });
+});
+
+describe('qualified flag', () => {
+  test('needs MIN_QUALIFIED_SCORES index scores; provisional models never form the frontier', () => {
+    const bms = [benchmark('a'), benchmark('b'), benchmark('c')];
+    const releases = [
+      release('q1', 'openai', '2025-01-01', [score('a', 60), score('b', 50), score('c', 40)]),
+      release('p1', 'meta', '2025-02-01', [score('a', 99)]), // single score, looks like a leader
+      release('q2', 'google', '2025-03-01', [score('a', 65), score('b', 55), score('c', 45)]),
+    ];
+    const fit = fitFrontierIndex(releases, bms);
+    expect(MIN_QUALIFIED_SCORES).toBe(3);
+    expect(fit.models['q1']!.qualified).toBe(true);
+    expect(fit.models['p1']!.qualified).toBe(false);
+    expect(fit.models['p1']!.index).toBeGreaterThan(fit.models['q2']!.index);
+    expect(frontierLine(fit).map((p) => p.release_id)).toEqual(['q1', 'q2']);
+    expect(frontierLine(fit, { includeProvisional: true }).map((p) => p.release_id)).toEqual(['q1', 'p1']);
   });
 });
