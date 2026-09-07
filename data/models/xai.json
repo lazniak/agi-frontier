@@ -1,6 +1,6 @@
 {
   "lab": "xai",
-  "updated_at": "2026-09-07T03:46:46Z",
+  "updated_at": "2026-09-07T04:20:42Z",
   "releases": [
     {
       "id": "xai-grok-1",
@@ -361,9 +361,69 @@
             "verified": true,
             "verified_at": "2026-09-07T03:42:43Z"
           }
+        },
+        {
+          "benchmark": "gpqa-diamond",
+          "value": 87.5,
+          "config": "no tools",
+          "reported_by": "official",
+          "source": {
+            "url": "https://x.ai/news/grok-4",
+            "title": "Grok 4",
+            "quote": "\\\"group\\\":\\\"GPQA\\\",\\\"tool\\\":\\\"Python\\\",\\\"data\\\":[{\\\"model\\\":\\\"O3_NT\\\",\\\"score\\\":83.3,\\\"tools\\\":false},{\\\"model\\\":\\\"GEMINI_25_PRO_NT\\\",\\\"score\\\":86.4,\\\"tools\\\":false},{\\\"model\\\":\\\"CLAUDE_OPUS_4_NT\\\",\\\"score\\\":79.6,\\\"tools\\\":false},{\\\"model\\\":\\\"GROK_4_NT\\\",\\\"score\\\":87.5,\\\"tools\\\":false}",
+            "retrieved_at": "2026-09-07T04:00:19Z",
+            "verified": false,
+            "verified_at": "2026-09-07T04:20:42Z",
+            "note": "value embedded in page chart payload"
+          }
+        },
+        {
+          "benchmark": "aime",
+          "value": 91.7,
+          "config": "AIME 2025, no tools",
+          "reported_by": "official",
+          "source": {
+            "url": "https://x.ai/news/grok-4",
+            "title": "Grok 4",
+            "quote": "\\\"group\\\":\\\"AIME’25\\\",\\\"tool\\\":\\\"Python\\\",\\\"data\\\":[{\\\"model\\\":\\\"O3_NT\\\",\\\"score\\\":88.9,\\\"tools\\\":false},{\\\"model\\\":\\\"GEMINI_25_PRO_NT\\\",\\\"score\\\":88,\\\"tools\\\":false},{\\\"model\\\":\\\"CLAUDE_OPUS_4_NT\\\",\\\"score\\\":75.5,\\\"tools\\\":false},{\\\"model\\\":\\\"GROK_4_NT\\\",\\\"score\\\":91.7,\\\"tools\\\":false}",
+            "retrieved_at": "2026-09-07T04:00:19Z",
+            "verified": false,
+            "verified_at": "2026-09-07T04:20:42Z",
+            "note": "value embedded in page chart payload"
+          }
+        },
+        {
+          "benchmark": "livecodebench",
+          "value": 79,
+          "config": "Jan-May 2025 window, no tools",
+          "reported_by": "official",
+          "source": {
+            "url": "https://x.ai/news/grok-4",
+            "title": "Grok 4",
+            "quote": "\\\"group\\\":\\\"LiveCodeBench (Jan - May)\\\",\\\"tool\\\":\\\"Python\\\",\\\"data\\\":[{\\\"model\\\":\\\"O3_NT\\\",\\\"score\\\":72,\\\"tools\\\":false},{\\\"model\\\":\\\"GEMINI_25_PRO_NT\\\",\\\"score\\\":74.2,\\\"tools\\\":false},{\\\"model\\\":\\\"GROK_4_NT\\\",\\\"score\\\":79,\\\"tools\\\":false}",
+            "retrieved_at": "2026-09-07T04:00:19Z",
+            "verified": false,
+            "verified_at": "2026-09-07T04:20:42Z",
+            "note": "value embedded in page chart payload"
+          }
+        },
+        {
+          "benchmark": "hle",
+          "value": 25.4,
+          "config": "no tools, text+multimodal",
+          "reported_by": "official",
+          "source": {
+            "url": "https://x.ai/news/grok-4",
+            "title": "Grok 4",
+            "quote": "\\\"model\\\":\\\"O3\\\",\\\"score\\\":24.9,\\\"tools\\\":true},{\\\"model\\\":\\\"GROK_4_NT\\\",\\\"score\\\":25.4,\\\"tools\\\":false}",
+            "retrieved_at": "2026-09-07T04:00:19Z",
+            "verified": false,
+            "verified_at": "2026-09-07T04:20:42Z",
+            "note": "value embedded in page chart payload"
+          }
         }
       ],
-      "notes": "Released Jul 9, 2025 to SuperGrok/X Premium+ subscribers and the xAI API, alongside a heavier 'Grok 4 Heavy' parallel-test-time-compute variant (excluded here as a non-flagship tier). xAI's own launch page reports GPQA Diamond (87.5%, no tools), AIME 2025 (91.7% no tools / 98.8% with a Python tool), and LiveCodeBench (~79%, Jan–May 2025 window) for the base Grok 4 model, but these are rendered only inside an interactive chart component with no accessible text in the page — the underlying numbers are widely reported second-hand but could not be captured as a clean, independently re-fetchable verbatim quote, so per the 'never guess' rule they are omitted here; only ARC-AGI-2, which is stated in the article's own prose, is recorded."
+      "notes": "Released Jul 9, 2025 to SuperGrok/X Premium+ subscribers and the xAI API, alongside a heavier 'Grok 4 Heavy' parallel-test-time-compute variant (excluded here as a non-flagship tier). GPQA Diamond (87.5%, no tools), AIME 2025 (91.7% no tools / 98.8% with a Python tool — no-tools recorded per basket preferred_config), LiveCodeBench (79%, Jan-May 2025 window, no tools) and HLE (25.4%, no tools) are not in the page's visible prose but are present as literal JSON inside the page's React/Next.js payload (`self.__next_f.push` chart data), re-fetched 2026-09-07 and quoted verbatim from that payload per source.note; ARC-AGI-2 is stated directly in the article's own prose."
     },
     {
       "id": "xai-grok-4.1",
@@ -401,7 +461,7 @@
           "quote": "XAI plans to release its next-generation Grok 5 artificial intelligence model in the first three months of next year, CEO Elon Musk said on Friday.",
           "retrieved_at": "2026-09-07T07:45:00Z",
           "verified": false,
-          "verified_at": "2026-09-07T03:46:46Z",
+          "verified_at": "2026-09-07T04:20:42Z",
           "via": "r.jina.ai",
           "note": "Article body is paywalled; quote is taken from the page's own meta description / teaser text, which is present in the fetched HTML regardless of subscription status."
         }
@@ -412,7 +472,7 @@
         "quote": "XAI plans to release its next-generation Grok 5 artificial intelligence model in the first three months of next year, CEO Elon Musk said on Friday.",
         "retrieved_at": "2026-09-07T07:45:00Z",
         "verified": false,
-        "verified_at": "2026-09-07T03:46:46Z",
+        "verified_at": "2026-09-07T04:20:42Z",
         "via": "r.jina.ai",
         "note": "Article body is paywalled; quote is taken from the page's own meta description / teaser text, which is present in the fetched HTML regardless of subscription status."
       },

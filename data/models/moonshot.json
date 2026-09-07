@@ -1,6 +1,6 @@
 {
   "lab": "moonshot",
-  "updated_at": "2026-09-07T03:46:46Z",
+  "updated_at": "2026-09-07T04:20:42Z",
   "releases": [
     {
       "id": "moonshot-kimi-k1.5",
@@ -567,8 +567,24 @@
             "verified_at": "2026-09-07T03:42:43Z",
             "note": "Cell format is 'without tools / with tools'; 43.5 is the no-tools figure for Kimi K3."
           }
+        },
+        {
+          "benchmark": "mmmu",
+          "value": 81.6,
+          "config": "MMMU-Pro, no tools, max reasoning effort",
+          "reported_by": "official",
+          "source": {
+            "url": "https://huggingface.co/moonshotai/Kimi-K3",
+            "title": "moonshotai/Kimi-K3 model card",
+            "quote": "MMMU-Pro</td>\n<td align=\"center\" style=\"vertical-align: middle; text-align: center\">81.6 / 83.4</td>",
+            "retrieved_at": "2026-09-07T04:20:00Z",
+            "verified": false,
+            "verified_at": "2026-09-07T04:20:42Z",
+            "note": "Cell format is 'without tools / with tools' per the README's evaluation notes; 81.6 is the no-tools figure for Kimi K3 (first column)."
+          }
         }
-      ]
+      ],
+      "notes": "Terminal-Bench 2.1 is also reported (Kimi K3 88.3%) but excluded per this project's basket rule requiring Terminal-Bench version 2.0 specifically. GPQA Diamond, HLE-Full and MMMU-Pro are the only tracked-basket benchmarks in the README's comparison table; no AIME, MMLU-Pro, LiveCodeBench, SWE-bench Verified, ARC-AGI-2 or τ2-bench figures are reported for this release."
     }
   ]
 }

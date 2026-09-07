@@ -1,6 +1,6 @@
 {
   "lab": "openai",
-  "updated_at": "2026-09-07T03:46:46Z",
+  "updated_at": "2026-09-07T04:20:42Z",
   "releases": [
     {
       "id": "openai-gpt-4",
@@ -30,7 +30,7 @@
             "quote": "86.4%",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": false,
-            "verified_at": "2026-09-07T03:46:46Z"
+            "verified_at": "2026-09-07T04:20:42Z"
           }
         },
         {
@@ -44,7 +44,7 @@
             "quote": "67.0%",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": false,
-            "verified_at": "2026-09-07T03:46:46Z"
+            "verified_at": "2026-09-07T04:20:42Z"
           }
         }
       ],
@@ -97,7 +97,7 @@
             "quote": "GPT-4o, Accuracy (%): 88.7",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": false,
-            "verified_at": "2026-09-07T03:46:46Z"
+            "verified_at": "2026-09-07T04:20:42Z"
           }
         },
         {
@@ -111,7 +111,7 @@
             "quote": "GPT-4o, Accuracy (%): 90.2",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": false,
-            "verified_at": "2026-09-07T03:46:46Z"
+            "verified_at": "2026-09-07T04:20:42Z"
           }
         },
         {
@@ -125,7 +125,7 @@
             "quote": "GPT-4o, Accuracy (%): 76.6",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": false,
-            "verified_at": "2026-09-07T03:46:46Z"
+            "verified_at": "2026-09-07T04:20:42Z"
           }
         },
         {
@@ -139,7 +139,7 @@
             "quote": "GPT-4o, Accuracy (%): 53.6",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": false,
-            "verified_at": "2026-09-07T03:46:46Z"
+            "verified_at": "2026-09-07T04:20:42Z"
           }
         }
       ],
@@ -282,7 +282,7 @@
             "quote": "{\"model\":\"o3 (no tools)\",\"value\":83.3,\"labelValue\":83.3,\"color\":\"theme3_yellow\",\"top\":true}",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": false,
-            "verified_at": "2026-09-07T03:46:46Z"
+            "verified_at": "2026-09-07T04:20:42Z"
           }
         },
         {
@@ -296,7 +296,7 @@
             "quote": "{\"model\":\"o3 (no tools)\",\"value\":88.9,\"labelValue\":88.9,\"color\":\"theme3_yellow\",\"top\":true}",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": false,
-            "verified_at": "2026-09-07T03:46:46Z"
+            "verified_at": "2026-09-07T04:20:42Z"
           }
         },
         {
@@ -310,7 +310,7 @@
             "quote": "{\"model\":\"o3\",\"value\":69.1,\"labelValue\":69.1,\"color\":\"theme3_yellow\",\"top\":true}",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": false,
-            "verified_at": "2026-09-07T03:46:46Z"
+            "verified_at": "2026-09-07T04:20:42Z"
           }
         },
         {
@@ -324,7 +324,7 @@
             "quote": "{\"model\":\"o3\",\"value\":82.9,\"labelValue\":82.9,\"color\":\"theme3_yellow\",\"top\":true}",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": false,
-            "verified_at": "2026-09-07T03:46:46Z"
+            "verified_at": "2026-09-07T04:20:42Z"
           }
         },
         {
@@ -338,7 +338,7 @@
             "quote": "{\"model\":\"o3 (no tools)\",\"value\":20.32,\"labelValue\":20.32,\"color\":\"theme3_yellow\",\"top\":true}",
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": false,
-            "verified_at": "2026-09-07T03:46:46Z"
+            "verified_at": "2026-09-07T04:20:42Z"
           }
         }
       ],

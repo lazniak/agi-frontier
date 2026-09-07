@@ -1,6 +1,6 @@
 {
   "lab": "mistral",
-  "updated_at": "2026-09-07T03:46:46Z",
+  "updated_at": "2026-09-07T04:20:42Z",
   "releases": [
     {
       "id": "mistral-mistral-large",
@@ -112,7 +112,7 @@
             "quote": "AIME'25 21.2 / 30.0 64.9 / 83.3 28.8 - 70.0",
             "retrieved_at": "2026-09-07T03:26:49Z",
             "verified": false,
-            "verified_at": "2026-09-07T03:46:46Z",
+            "verified_at": "2026-09-07T04:20:42Z",
             "note": "Table 2 row 'AIME'25', shown as pass@1 / maj@64. Column order: Mistral Medium 3, Magistral Medium, DeepSeek-V3, DeepSeek-R1-Zero, DeepSeek-R1. Value used here is Mistral Medium 3's pass@1 (21.2)."
           }
         },
@@ -127,7 +127,7 @@
             "quote": "MATH-500 91.0 94.3 90.2 95.9 97.3",
             "retrieved_at": "2026-09-07T03:26:49Z",
             "verified": false,
-            "verified_at": "2026-09-07T03:46:46Z",
+            "verified_at": "2026-09-07T04:20:42Z",
             "note": "Table 2 row 'MATH-500'. Column order: Mistral Medium 3, Magistral Medium, DeepSeek-V3, DeepSeek-R1-Zero, DeepSeek-R1."
           }
         },
@@ -141,7 +141,7 @@
             "quote": "GPQA 59.6 70.8 59.1 73.3 71.5",
             "retrieved_at": "2026-09-07T03:26:49Z",
             "verified": false,
-            "verified_at": "2026-09-07T03:46:46Z",
+            "verified_at": "2026-09-07T04:20:42Z",
             "note": "Table 2 row 'GPQA'; Diamond subset not explicitly specified. Column order: Mistral Medium 3, Magistral Medium, DeepSeek-V3, DeepSeek-R1-Zero, DeepSeek-R1."
           }
         },
@@ -156,7 +156,7 @@
             "quote": "LiveCodeBench (v6) 30.0 50.3 - - -",
             "retrieved_at": "2026-09-07T03:26:49Z",
             "verified": false,
-            "verified_at": "2026-09-07T03:46:46Z",
+            "verified_at": "2026-09-07T04:20:42Z",
             "note": "Table 2 row 'LiveCodeBench (v6)'. Column order: Mistral Medium 3, Magistral Medium, DeepSeek-V3, DeepSeek-R1-Zero, DeepSeek-R1."
           }
         },
@@ -171,7 +171,7 @@
             "quote": "Humanity's Last Exam 4.4 9.0 - - 8.6",
             "retrieved_at": "2026-09-07T03:26:49Z",
             "verified": false,
-            "verified_at": "2026-09-07T03:46:46Z",
+            "verified_at": "2026-09-07T04:20:42Z",
             "note": "Table 2 row 'Humanity's Last Exam', text subset only (per Table 2 caption). Column order: Mistral Medium 3, Magistral Medium, DeepSeek-V3, DeepSeek-R1-Zero, DeepSeek-R1."
           }
         }
@@ -220,7 +220,7 @@
             "quote": "MATH-500 91.0 94.3 90.2 95.9 97.3",
             "retrieved_at": "2026-09-07T03:26:49Z",
             "verified": false,
-            "verified_at": "2026-09-07T03:46:46Z",
+            "verified_at": "2026-09-07T04:20:42Z",
             "note": "Table 2 row 'MATH-500'. Column order: Mistral Medium 3, Magistral Medium, DeepSeek-V3, DeepSeek-R1-Zero, DeepSeek-R1."
           }
         },
@@ -234,7 +234,7 @@
             "quote": "GPQA 59.6 70.8 59.1 73.3 71.5",
             "retrieved_at": "2026-09-07T03:26:49Z",
             "verified": false,
-            "verified_at": "2026-09-07T03:46:46Z",
+            "verified_at": "2026-09-07T04:20:42Z",
             "note": "Table 2 row 'GPQA'; Diamond subset not explicitly specified. Column order: Mistral Medium 3, Magistral Medium, DeepSeek-V3, DeepSeek-R1-Zero, DeepSeek-R1."
           }
         },
@@ -249,7 +249,7 @@
             "quote": "LiveCodeBench (v6) 30.0 50.3 - - -",
             "retrieved_at": "2026-09-07T03:26:49Z",
             "verified": false,
-            "verified_at": "2026-09-07T03:46:46Z",
+            "verified_at": "2026-09-07T04:20:42Z",
             "note": "Table 2 row 'LiveCodeBench (v6)'. Column order: Mistral Medium 3, Magistral Medium, DeepSeek-V3, DeepSeek-R1-Zero, DeepSeek-R1."
           }
         },
@@ -264,7 +264,7 @@
             "quote": "Humanity's Last Exam 4.4 9.0 - - 8.6",
             "retrieved_at": "2026-09-07T03:26:49Z",
             "verified": false,
-            "verified_at": "2026-09-07T03:46:46Z",
+            "verified_at": "2026-09-07T04:20:42Z",
             "note": "Table 2 row 'Humanity's Last Exam', text subset only (per Table 2 caption). Column order: Mistral Medium 3, Magistral Medium, DeepSeek-V3, DeepSeek-R1-Zero, DeepSeek-R1."
           }
         }
@@ -287,8 +287,22 @@
         "verified": true,
         "verified_at": "2026-09-07T03:42:43Z"
       },
+      "sources": [
+        {
+          "url": "https://huggingface.co/mistralai/Mistral-Large-3-675B-Instruct-2512/raw/main/README.md",
+          "title": "mistralai/Mistral-Large-3-675B-Instruct-2512 model card",
+          "retrieved_at": "2026-09-07T04:35:00Z",
+          "note": "README contains tool-use/function-calling code examples only, no benchmark table."
+        },
+        {
+          "url": "https://docs.mistral.ai/models/mistral-large-3-25-12",
+          "title": "Mistral Large 3 — model documentation",
+          "retrieved_at": "2026-09-07T04:35:00Z",
+          "note": "Client-rendered docs page; no GPQA/AIME/MMLU-Pro/HLE/ARC-AGI-2/SWE-bench/MMMU/LiveCodeBench/Terminal-Bench text or table found in the fetched HTML."
+        }
+      ],
       "scores": [],
-      "notes": "No official numeric benchmark scores could be sourced: the launch post's performance comparisons are rendered as images only, the model's Hugging Face README has an empty 'Benchmark Results' section, and no dedicated technical report for Mistral Large 3 was found as of the retrieval date."
+      "notes": "No official numeric benchmark scores could be sourced: the launch post's performance comparisons are rendered as images only ('Chart Base Models', 'Model Performance Comparison (instruct)', GPQA Diamond chart), the model's Hugging Face README has no benchmark table, the docs.mistral.ai model page has no extractable benchmark text, and no dedicated technical report for Mistral Large 3 was found as of the retrieval date (re-checked 2026-09-07). The launch post's only readable numeric capability figure (85% on AIME '25) belongs to the separate Ministral 14B reasoning variant, a non-flagship mini tier excluded by this project's rules."
     }
   ]
 }

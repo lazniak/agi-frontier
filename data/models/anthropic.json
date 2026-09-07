@@ -1,6 +1,6 @@
 {
   "lab": "anthropic",
-  "updated_at": "2026-09-07T03:46:46Z",
+  "updated_at": "2026-09-07T04:20:42Z",
   "releases": [
     {
       "id": "anthropic-claude-2",
@@ -37,7 +37,7 @@
             "quote": "MMLU(5-shotCoT) 73.4% 77.0% 78.5%",
             "retrieved_at": "2026-09-07T05:00:00Z",
             "verified": false,
-            "verified_at": "2026-09-07T03:46:46Z",
+            "verified_at": "2026-09-07T04:20:42Z",
             "note": "Model card table (Claude Instant / Claude 1.3 / Claude 2 columns); text extraction lost inter-word spaces. 78.5% is Claude 2's value."
           }
         },
@@ -111,7 +111,7 @@
             "quote": "MMLU 5-shot 86.8% 79.0% 75.2%",
             "retrieved_at": "2026-09-07T05:00:00Z",
             "verified": false,
-            "verified_at": "2026-09-07T03:46:46Z",
+            "verified_at": "2026-09-07T04:20:42Z",
             "note": "Table 1, columns Opus/Sonnet/Haiku; 86.8% is Opus's value."
           }
         },
@@ -126,7 +126,7 @@
             "quote": "0-shot 84.9% 73.0% 75.9%",
             "retrieved_at": "2026-09-07T05:00:00Z",
             "verified": false,
-            "verified_at": "2026-09-07T03:46:46Z",
+            "verified_at": "2026-09-07T04:20:42Z",
             "note": "Table 1 HumanEval row, columns Opus/Sonnet/Haiku; 84.9% is Opus's value."
           }
         },
@@ -141,7 +141,7 @@
             "quote": "0-shot 60.1% 43.1% 38.9%",
             "retrieved_at": "2026-09-07T05:00:00Z",
             "verified": false,
-            "verified_at": "2026-09-07T03:46:46Z",
+            "verified_at": "2026-09-07T04:20:42Z",
             "note": "Table 1 MATH row (0-shot variant), columns Opus/Sonnet/Haiku; 60.1% is Opus's value. A 4-shot CoT variant is also reported at 61%."
           }
         },
@@ -156,7 +156,7 @@
             "quote": "0-shotCoT 50.4% 40.4% 33.3%",
             "retrieved_at": "2026-09-07T05:00:00Z",
             "verified": false,
-            "verified_at": "2026-09-07T03:46:46Z",
+            "verified_at": "2026-09-07T04:20:42Z",
             "note": "Section 5.1 / Table 1 GPQA Diamond row, columns Opus/Sonnet/Haiku; 50.4% is Opus's value. With Maj@32 5-shot CoT, Opus scores 59.5%."
           }
         }
@@ -198,7 +198,7 @@
             "quote": "GPQA(Diamond) 0-shotCoT 59.4% 50.4% 40.4% 53.6% 48.0%",
             "retrieved_at": "2026-09-07T05:00:00Z",
             "verified": false,
-            "verified_at": "2026-09-07T03:46:46Z",
+            "verified_at": "2026-09-07T04:20:42Z",
             "note": "Table 1, columns Claude 3.5 Sonnet / Claude 3 Opus / Claude 3 Sonnet / GPT-4o / GPT-4T; 59.4% is 3.5 Sonnet's value."
           }
         },
@@ -213,7 +213,7 @@
             "quote": "5-shot 88.7% 86.8% 78.3%",
             "retrieved_at": "2026-09-07T05:00:00Z",
             "verified": false,
-            "verified_at": "2026-09-07T03:46:46Z",
+            "verified_at": "2026-09-07T04:20:42Z",
             "note": "Table 1 MMLU 5-shot row; 88.7% is 3.5 Sonnet's value."
           }
         },
@@ -228,7 +228,7 @@
             "quote": "MATH[10] 71.1% 60.1% 43.1% 76.6% 72.6%",
             "retrieved_at": "2026-09-07T05:00:00Z",
             "verified": false,
-            "verified_at": "2026-09-07T03:46:46Z",
+            "verified_at": "2026-09-07T04:20:42Z",
             "note": "Table 1 MATH row; 71.1% is 3.5 Sonnet's value."
           }
         },
@@ -243,7 +243,7 @@
             "quote": "0-shot 92.0% 84.9% 73.0% 90.2% 87.1%",
             "retrieved_at": "2026-09-07T05:00:00Z",
             "verified": false,
-            "verified_at": "2026-09-07T03:46:46Z",
+            "verified_at": "2026-09-07T04:20:42Z",
             "note": "Table 1 HumanEval row; 92.0% is 3.5 Sonnet's value."
           }
         },
@@ -258,7 +258,7 @@
             "quote": "MMMU[18](validation) 68.3% 59.4% 53.1% 69.1% 63.1%",
             "retrieved_at": "2026-09-07T05:00:00Z",
             "verified": false,
-            "verified_at": "2026-09-07T03:46:46Z",
+            "verified_at": "2026-09-07T04:20:42Z",
             "note": "Table 2, columns 3.5 Sonnet / Claude 3 Opus / Claude 3 Sonnet / GPT-4o / GPT-4T."
           }
         }
@@ -325,7 +325,7 @@
             "quote": "79.6% / 83.3%",
             "retrieved_at": "2026-09-07T05:00:00Z",
             "verified": false,
-            "verified_at": "2026-09-07T03:46:46Z"
+            "verified_at": "2026-09-07T04:20:42Z"
           }
         },
         {
@@ -338,7 +338,7 @@
             "quote": "76.5%",
             "retrieved_at": "2026-09-07T05:00:00Z",
             "verified": false,
-            "verified_at": "2026-09-07T03:46:46Z",
+            "verified_at": "2026-09-07T04:20:42Z",
             "note": "MMMU (validation) row of the benchmark table; Opus 4's column value."
           }
         },
@@ -353,7 +353,7 @@
             "quote": "75.5% / 90.0%",
             "retrieved_at": "2026-09-07T05:00:00Z",
             "verified": false,
-            "verified_at": "2026-09-07T03:46:46Z"
+            "verified_at": "2026-09-07T04:20:42Z"
           }
         }
       ],
@@ -426,7 +426,7 @@
             "quote": "SWE-bench 80.9%4 77.2% 74.5% 76.2% 76.3%",
             "retrieved_at": "2026-09-07T05:00:00Z",
             "verified": false,
-            "verified_at": "2026-09-07T03:46:46Z",
+            "verified_at": "2026-09-07T04:20:42Z",
             "note": "Table 2.3.A overview; footnote 4 = 'Without extended thinking'. With 64k thinking, Opus 4.5 scores 80.60% (Table 2.4.A)."
           }
         },
@@ -441,7 +441,7 @@
             "quote": "With a 128k thinking budget, Claude Opus 4.5 achieved a score of 59.27%",
             "retrieved_at": "2026-09-07T05:00:00Z",
             "verified": false,
-            "verified_at": "2026-09-07T03:46:46Z"
+            "verified_at": "2026-09-07T04:20:42Z"
           }
         },
         {
@@ -455,7 +455,7 @@
             "quote": "Claude Opus 4.5 achieved a score of 86.95% (averaged over 5 trials) on GPQA Diamond.",
             "retrieved_at": "2026-09-07T05:00:00Z",
             "verified": false,
-            "verified_at": "2026-09-07T03:46:46Z"
+            "verified_at": "2026-09-07T04:20:42Z"
           }
         },
         {
@@ -469,7 +469,7 @@
             "quote": "Claude Opus 4.5 achieved a score of 80.72% on MMMU.",
             "retrieved_at": "2026-09-07T05:00:00Z",
             "verified": false,
-            "verified_at": "2026-09-07T03:46:46Z"
+            "verified_at": "2026-09-07T04:20:42Z"
           }
         },
         {
@@ -484,7 +484,7 @@
             "quote": "Claude Opus 4.5 achieved a score of 92.77% without tools, and 100% with access to python tools.",
             "retrieved_at": "2026-09-07T05:00:00Z",
             "verified": false,
-            "verified_at": "2026-09-07T03:46:46Z"
+            "verified_at": "2026-09-07T04:20:42Z"
           }
         },
         {
@@ -498,7 +498,7 @@
             "quote": "ARC-AGI-2 37.6% 13.6% — 31.1% 17.6%",
             "retrieved_at": "2026-09-07T05:00:00Z",
             "verified": false,
-            "verified_at": "2026-09-07T03:46:46Z",
+            "verified_at": "2026-09-07T04:20:42Z",
             "note": "Table 2.3.A overview row (Verified); 37.6% is Opus 4.5's value."
           }
         },
@@ -514,7 +514,7 @@
             "quote": "88.9%4 86.2% 86.8% 85.3%",
             "retrieved_at": "2026-09-07T05:00:00Z",
             "verified": false,
-            "verified_at": "2026-09-07T03:46:46Z"
+            "verified_at": "2026-09-07T04:20:42Z"
           }
         }
       ],
@@ -555,7 +555,7 @@
             "quote": "SWE-bench 80.8% 80.9% 77.2% 76.2% 80.0%",
             "retrieved_at": "2026-09-07T05:00:00Z",
             "verified": false,
-            "verified_at": "2026-09-07T03:46:46Z",
+            "verified_at": "2026-09-07T04:20:42Z",
             "note": "Table 2.3.A, columns Opus 4.6 / Opus 4.5 / Sonnet 4.5 / Gemini 3 Pro / GPT-5.2; 80.8% is Opus 4.6's value."
           }
         },
@@ -570,7 +570,7 @@
             "quote": "Terminal-Bench 65.4% 59.8% 51.0% 56.2% 64.7%",
             "retrieved_at": "2026-09-07T05:00:00Z",
             "verified": false,
-            "verified_at": "2026-09-07T03:46:46Z",
+            "verified_at": "2026-09-07T04:20:42Z",
             "note": "Table 2.3.A Terminal-Bench 2.0 row; 65.4% is Opus 4.6's value."
           }
         },
@@ -585,7 +585,7 @@
             "quote": "GPQA Diamond 91.3% 87.0% 83.40% 91.9% 93.2%",
             "retrieved_at": "2026-09-07T05:00:00Z",
             "verified": false,
-            "verified_at": "2026-09-07T03:46:46Z",
+            "verified_at": "2026-09-07T04:20:42Z",
             "note": "Table 2.3.A; 91.3% is Opus 4.6's value."
           }
         },
@@ -600,7 +600,7 @@
             "quote": "MMMU-Pro (no tools) 73.9% 70.6% 63.4% 81% 79.5%",
             "retrieved_at": "2026-09-07T05:00:00Z",
             "verified": false,
-            "verified_at": "2026-09-07T03:46:46Z"
+            "verified_at": "2026-09-07T04:20:42Z"
           }
         },
         {
@@ -614,7 +614,7 @@
             "quote": "ARC-AGI-2 68.8% 37.6% 13.6% 45.1% 54.2%",
             "retrieved_at": "2026-09-07T05:00:00Z",
             "verified": false,
-            "verified_at": "2026-09-07T03:46:46Z"
+            "verified_at": "2026-09-07T04:20:42Z"
           }
         },
         {
@@ -629,7 +629,7 @@
             "quote": "91.9% 88.9% 86.2% 85.3% 82.0%",
             "retrieved_at": "2026-09-07T05:00:00Z",
             "verified": false,
-            "verified_at": "2026-09-07T03:46:46Z"
+            "verified_at": "2026-09-07T04:20:42Z"
           }
         }
       ],
@@ -669,7 +669,7 @@
             "quote": "SWE-bench Verified 88.6 87.6 - 80.6",
             "retrieved_at": "2026-09-07T05:00:00Z",
             "verified": false,
-            "verified_at": "2026-09-07T03:46:46Z",
+            "verified_at": "2026-09-07T04:20:42Z",
             "note": "Table 8.1 (Evaluation summary), columns Opus 4.8 / Opus 4.7 / GPT-5.5 / Gemini 3.1 Pro; 88.6 is Opus 4.8's value."
           }
         },
@@ -683,7 +683,7 @@
             "quote": "GPQA Diamond 93.6 94.2 - 94.3",
             "retrieved_at": "2026-09-07T05:00:00Z",
             "verified": false,
-            "verified_at": "2026-09-07T03:46:46Z"
+            "verified_at": "2026-09-07T04:20:42Z"
           }
         },
         {
@@ -697,7 +697,7 @@
             "quote": "No tools 49.8 46.9 41.4 44.4",
             "retrieved_at": "2026-09-07T05:00:00Z",
             "verified": false,
-            "verified_at": "2026-09-07T03:46:46Z",
+            "verified_at": "2026-09-07T04:20:42Z",
             "note": "Table 8.1 Humanity's Last Exam row (no-tools variant)."
           }
         }
@@ -745,7 +745,7 @@
             "quote": "SWE-bench Verified 95.5 95 93.9 88.6 - 80.6",
             "retrieved_at": "2026-09-07T05:00:00Z",
             "verified": false,
-            "verified_at": "2026-09-07T03:46:46Z",
+            "verified_at": "2026-09-07T04:20:42Z",
             "note": "Table 8.1.A, columns Mythos 5 / Fable 5 / Mythos Preview / Opus 4.8 / GPT-5.2 / Gemini 3.1 Pro; 95 is Fable 5's value (Mythos 5 itself scores 95.5)."
           }
         }
@@ -787,7 +787,7 @@
             "quote": "ARC-AGI-2 90.0% 89.2% 90.42% 92.5%",
             "retrieved_at": "2026-09-07T05:00:00Z",
             "verified": false,
-            "verified_at": "2026-09-07T03:46:46Z",
+            "verified_at": "2026-09-07T04:20:42Z",
             "note": "Table 8.1.A, columns Fable 5.1/Mythos 5.1 (shared) / Fable 5/Mythos 5 (previous gen) / Claude Opus 5 / GPT-5.6 Sol; 90.0% is Fable 5.1's (and Mythos 5.1's) value."
           }
         },
@@ -802,7 +802,7 @@
             "quote": "No tools 60.9% 57.8% 56.6% -",
             "retrieved_at": "2026-09-07T05:00:00Z",
             "verified": false,
-            "verified_at": "2026-09-07T03:46:46Z",
+            "verified_at": "2026-09-07T04:20:42Z",
             "note": "Table 8.1.A Humanity's Last Exam row, no-tools variant."
           }
         }

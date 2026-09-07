@@ -1,6 +1,6 @@
 {
   "lab": "meta",
-  "updated_at": "2026-09-07T03:46:46Z",
+  "updated_at": "2026-09-07T04:20:42Z",
   "releases": [
     {
       "id": "meta-llama-1-65b",
@@ -85,7 +85,7 @@
         "quote": "Today, we're excited to share the first two models of the next generation of Llama, Meta Llama 3, available for broad use. This release features pretrained and instruction-fine-tuned language models with 8B and 70B parameters.",
         "retrieved_at": "2026-09-07T03:30:00Z",
         "verified": false,
-        "verified_at": "2026-09-07T03:46:46Z",
+        "verified_at": "2026-09-07T04:20:42Z",
         "via": "r.jina.ai"
       },
       "scores": [
@@ -161,8 +161,8 @@
         "title": "Introducing Llama 3.1: Our most capable models to date",
         "quote": "Llama 3.1 405B is the first openly available model that rivals the top AI models when it comes to state-of-the-art capabilities in general knowledge, steerability, math, tool use, and multilingual translation.",
         "retrieved_at": "2026-09-07T03:30:00Z",
-        "verified": false,
-        "verified_at": "2026-09-07T03:46:46Z",
+        "verified": true,
+        "verified_at": "2026-09-07T04:20:42Z",
         "via": "r.jina.ai"
       },
       "scores": [
@@ -371,6 +371,24 @@
           "url": "https://about.fb.com/news/2026/04/introducing-muse-spark-meta-superintelligence-labs/",
           "title": "Introducing Muse Spark: Meta's Most Powerful Model Yet",
           "retrieved_at": "2026-09-07T03:30:00Z"
+        },
+        {
+          "url": "https://ai.meta.com/static-resource/muse-spark-eval-methodology",
+          "title": "Muse Spark Eval Methodology",
+          "retrieved_at": "2026-09-07T04:25:00Z",
+          "note": "Describes how each benchmark (HLE, GPQA Diamond, ARC-AGI-2, SWE-Bench Verified/Pro, Terminal-Bench 2.0, LiveCodeBench Pro, tau-Bench Telecom, GDPval-AA) was run, but the document itself reports no actual scores/results table."
+        },
+        {
+          "url": "https://ai.meta.com/static-resource/muse-spark-safety-and-preparedness-report/",
+          "title": "Muse Spark Safety & Preparedness Report",
+          "retrieved_at": "2026-09-07T04:25:00Z",
+          "note": "160-page frontier-risk framework report (Chemical/Bio, Cyber, Loss of Control domains). Only non-standard variants appear (e.g. 'SWE-Bench Verified (hard subset)', 'Terminal-Bench Pro' 68.7%), none matching this project's tracked benchmark configs; no general GPQA/ARC-AGI-2/MMLU-Pro/AIME/SWE-bench Verified leaderboard table."
+        },
+        {
+          "url": "https://ai.meta.com/static-resource/muse-spark-1-1-evaluation-report/",
+          "title": "Muse Spark 1.1 Evaluation Report",
+          "retrieved_at": "2026-09-07T04:25:00Z",
+          "note": "July 9, 2026 update to the same Muse Spark checkpoint family; likewise structured as a safety/preparedness report with no general-capability leaderboard table. Reports 'resolved 24/42 unique tasks on SWE-Bench Verified Hard' (a dangerous-capability threshold metric, not this project's tracked pass@1 SWE-bench Verified config)."
         }
       ],
       "scores": [
@@ -378,7 +396,7 @@
           "benchmark": "hle",
           "value": 58,
           "config": "Contemplating mode (multi-agent test-time scaling)",
-          "note": "Meta's launch post gives this single headline number for HLE via its extended \"Contemplating mode\"; no plain/no-tools HLE figure or other index-basket scores (MMLU-Pro, GPQA, SWE-bench, etc.) were published in the launch post or found in an official model card at time of writing.",
+          "note": "Meta's launch post gives this single headline number for HLE via its extended \"Contemplating mode\"; no plain/no-tools HLE figure or other index-basket scores (MMLU-Pro, GPQA, SWE-bench, etc.) were published in the launch post or found in an official model card at time of writing. Re-checked 2026-09-07 against the Eval Methodology doc and the Safety & Preparedness Reports for Muse Spark 1.0 and 1.1 (see sources[]) — neither contains a general-capability comparison table with index-basket numbers.",
           "reported_by": "official",
           "source": {
             "url": "https://ai.meta.com/blog/introducing-muse-spark-msl/",

@@ -1,6 +1,6 @@
 {
   "lab": "alibaba",
-  "updated_at": "2026-09-07T03:46:46Z",
+  "updated_at": "2026-09-07T04:20:42Z",
   "releases": [
     {
       "id": "alibaba-qwen-72b",
@@ -79,7 +79,7 @@
         "quote": "Today, we release the first 100B+ model of the Qwen1.5 series, Qwen1.5-110B, which achieves comparable performance with Meta-Llama3-70B in the base model evaluation, and outstanding performance in the chat evaluation.",
         "retrieved_at": "2026-09-07T03:30:00Z",
         "verified": false,
-        "verified_at": "2026-09-07T03:46:46Z"
+        "verified_at": "2026-09-07T04:20:42Z"
       },
       "scores": [
         {
