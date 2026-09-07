@@ -23,6 +23,7 @@ const KIND_LABEL: Record<LevelKind, string> = {
   saturation: 'saturation',
   generation: 'generation',
   ceiling: 'ceiling',
+  speculative: 'speculative',
 };
 
 const REGIME_NOTE: Record<Era['regime'], string> = {
