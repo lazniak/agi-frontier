@@ -20,6 +20,6 @@ Status: `todo` · `doing` · `review` · `done` · `parked`. Claim = set `claime
 | T14 | Announced entries: add `expected_window` when labs state one (Gemini 3.5 Pro / Gemini 4 / Grok 5 / Qwen4); Grok 5 Q1 2026 window is stale — kept as history | data | todo | |
 | T15 | Worker `verify`: extract text from PDF sources (model/system cards) so those quotes can be verified; ~60 of the 77 unverified quotes are PDFs | worker | todo | |
 | T16 | Anthropic Opus line continues in parallel to Fable (Opus 4.7 ~Apr 2026, Claude Opus 5 per Fable 5.1 system card comparison table) — add releases with sources | data | todo | |
-| T17 | Chart polish: k=1 circles only by default + long-range toggle, lines through qualified points only, label de-confliction, announced markers on trend | web | doing | opus-web |
+| T17 | Chart polish: k=1 circles only by default + long-range toggle, lines through qualified points only, label de-confliction, announced markers on trend | web | done | opus-web |
 | T18 | Worker: sitemap source kind (z.ai/sitemap.xml lists blog posts; the blog index 404s) | worker, data | todo | |
 | T19 | Z.ai `docs.z.ai/release-notes` html parser sees 34 items — confirm the poller detects a new GLM post end-to-end (dry run against a synthetic change) | worker | todo | |

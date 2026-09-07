@@ -48,6 +48,18 @@
   border-color: var(--ink-1);
 }
 
+/* A state switch rather than an action: quieter than the others until it is on. */
+.pill--toggle {
+  font-size: 11.5px;
+  letter-spacing: 0.05em;
+}
+
+.pill--toggle[aria-pressed='true'] {
+  border-color: var(--predict);
+  color: var(--predict-ink);
+  background: linear-gradient(var(--predict-tint), var(--predict-tint)), var(--paper);
+}
+
 .pill--accent {
   border-color: var(--predict);
   color: var(--predict-ink);
@@ -143,9 +155,24 @@
   fill: var(--ink-3);
 }
 
+/* The future is a hint, not a region: it must never read as part of a forecast fan. */
 .future-tint {
   fill: var(--predict);
-  opacity: 0.038;
+  opacity: 0.032;
+}
+
+.saturation-note {
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  fill: var(--ink-3);
+  opacity: 0.75;
+  paint-order: stroke;
+  stroke: #fff;
+  stroke-width: 3px;
+  stroke-linejoin: round;
+  pointer-events: none;
 }
 
 .lab-line {
@@ -185,6 +212,13 @@
   stroke-width: 1;
   stroke-linecap: round;
   opacity: 0.6;
+}
+
+/* Drawn only for a label the de-confliction pushed off its own line end. */
+.lab-leader {
+  stroke-width: 0.75;
+  opacity: 0.5;
+  pointer-events: none;
 }
 
 .lab-label {
@@ -234,6 +268,19 @@
 
 .pred-circle:hover {
   opacity: 1 !important;
+}
+
+/* k = 2 in the default view: present, clearly weaker, no fill of its own. */
+.pred-circle--ghost {
+  stroke-width: 1;
+  stroke-dasharray: 3 4;
+}
+
+/* Halo on the k = 1 circle of the lab with the highest P(30 d). */
+.pred-glow {
+  stroke-width: 4;
+  opacity: 0.25;
+  pointer-events: none;
 }
 
 .pred-dot {

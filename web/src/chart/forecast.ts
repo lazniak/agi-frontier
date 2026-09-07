@@ -21,6 +21,8 @@ const MIN_D = 8;
 const MAX_D = 160;
 const FAN_OPACITY = 0.14;
 const CIRCLE_FILL_OPACITY = 0.1;
+/** Default view: k = 1 in full, k = 2 as a ghost, the rest hidden. */
+const GHOST_OPACITY = 0.3;
 
 interface CircleDatum {
   key: string;
@@ -31,6 +33,10 @@ interface CircleDatum {
   r: number;
   colour: string;
   opacity: number;
+  /** k = 2 in the default view: outline only, dashed, no fill. */
+  ghost: boolean;
+  /** The single most likely next release gets a soft halo. */
+  lead: boolean;
   p30: number;
   p90: number;
 }
@@ -61,7 +67,10 @@ export function drawFans(g: G, r: RenderCtx): void {
     .y((d) => y(d.mid))
     .curve(curveMonotoneX);
 
-  const views = computed.labViews.filter((v) => r.visible(v.lab.id) && v.fan.length > 1);
+  // The default view draws each lab's fan only as far as its own next release (p95 + 30 days).
+  // Ten fans run to the 3-year horizon add up to one opaque block that hides the whole future.
+  const fanOf = (v: LabView): typeof v.fan => (r.longRange ? v.fan : v.fanNear);
+  const views = computed.labViews.filter((v) => r.visible(v.lab.id) && fanOf(v).length > 1);
 
   const fillHost = sub(g, 'fan-fills', { opacity: String(FAN_OPACITY), 'pointer-events': 'none' });
   const fans = fillHost.selectAll<SVGPathElement, LabView>('path.fan').data(views, (d) => d.lab.id);
@@ -71,7 +80,7 @@ export function drawFans(g: G, r: RenderCtx): void {
     .append('path')
     .attr('class', 'fan')
     .merge(fans)
-    .attr('d', (d) => band(d.fan) ?? '')
+    .attr('d', (d) => band(fanOf(d)) ?? '')
     .attr('fill', (d) => (announcedLed(d) ? ANNOUNCED : PREDICT));
 
   const medHost = sub(g, 'fan-medians', { 'pointer-events': 'none' });
@@ -82,20 +91,37 @@ export function drawFans(g: G, r: RenderCtx): void {
     .append('path')
     .attr('class', 'fan-median')
     .merge(meds)
-    .attr('d', (d) => mid(d.fan) ?? '')
+    .attr('d', (d) => mid(fanOf(d)) ?? '')
     .attr('stroke', (d) => (announcedLed(d) ? ANNOUNCED : PREDICT))
     .attr('opacity', 0.8);
 }
 
 export function drawPredictions(g: G, r: RenderCtx): void {
   const { x, y, computed, ctx } = r;
-  // On a narrow chart a 160 px circle would swallow the plot, so cap against the width too.
-  const maxD = Math.min(MAX_D, Math.max(MIN_D * 3, r.geom.iw * 0.16));
+  // On a narrow chart a 160 px circle would swallow the plot, so cap against both axes.
+  const maxD = Math.min(MAX_D, r.geom.ih * 0.6, Math.max(MIN_D * 3, r.geom.iw * 0.16));
   const data: CircleDatum[] = [];
+
+  // "Most likely next": the highest P(30 d) among the labs currently drawn. Its k = 1 circle
+  // carries a halo, so the eye lands on the release the model actually expects first.
+  let leadLab: string | null = null;
+  let leadP30 = -1;
+  for (const v of computed.labViews) {
+    if (!r.visible(v.lab.id) || !v.forecast) continue;
+    if (!v.predictions.some((p) => p.k === 1)) continue;
+    if (v.forecast.p30 > leadP30) {
+      leadP30 = v.forecast.p30;
+      leadLab = v.lab.id;
+    }
+  }
 
   for (const v of computed.labViews) {
     if (!r.visible(v.lab.id) || !v.forecast) continue;
     for (const pred of v.predictions) {
+      // Default view: the next release per lab, plus a ghost of the one after it. Everything
+      // further down the chain lands in the same fortnight for every lab and reads as noise.
+      if (!r.longRange && pred.k > 2) continue;
+      const ghost = !r.longRange && pred.k === 2;
       const spanPx = Math.abs(x(toDate(pred.p84Date)) - x(toDate(pred.p16Date)));
       const announced = pred.source === 'announced';
       data.push({
@@ -106,7 +132,9 @@ export function drawPredictions(g: G, r: RenderCtx): void {
         cy: y(pred.index),
         r: Math.min(maxD, Math.max(MIN_D, spanPx)) / 2,
         colour: announced ? ANNOUNCED : PREDICT,
-        opacity: chainOpacity(pred.k),
+        opacity: ghost ? GHOST_OPACITY : chainOpacity(pred.k),
+        ghost,
+        lead: pred.k === 1 && v.lab.id === leadLab,
         p30: v.forecast.p30,
         p90: v.forecast.p90,
       });
@@ -115,9 +143,27 @@ export function drawPredictions(g: G, r: RenderCtx): void {
 
   const key = (d: CircleDatum): string => d.key;
 
-  // 1 — fills, union-capped by the group opacity
+  // 0 — the halo behind the most likely next release
+  const glowHost = sub(g, 'pred-glow', { 'pointer-events': 'none' });
+  const glows = glowHost
+    .selectAll<SVGCircleElement, CircleDatum>('circle')
+    .data(data.filter((d) => d.lead && !d.ghost), key);
+  glows.exit().remove();
+  glows
+    .enter()
+    .append('circle')
+    .attr('class', 'pred-glow')
+    .attr('fill', 'none')
+    .merge(glows)
+    .attr('cx', (d) => d.cx)
+    .attr('cy', (d) => d.cy)
+    .attr('r', (d) => d.r)
+    .attr('stroke', (d) => d.colour)
+    .attr('filter', `url(#${r.glowId})`);
+
+  // 1 — fills, union-capped by the group opacity. A ghost has none by definition.
   const fillHost = sub(g, 'pred-fills', { opacity: String(CIRCLE_FILL_OPACITY), 'pointer-events': 'none' });
-  const fills = fillHost.selectAll<SVGCircleElement, CircleDatum>('circle').data(data, key);
+  const fills = fillHost.selectAll<SVGCircleElement, CircleDatum>('circle').data(data.filter((d) => !d.ghost), key);
   fills.exit().remove();
   fills
     .enter()
@@ -137,9 +183,9 @@ export function drawPredictions(g: G, r: RenderCtx): void {
   rings
     .enter()
     .append('circle')
-    .attr('class', 'pred-circle')
     .attr('fill', 'none')
     .merge(rings)
+    .attr('class', (d) => `pred-circle${d.ghost ? ' pred-circle--ghost' : ''}`)
     .attr('cx', (d) => d.cx)
     .attr('cy', (d) => d.cy)
     .attr('r', (d) => d.r)
@@ -158,7 +204,7 @@ export function drawPredictions(g: G, r: RenderCtx): void {
     .attr('cx', (d) => d.cx)
     .attr('cy', (d) => d.cy)
     .attr('fill', (d) => d.colour)
-    .attr('opacity', (d) => Math.max(0.5, d.opacity));
+    .attr('opacity', (d) => (d.ghost ? GHOST_OPACITY : Math.max(0.5, d.opacity)));
 
   // 4 — an invisible fat ring carries hover and focus, so the discs never swallow the
   //     pointer and every window stays individually reachable by keyboard.

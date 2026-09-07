@@ -23,6 +23,11 @@ export interface StateShape {
   hover: string | null;
   /** "Fit to data" y-axis toggle. */
   fitY: boolean;
+  /**
+   * "Long-range forecast (3 years)": the full chained forecast and the 3-year right edge.
+   * Off by default — see `chart/forecast.ts` for what the default view draws instead.
+   */
+  longRange: boolean;
 }
 
 type Listener = (channels: Set<Channel>) => void;
@@ -33,7 +38,7 @@ export class Store {
   private queued = new Set<Channel>();
   private frame = 0;
 
-  constructor(init: Pick<StateShape, 'asOf' | 'today' | 'minDate'>) {
+  constructor(init: Pick<StateShape, 'asOf' | 'today' | 'minDate'> & { longRange?: boolean }) {
     this.state = {
       ...init,
       hidden: new Set<LabId>(),
@@ -41,6 +46,7 @@ export class Store {
       selected: null,
       hover: null,
       fitY: false,
+      longRange: init.longRange ?? false,
     };
   }
 
@@ -130,6 +136,12 @@ export class Store {
   setFitY(on: boolean): void {
     if (this.state.fitY === on) return;
     this.state.fitY = on;
+    this.emit('view');
+  }
+
+  setLongRange(on: boolean): void {
+    if (this.state.longRange === on) return;
+    this.state.longRange = on;
     this.emit('view');
   }
 }

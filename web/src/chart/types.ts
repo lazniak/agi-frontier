@@ -29,6 +29,10 @@ export interface RenderCtx {
   selected: string | null;
   visible: (lab: LabId) => boolean;
   reduced: boolean;
+  /** "Long-range forecast (3 years)": full chained chain + the 3-year right edge. */
+  longRange: boolean;
+  /** Id of the soft-glow SVG filter defined by the chart shell. */
+  glowId: string;
   io: Interactions;
 }
 

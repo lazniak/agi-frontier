@@ -107,11 +107,21 @@ One `<svg>` with eight sibling `<g>` layers in a fixed z-order — `grid`, `stri
 different amount. `fans` and `markers` are clipped to the plot rect; the others are not, so lab
 labels can sit in the right-hand gutter and the stripe band below the axis.
 
-- **x** is time and never ends: the default domain is 2023-01 → today + 18 months, and
+- **x** is time and never ends: the default domain is 2023-01 → today + 12 months, and
   `d3-zoom` pans and scales it (wheel, drag, pinch). Scrolling *out* at the default zoom is
   deliberately **not** captured, so the page keeps scrolling normally; scrolling *in* zooms.
+- **“Long-range forecast (3 years)”** is the one view switch. Off (the default) the chart shows
+  the *next* release per lab and stops the right edge at today + 12 months; on, it restores the
+  full chained forecast and the today + 3 years horizon that matches METHODOLOGY §4. The choice
+  is kept in `localStorage` under `agi:long-range`, and flipping it resets the zoom, because the
+  base x-domain it was built on has just changed. What each mode draws is listed below.
 - **y** is the index, 0–100 by default; “Fit to data” tweens to the range of whatever the
-  legend is currently showing.
+  legend is currently showing (and of whichever fan the toggle has on). The **“Frontier index”**
+  caption sits above the plot, flush with the y axis, and a grey **“Saturation of the basket”**
+  note marks 100 from inside the plot's top-left, where nothing is ever drawn.
+- The **time-tick ladder thins by pixel distance, not by index** (`chart/scales.ts`): a year mark
+  is never dropped, and a quarter that would collide with one is. Keeping every n-th tick instead
+  is what used to print “Q2” on top of “2024” on a phone.
 - The **“now” rule is the time scrubber**. Drag its handle (or use the range input below the
   chart, or focus the handle and press arrow keys) and every number on the page — the fit, the
   frontier, the forecasts, the rankings, the watch cards — is recomputed as of that date.
@@ -120,20 +130,46 @@ labels can sit in the right-hand gutter and the stripe band below the axis.
   would add up to a solid yellow block, so the fills are opaque inside a group that carries the
   opacity: the union sits at exactly 14 % however many labs are on. Prediction-circle fills use
   the same trick at 10 %; their strokes stay outside it so each window still reads as a ring.
+  The future tint right of the “now” rule is a separate 3.2 % wash — deliberately below the fan,
+  so the region reads as “after today”, never as a forecast.
+- **The default view draws one release ahead, not five.** Each lab's fan runs from the scrubbed
+  date to its own k = 1 `p95Date` + 30 days (`data.ts: nearFanEnd`, kept as `LabView.fanNear`
+  beside the full-horizon `fan`); its k = 1 circle is drawn in full, k = 2 as a ghost — dashed
+  1 px, 30 % opacity, no fill — and k ≥ 3 not at all. Chained out to three years, ten labs put
+  fifty circles and ten full-width fans in the same corner and the future became one yellow
+  blob. The long-range toggle brings all of it back.
+- The **k = 1 circle of the lab with the highest P(30 d)** carries a soft yellow halo (25 %,
+  a 6 px blur from a `feGaussianBlur` filter the chart shell puts in `<defs>`), so the eye lands
+  on the release the cadence model actually expects first.
 - **Qualified vs provisional** (METHODOLOGY §3) is drawn everywhere the index is shown. A release
   with fewer than `MIN_QUALIFIED_SCORES` index benchmarks (`fit.models[id].qualified === false`) is
   a **hollow point** — white fill, 1.5 px lab-colour stroke — and its tooltip says how many of the
-  basket it reported. The lab line still runs through it, and its whisker, hover and selected
-  states are unchanged. `fill` and `stroke` are set as presentation attributes in `chart/layers.ts`
+  basket it reported. **The lab line joins qualified releases only** (`LabView.qualified`), so a
+  provisional point floats off the line rather than dragging the curve down to a number the index
+  never measured; a lab with fewer than two qualified releases gets no line at all, just its
+  points. Whisker, hover and selected states are unchanged. `fill` and `stroke` are set as
+  presentation attributes in `chart/layers.ts`
   precisely because CSS would beat them; only `stroke-width` and the selected ring live in
   `chart.css`. Downstream: the rankings table breaks the two groups with a divider row (rank
   numbers keep counting), badges the model and drops its rows to `--ink-2`; the release-watch card
   badges a provisional flagship and links to `docs/DATA-GUIDE.md`; the audit drawer badges the
   header and names the missing index benchmarks as grey chips.
 - Each predicted release is a **true circle** whose *diameter* is the pixel distance from
-  `p16Date` to `p84Date` (clamped 8–160 px, and to 16 % of the plot width), centred on the
-  median date at the expected index. Opacity falls with the chain index (1, .7, .5, .35, .25).
+  `p16Date` to `p84Date` (clamped 8–160 px, and to 16 % of the plot width and 60 % of the plot
+  height, so a circle can never swallow the axis), centred on the median date at the expected
+  index. In the long-range view opacity falls with the chain index (1, .7, .5, .35, .25).
   Announced-sourced predictions are grey instead of yellow.
+- **Announced / rumored / cancelled markers have no scores**, so their height is *indicative* and
+  is chosen to be the least misleading value available (`chart/layers.ts: markerLevel`): the k = 1
+  predicted index for a future date, the lab's last qualified index before that date for a past
+  one, otherwise the frontier at that date. They are never placed on the lab line, and both the
+  tooltip and the accessible name say the position is indicative.
+- **End-labels are de-conflicted, not just drawn.** They follow each lab's *last qualified*
+  release (where the line actually ends), are sorted by y and pushed apart to ≥ 13 px keeping
+  their order, then clamped against the bottom and top edges; a label displaced by more than 6 px
+  gets a hairline leader back to its line end. Below 560 px they are dropped altogether and the
+  right-hand gutter collapses with them, and a lab switched off in the legend loses its label
+  with the rest of its series.
 
 ### Accessibility
 

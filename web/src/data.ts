@@ -35,11 +35,16 @@ import {
   todayISO,
 } from '@agi/shared';
 
-/** The chart always starts here; the right edge is `today + CHART_FUTURE_DAYS`. */
+/** The chart always starts here; the right edge depends on the long-range toggle. */
 export const CHART_START: ISODate = '2023-01-01';
-export const CHART_FUTURE_DAYS = 548; // ~18 months
+/** Default right edge: today + 12 months. Only the next release per lab fits in it. */
+export const CHART_FUTURE_DAYS = 365;
+/** "Long-range forecast (3 years)" right edge, matching the chained-forecast horizon. */
+export const CHART_FUTURE_DAYS_LONG = 1095;
 /** Chained forecasts are cut at 3 years, matching METHODOLOGY §4. */
 export const FORECAST_HORIZON_DAYS = 1095;
+/** How far past the k = 1 p95 date a lab's near-term fan is drawn. */
+export const FAN_TAIL_DAYS = 30;
 
 export interface Ctx {
   bundle: Bundle;
@@ -52,7 +57,10 @@ export interface Ctx {
   today: ISODate;
   /** First release date in the dataset (scrubber lower bound is derived from it). */
   firstDate: ISODate;
+  /** Right edge of the long-range view (today + 3 years); also clips the chained predictions. */
   chartEnd: ISODate;
+  /** Right edge of the default view (today + 12 months). */
+  chartEndNear: ISODate;
   /** True when the loaded bundle is the synthetic development fixture. */
   synthetic: boolean;
 }
@@ -65,13 +73,23 @@ export interface SeriesPoint {
 export interface LabView {
   lab: Lab;
   points: SeriesPoint[];
+  /**
+   * The subset of `points` that qualifies for the index (METHODOLOGY §3). The lab line is drawn
+   * through these and only these, so a provisional release can never bend the trend downwards.
+   */
+  qualified: SeriesPoint[];
   forecast: LabForecast | null;
+  /** Capability fan out to the 3-year horizon — the long-range view. */
   fan: FanPoint[];
+  /** Capability fan trimmed to the k = 1 p95 date + 30 days — the default view. */
+  fanNear: FanPoint[];
   /** Predicted releases clipped to the chart's right edge. */
   predictions: PredictedRelease[];
   /** Non-released markers already known at `asOf`. */
   markers: ModelRelease[];
   last: SeriesPoint | null;
+  /** Last *qualified* release — where the lab line actually ends. */
+  lastQualified: SeriesPoint | null;
 }
 
 export interface NextUp {
@@ -143,7 +161,8 @@ export function makeCtx(bundle: Bundle): Ctx {
     releasesById: new Map(bundle.releases.map((r) => [r.id, r])),
     today,
     firstDate,
-    chartEnd: addDays(today, CHART_FUTURE_DAYS),
+    chartEnd: addDays(today, CHART_FUTURE_DAYS_LONG),
+    chartEndNear: addDays(today, CHART_FUTURE_DAYS),
     synthetic: bundle.releases.some((r) => (r.notes ?? '').includes('SYNTHETIC FIXTURE')),
   };
 }
@@ -210,20 +229,26 @@ function computeUncached(ctx: Ctx, asOf: ISODate): Computed {
     const labViews: LabView[] = [];
     for (const lab of ctx.labList) {
       const points = seriesByLab.get(lab.id) ?? [];
+      const qualified = points.filter((p) => p.mi.qualified);
       const forecast = forecasts.get(lab.id) ?? null;
-      const fan =
-        forecast && forecast.lastRelease && points.length > 0
-          ? capabilityFan(forecast, { asOf, toDate: fanEnd, stepDays: 7 })
-          : [];
+      const hasFan = Boolean(forecast?.lastRelease) && points.length > 0;
+      const fan = hasFan && forecast ? fanTo(forecast, asOf, fanEnd) : [];
+      // The default view stops one release ahead: a fan drawn to the 3-year horizon for ten labs
+      // merges into a single yellow block that hides everything under it.
+      const nearEnd = nearFanEnd(forecast, asOf, fanEnd);
+      const fanNear = hasFan && forecast ? fanTo(forecast, asOf, nearEnd) : [];
       const predictions = (forecast?.next ?? []).filter((p) => p.medianDate <= ctx.chartEnd);
       labViews.push({
         lab,
         points,
+        qualified,
         forecast,
         fan,
+        fanNear,
         predictions,
         markers: markersByLab.get(lab.id) ?? [],
         last: points.length ? points[points.length - 1]! : null,
+        lastQualified: qualified.length ? qualified[qualified.length - 1]! : null,
       });
     }
 
@@ -255,15 +280,41 @@ function computeUncached(ctx: Ctx, asOf: ISODate): Computed {
   }
 }
 
+/**
+ * Sample a lab's capability band from `asOf` to `end`, always landing exactly on `end` —
+ * `capabilityFan` steps in whole weeks, so the last sample can otherwise fall up to six days
+ * short and the trimmed fans would end on a ragged edge.
+ */
+function fanTo(forecast: LabForecast, asOf: ISODate, end: ISODate): FanPoint[] {
+  if (end < asOf) return [];
+  const pts = capabilityFan(forecast, { asOf, toDate: end, stepDays: 7 });
+  const last = pts[pts.length - 1];
+  if (last && last.date !== end) {
+    const tail = capabilityFan(forecast, { asOf: end, toDate: end, stepDays: 7 })[0];
+    if (tail) pts.push(tail);
+  }
+  return pts;
+}
+
+/** Where the default (non-long-range) fan stops: the k = 1 p95 date plus a short tail. */
+function nearFanEnd(forecast: LabForecast | null, asOf: ISODate, hardEnd: ISODate): ISODate {
+  const first = forecast?.next.find((p) => p.k === 1) ?? forecast?.next[0];
+  if (!first) return minDate(addDays(asOf, 120), hardEnd);
+  return minDate(addDays(first.p95Date, FAN_TAIL_DAYS), hardEnd);
+}
+
 function emptyComputed(ctx: Ctx, asOf: ISODate): Computed {
   const labViews = ctx.labList.map<LabView>((lab) => ({
     lab,
     points: [],
+    qualified: [],
     forecast: null,
     fan: [],
+    fanNear: [],
     predictions: [],
     markers: [],
     last: null,
+    lastQualified: null,
   }));
   return {
     ok: true,
@@ -314,8 +365,11 @@ function pickNextUp(ctx: Ctx, views: LabView[], asOf: ISODate): NextUp | null {
   return best;
 }
 
-/** Index range occupied by these lab views, padded. Exported so "fit to data" can honour the legend. */
-export function extentOfViews(views: LabView[]): [number, number] {
+/**
+ * Index range occupied by these lab views, padded. Exported so "fit to data" can honour the
+ * legend — and the long-range toggle, since the two views draw different fans.
+ */
+export function extentOfViews(views: LabView[], longRange = false): [number, number] {
   let lo = Number.POSITIVE_INFINITY;
   let hi = Number.NEGATIVE_INFINITY;
   for (const v of views) {
@@ -323,7 +377,7 @@ export function extentOfViews(views: LabView[]): [number, number] {
       lo = Math.min(lo, p.mi.indexLow);
       hi = Math.max(hi, p.mi.indexHigh);
     }
-    for (const f of v.fan) {
+    for (const f of longRange ? v.fan : v.fanNear) {
       lo = Math.min(lo, f.low);
       hi = Math.max(hi, f.high);
     }

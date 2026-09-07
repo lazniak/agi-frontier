@@ -76,7 +76,7 @@ export function releaseTooltip(ctx: Ctx, p: SeriesPoint): string {
   const total = ctx.indexBenchmarks.length;
   const provisional = p.mi.qualified
     ? ''
-    : `<p class="tt-note">Provisional — only ${p.mi.n} of ${total} index benchmarks reported; not used for the frontier or trend</p>`;
+    : `<p class="tt-note">Provisional — only ${p.mi.n} of ${total} index benchmarks reported; off the lab line, and not used for the frontier or trend</p>`;
   return (
     head(lab?.color ?? '#111', p.release.name, `${lab?.name ?? p.release.lab} · ${fmtDatePrecision(p.release.date, p.release.date_precision)}`) +
     `<p class="tt-big">${fmtIndex(p.mi.index)}<small>± ${p.mi.se.toFixed(2)} θ</small></p>` +
@@ -108,7 +108,7 @@ export function markerTooltip(ctx: Ctx, r: ModelRelease): string {
   return (
     head(lab?.color ?? '#111', r.name, `${lab?.name ?? r.lab} · ${r.status}`) +
     rows(pairs) +
-    `<p class="tt-hint">${esc(what)}</p>`
+    `<p class="tt-note">Status: ${esc(r.status)} — its position on the y axis is indicative (no scores). ${esc(what)}</p>`
   );
 }
 

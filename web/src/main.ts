@@ -31,6 +31,25 @@ import { renderWatch } from './ui/watch';
 
 const status = maybe('[data-chart-status]');
 
+/** The long-range choice sticks between visits. Private-mode storage throws — never fatally. */
+const LONG_RANGE_KEY = 'agi:long-range';
+
+function readLongRange(): boolean {
+  try {
+    return localStorage.getItem(LONG_RANGE_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
+
+function writeLongRange(on: boolean): void {
+  try {
+    localStorage.setItem(LONG_RANGE_KEY, on ? '1' : '0');
+  } catch {
+    /* storage unavailable — the toggle simply does not persist */
+  }
+}
+
 function fail(message: string): void {
   if (status) {
     status.hidden = false;
@@ -53,7 +72,12 @@ async function boot(): Promise<void> {
     return;
   }
 
-  const store = new Store({ asOf: ctx.today, today: ctx.today, minDate: minScrub(ctx) });
+  const store = new Store({
+    asOf: ctx.today,
+    today: ctx.today,
+    minDate: minScrub(ctx),
+    longRange: readLongRange(),
+  });
   const tooltip = new Tooltip();
   const drawer = new Drawer(ctx, store);
 
@@ -87,6 +111,20 @@ async function boot(): Promise<void> {
   });
 
   /* ------------------------------------------------------------- controls */
+  const longBtn = qs<HTMLButtonElement>('[data-long-range]');
+  longBtn.setAttribute('aria-pressed', String(store.get().longRange));
+  longBtn.addEventListener('click', () => {
+    const on = longBtn.getAttribute('aria-pressed') !== 'true';
+    longBtn.setAttribute('aria-pressed', String(on));
+    store.setLongRange(on);
+    writeLongRange(on);
+    announce(
+      on
+        ? 'Long-range forecast on — every chained prediction out to three years'
+        : 'Long-range forecast off — only the next release per lab',
+    );
+  });
+
   const fitBtn = qs<HTMLButtonElement>('[data-fit]');
   fitBtn.addEventListener('click', () => {
     const on = fitBtn.getAttribute('aria-pressed') !== 'true';

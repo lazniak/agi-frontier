@@ -22,6 +22,8 @@ export interface Geom {
   y0: number;
   y1: number;
   compact: boolean;
+  /** Is the right-hand gutter wide enough for the lab end-labels? */
+  endLabels: boolean;
 }
 
 export type XScale = ScaleTime<number, number>;
@@ -29,11 +31,16 @@ export type YScale = ScaleLinear<number, number>;
 
 const DAY = 86_400_000;
 
+/** Below this the right-hand gutter cannot hold a lab name without eating the plot. */
+const END_LABEL_MIN_WIDTH = 560;
+
 export function geometry(width: number, height: number): Geom {
   const compact = width < 720;
+  const endLabels = width >= END_LABEL_MIN_WIDTH;
   const m: Margins = {
-    top: compact ? 20 : 28,
-    right: compact ? 20 : 96,
+    // The "Frontier Index" caption sits above the plot, clear of the 100 tick and the scrubber.
+    top: compact ? 32 : 38,
+    right: endLabels ? (compact ? 76 : 96) : 20,
     bottom: compact ? 58 : 66,
     left: compact ? 38 : 54,
   };
@@ -50,6 +57,7 @@ export function geometry(width: number, height: number): Geom {
     y0: m.top + ih,
     y1: m.top,
     compact,
+    endLabels,
   };
 }
 
@@ -125,12 +133,47 @@ export function timeTicks(x: XScale, maxTicks: number): TimeTick[] {
     }
   }
 
-  // Thin out if the ladder still crowds the axis.
-  if (out.length > maxTicks) {
-    const keep = Math.ceil(out.length / maxTicks);
-    return out.filter((t, i) => t.major || i % keep === 0);
+  return thin(out, x, maxTicks);
+}
+
+/**
+ * Thin the ladder by *pixel* distance rather than by index: keeping every n-th tick regardless of
+ * where it lands is what puts "Q2" hard against "2024" on a narrow chart. Year marks always win —
+ * a quarter that crowds one is dropped, never the other way round.
+ */
+function thin(ticks: TimeTick[], x: XScale, maxTicks: number): TimeTick[] {
+  const range = x.range();
+  const width = Math.abs((range[1] ?? 0) - (range[0] ?? 0));
+  const minPx = maxTicks > 0 ? width / maxTicks : 0;
+  if (!(minPx > 0) || ticks.length <= 1) return ticks;
+
+  // Distance from each tick to the next major, so a minor never squeezes in just before a year.
+  const nextMajorX: number[] = new Array(ticks.length).fill(Number.POSITIVE_INFINITY);
+  let ahead = Number.POSITIVE_INFINITY;
+  for (let i = ticks.length - 1; i >= 0; i--) {
+    nextMajorX[i] = ahead;
+    if (ticks[i]!.major) ahead = x(ticks[i]!.date);
   }
-  return out;
+
+  const kept: TimeTick[] = [];
+  let lastX = Number.NEGATIVE_INFINITY;
+  for (let i = 0; i < ticks.length; i++) {
+    const t = ticks[i]!;
+    const px = x(t.date);
+    if (t.major) {
+      // A year is never dropped — only the minor labels crowding it are.
+      while (kept.length && !kept[kept.length - 1]!.major && px - lastX < minPx) {
+        kept.pop();
+        const prev = kept[kept.length - 1];
+        lastX = prev ? x(prev.date) : Number.NEGATIVE_INFINITY;
+      }
+    } else if (px - lastX < minPx || (nextMajorX[i] ?? Infinity) - px < minPx) {
+      continue;
+    }
+    kept.push(t);
+    lastX = px;
+  }
+  return kept;
 }
 
 export function valueTicks(y: YScale, count: number): number[] {

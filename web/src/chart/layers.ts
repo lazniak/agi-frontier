@@ -72,14 +72,29 @@ export function drawGrid(g: G, r: RenderCtx): void {
     .attr('y', geom.y0 + 30)
     .text((d) => d.label);
 
-  // axis caption
+  // Axis caption — above the plot, flush with the y axis, so it never collides with the 100 tick.
   let cap = g.select<SVGTextElement>('text.axis-title');
   if (cap.empty()) cap = g.append('text').attr('class', 'axis-title');
   cap
-    .attr('x', 2)
-    .attr('y', geom.y1 - 11)
+    .attr('x', geom.x0)
+    .attr('y', geom.y1 - 22)
     .attr('text-anchor', 'start')
     .text('Frontier Index');
+
+  // What the top of the scale means. Drawn only when 100 is actually on screen.
+  const dom = y.domain();
+  const sat = g.select<SVGTextElement>('text.saturation-note').empty()
+    ? g.append('text').attr('class', 'saturation-note')
+    : g.select<SVGTextElement>('text.saturation-note');
+  const showSat = (dom[1] ?? 100) >= 99.5 && !geom.compact;
+  // Left-hand side: the top-right of the plot belongs to the forecast, and 100 is empty over there.
+  // Hidden with `display`, not `opacity` — the stylesheet owns the latter and would win.
+  sat
+    .attr('x', geom.x0 + 7)
+    .attr('y', y(100) + 14)
+    .attr('text-anchor', 'start')
+    .attr('display', showSat ? null : 'none')
+    .text('Saturation of the basket');
 }
 
 /* ----------------------------------------------------------------- stripes */
@@ -120,7 +135,10 @@ export function drawLines(g: G, r: RenderCtx): void {
     .y((d) => y(d.mi.index))
     .curve(curveMonotoneX);
 
-  const data = computed.labViews.filter((v) => v.points.length > 1);
+  // A lab line joins qualified releases and nothing else (METHODOLOGY §3). Running it through a
+  // provisional point would invent a dive the index never measured — those points stay hollow and
+  // off the line. Fewer than two qualified releases means no line at all, just markers.
+  const data = computed.labViews.filter((v) => v.qualified.length > 1);
   const sel = g.selectAll<SVGPathElement, LabView>('path.lab-line').data(data, (d) => d.lab.id);
   sel.exit().remove();
   sel
@@ -128,7 +146,7 @@ export function drawLines(g: G, r: RenderCtx): void {
     .append('path')
     .attr('class', 'lab-line')
     .merge(sel)
-    .attr('d', (d) => path(d.points) ?? '')
+    .attr('d', (d) => path(d.qualified) ?? '')
     .attr('stroke', (d) => d.lab.color)
     .attr('opacity', (d) => (r.visible(d.lab.id) ? 1 : 0.07))
     .attr('pointer-events', 'none');
@@ -151,7 +169,8 @@ export function drawLines(g: G, r: RenderCtx): void {
   const leaderId = computed.rankings[0]?.lab;
   const leader = leaderId ? computed.byLab.get(leaderId) : undefined;
   let running = last?.index ?? 0;
-  const future = (leader?.fan ?? [])
+  const leaderFan = leader ? (r.longRange ? leader.fan : leader.fanNear) : [];
+  const future = leaderFan
     .filter((p) => p.date >= computed.asOf)
     .map((p) => {
       running = Math.max(running, p.mid);
@@ -249,13 +268,32 @@ export function drawPoints(g: G, r: RenderCtx): void {
 
 /* ----------------------------------------------------------------- markers */
 
-/** Announced / rumored / cancelled models have no index — park them on the lab's own level. */
+/**
+ * Announced / rumored / cancelled models have no scores, so their height is *indicative*: the
+ * lab's own capability trend at that date. A future date takes the k = 1 prediction, a past one
+ * the last qualified index the lab had before it; a lab with no trend at all falls back to the
+ * frontier. Never the lab line — the tooltip says so, and the marker is drawn hollow and grey.
+ */
 function markerLevel(r: RenderCtx, rel: ModelRelease): number {
   const view = r.computed.byLab.get(rel.lab);
   const announced = view?.forecast?.next.find((p) => p.release_id === rel.id);
   if (announced) return announced.index;
-  if (view?.last) return view.last.mi.index;
-  const lastFrontier = r.computed.frontier[r.computed.frontier.length - 1];
+
+  if (view) {
+    if (rel.date > r.computed.asOf) {
+      const next = view.predictions.find((p) => p.k === 1) ?? view.forecast?.next[0];
+      if (next) return next.index;
+    }
+    // Last qualified index strictly before the marker's own date.
+    for (let i = view.qualified.length - 1; i >= 0; i--) {
+      const p = view.qualified[i]!;
+      if (p.release.date <= rel.date) return p.mi.index;
+    }
+    if (view.lastQualified) return view.lastQualified.mi.index;
+  }
+
+  const frontierBefore = [...r.computed.frontier].reverse().find((p) => p.date <= rel.date);
+  const lastFrontier = frontierBefore ?? r.computed.frontier[r.computed.frontier.length - 1];
   return lastFrontier ? lastFrontier.index : 50;
 }
 
@@ -274,7 +312,11 @@ export function drawMarkers(g: G, r: RenderCtx): void {
   merged
     .attr('transform', (d) => `translate(${x(toDate(d.date))},${y(markerLevel(r, d))})`)
     .attr('data-id', (d) => d.id)
-    .attr('aria-label', (d) => `${d.name}, ${ctx.labs.get(d.lab)?.name ?? d.lab}, ${d.status}, ${fmtDate(d.date)}`)
+    .attr(
+      'aria-label',
+      (d) =>
+        `${d.name}, ${ctx.labs.get(d.lab)?.name ?? d.lab}, ${d.status}, ${fmtDate(d.date)}. No scores — its height on the index is indicative.`,
+    )
     .on('pointerenter', function (ev: PointerEvent, d) {
       r.io.tip(markerTooltip(ctx, d), ev);
     })
@@ -312,38 +354,86 @@ interface EndLabel {
   short: string;
   color: string;
   x: number;
+  /** Where the label is drawn after de-confliction. */
   y: number;
+  /** Where the lab's line actually ends — the leader line goes back to this. */
+  anchorY: number;
 }
+
+/** Minimum vertical distance between two end-labels. */
+const LABEL_GAP = 13;
+/** Beyond this displacement a label needs a leader line to stay attached to its line. */
+const LEADER_MIN = 6;
 
 export function drawLabels(g: G, r: RenderCtx): void {
   const { geom, x, y, computed } = r;
-  if (geom.compact) {
+  if (!geom.endLabels) {
     g.selectAll('text.lab-label').remove();
+    g.selectAll('line.lab-leader').remove();
     return;
   }
 
   const raw: EndLabel[] = [];
   for (const v of computed.labViews) {
-    if (!r.visible(v.lab.id) || !v.last) continue;
+    // The label belongs to the line, so it follows the last *qualified* release; a lab with no
+    // line at all still gets one, parked on its newest point.
+    const at = v.lastQualified ?? v.last;
+    if (!r.visible(v.lab.id) || !at) continue;
+    const yy = y(at.mi.index);
     raw.push({
       id: v.lab.id,
       short: v.lab.short,
       color: v.lab.color,
-      x: x(toDate(v.last.release.date)),
-      y: y(v.last.mi.index),
+      x: x(toDate(at.release.date)),
+      y: yy,
+      anchorY: yy,
     });
   }
 
-  // Push overlapping labels apart so ten labs stay readable at the line ends.
+  // Push overlapping labels apart, keeping their vertical order: forward pass opens the gaps,
+  // then a backward pass from the bottom edge and a final forward pass from the top keep the
+  // whole stack inside the plot however many labs are on.
   raw.sort((a, b) => a.y - b.y);
-  const MIN_GAP = 15;
-  for (let i = 1; i < raw.length; i++) {
-    const prev = raw[i - 1]!;
-    const cur = raw[i]!;
-    if (cur.y - prev.y < MIN_GAP) cur.y = prev.y + MIN_GAP;
+  const top = geom.y1 + 5;
+  const bottom = geom.y0 - 3;
+  const spread = (): void => {
+    for (let i = 1; i < raw.length; i++) {
+      const prev = raw[i - 1]!;
+      const cur = raw[i]!;
+      if (cur.y - prev.y < LABEL_GAP) cur.y = prev.y + LABEL_GAP;
+    }
+  };
+  spread();
+  const lastLabel = raw[raw.length - 1];
+  if (lastLabel && lastLabel.y > bottom) {
+    lastLabel.y = bottom;
+    for (let i = raw.length - 2; i >= 0; i--) {
+      const below = raw[i + 1]!;
+      const cur = raw[i]!;
+      if (below.y - cur.y < LABEL_GAP) cur.y = below.y - LABEL_GAP;
+    }
   }
-  const overflow = (raw[raw.length - 1]?.y ?? 0) - geom.y0;
-  if (overflow > 0) for (const l of raw) l.y -= overflow;
+  const firstLabel = raw[0];
+  if (firstLabel && firstLabel.y < top) {
+    firstLabel.y = top;
+    spread();
+  }
+
+  const textX = (d: EndLabel): number => Math.min(d.x + 11, geom.x1 + 8);
+
+  const leaders = raw.filter((d) => Math.abs(d.y - d.anchorY) > LEADER_MIN);
+  const lines = g.selectAll<SVGLineElement, EndLabel>('line.lab-leader').data(leaders, (d) => d.id);
+  lines.exit().remove();
+  lines
+    .enter()
+    .append('line')
+    .attr('class', 'lab-leader')
+    .merge(lines)
+    .attr('x1', (d) => d.x + 3)
+    .attr('y1', (d) => d.anchorY)
+    .attr('x2', (d) => textX(d) - 2)
+    .attr('y2', (d) => d.y)
+    .attr('stroke', (d) => d.color);
 
   const sel = g.selectAll<SVGTextElement, EndLabel>('text.lab-label').data(raw, (d) => d.id);
   sel.exit().remove();
@@ -352,7 +442,7 @@ export function drawLabels(g: G, r: RenderCtx): void {
     .append('text')
     .attr('class', 'lab-label')
     .merge(sel)
-    .attr('x', (d) => Math.min(d.x + 11, geom.x1 + 8))
+    .attr('x', textX)
     .attr('y', (d) => d.y + 4)
     .attr('fill', (d) => d.color)
     .text((d) => d.short);

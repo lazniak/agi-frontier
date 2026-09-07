@@ -42,12 +42,27 @@ export function createChart(host: HTMLElement, ctx: Ctx, store: Store, io: Inter
   host.append(svgEl);
 
   // Forecast fans and window circles are wide by nature; they must never paint outside the plot.
-  const clipId = `agi-plot-${Math.random().toString(36).slice(2, 8)}`;
+  const uid = Math.random().toString(36).slice(2, 8);
+  const clipId = `agi-plot-${uid}`;
+  const glowId = `agi-glow-${uid}`;
   const clipRect = mk('rect');
   const defs = mk('defs');
   const clip = mk('clipPath', { id: clipId });
   clip.append(clipRect);
   defs.append(clip);
+
+  // Soft halo behind the single most likely next release. A blur wide enough to read needs a
+  // filter region well outside the shape's own box, or Chrome clips the halo to the circle.
+  const glow = mk('filter', {
+    id: glowId,
+    x: '-60%',
+    y: '-60%',
+    width: '220%',
+    height: '220%',
+    'color-interpolation-filters': 'sRGB',
+  });
+  glow.append(mk('feGaussianBlur', { stdDeviation: '3', in: 'SourceGraphic' }));
+  defs.append(glow);
   svgEl.append(defs);
 
   const groups = {} as Record<LayerName, SVGGElement>;
@@ -67,7 +82,10 @@ export function createChart(host: HTMLElement, ctx: Ctx, store: Store, io: Inter
   let drawn = false;
   let scrubDetach: (() => void) | null = null;
 
-  const baseDomain = (): [Date, Date] => [toDate(CHART_START), toDate(ctx.chartEnd)];
+  const baseDomain = (): [Date, Date] => [
+    toDate(CHART_START),
+    toDate(store.get().longRange ? ctx.chartEnd : ctx.chartEndNear),
+  ];
 
   const currentX = (): XScale => {
     const base = makeX(baseDomain(), geom);
@@ -81,7 +99,7 @@ export function createChart(host: HTMLElement, ctx: Ctx, store: Store, io: Inter
     if (!store.get().fitY || !computed) return [0, 100];
     // Fit what the legend is actually showing, not every lab in the dataset.
     const shown = computed.labViews.filter((v) => store.visible(v.lab.id));
-    return niceExtent(extentOfViews(shown.length ? shown : computed.labViews));
+    return niceExtent(extentOfViews(shown.length ? shown : computed.labViews, store.get().longRange));
   }
 
   function schedule(): void {
@@ -140,6 +158,8 @@ export function createChart(host: HTMLElement, ctx: Ctx, store: Store, io: Inter
       selected: st.selected,
       visible: (lab) => store.visible(lab),
       reduced,
+      longRange: st.longRange,
+      glowId,
       io,
     };
 
@@ -175,7 +195,14 @@ export function createChart(host: HTMLElement, ctx: Ctx, store: Store, io: Inter
 
   const detachKeys = attachKeyboardNav(groups.points);
 
+  let lastLongRange = store.get().longRange;
   const unsubscribe = store.subscribe((channels) => {
+    if (channels.has('view') && store.get().longRange !== lastLongRange) {
+      // The base x-domain just changed under the zoom transform; keeping the old one would land
+      // the reader somewhere arbitrary. Snap back to the new default window instead.
+      lastLongRange = store.get().longRange;
+      zoomHandle.reset();
+    }
     if (channels.has('view') || channels.has('filters')) {
       const to = targetYDomain();
       if (to[0] !== yDomain[0] || to[1] !== yDomain[1]) {
