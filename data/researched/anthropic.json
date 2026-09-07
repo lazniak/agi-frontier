@@ -1,0 +1,34 @@
+{
+  "lab": "anthropic",
+  "updated_at": "2026-09-07T16:15:34Z",
+  "releases": [
+    {
+      "id": "anthropic-opus-5",
+      "lab": "anthropic",
+      "name": "Opus 5",
+      "family": "Claude Opus",
+      "date": "2026-07-24",
+      "date_precision": "day",
+      "status": "released",
+      "origin": "researcher",
+      "announcement": {
+        "url": "https://www.anthropic.com",
+        "title": "Claude Opus 5",
+        "quote": "Introducing Opus 5\nOpus 5 is a step change for the Opus tier: stronger coding, more capable agents, and sharper professional work.",
+        "retrieved_at": "2026-09-07T16:15:34Z",
+        "verified": true,
+        "verified_at": "2026-09-07T16:15:34Z"
+      },
+      "sources": [
+        {
+          "url": "https://www.anthropic.com",
+          "quote": "Introducing Opus 5\nOpus 5 is a step change for the Opus tier: stronger coding, more capable agents, and sharper professional work.",
+          "retrieved_at": "2026-09-07T16:15:34Z",
+          "verified": true,
+          "verified_at": "2026-09-07T16:15:34Z"
+        }
+      ],
+      "scores": []
+    }
+  ]
+}
