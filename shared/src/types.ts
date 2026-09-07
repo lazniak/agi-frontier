@@ -86,6 +86,8 @@ export interface Source {
   verified_at?: ISOTimestamp;
   /** If a page could not be fetched directly (403 etc.), the fallback reader used, e.g. "r.jina.ai". */
   via?: string;
+  /** Free-text caveat about this source (e.g. "date taken from page metadata"). */
+  note?: string;
 }
 
 export interface Score {

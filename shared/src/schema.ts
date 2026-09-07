@@ -16,6 +16,7 @@ export const SourceSchema = z.object({
   verified: z.boolean().optional(),
   verified_at: isoTs.optional(),
   via: z.string().optional(),
+  note: z.string().max(500).optional(),
 }).strict();
 
 export const ScoreSchema = z.object({

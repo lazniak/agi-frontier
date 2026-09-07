@@ -1,5 +1,6 @@
 import type { ISODate, LabId, ModelRelease, ReleaseStatus } from './types';
 import type { IndexFit, ModelIndex } from './frontier-index';
+import { frontierLine } from './frontier-index';
 
 const DAY_MS = 86_400_000;
 
@@ -74,8 +75,14 @@ export interface LeadershipStripe {
  * Implemented by the shared-math task.
  */
 export function leadershipStripes(fit: IndexFit): LeadershipStripe[] {
-  void fit;
-  throw new Error('not implemented: leadershipStripes');
+  const knots = frontierLine(fit);
+  return knots.map((k, i) => ({
+    from: k.date,
+    to: i + 1 < knots.length ? knots[i + 1]!.date : null,
+    lab: k.lab,
+    release_id: k.release_id,
+    index: k.index,
+  }));
 }
 
 /**
@@ -83,6 +90,10 @@ export function leadershipStripes(fit: IndexFit): LeadershipStripe[] {
  * Labs without a fitted model are omitted. Implemented by the shared-math task.
  */
 export function rankCurrentFlagships(fit: IndexFit, releases: ModelRelease[], asOf: ISODate): ModelIndex[] {
-  void fit; void releases; void asOf;
-  throw new Error('not implemented: rankCurrentFlagships');
+  const out: ModelIndex[] = [];
+  for (const r of latestPerLab(releases, asOf).values()) {
+    const m = fit.models[r.id];
+    if (m) out.push(m); // labs whose flagship has no official index score are omitted
+  }
+  return out.sort((a, b) => (b.index - a.index) || a.release_id.localeCompare(b.release_id));
 }
