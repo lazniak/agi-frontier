@@ -156,8 +156,10 @@
   transition: opacity 0.25s ease, stroke-width 0.2s ease;
 }
 
+/* `fill` and `stroke` are set per point in chart/layers.ts — a qualified release is solid in the
+   lab colour with a white halo, a provisional one is hollow with the lab colour as its stroke.
+   Neither is declared here, or the CSS would beat the presentation attribute. */
 .lab-point {
-  stroke: #fff;
   stroke-width: 1.5;
   cursor: pointer;
   transition: opacity 0.25s ease;
@@ -510,6 +512,14 @@
   box-shadow: 0 0 0 1.5px #fff;
 }
 
+.key__swatch--provisional {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #fff;
+  border: 1.5px solid var(--ink-1);
+}
+
 .key__swatch--announced {
   width: 9px;
   height: 9px;
@@ -641,6 +651,16 @@
 .tt-row dd {
   color: var(--ink-1);
   text-align: right;
+}
+
+/* Why a hollow point is hollow — sentence case, so it reads as prose next to the uppercase hint. */
+.tt-note {
+  margin-top: 9px;
+  padding-top: 8px;
+  border-top: 1px solid var(--hair-soft);
+  font-size: 11.5px;
+  line-height: 1.45;
+  color: var(--ink-2);
 }
 
 .tt-hint {

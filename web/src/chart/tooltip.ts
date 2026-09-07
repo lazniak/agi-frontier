@@ -74,6 +74,9 @@ function rows(pairs: [string, string][]): string {
 export function releaseTooltip(ctx: Ctx, p: SeriesPoint): string {
   const lab = ctx.labs.get(p.release.lab);
   const total = ctx.indexBenchmarks.length;
+  const provisional = p.mi.qualified
+    ? ''
+    : `<p class="tt-note">Provisional — only ${p.mi.n} of ${total} index benchmarks reported; not used for the frontier or trend</p>`;
   return (
     head(lab?.color ?? '#111', p.release.name, `${lab?.name ?? p.release.lab} · ${fmtDatePrecision(p.release.date, p.release.date_precision)}`) +
     `<p class="tt-big">${fmtIndex(p.mi.index)}<small>± ${p.mi.se.toFixed(2)} θ</small></p>` +
@@ -82,6 +85,7 @@ export function releaseTooltip(ctx: Ctx, p: SeriesPoint): string {
       ['Coverage', `${p.mi.n} / ${total} benchmarks`],
       ['Date precision', esc(precisionLabel(p.release.date_precision))],
     ]) +
+    provisional +
     `<p class="tt-hint">Click for sources</p>`
   );
 }

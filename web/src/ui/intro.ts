@@ -1,7 +1,7 @@
 /** The three live stats above the chart, plus the header "as of" stamp. */
 import type { Computed, Ctx } from '../data';
 import { clear, el, maybe, qs } from '../dom';
-import { EN_DASH, esc, fmtDate, fmtIndex, fmtPercent, fmtTimestamp } from './format';
+import { EN_DASH, esc, fmtDate, fmtIndex, fmtPercent, fmtTimestamp, pluralise } from './format';
 
 export function renderStamp(ctx: Ctx): void {
   const stamp = maybe('[data-generated]');
@@ -33,7 +33,8 @@ export function renderStats(ctx: Ctx, c: Computed): void {
   const next = qs('[data-stat="next"]');
   const nextMeta = qs('[data-stat="next-meta"]');
 
-  // 1 — the frontier itself
+  // 1 — the frontier itself. `c.top` is the last knot of the frontier line, which `frontierLine`
+  // builds from qualified models only, so this number can never come from a provisional release.
   if (c.top) {
     const lab = ctx.labs.get(c.top.release.lab);
     value(idx, fmtIndex(c.top.mi.index));
@@ -42,8 +43,11 @@ export function renderStats(ctx: Ctx, c: Computed): void {
       `<b>${esc(c.top.release.name)}</b> · ${esc(lab?.name ?? c.top.release.lab)} · released ${esc(fmtDate(c.top.release.date))}`;
   } else {
     value(idx, EN_DASH);
-    idxMeta.textContent = 'No released model has an official index score yet.';
+    idxMeta.textContent = c.topProvisional
+      ? 'No qualified model yet — every released flagship reports fewer than three index benchmarks.'
+      : 'No released model has an official index score yet.';
   }
+  renderProvisionalFootnote(idx, c);
 
   // 2 — how fast it is moving
   if (c.velocity === null) {
@@ -71,6 +75,27 @@ export function renderStats(ctx: Ctx, c: Computed): void {
     next.classList.add('stat__value--sm');
     nextMeta.textContent = 'Not enough release history to forecast a next flagship.';
   }
+}
+
+/**
+ * A provisional release can out-score the frontier leader on raw index — it is fitted from too
+ * few benchmarks to be believed, but it is visible on the chart, so say so rather than let the
+ * reader think the headline number is stale.
+ */
+function renderProvisionalFootnote(idx: HTMLElement, c: Computed): void {
+  const host = idx.parentElement;
+  if (!host) return;
+  host.querySelector('.stat__foot')?.remove();
+
+  const p = c.topProvisional;
+  if (!p) return;
+  if (c.top && p.mi.index <= c.top.mi.index) return;
+
+  const foot = el('p', { class: 'stat__foot' });
+  foot.innerHTML =
+    `Provisional: <b>${esc(p.release.name)}</b> shows <b>${fmtIndex(p.mi.index)}</b> on ` +
+    `${pluralise(p.mi.n, 'benchmark')}`;
+  host.append(foot);
 }
 
 export function renderWorkerHealth(ctx: Ctx): void {

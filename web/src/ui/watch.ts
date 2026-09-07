@@ -1,8 +1,11 @@
 /** Release watch — one card per lab: last flagship, P(30/90 d), median window, sparkline. */
 import type { LabView } from '../data';
 import type { Computed, Ctx } from '../data';
-import { clear, qs, svg } from '../dom';
+import { badge, clear, qs, svg } from '../dom';
 import { EN_DASH, esc, fmtDate, fmtDays, fmtIndex, fmtPercent, pluralise } from './format';
+
+/** Where a reader can fix a provisional entry by contributing sources. */
+const DATA_GUIDE = 'https://github.com/lazniak/agi-frontier/blob/main/docs/DATA-GUIDE.md';
 
 const SPARK_W = 240;
 const SPARK_H = 34;
@@ -69,9 +72,12 @@ export function renderWatch(ctx: Ctx, c: Computed, onSelect: (id: string) => voi
         <span class="watch-card__age">${days === null ? '' : `${esc(fmtDays(days))} ago`}</span>
       </div>`;
 
+    // A provisional flagship is the one thing on this card a reader can actually fix.
+    const provisional = v.last !== null && !v.last.mi.qualified;
     const model = v.last
-      ? `<div><p class="watch-card__model">${esc(v.last.release.name)}</p>
-         <p class="watch-card__index">Index ${fmtIndex(v.last.mi.index)} · ${esc(fmtDate(v.last.release.date))} · ${pluralise(v.last.mi.n, 'benchmark')}</p></div>`
+      ? `<div><p class="watch-card__model">${esc(v.last.release.name)}${provisional ? ` ${badge('provisional', 'provisional')}` : ''}</p>
+         <p class="watch-card__index">Index ${fmtIndex(v.last.mi.index)} · ${esc(fmtDate(v.last.release.date))} · ${pluralise(v.last.mi.n, 'benchmark')}</p>
+         ${provisional ? `<p class="watch-card__hint"><a class="link-out" href="${DATA_GUIDE}" rel="noopener">Add sources → GitHub</a></p>` : ''}</div>`
       : `<div><p class="watch-card__model">No released flagship yet</p>
          <p class="watch-card__index">Nothing to forecast from.</p></div>`;
 
@@ -96,6 +102,9 @@ export function renderWatch(ctx: Ctx, c: Computed, onSelect: (id: string) => voi
 
     card.innerHTML = head + model + probs + nextBlock + annBlock;
     if (v.points.length > 1) card.append(sparkline(v));
+
+    // The whole card is a button; the data-guide link must not open the audit drawer as well.
+    card.querySelector('.watch-card__hint a')?.addEventListener('click', (ev) => ev.stopPropagation());
 
     if (v.last) {
       card.tabIndex = 0;

@@ -2,6 +2,7 @@
  * The audit drawer: everything behind a single number.
  * Desktop = right-hand panel, mobile = bottom sheet (CSS decides).
  */
+import { MIN_QUALIFIED_SCORES } from '@agi/shared';
 import type { ModelRelease, Score, Source } from '@agi/shared';
 import type { Computed, Ctx } from '../data';
 import { orderedScores, sourceCount } from '../data';
@@ -81,9 +82,11 @@ export class Drawer {
     }
 
     const lab = this.ctx.labs.get(release.lab);
+    const mi = computed.fit.models[release.id];
     this.eyebrow.innerHTML =
       `<span class="rank-dot" style="background:${esc(lab?.color ?? '#111')}"></span>` +
-      `${esc(lab?.name ?? release.lab)} · ${esc(release.status)}`;
+      `${esc(lab?.name ?? release.lab)} · ${esc(release.status)}` +
+      (mi ? badge(mi.qualified ? 'qualified' : 'provisional', mi.qualified ? 'qualified' : 'provisional') : '');
     this.title.textContent = release.name;
     this.body.innerHTML = this.content(release, computed);
     this.body.scrollTop = 0;
@@ -98,13 +101,27 @@ export class Drawer {
     if (mi) {
       facts.push(fact('Frontier Index', `${fmtIndex(mi.index)}<small> ± ${mi.se.toFixed(2)} θ</small>`));
       facts.push(fact('Range', `<small>${fmtIndex(mi.indexLow)} ${EN_DASH} ${fmtIndex(mi.indexHigh)}</small>`));
-      facts.push(fact('Coverage', `${mi.n}<small> / ${basket.length}</small>`));
+      facts.push(fact('Coverage', `${mi.n}<small> / ${basket.length} index benchmarks</small>`));
       facts.push(fact('θ (ability)', fmtSigned(mi.theta)));
     } else {
       facts.push(fact('Frontier Index', `<small>${release.status === 'released' ? 'no official index score' : 'not on the index'}</small>`));
     }
     facts.push(fact('Released', `<small>${esc(fmtDatePrecision(release.date, release.date_precision))}</small>`));
     facts.push(fact('Sources', String(sourceCount(release))));
+
+    // Name the gap: exactly these benchmarks are what stands between provisional and qualified.
+    const reported = new Set((mi?.used ?? []).map((u) => u.benchmark));
+    const missing = release.status === 'released' ? basket.filter((b) => !reported.has(b.id)) : [];
+    const missingBlock = missing.length
+      ? `<p class="dmissing"><span class="dmissing__label">Not reported</span>${missing
+          .map((b) => `<span class="bchip bchip--missing" title="${esc(b.description)}">${esc(b.name)}</span>`)
+          .join('')}</p>`
+      : '';
+    const qualifyNote =
+      mi && !mi.qualified
+        ? `<p class="method-copy dqualify">Provisional: ${MIN_QUALIFIED_SCORES} index benchmarks are the minimum for the fit to say anything
+            about this model, so it is drawn hollow, listed after the qualified flagships, and kept off the frontier line and the trend.</p>`
+        : '';
 
     const window = release.expected_window
       ? `<div class="dblock"><h3 class="dblock__title">Expected window</h3>
@@ -131,6 +148,8 @@ export class Drawer {
 
     return (
       `<div class="dblock"><dl class="dfacts">${facts.join('')}</dl>
+        ${missingBlock}
+        ${qualifyNote}
         <p class="method-copy" style="margin-top:14px">${esc(precisionLabel(release.date_precision))} · family ${esc(release.family)}${
           mi ? ` · residual σ of the whole fit ${c.fit.residualSigma.toFixed(3)}` : ''
         }</p></div>` +

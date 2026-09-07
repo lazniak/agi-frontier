@@ -92,7 +92,16 @@ export interface Computed {
   rankings: ModelIndex[];
   labViews: LabView[];
   byLab: Map<LabId, LabView>;
+  /**
+   * The frontier itself: the last knot of the running maximum, which `frontierLine` builds from
+   * qualified models only. Never a provisional release — see METHODOLOGY §3.
+   */
   top: SeriesPoint | null;
+  /**
+   * Highest-index provisional release as of `asOf`. Shown as a footnote when it out-scores `top`,
+   * so a reader who spots a bigger number on the chart is not left wondering why it is not the lead.
+   */
+  topProvisional: SeriesPoint | null;
   nextUp: NextUp | null;
   /** Index range actually occupied by visible data — used by "fit to data". */
   extent: [number, number];
@@ -219,9 +228,10 @@ function computeUncached(ctx: Ctx, asOf: ISODate): Computed {
     }
 
     const byLab = new Map(labViews.map((v) => [v.lab.id, v]));
-    const topId = rankings[0]?.release_id;
-    const topRelease = topId ? ctx.releasesById.get(topId) : undefined;
-    const top = topRelease && rankings[0] ? { release: topRelease, mi: rankings[0] } : null;
+    // The headline number is the frontier, not the best current flagship: `frontierLine` already
+    // filters to qualified models, so a provisional release can never become the lead.
+    const top = seriesPoint(ctx, fit, frontier[frontier.length - 1]?.release_id);
+    const topProvisional = seriesPoint(ctx, fit, bestProvisionalId(fit));
 
     return {
       ok: true,
@@ -236,6 +246,7 @@ function computeUncached(ctx: Ctx, asOf: ISODate): Computed {
       labViews,
       byLab,
       top,
+      topProvisional,
       nextUp: pickNextUp(ctx, labViews, asOf),
       extent: extentOfViews(labViews),
     };
@@ -267,9 +278,28 @@ function emptyComputed(ctx: Ctx, asOf: ISODate): Computed {
     labViews,
     byLab: new Map(labViews.map((v) => [v.lab.id, v])),
     top: null,
+    topProvisional: null,
     nextUp: null,
     extent: [0, 100],
   };
+}
+
+/** Pair a fitted model with its release, or null when either half is missing. */
+function seriesPoint(ctx: Ctx, fit: IndexFit, id: string | undefined): SeriesPoint | null {
+  if (!id) return null;
+  const mi = fit.models[id];
+  const release = ctx.releasesById.get(id);
+  return mi && release ? { release, mi } : null;
+}
+
+/** Highest-index provisional model in the fit (the fit is already scoped to `asOf`). */
+function bestProvisionalId(fit: IndexFit): string | undefined {
+  let best: ModelIndex | undefined;
+  for (const m of Object.values(fit.models)) {
+    if (m.qualified) continue;
+    if (!best || m.index > best.index || (m.index === best.index && m.release_id < best.release_id)) best = m;
+  }
+  return best?.release_id;
 }
 
 /** The soonest credible next flagship across all labs. */

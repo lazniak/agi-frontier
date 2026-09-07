@@ -89,7 +89,7 @@ Nothing numeric is implemented here. `src/data.ts` calls, and only calls, `@agi/
 | what you see | function |
 |---|---|
 | Frontier Index per model, δ per benchmark, residuals | `fitFrontierIndex` |
-| the black step line (running maximum) | `frontierLine` |
+| the black step line (running maximum), and the “Frontier Index today” stat | `frontierLine` |
 | “+0.68 pts / mo” | `frontierVelocity` |
 | the coloured band under the x axis | `leadershipStripes` |
 | the rankings table | `rankCurrentFlagships` |
@@ -120,6 +120,16 @@ labels can sit in the right-hand gutter and the stripe band below the axis.
   would add up to a solid yellow block, so the fills are opaque inside a group that carries the
   opacity: the union sits at exactly 14 % however many labs are on. Prediction-circle fills use
   the same trick at 10 %; their strokes stay outside it so each window still reads as a ring.
+- **Qualified vs provisional** (METHODOLOGY §3) is drawn everywhere the index is shown. A release
+  with fewer than `MIN_QUALIFIED_SCORES` index benchmarks (`fit.models[id].qualified === false`) is
+  a **hollow point** — white fill, 1.5 px lab-colour stroke — and its tooltip says how many of the
+  basket it reported. The lab line still runs through it, and its whisker, hover and selected
+  states are unchanged. `fill` and `stroke` are set as presentation attributes in `chart/layers.ts`
+  precisely because CSS would beat them; only `stroke-width` and the selected ring live in
+  `chart.css`. Downstream: the rankings table breaks the two groups with a divider row (rank
+  numbers keep counting), badges the model and drops its rows to `--ink-2`; the release-watch card
+  badges a provisional flagship and links to `docs/DATA-GUIDE.md`; the audit drawer badges the
+  header and names the missing index benchmarks as grey chips.
 - Each predicted release is a **true circle** whose *diameter* is the pixel distance from
   `p16Date` to `p84Date` (clamped 8–160 px, and to 16 % of the plot width), centred on the
   median date at the expected index. Opacity falls with the chain index (1, .7, .5, .35, .25).

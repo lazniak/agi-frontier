@@ -156,6 +156,8 @@
           <p class="key">
             <span class="key__swatch key__swatch--point" aria-hidden="true"></span> released flagship
             <span class="key__sep" aria-hidden="true">·</span>
+            <span class="key__swatch key__swatch--provisional" aria-hidden="true"></span> provisional (fewer than 3 index benchmarks)
+            <span class="key__sep" aria-hidden="true">·</span>
             <span class="key__swatch key__swatch--announced" aria-hidden="true"></span> announced
             <span class="key__sep" aria-hidden="true">·</span>
             <span class="key__swatch key__swatch--rumored" aria-hidden="true"></span> rumored
@@ -232,7 +234,11 @@
               <em>logit(score) = θ<sub>model</sub> − δ<sub>benchmark</sub></em>. The
               <strong>Frontier Index</strong> is 100·σ(θ) — the score a model would be expected to get
               on a benchmark of average difficulty in the basket — so it is comparable even when two
-              models reported different subsets. Release timing comes from a log-normal fit of each
+              models reported different subsets. A <strong>hollow marker</strong> — matched by a
+              "provisional" badge in the rankings and the release watch — means the release reported
+              fewer than three index benchmarks, so its index rests on too little evidence to form
+              the frontier line or feed a lab's trend, and it is listed after the qualified
+              flagships. Release timing comes from a log-normal fit of each
               lab's inter-release intervals, shrunk toward the cross-lab prior so a lab with two
               releases does not get absurd certainty. The yellow circle is centred on the median
               predicted date and its diameter is the 16th–84th percentile window; the fan is the

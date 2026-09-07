@@ -202,15 +202,24 @@ export function drawPoints(g: G, r: RenderCtx): void {
     .attr('role', 'button')
     .merge(sel);
 
+  // A provisional release (fewer than MIN_QUALIFIED_SCORES index benchmarks) is drawn hollow:
+  // white fill, the lab's colour as the 1.5px stroke. The lab line still runs through it.
+  const colorOf = (d: SeriesPoint): string => ctx.labs.get(d.release.lab)?.color ?? INK;
+
   merged
-    .attr('class', (d) => `lab-point${d.mi.release_id === r.selected ? ' is-selected' : ''}`)
+    .attr('class', (d) =>
+      `lab-point${d.mi.qualified ? '' : ' lab-point--provisional'}${d.mi.release_id === r.selected ? ' is-selected' : ''}`,
+    )
     .attr('data-id', (d) => d.mi.release_id)
     .attr('data-lab', (d) => d.release.lab)
     .attr('cx', (d) => x(toDate(d.release.date)))
     .attr('cy', (d) => y(d.mi.index))
-    .attr('fill', (d) => ctx.labs.get(d.release.lab)?.color ?? INK)
+    .attr('fill', (d) => (d.mi.qualified ? colorOf(d) : '#fff'))
+    .attr('stroke', (d) => (d.mi.qualified ? '#fff' : colorOf(d)))
     .attr('aria-label', (d) =>
-      `${d.release.name}, ${ctx.labs.get(d.release.lab)?.name ?? d.release.lab}, released ${fmtDate(d.release.date)}, Frontier Index ${fmtIndex(d.mi.index)}. Activate for sources.`,
+      `${d.release.name}, ${ctx.labs.get(d.release.lab)?.name ?? d.release.lab}, released ${fmtDate(d.release.date)}, Frontier Index ${fmtIndex(d.mi.index)}${
+        d.mi.qualified ? '' : ', provisional'
+      }. Activate for sources.`,
     )
     .on('pointerenter', function (ev: PointerEvent, d) {
       r.io.hoverRelease(d.mi.release_id);
