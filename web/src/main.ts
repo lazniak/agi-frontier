@@ -50,6 +50,25 @@ function writeLongRange(on: boolean): void {
   }
 }
 
+/** Full history (since the first GPT) is the default; "0" means the 2023-onwards view. */
+const FULL_HISTORY_KEY = 'agi:full-history';
+
+function readFullHistory(): boolean {
+  try {
+    return localStorage.getItem(FULL_HISTORY_KEY) !== '0';
+  } catch {
+    return true;
+  }
+}
+
+function writeFullHistory(on: boolean): void {
+  try {
+    localStorage.setItem(FULL_HISTORY_KEY, on ? '1' : '0');
+  } catch {
+    /* storage unavailable */
+  }
+}
+
 /** The y-axis choice sticks too. Anything but "linear" means the default, the logit axis. */
 const Y_SCALE_KEY = 'agi:y-scale';
 
@@ -97,6 +116,7 @@ async function boot(): Promise<void> {
     minDate: minScrub(ctx),
     longRange: readLongRange(),
     yMode: readYMode(),
+    fullHistory: readFullHistory(),
   });
   const tooltip = new Tooltip();
   const drawer = new Drawer(ctx, store);
@@ -144,6 +164,16 @@ async function boot(): Promise<void> {
         ? 'Long-range forecast on — every chained prediction out to three years'
         : 'Long-range forecast off — only the next release per lab',
     );
+  });
+
+  const histBtn = qs<HTMLButtonElement>('[data-full-history]');
+  histBtn.setAttribute('aria-pressed', String(store.get().fullHistory));
+  histBtn.addEventListener('click', () => {
+    const on = histBtn.getAttribute('aria-pressed') !== 'true';
+    histBtn.setAttribute('aria-pressed', String(on));
+    store.setFullHistory(on);
+    writeFullHistory(on);
+    announce(on ? 'Full history — from the first release' : 'Recent view — from 2023');
   });
 
   const yBtn = qs<HTMLButtonElement>('[data-y-scale]');

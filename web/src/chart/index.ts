@@ -8,7 +8,7 @@ import { select } from 'd3-selection';
 import { zoomTransform, type ZoomTransform } from 'd3-zoom';
 import type { ISODate } from '@agi/shared';
 import type { Computed, Ctx } from '../data';
-import { CHART_START, compute, extentOfViews, restingLogitExtent } from '../data';
+import { CHART_START_RECENT, compute, extentOfViews, restingLogitExtent } from '../data';
 import type { Store } from '../state';
 import { prefersReducedMotion, svg as mk } from '../dom';
 import { drawFans, drawPredictions, spotlightLabs } from './forecast';
@@ -86,7 +86,7 @@ export function createChart(host: HTMLElement, ctx: Ctx, store: Store, io: Inter
   let scrubDetach: (() => void) | null = null;
 
   const baseDomain = (): [Date, Date] => [
-    toDate(CHART_START),
+    toDate(store.get().fullHistory ? ctx.chartStart : CHART_START_RECENT),
     toDate(store.get().longRange ? ctx.chartEnd : ctx.chartEndNear),
   ];
 
@@ -243,11 +243,13 @@ export function createChart(host: HTMLElement, ctx: Ctx, store: Store, io: Inter
   const detachKeys = attachKeyboardNav(groups.points);
 
   let lastLongRange = store.get().longRange;
+  let lastFullHistory = store.get().fullHistory;
   const unsubscribe = store.subscribe((channels) => {
-    if (channels.has('view') && store.get().longRange !== lastLongRange) {
+    if (channels.has('view') && (store.get().longRange !== lastLongRange || store.get().fullHistory !== lastFullHistory)) {
       // The base x-domain just changed under the zoom transform; keeping the old one would land
       // the reader somewhere arbitrary. Snap back to the new default window instead.
       lastLongRange = store.get().longRange;
+      lastFullHistory = store.get().fullHistory;
       zoomHandle.reset();
     }
     if (channels.has('view') || channels.has('filters')) {

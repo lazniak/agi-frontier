@@ -41,8 +41,10 @@ import {
   todayISO,
 } from '@agi/shared';
 
-/** The chart always starts here; the right edge depends on the long-range toggle. */
-export const CHART_START: ISODate = '2023-01-01';
+/** Left edge of the "recent" view (the modern basket era); the right edge depends on the long-range toggle. */
+export const CHART_START_RECENT: ISODate = '2023-01-01';
+/** Room left of the first release in the full-history view. */
+export const CHART_HISTORY_PAD_DAYS = 120;
 /** Default right edge: today + 12 months. Only the next release per lab fits in it. */
 export const CHART_FUTURE_DAYS = 365;
 /** "Long-range forecast (3 years)" right edge, matching the chained-forecast horizon. */
@@ -63,6 +65,8 @@ export interface Ctx {
   today: ISODate;
   /** First release date in the dataset (scrubber lower bound is derived from it). */
   firstDate: ISODate;
+  /** Left edge of the full-history view: a little before the first release. */
+  chartStart: ISODate;
   /** Right edge of the long-range view (today + 3 years); also clips the chained predictions. */
   chartEnd: ISODate;
   /** Right edge of the default view (today + 12 months). */
@@ -165,7 +169,7 @@ export async function loadBundle(): Promise<Bundle> {
 export function makeCtx(bundle: Bundle): Ctx {
   const today = todayISO();
   const dates = bundle.releases.map((r) => r.date).sort();
-  const firstDate = dates[0] ?? CHART_START;
+  const firstDate = dates[0] ?? CHART_START_RECENT;
   return {
     bundle,
     labs: new Map(bundle.labs.map((l) => [l.id, l])),
@@ -176,6 +180,7 @@ export function makeCtx(bundle: Bundle): Ctx {
     releasesById: new Map(bundle.releases.map((r) => [r.id, r])),
     today,
     firstDate,
+    chartStart: minDate(addDays(firstDate, -CHART_HISTORY_PAD_DAYS), CHART_START_RECENT),
     chartEnd: addDays(today, CHART_FUTURE_DAYS_LONG),
     chartEndNear: addDays(today, CHART_FUTURE_DAYS),
     synthetic: bundle.releases.some((r) => (r.notes ?? '').includes('SYNTHETIC FIXTURE')),

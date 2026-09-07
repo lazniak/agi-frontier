@@ -27,6 +27,8 @@ export interface StateShape {
   hoverLab: LabId | null;
   /** Y axis: linear in latent ability θ (logit) or in the 0–100 index. */
   yMode: YMode;
+  /** Left edge of the chart: the first release (true) or the start of the modern basket era, 2023 (false). */
+  fullHistory: boolean;
   /** "Fit to data" y-axis toggle. */
   fitY: boolean;
   /**
@@ -44,7 +46,9 @@ export class Store {
   private queued = new Set<Channel>();
   private frame = 0;
 
-  constructor(init: Pick<StateShape, 'asOf' | 'today' | 'minDate'> & { longRange?: boolean; yMode?: YMode }) {
+  constructor(
+    init: Pick<StateShape, 'asOf' | 'today' | 'minDate'> & { longRange?: boolean; yMode?: YMode; fullHistory?: boolean },
+  ) {
     this.state = {
       ...init,
       hidden: new Set<LabId>(),
@@ -53,6 +57,7 @@ export class Store {
       hover: null,
       hoverLab: null,
       yMode: init.yMode ?? 'logit',
+      fullHistory: init.fullHistory ?? true,
       fitY: false,
       longRange: init.longRange ?? false,
     };
@@ -145,6 +150,12 @@ export class Store {
     if (this.state.hoverLab === lab) return;
     this.state.hoverLab = lab;
     this.emit('hover');
+  }
+
+  setFullHistory(on: boolean): void {
+    if (this.state.fullHistory === on) return;
+    this.state.fullHistory = on;
+    this.emit('view');
   }
 
   setYMode(mode: YMode): void {

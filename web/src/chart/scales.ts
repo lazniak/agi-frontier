@@ -157,8 +157,12 @@ export function timeTicks(x: XScale, maxTicks: number): TimeTick[] {
   };
 
   if (spanDays > 2400) {
-    const step = spanDays > 7000 ? 2 : 1;
-    for (let y = a.getUTCFullYear(); y <= b.getUTCFullYear() + 1; y += step) {
+    // Years only. Every year is a major tick and majors are never thinned, so pick the stride
+    // from the pixel budget here: nine years on a phone become 2019 · 2021 · 2023 · 2025.
+    const step = Math.max(1, Math.ceil(spanDays / 365.25 / Math.max(1, maxTicks)));
+    const first = a.getUTCFullYear();
+    const start = first + ((step - (first % step)) % step);
+    for (let y = start; y <= b.getUTCFullYear() + 1; y += step) {
       push(new Date(Date.UTC(y, 0, 1)), String(y), true);
     }
   } else if (spanDays > 1000) {

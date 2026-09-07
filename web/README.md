@@ -107,7 +107,9 @@ One `<svg>` with nine sibling `<g>` layers in a fixed z-order — `grid`, `strip
 different amount. `fans` and `markers` are clipped to the plot rect; the others are not, so lab
 labels can sit in the right-hand gutter and the stripe band below the axis.
 
-- **x** is time and never ends: the default domain is 2023-01 → today + 12 months, and
+- **x** is time and never ends: the default domain is 120 days before the first release (GPT-1,
+  2018) → today + 12 months; the **“Full history”** pill (kept under `agi:full-history`) switches
+  the left edge to 2023-01, the start of the modern basket era. Either way
   `d3-zoom` pans and scales it (wheel, drag, pinch). Scrolling *out* at the default zoom is
   deliberately **not** captured, so the page keeps scrolling normally; scrolling *in* zooms.
 - **“Long-range forecast (3 years)”** is the one view switch. Off (the default) the chart shows
