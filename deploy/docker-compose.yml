@@ -32,6 +32,6 @@ services:
     volumes:
       # the whole checkout: the worker edits data/ and commits into the host repo
       - ..:/repo
-      - /root/.ssh/agi_frontier_deploy:/root/.ssh/id_ed25519:ro
+      - /root/.ssh/agi_frontier_bot:/root/.ssh/id_ed25519:ro
     working_dir: /repo
     command: ["bun", "run", "worker/src/cli.ts", "loop"]
