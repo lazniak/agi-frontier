@@ -17,6 +17,7 @@ import type {
   Benchmark,
   Bundle,
   Crossing,
+  DensitySample,
   Era,
   FanPoint,
   FrontierGain,
@@ -40,6 +41,7 @@ import {
   backtestAsOf,
   benchmarkLevels,
   capabilityFan,
+  familyRibbon,
   fitFrontierIndex,
   forecastAll,
   frontierCrossings,
@@ -56,7 +58,9 @@ import {
   paceEras,
   projectedEra as projectedEraOf,
   rankCurrentFlagships,
+  releaseDensity,
   releasesAsOf,
+  speculativeLevels,
   thetaFromIndex,
   todayISO,
 } from '@agi/shared';
@@ -186,8 +190,21 @@ export interface Computed {
   eras: Era[];
   /** Regime of the current trend slope, open-ended. */
   projectedEra: PaceRegime | null;
-  /** Family band per lab (REDESIGN §3). */
+  /**
+   * Real-data family ribbon per lab (REDESIGN §12.3, `familyRibbon`): the best and the weakest
+   * member of the lab's current family through time. `LabView.band` keeps the older lineup band.
+   */
   bands: Map<LabId, BandPoint[]>;
+  /**
+   * Speculative landmarks above the basket ceiling (REDESIGN §12.1). Drawn on the ladder only —
+   * never part of `levels`, `crossings` or the eras.
+   */
+  speculativeLevels: Level[];
+  /**
+   * Release-date density per prediction, keyed `${lab}|${k}` (REDESIGN §12.4) — the shape of the
+   * release lens. Precomputed here so the chart never re-derives a law while panning.
+   */
+  densities: Map<string, DensitySample[]>;
   backtest: {
     /** The worker-computed whole-history report, when the bundle carries one. */
     report: BacktestReport | null;
@@ -370,7 +387,18 @@ function computeUncached(ctx: Ctx, asOf: ISODate, forecastMode: ForecastMode): C
       });
     }
 
-    const bands = new Map(labViews.map((v) => [v.lab.id, v.band]));
+    // The ribbon is the real-data counterpart of the fan (REDESIGN §12.3): every tier joins the
+    // current family, so with flagships only it is the spread between the last two flagships.
+    const bands = new Map(labViews.map((v) => [v.lab.id, familyRibbon(fit, bundle.releases, v.lab.id, { asOf })]));
+
+    const densities = new Map<string, DensitySample[]>();
+    for (const v of labViews) {
+      if (!v.forecast) continue;
+      for (const pred of v.predictions) densities.set(densityKey(v.lab.id, pred.k), releaseDensity(v.forecast, pred));
+    }
+
+    const ceiling = levels.find((lv) => lv.kind === 'ceiling');
+    const speculative = ceiling ? speculativeLevels(ceiling) : [];
 
     const byLab = new Map(labViews.map((v) => [v.lab.id, v]));
     // The headline number is the frontier, not the best current flagship: `frontierLine` already
@@ -419,6 +447,8 @@ function computeUncached(ctx: Ctx, asOf: ISODate, forecastMode: ForecastMode): C
       eras,
       projectedEra: projected,
       bands,
+      speculativeLevels: speculative,
+      densities,
       backtest,
     };
   } catch (err) {
@@ -492,8 +522,15 @@ function emptyComputed(ctx: Ctx, asOf: ISODate): Computed {
     eras: [],
     projectedEra: null,
     bands: new Map(),
+    speculativeLevels: [],
+    densities: new Map(),
     backtest: { report: ctx.bundle.backtest ?? null, rows: null },
   };
+}
+
+/** Key of `Computed.densities` for one lab's k-th prediction. */
+export function densityKey(lab: LabId, k: number): string {
+  return `${lab}|${k}`;
 }
 
 /** Pair a fitted model with its release, or null when either half is missing. */

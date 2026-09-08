@@ -66,23 +66,67 @@
   background: linear-gradient(var(--predict-tint), var(--predict-tint)), var(--paper);
 }
 
-/* ------------------------------------------------------------- the canvas */
+/* ------------------------------------------------------------- the stage */
+/* One block (REDESIGN §12.1): control bar · canvas (flex 1) · time-axis strip pinned to the
+   bottom edge · legend dock. The viewport budget belongs to the *stage*, not to the figure:
+   the dock is the only key to the marks and the layers now that the static `.key` paragraph is
+   gone, so it has to share the screen with the plot. The canvas takes what the other rows
+   leave, never less than its own floor. */
+.chart-stage {
+  display: flex;
+  flex-direction: column;
+  height: clamp(560px, calc(100vh - 120px), 1000px);
+  /* A tall control bar or a dock that wrapped onto more rows grows the stage instead of pushing
+     itself past the bottom edge — the budget is a target, never a clip. */
+  min-height: min-content;
+}
+
+/* The plot (canvas + axis strip) is the row that stretches; the control bar and the legend dock
+   keep their natural height. `min-height` is the canvas floor plus the axis strip. */
 .chart-figure {
   position: relative;
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 340px;
   width: 100%;
-  margin-block: 4px 20px;
+  margin-block: 4px 0;
+}
+
+@media (max-width: 720px) {
+  /* The control bar is a fixed bottom sheet on phones, so the stage is plot · dates · dock. */
+  .chart-stage {
+    height: calc(100vh - 160px);
+  }
+
+  .chart-figure {
+    min-height: 300px;
+  }
 }
 
 .chart-canvas {
   position: relative;
+  flex: 1 1 auto;
   width: 100%;
-  /* The plot plus the pace strip under it (see chart/scales.ts geometry). */
-  min-height: calc(72vh + 96px);
-  height: calc(72vh + 96px);
-  max-height: 960px;
+  min-height: 240px;
+  /* Vertical swipes scroll the page; horizontal drags and pinches are the chart's. */
   touch-action: pan-y;
   cursor: grab;
   overscroll-behavior-x: contain;
+}
+
+/* A short laptop screen cannot give the plot its full floor *and* keep the dock above the fold
+   once the control bar has taken its ~150 px. The dock wins: a plot whose key is off-screen is
+   unreadable in its own way, and the reader can still zoom the plot. (After the base rules, so
+   the lower floors take effect.) */
+@media (min-width: 721px) and (max-height: 780px) {
+  .chart-figure {
+    min-height: 280px;
+  }
+
+  .chart-canvas {
+    min-height: 180px;
+  }
 }
 
 .chart-canvas.is-panning {
@@ -96,10 +140,109 @@
   overflow: visible;
 }
 
-@media (max-width: 760px) {
-  .chart-canvas {
-    min-height: calc(60vh + 76px);
-    height: calc(60vh + 76px);
+/* The time-axis strip: fixed rows under the plot, drawn from the same x scale. */
+.chart-axis {
+  flex: 0 0 auto;
+  width: 100%;
+  position: relative;
+}
+
+.chart-axis svg {
+  display: block;
+  width: 100%;
+  overflow: visible;
+}
+
+.axis-rule {
+  stroke: var(--hair-strong);
+  stroke-width: 1;
+  shape-rendering: crispEdges;
+}
+
+.axis-tick {
+  stroke: var(--hair-strong);
+  stroke-width: 1;
+  shape-rendering: crispEdges;
+}
+
+.axis-tick--major {
+  stroke: var(--ink-2);
+}
+
+.axis-now {
+  stroke: var(--ink-1);
+  stroke-width: 1;
+  opacity: 0.35;
+  shape-rendering: crispEdges;
+}
+
+/* The one-time wheel hint (REDESIGN §12.1). */
+.chart-hint {
+  position: absolute;
+  left: 50%;
+  bottom: 18px;
+  transform: translate(-50%, 6px);
+  z-index: 5;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: rgba(17, 17, 17, 0.88);
+  color: #fff;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.22s ease, transform 0.22s ease;
+}
+
+.chart-hint.is-visible {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+@media (max-width: 720px) {
+  .chart-hint {
+    white-space: normal;
+    text-align: center;
+    max-width: 82vw;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chart-hint {
+    transition: none;
+  }
+}
+
+/* ------------------------------------------------------------ smart hover */
+/* Focus is a class toggle on every [data-lab] element (chart/hover.ts); the transition does
+   the cross-fade. Fans, the frontier line and the ladder carry no data-lab and stay untouched. */
+.chart-svg [data-lab],
+.chart-axis-svg [data-lab] {
+  transition: opacity 0.26s cubic-bezier(0.2, 0.7, 0.2, 1), stroke-width 0.26s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+/* Ribbons carry `data-lab` too, but they rest at 0.14 and quieten to 0.05 — lower than the
+   generic dim. Excluding them here keeps `.family-band.is-dim` authoritative; with the plain
+   `[data-lab].is-dim` selector its higher specificity made a *dimmed* ribbon brighter than a
+   resting one, so focusing a family lit up every other family's band. */
+.chart-svg [data-lab]:not(.family-band).is-dim,
+.chart-axis-svg [data-lab]:not(.family-band).is-dim {
+  opacity: 0.18;
+}
+
+.lab-line.is-focus {
+  stroke-width: 2.4;
+}
+
+.lab-label.is-focus {
+  font-weight: 600;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chart-svg [data-lab],
+  .chart-axis-svg [data-lab] {
+    transition: none;
   }
 }
 
@@ -181,7 +324,29 @@
   stroke-width: 1.5;
   stroke-linecap: round;
   stroke-linejoin: round;
-  transition: opacity 0.25s ease, stroke-width 0.2s ease;
+}
+
+/* Family ribbon (REDESIGN §12.3): 14 % at rest, 34 % when the family is focused. */
+.family-band {
+  opacity: 0.14;
+}
+
+.family-band.is-focus {
+  opacity: 0.34;
+}
+
+.family-band.is-dim {
+  opacity: 0.05;
+}
+
+.tier-point {
+  opacity: 0.9;
+  cursor: pointer;
+}
+
+.release-tick,
+.stripe {
+  opacity: 0.85;
 }
 
 /* `fill` and `stroke` are set per point in chart/layers.ts — a qualified release is solid in the
@@ -190,7 +355,6 @@
 .lab-point {
   stroke-width: 1.5;
   cursor: pointer;
-  transition: opacity 0.25s ease;
 }
 
 .lab-point:hover,
@@ -261,31 +425,60 @@
   stroke-linecap: round;
 }
 
-.pred-circle {
-  stroke-width: 1.5;
+/* Release lens (REDESIGN §12.4): fill = gradient toward the mode, 90 % outer edge, 68 % inner
+   outline, 1.5 px median tick. The hit path is the lens itself, invisible and thickened. */
+.pred-lens {
   cursor: pointer;
-  transition: opacity 0.2s ease;
 }
 
-.pred-circle:hover {
-  opacity: 1 !important;
+.pred-lens__fill,
+.pred-lens__edge90,
+.pred-lens__edge68,
+.pred-lens__median,
+.pred-lens__halo {
+  pointer-events: none;
 }
 
-/* k = 2 in the default view: present, clearly weaker, no fill of its own. */
-.pred-circle--ghost {
-  stroke-width: 1;
-  stroke-dasharray: 3 4;
+.pred-lens__edge90 {
+  stroke-width: 0.75;
+  stroke-opacity: 0.55;
+  stroke-linejoin: round;
 }
 
-/* Halo on the k = 1 circle of the lab with the highest P(30 d). */
-.pred-glow {
+.pred-lens__edge68 {
+  stroke-width: 1.4;
+  stroke-opacity: 0.95;
+  stroke-linejoin: round;
+}
+
+.pred-lens__median {
+  stroke-width: 1.5;
+  stroke-linecap: round;
+}
+
+/* Halo on the k = 1 lens of the lab with the highest P(30 d). */
+.pred-lens__halo {
   stroke-width: 4;
-  opacity: 0.25;
-  pointer-events: none;
+  opacity: 0.3;
 }
 
-.pred-dot {
-  pointer-events: none;
+.pred-lens__hit {
+  fill: transparent;
+  stroke: transparent;
+  stroke-width: 10;
+  pointer-events: all;
+}
+
+.pred-lens__hit:focus-visible {
+  outline: none;
+  stroke: var(--ink-1);
+  stroke-width: 1.5;
+  stroke-dasharray: 3 3;
+}
+
+.pred-lens:hover,
+.pred-lens:focus-within {
+  opacity: 1 !important;
 }
 
 /* A lab outside the spotlight: its 68 % window as a bar, the median as a dot. */
@@ -449,11 +642,13 @@
 }
 
 /* --------------------------------------------------------------- controls */
+/* The lab chips moved into the legend dock; this row is the scrubber alone now. */
 .chart-controls {
   display: grid;
-  grid-template-columns: minmax(240px, 380px) minmax(0, 1fr);
+  grid-template-columns: minmax(240px, 560px);
   align-items: center;
   gap: clamp(18px, 3vw, 40px);
+  margin-top: 18px;
 }
 
 @media (max-width: 900px) {
@@ -596,21 +791,148 @@
   font-weight: 500;
 }
 
-/* -------------------------------------------------------------------- key */
-.chart-key {
-  margin-top: 18px;
+/* -------------------------------------------------------------- legend dock */
+/* Replaces the static key (REDESIGN §12.1): labs · marks · layers. */
+.legend-dock {
+  display: grid;
+  gap: 8px;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--hair-soft);
 }
 
-.key {
+.legend-row {
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr);
+  align-items: start;
+  gap: 6px 12px;
+}
+
+.legend-row__label {
+  padding-top: 8px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.legend-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-width: 0;
+}
+
+.legend-chips--marks {
+  gap: 4px 16px;
+  padding-top: 6px;
+}
+
+.legend-mark {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   font-size: 12px;
   color: var(--ink-3);
-  line-height: 2.1;
   letter-spacing: 0.02em;
+  white-space: nowrap;
 }
 
-.key__sep {
-  color: var(--hair-strong);
-  margin-inline: 6px;
+.legend-mark .key__swatch {
+  margin-right: 0;
+}
+
+.chip--lab .chip__count {
+  font-size: 10.5px;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-3);
+  opacity: 0.85;
+}
+
+.chip--lab[aria-current='true'] {
+  border-color: currentColor;
+  box-shadow: 0 0 0 1px currentColor inset;
+}
+
+.chip--layer {
+  color: var(--ink-3);
+  padding-inline: 10px 12px;
+}
+
+.chip--layer .key__swatch {
+  margin-right: 0;
+}
+
+.chip--layer[aria-pressed='true'] {
+  color: var(--ink-2);
+}
+
+.chip--layer[aria-pressed='false'] {
+  opacity: 0.45;
+  text-decoration: line-through;
+  text-decoration-color: var(--hair-strong);
+}
+
+/* Phones: 44 px targets. The rows keep their own horizontal scroll instead of eating the canvas
+   — but the scroll has to be *visible*: a thin scrollbar plus a fade on the right edge, or half
+   the labs and most of the layer toggles are hidden with nothing to say they exist. */
+@media (max-width: 720px) {
+  .legend-row {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+
+  .legend-row__label {
+    padding-top: 0;
+  }
+
+  .legend-chips {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--hair-strong) transparent;
+    padding-bottom: 4px;
+    margin-inline: calc(clamp(18px, 4vw, 48px) * -1);
+    padding-inline: clamp(18px, 4vw, 48px);
+    /* The fade sits on the scroll port, so it stays on the right edge as the row scrolls. */
+    mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent 100%);
+  }
+
+  .legend-chips::-webkit-scrollbar {
+    height: 4px;
+  }
+
+  .legend-chips::-webkit-scrollbar-thumb {
+    background: var(--hair-strong);
+    border-radius: 2px;
+  }
+
+  .legend-chips .chip {
+    min-height: 44px;
+    padding-inline: 14px 12px;
+  }
+
+  .legend-mark {
+    min-height: 32px;
+  }
+}
+
+/* ----------------------------------------------------------------- swatches */
+/* The static `.key` paragraph is gone (REDESIGN §12.1); the legend dock reuses its swatches. */
+.key__swatch--lens {
+  width: 22px;
+  height: 11px;
+  border-radius: 50%;
+  background: linear-gradient(to right, rgba(245, 196, 0, 0.12), rgba(245, 196, 0, 0.6), rgba(245, 196, 0, 0.12));
+  border: 1px solid rgba(245, 196, 0, 0.7);
+}
+
+.key__swatch--bt {
+  width: 18px;
+  height: 0;
+  border-top: 1.5px dashed #2e7d32;
+  transform: translateY(-2px);
 }
 
 .key__swatch {
@@ -654,14 +976,6 @@
   height: 9px;
   border-radius: 2px;
   background: var(--predict-wash);
-}
-
-.key__swatch--circle {
-  width: 11px;
-  height: 11px;
-  border-radius: 50%;
-  border: 1.5px solid var(--predict);
-  background: rgba(245, 196, 0, 0.1);
 }
 
 .key__swatch--frontier {
@@ -903,17 +1217,28 @@
 .level-label--ceiling {
   fill: var(--ink-2);
 }
+
+/* Speculative landmarks (REDESIGN §12.1): grey, italic, dotted rung — never data. */
+.level-label--speculative {
+  fill: var(--announced-ink);
+  font-style: italic;
+}
 @media (max-width: 719px) {
   .level-label {
     font-size: 9.5px;
   }
 }
 
-/* Label beside a predicted crossing circle (chart/crossings.ts drops it when it would hit the gutter). */
+/* Label beside a predicted crossing circle (chart/crossings.ts drops it when it would hit the
+   gutter or a lab end-label). The white halo keeps it legible over the grid and the fans. */
 .crossing-label {
   font-size: 10.5px;
   font-weight: 400;
   letter-spacing: 0.02em;
   fill: var(--ink-2);
+  paint-order: stroke;
+  stroke: #fff;
+  stroke-width: 3px;
+  stroke-linejoin: round;
   pointer-events: none;
 }

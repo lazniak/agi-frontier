@@ -14,7 +14,7 @@ import { thetaFromIndex, type Crossing, type FanPoint, type FrontierPoint } from
 import { fanHighTheta, fanLowTheta, fanMidTheta } from '../data';
 import { toDate } from './scales';
 import { INK, PREDICT, ANNOUNCED, type RenderCtx } from './types';
-import type { G } from './layers';
+import type { G, LabelBox } from './layers';
 
 const FAN_OPACITY = 0.12;
 const LABEL_GAP = 18;
@@ -26,18 +26,18 @@ export function frontierFanPaths(r: RenderCtx, fan: FanPoint[]): { areaPath: str
   const { x, y } = r;
   const a = area<FanPoint>()
     .x((p) => x(toDate(p.date)))
-    .y0((p) => y(idx(fanLowTheta(p))))
-    .y1((p) => y(idx(fanHighTheta(p))))
+    .y0((p) => y.theta(fanLowTheta(p)))
+    .y1((p) => y.theta(fanHighTheta(p)))
     .curve(curveMonotoneX);
   const m = line<FanPoint>()
     .x((p) => x(toDate(p.date)))
-    .y((p) => y(idx(fanMidTheta(p))))
+    .y((p) => y.theta(fanMidTheta(p)))
     .curve(curveMonotoneX);
   return { areaPath: a(fan) ?? '', medianPath: m(fan) ?? '' };
 }
 
 export function drawFrontierFan(g: G, r: RenderCtx, fan: FanPoint[]): void {
-  if (fan.length < 2) {
+  if (fan.length < 2 || !r.layerOn('frontierFan')) {
     g.selectAll('*').remove();
     return;
   }
@@ -71,9 +71,20 @@ export function crossingRadius(c: Crossing, x: (d: Date) => number): number {
   return Math.min(MAX_CIRCLE_D, Math.max(MIN_CIRCLE_D, Math.abs(x84 - x16))) / 2;
 }
 
-export function drawCrossings(g: G, r: RenderCtx): void {
+/**
+ * @param reserved boxes another layer already occupies (the lab end-labels): a crossing label
+ * that would land on one is dropped rather than printed over it. The ladder names the same level
+ * at the same height in the right-hand gutter, so nothing is lost.
+ */
+export function drawCrossings(g: G, r: RenderCtx, reserved: readonly LabelBox[] = []): void {
   const { x, y, computed, geom } = r;
+  if (!r.layerOn('crossings')) {
+    g.selectAll('*').remove();
+    return;
+  }
 
+  // `computed.crossings` is built from the fitted levels only; the speculative landmarks never
+  // reach this layer (REDESIGN §12.1).
   const circles: CrossingDatum[] = [];
   for (const c of computed.crossings) {
     if (c.kind !== 'predicted') continue;
@@ -83,7 +94,7 @@ export function drawCrossings(g: G, r: RenderCtx): void {
       key: c.level.id,
       crossing: c,
       cx,
-      cy: y(idx(medianThetaAt(computed.frontierFan, c.date))),
+      cy: y.theta(medianThetaAt(computed.frontierFan, c.date)),
       rd: crossingRadius(c, x),
     });
   }
@@ -129,10 +140,17 @@ export function drawCrossings(g: G, r: RenderCtx): void {
     .attr('y', 3.5)
     .text((d) => (labelled.has(d.key) ? shortLevel(d.crossing, r.ctx.benchmarks) : ''))
     // The label lives inside the plot: drop it when it would run into the gutter (the ladder
-    // names the same level at the same height there anyway).
+    // names the same level at the same height there anyway) or over a lab end-label.
     .each(function (d) {
       const room = geom.x1 - d.cx - d.rd - 8;
-      if (room < 30 || this.getComputedTextLength() > room) this.textContent = '';
+      const width = this.getComputedTextLength();
+      if (room < 30 || width > room) {
+        this.textContent = '';
+        return;
+      }
+      const x0 = d.cx + Number(this.getAttribute('x') ?? 0);
+      const box: LabelBox = { x0, y0: d.cy - 6, x1: x0 + width, y1: d.cy + 7 };
+      if (reserved.some((b) => overlaps(box, b))) this.textContent = '';
     });
 
   // Past: small ink ticks on the frontier line, only the ones inside the window.
@@ -152,11 +170,16 @@ export function drawCrossings(g: G, r: RenderCtx): void {
     .merge(tickSel as never)
     .attr('x1', (d) => x(toDate(d.date)) - 3)
     .attr('x2', (d) => x(toDate(d.date)) + 3)
-    .attr('y1', (d) => y(idx(frontierThetaAt(computed, d.date))) - 3)
-    .attr('y2', (d) => y(idx(frontierThetaAt(computed, d.date))) + 3)
+    .attr('y1', (d) => y.theta(frontierThetaAt(computed, d.date)) - 3)
+    .attr('y2', (d) => y.theta(frontierThetaAt(computed, d.date)) + 3)
     .on('pointerenter', (ev: PointerEvent, d) => r.io.tip(crossingTooltip(d), ev))
     .on('pointermove', (ev: PointerEvent) => r.io.tipMove(ev))
     .on('pointerleave', () => r.io.tipHide());
+}
+
+/** Do two label boxes touch? A 2 px pad keeps two words from reading as one. */
+function overlaps(a: LabelBox, b: LabelBox): boolean {
+  return a.x0 < b.x1 + 2 && a.x1 + 2 > b.x0 && a.y0 < b.y1 + 2 && a.y1 + 2 > b.y0;
 }
 
 /** Median theta of the frontier trend fan at a date (nearest sample). */
@@ -181,11 +204,6 @@ function frontierThetaAt(computed: { frontier: FrontierPoint[] }, date: string):
 
 function days(a: string, b: string): number {
   return (Date.parse(`${a}T00:00:00Z`) - Date.parse(`${b}T00:00:00Z`)) / 86_400_000;
-}
-
-/** Theta to the index the y scale reads — 100·sigma(theta), the same conversion everywhere. */
-function idx(theta: number): number {
-  return 100 / (1 + Math.exp(-theta));
 }
 
 function shortLevel(c: Crossing, benchmarks?: Map<string, { short: string }>): string {

@@ -131,7 +131,7 @@ export function predictionTooltip(ctx: Ctx, labId: string, pred: PredictedReleas
       ['Expected rating', `${Math.round(ratingFromTheta(pred.thetaLow ?? pred.theta))} ${EN_DASH} ${Math.round(ratingFromTheta(pred.thetaHigh ?? pred.theta))}`],
       ['Expected index', `${fmtIndex(pred.indexLow)} ${EN_DASH} ${fmtIndex(pred.indexHigh)}`],
     ]) +
-    `<p class="tt-hint">Circle diameter = the 68% window</p>`
+    `<p class="tt-hint">Lens thickness follows the launch-date density · inner edge 68 %, outer edge 90 %</p>`
   );
 }
 

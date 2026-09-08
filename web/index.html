@@ -133,26 +133,30 @@
           <h2 id="chart-h" class="section-title">The frontier</h2>
         </div>
 
-        <div class="shell">
-          <div class="controlbar" data-controlbar aria-label="Chart controls">
-            <div class="controlbar__grab" aria-hidden="true"></div>
-            <div class="controlbar__inner" data-controlbar-inner></div>
+        <!-- The stage (REDESIGN §12.1): control bar · canvas · time-axis strip · legend dock. -->
+        <div class="chart-stage" data-chart-stage>
+          <div class="shell">
+            <div class="controlbar" data-controlbar aria-label="Chart controls">
+              <div class="controlbar__grab" aria-hidden="true"></div>
+              <div class="controlbar__inner" data-controlbar-inner></div>
+            </div>
           </div>
-        </div>
 
-        <figure class="chart-figure" data-chart-figure>
-          <div class="chart-canvas" data-chart-canvas>
-            <div class="chart-status" data-chart-status role="status">Loading the frontier…</div>
-          </div>
-          <div class="chart-axis" data-chart-axis aria-hidden="true"></div>
-          <figcaption class="visually-hidden">
-            Frontier Rating of every flagship model over time, per lab, with family bands, the level
-            ladder on the right, yellow forecast fans and release-window circles for predicted
-            releases, and a strip of the frontier's quarterly gain underneath. A table of the same
-            data is under Rankings.
-          </figcaption>
-        </figure>
-        <div class="shell legend-dock" data-legend-dock role="group" aria-label="Chart legend and layers"></div>
+          <figure class="chart-figure" data-chart-figure>
+            <div class="chart-canvas" data-chart-canvas>
+              <div class="chart-status" data-chart-status role="status">Loading the frontier…</div>
+            </div>
+            <div class="chart-axis" data-chart-axis></div>
+            <figcaption class="visually-hidden">
+              Frontier Rating of every flagship model over time, per lab, with family ribbons, the
+              level ladder on the right, yellow forecast fans and release lenses whose thickness follows
+              the probability of the launch date, and a time axis with the frontier's quarterly gain
+              underneath. Point at a family to emphasise it; click to pin it. A table of the same data
+              is under Rankings.
+            </figcaption>
+          </figure>
+          <div class="shell legend-dock" data-legend-dock role="group" aria-label="Chart legend and layers"></div>
+        </div>
 
         <div class="shell chart-controls">
           <div class="scrubber">
@@ -171,46 +175,6 @@
               <output class="scrubber__value" for="scrub" data-scrub-value>today</output>
             </div>
           </div>
-          <div class="legend" data-legend role="group" aria-label="Labs — toggle visibility">
-            <button type="button" class="chip chip--all" data-legend-all>All</button>
-          </div>
-        </div>
-
-        <div class="shell chart-key">
-          <p class="key">
-            <span class="key__swatch key__swatch--point" aria-hidden="true"></span> released flagship
-            <span class="key__sep" aria-hidden="true">·</span>
-            <span class="key__swatch key__swatch--provisional" aria-hidden="true"></span> provisional (fewer than 3 index benchmarks)
-            <span class="key__sep" aria-hidden="true">·</span>
-            <span class="key__swatch key__swatch--tier" aria-hidden="true"></span> mid / small tier (Tiers · All)
-            <span class="key__sep" aria-hidden="true">·</span>
-            <span class="key__swatch key__swatch--band" aria-hidden="true"></span> family band — flagship down to the lab's smallest current tier
-            <span class="key__sep" aria-hidden="true">·</span>
-            <span class="key__swatch key__swatch--announced" aria-hidden="true"></span> announced
-            <span class="key__sep" aria-hidden="true">·</span>
-            <span class="key__swatch key__swatch--rumored" aria-hidden="true"></span> rumored
-            <span class="key__sep" aria-hidden="true">·</span>
-            <span class="key__swatch key__swatch--fan" aria-hidden="true"></span> forecast fan (10th–90th pct)
-            <span class="key__sep" aria-hidden="true">·</span>
-            <span class="key__swatch key__swatch--frontierfan" aria-hidden="true"></span> frontier trend fan — the running maximum continued
-            <span class="key__sep" aria-hidden="true">·</span>
-            <span class="key__swatch key__swatch--circle" aria-hidden="true"></span> circle diameter = 68 % release window (3 most likely labs, or the one you point at)
-            <span class="key__sep" aria-hidden="true">·</span>
-            <span class="key__swatch key__swatch--whisker" aria-hidden="true"></span> same window as a whisker (other labs)
-            <span class="key__sep" aria-hidden="true">·</span>
-            <span class="key__swatch key__swatch--ladder" aria-hidden="true"></span> ladder level — human baseline, saturation, generation ceiling
-            <span class="key__sep" aria-hidden="true">·</span>
-            <span class="key__swatch key__swatch--crossing" aria-hidden="true"></span> predicted crossing of a level
-            <span class="key__sep" aria-hidden="true">·</span>
-            <span class="key__swatch key__swatch--frontier" aria-hidden="true"></span> running maximum
-            <span class="key__sep" aria-hidden="true">·</span>
-            <span class="key__swatch key__swatch--bt68" aria-hidden="true"></span><span class="key__swatch key__swatch--bt90" aria-hidden="true"></span><span class="key__swatch key__swatch--btmiss" aria-hidden="true"></span>
-            backtest hairline — inside 68 %, inside 90 %, missed (while scrubbed)
-            <span class="key__sep" aria-hidden="true">·</span>
-            <span class="key__swatch key__swatch--tick" aria-hidden="true"></span> released, no basket score (timeline only)
-            <span class="key__sep" aria-hidden="true">·</span>
-            <span class="key__swatch key__swatch--pace" aria-hidden="true"></span> pace = frontier gain per quarter, in logits
-          </p>
         </div>
       </section>
 

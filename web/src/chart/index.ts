@@ -1,23 +1,31 @@
 /**
- * The chart shell: owns the <svg>, its layer stack and the redraw loop.
- * Layers are separate <g> elements in a fixed z-order so `ui/parallax` can offset them.
+ * The chart shell (REDESIGN §12.1): owns the plot <svg>, the time-axis strip <svg> under it, the
+ * legend dock, the layer stack and the redraw loop. Layers are separate <g> elements in a fixed
+ * z-order so `ui/parallax` can offset them; the stripe and pace groups live in the strip SVG.
+ *
+ * The view is a `View2D` — independent x/y zoom plus a translation over the resting scales —
+ * driven by `interaction.ts` (drag, pinch, modifier + wheel) and by `ChartApi.zoomBy(kx, ky)`.
+ * The resting y-domain (`yDomain`, theta) is what "fit" and "reset" tween; the view sits on top.
  */
 import { easeCubicOut } from 'd3-ease';
+import { scaleLinear } from 'd3-scale';
 import { select } from 'd3-selection';
-import { zoomTransform, ZoomTransform } from 'd3-zoom';
-import { frontierFan as frontierFanOf } from '@agi/shared';
+import { frontierFan as frontierFanOf, thetaFromRating } from '@agi/shared';
 import type { FanPoint, ISODate, LabId } from '@agi/shared';
-import type { Computed, Ctx } from '../data';
+import type { Computed, Ctx, LabView } from '../data';
 import { CHART_START_RECENT, compute, thetaExtent } from '../data';
 import type { Store } from '../state';
-import { prefersReducedMotion, svg as mk } from '../dom';
+import { maybe, prefersReducedMotion, svg as mk } from '../dom';
+import { drawTimeAxis } from './axis';
 import { drawBands } from './bands';
 import { drawBacktest } from './backtest';
 import { drawCrossings, drawFrontierFan } from './crossings';
 import { drawFans, drawPredictions, spotlightLabs } from './forecast';
+import { applyFocus, createHoverController, type FamilyGeometry } from './hover';
+import { attachKeyboardNav, attachScrub, attachView, createHint } from './interaction';
 import { drawLadder } from './ladder';
+import { buildLegendDock, createLayerState, type LayerState } from './legend';
 import { drawPace } from './pace';
-import { attachKeyboardNav, attachScrub, attachZoom } from './interaction';
 import {
   drawGrid,
   drawLabels,
@@ -30,8 +38,23 @@ import {
   drawTiers,
   type G,
 } from './layers';
-import { fromDate, geometry, makeX, makeY, niceThetaExtent, toDate, valueTicks, type Geom, type XScale, type YScale } from './scales';
-import type { Interactions, RenderCtx } from './types';
+import {
+  fromDate,
+  geometry,
+  makeX,
+  makeY,
+  niceThetaExtent,
+  toDate,
+  valueTicks,
+  viewThetaDomain,
+  viewX,
+  clampK,
+  type Geom,
+  type View2D,
+  type XScale,
+  type YScale,
+} from './scales';
+import type { Interactions, LayerToggle, LensShape, RenderCtx } from './types';
 
 const LAYER_ORDER = [
   'grid',
@@ -52,30 +75,61 @@ const LAYER_ORDER = [
 ] as const;
 export type LayerName = (typeof LAYER_ORDER)[number];
 
+/** Layers whose groups live in the time-axis strip SVG rather than the plot. */
+const STRIP_LAYERS: ReadonlySet<LayerName> = new Set<LayerName>(['stripes', 'pace']);
+
 export interface ChartApi {
   render(computed: Computed): void;
   /** Restore the resting domains on both axes. */
   resetZoom(): void;
-  /** Fit y (and x to the story range) to the visible data - the "Fit" button. */
+  /** Fit both axes to the visible data, fans and lenses - the "Fit" button. */
   fitView(): void;
-  /** Programmatic zoom for keyboard shortcuts: kx multiplies the x zoom, ky the y. */
+  /** Programmatic zoom: kx multiplies the x zoom, ky the y — independently (REDESIGN §12.1). */
   zoomBy(kx: number, ky: number): void;
   layers: Record<LayerName, SVGGElement>;
   destroy(): void;
+  /** v3 additions — optional layers toggled by the legend dock (`LayerToggle`). */
+  setLayerVisible(layer: LayerToggle, on: boolean): void;
+  layerVisible(layer: LayerToggle): boolean;
+  /** The current 2-D view (identity = resting). Exposed for tests and shortcuts. */
+  view(): View2D;
+  /** The family currently in focus (pin, smart hover, legend hover, hovered release, solo). */
+  focusLab(): LabId | null;
 }
 
 export function createChart(host: HTMLElement, ctx: Ctx, store: Store, io: Interactions): ChartApi {
   const reduced = prefersReducedMotion();
+  // `role="group"`, not `role="img"`: both SVGs hold keyboard-focusable children (release points,
+  // markers, lenses, release ticks). Under `img` those children are presentational, so a focused
+  // point would be announced with the whole chart's label instead of its own.
   const svgEl = mk('svg', {
     class: 'chart-svg',
-    role: 'img',
+    role: 'group',
     'aria-label': 'Frontier Rating over time - flagship model capability by lab, with forecasts',
   });
   host.append(svgEl);
+  const hint = createHint(host);
 
-  // Forecast fans and window circles are wide by nature; they must never paint outside the plot.
+  // The time-axis strip: a sibling container after the canvas (index.html ships it; created when
+  // an older page lacks it), holding the second SVG that shares the x scale and the view.
+  let stripHost = host.parentElement?.querySelector<HTMLElement>('[data-chart-axis]') ?? maybe('[data-chart-axis]');
+  if (!stripHost) {
+    stripHost = document.createElement('div');
+    stripHost.className = 'chart-axis';
+    stripHost.setAttribute('data-chart-axis', '');
+    host.after(stripHost);
+  }
+  const stripEl = mk('svg', {
+    class: 'chart-axis-svg',
+    role: 'group',
+    'aria-label': 'Time axis, frontier leadership and the pace strip',
+  });
+  stripHost.append(stripEl);
+
+  // Forecast fans and lenses are wide by nature; they must never paint outside the plot.
   const uid = Math.random().toString(36).slice(2, 8);
   const clipId = `agi-plot-${uid}`;
+  const stripClipId = `agi-strip-${uid}`;
   const glowId = `agi-glow-${uid}`;
   const clipRect = mk('rect');
   const defs = mk('defs');
@@ -96,42 +150,76 @@ export function createChart(host: HTMLElement, ctx: Ctx, store: Store, io: Inter
   defs.append(glow);
   svgEl.append(defs);
 
+  const stripClipRect = mk('rect');
+  const stripDefs = mk('defs');
+  const stripClip = mk('clipPath', { id: stripClipId });
+  stripClip.append(stripClipRect);
+  stripDefs.append(stripClip);
+  stripEl.append(stripDefs);
+  const axisG = mk('g', { class: 'layer layer-axis' });
+  stripEl.append(axisG);
+
   const groups = {} as Record<LayerName, SVGGElement>;
   for (const name of LAYER_ORDER) {
     const g = mk('g', { class: `layer layer-${name}` });
-    // Wide fills get clipped to the plot; text and rules may live in the gutters.
-    const clipped = name === 'bands' || name === 'frontierFan' || name === 'fans' || name === 'tiers' || name === 'markers' || name === 'crossings' || name === 'backtest';
-    if (clipped) g.setAttribute('clip-path', `url(#${clipId})`);
-    svgEl.append(g);
+    if (STRIP_LAYERS.has(name)) {
+      if (name === 'stripes') g.setAttribute('clip-path', `url(#${stripClipId})`);
+      stripEl.append(g);
+    } else {
+      // Wide fills and the data marks get clipped to the plot; text and rules may live in the
+      // gutters. With an unbounded rating axis a panned line would otherwise run over the caption.
+      const clipped =
+        name === 'bands' ||
+        name === 'frontierFan' ||
+        name === 'fans' ||
+        name === 'lines' ||
+        name === 'points' ||
+        name === 'tiers' ||
+        name === 'markers' ||
+        name === 'crossings' ||
+        name === 'backtest';
+      if (clipped) g.setAttribute('clip-path', `url(#${clipId})`);
+      svgEl.append(g);
+    }
     groups[name] = g;
   }
   const sel = (name: LayerName): G => select(groups[name]) as unknown as G;
+  const axisSel = (): G => select(axisG) as unknown as G;
 
-  let geom: Geom = geometry(host.clientWidth || 960, host.clientHeight || 600);
+  const layers: LayerState = createLayerState(store);
+
+  let geom: Geom = geometry(host.clientWidth || 960, host.clientHeight || 600, { pace: layers.on('pace') });
   let computed: Computed | null = null;
-  /** The y domain in theta - the axis' native units, unbounded above. */
+  /** The resting y domain in theta - the axis' native units, unbounded above. */
   let yDomain: [number, number] = [-1, 4];
   let yTween: { from: [number, number]; to: [number, number]; t0: number } | null = null;
   let frame = 0;
   let drawn = false;
   let scrubDetach: (() => void) | null = null;
+  /** Pixel geometry of every visible family after the last draw — the smart hover reads it. */
+  let families: FamilyGeometry[] = [];
+  let lastFocus: LabId | null | undefined;
 
   const baseDomain = (): [Date, Date] => [
     toDate(store.get().range === 'recent' ? CHART_START_RECENT : ctx.chartStart),
     toDate(ctx.chartEnd),
   ];
 
-  /**
-   * The x scale with the 2-D zoom transform applied. Wheel zooms x (rescaleX), shift+wheel and
-   * pinch drive the transform's y half, drag pans both.
-   */
-  const currentX = (): XScale => {
-    const base = makeX(baseDomain(), geom);
-    const t: ZoomTransform = zoomTransform(svgEl);
-    return t.k === 1 && t.x === 0 ? base : (t.rescaleX(base) as XScale);
-  };
+  /** Where rating 0 sits in the resting y scale — the floor the view may never lift above the plot. */
+  const floorPx = (): number => scaleLinear().domain(yDomain).range([geom.y0, geom.y1]).clamp(false)(thetaFromRating(0));
 
-  const zoomHandle = attachZoom(svgEl, () => geom, () => schedule());
+  const view = attachView(svgEl, {
+    getGeom: () => geom,
+    floorPx,
+    onChange: () => schedule(),
+    onClick: (px, py) => hover.click(px, py),
+    onPlainWheel: () => hint.show(),
+  });
+
+  /** The x scale seen through the view. */
+  const currentX = (): XScale => viewX(makeX(baseDomain(), geom), view.view());
+  /** The y scale seen through the view. */
+  const currentY = (): YScale => makeY(viewThetaDomain(yDomain, geom, view.view()), geom, store.get().yMode);
 
   /**
    * The resting y-domain: the extent of *all* data as of today (not as of the scrubber, or the
@@ -146,17 +234,51 @@ export function createChart(host: HTMLElement, ctx: Ctx, store: Store, io: Inter
     return niceThetaExtent(thetaExtent(all.labViews, { fanMode: store.get().forecast === 'long' ? 'long' : 'near' }));
   }
 
+  /** The lab views the legend is actually showing (every lab when all are hidden). */
+  function shownViews(): LabView[] {
+    if (!computed) return [];
+    const shown = computed.labViews.filter((v) => store.visible(v.lab.id));
+    return shown.length ? shown : computed.labViews;
+  }
+
   function targetYDomain(): [number, number] {
     if (!store.get().fitY || !computed) return defaultYDomain();
     // Fit what the legend is actually showing, not every lab in the dataset.
-    const shown = computed.labViews.filter((v) => store.visible(v.lab.id));
-    const views = shown.length ? shown : computed.labViews;
     return niceThetaExtent(
-      thetaExtent(views, {
+      thetaExtent(shownViews(), {
         fanMode: store.get().forecast === 'long' ? 'long' : 'near',
         withTiers: store.get().tierView === 'all',
       }),
     );
+  }
+
+  /**
+   * The date window the visible data occupies: first point to the end of the fans and the
+   * lenses' 95th percentile (REDESIGN §12.1: fit fits both axes).
+   */
+  function targetXDomain(): [Date, Date] | null {
+    const views = shownViews();
+    let lo: ISODate | null = null;
+    let hi: ISODate | null = null;
+    const take = (d: ISODate): void => {
+      if (lo === null || d < lo) lo = d;
+      if (hi === null || d > hi) hi = d;
+    };
+    for (const v of views) {
+      for (const p of v.points) take(p.release.date);
+      const fan = store.get().forecast === 'long' ? v.fan : v.fanNear;
+      const last = fan[fan.length - 1];
+      if (last) take(last.date);
+      for (const pred of v.predictions) {
+        if (pred.k > 1 && store.get().forecast === 'next') continue;
+        take(pred.p95Date);
+      }
+    }
+    if (lo === null || hi === null || hi <= lo) return null;
+    const a = toDate(lo).getTime();
+    const b = toDate(hi).getTime();
+    const pad = (b - a) * 0.04;
+    return [new Date(a - pad), new Date(b + pad)];
   }
 
   /** Tween in theta: the axis' own units, so both labellings animate identically. */
@@ -164,13 +286,67 @@ export function createChart(host: HTMLElement, ctx: Ctx, store: Store, io: Inter
     return [from[0] + (to[0] - from[0]) * e, from[1] + (to[1] - from[1]) * e];
   }
 
-  /** The lab the reader is looking at: legend hover, hovered/selected release, solo. */
+  /**
+   * The lab the reader is looking at: pin, smart/legend hover, hovered/selected release, solo.
+   *
+   * A lab that is switched off in the legend never holds the focus. Otherwise pinning a family
+   * and then hiding it (or resting the pointer on a hidden lab's chip) would dim every *visible*
+   * family with nothing left in focus — the chart reads as "all faded" for no visible reason.
+   */
   function focusLab(): LabId | null {
     const st = store.get();
-    if (st.hoverLab) return st.hoverLab;
+    if (st.pinnedLab && store.visible(st.pinnedLab)) return st.pinnedLab;
+    if (st.hoverLab && store.visible(st.hoverLab)) return st.hoverLab;
     const of = (id: string | null): LabId | null => (id ? (ctx.releasesById.get(id)?.lab ?? null) : null);
-    return of(st.hover) ?? of(st.selected) ?? st.solo;
+    const rel = of(st.hover) ?? of(st.selected);
+    if (rel && store.visible(rel)) return rel;
+    return st.solo;
   }
+
+  const hover = createHoverController({
+    geometry: () => families,
+    current: () => focusLab(),
+    pinned: () => store.get().pinnedLab,
+    setFocus: (lab) => store.setHoverLab(lab),
+    pin: (lab) => {
+      store.pinLab(lab);
+      // A fresh pin also becomes the hover focus, so releasing the pointer keeps the family lit.
+      if (lab && store.get().pinnedLab === lab) store.setHoverLab(lab);
+    },
+  });
+
+  const onPointerMove = (ev: PointerEvent): void => {
+    if (ev.pointerType !== 'mouse' && ev.pointerType !== 'pen') return;
+    const rect = svgEl.getBoundingClientRect();
+    hover.move(ev.clientX - rect.left, ev.clientY - rect.top);
+  };
+  const onPointerLeave = (): void => hover.leave();
+  /**
+   * Esc unpins the family (REDESIGN §12.2 "click again or Esc unpins").
+   *
+   * Contract with `ui/shortcuts.ts`, which binds Esc on the document too: this handler is
+   * registered first, so it sees the key first. **When it actually unpins it consumes the
+   * event** — `preventDefault()` plus `stopPropagation()` — and `shortcuts.ts` returns early on
+   * `ev.defaultPrevented`, so its "no pin left, reset the zoom" branch cannot run on the same
+   * keystroke. When nothing is pinned this handler leaves the event completely untouched and
+   * shortcuts.ts resets the zoom as it should. One Esc = one step, either way.
+   *
+   * A native `<dialog>` (the shortcut sheet) owns Escape ahead of us: cancelling it with
+   * `preventDefault()` would trap the reader inside, so the pin waits for the next press.
+   */
+  const onKeyDown = (ev: KeyboardEvent): void => {
+    if (ev.defaultPrevented || ev.key !== 'Escape' || !store.get().pinnedLab) return;
+    if (document.querySelector('dialog[open]')) return;
+    // Esc drops the pin *and* the hover focus the pin carried, so the family goes quiet at once;
+    // the next pointer move decides afresh.
+    store.setPinLab(null);
+    store.setHoverLab(null);
+    ev.preventDefault();
+    ev.stopPropagation();
+  };
+  svgEl.addEventListener('pointermove', onPointerMove);
+  svgEl.addEventListener('pointerleave', onPointerLeave);
+  document.addEventListener('keydown', onKeyDown);
 
   let paceMax = 0;
   function paceScale(): { maxGain: number } {
@@ -213,16 +389,34 @@ export function createChart(host: HTMLElement, ctx: Ctx, store: Store, io: Inter
     return fan;
   }
 
+  /** Pixel geometry of the visible families for the smart hover (REDESIGN §12.2). */
+  function familyGeometry(r: RenderCtx, lenses: LensShape[]): FamilyGeometry[] {
+    const out: FamilyGeometry[] = [];
+    for (const v of r.computed.labViews) {
+      if (!r.visible(v.lab.id)) continue;
+      const polyline: [number, number][] = v.qualified.map((p) => [r.x(toDate(p.release.date)), r.y(p.mi.index)]);
+      const points: [number, number][] = v.points.map((p) => [r.x(toDate(p.release.date)), r.y(p.mi.index)]);
+      if (r.tierView === 'all') for (const p of v.tiers) points.push([r.x(toDate(p.release.date)), r.y(p.mi.index)]);
+      const own = lenses.filter((l) => l.lab === v.lab.id);
+      if (polyline.length === 0 && points.length === 0 && own.length === 0) continue;
+      out.push({ lab: v.lab.id, polyline, points, lenses: own });
+    }
+    return out;
+  }
+
   function draw(): void {
     if (!computed) return;
     const w = host.clientWidth;
     const h = host.clientHeight;
     if (w < 2 || h < 2) return;
     drawn = true;
-    geom = geometry(w, h);
+    geom = geometry(w, h, { pace: layers.on('pace') });
     svgEl.setAttribute('width', String(w));
     svgEl.setAttribute('height', String(h));
     svgEl.setAttribute('viewBox', `0 0 ${w} ${h}`);
+    stripEl.setAttribute('width', String(w));
+    stripEl.setAttribute('height', String(geom.stripH));
+    stripEl.setAttribute('viewBox', `0 0 ${w} ${geom.stripH}`);
 
     // y-domain tween ("fit to data")
     if (yTween) {
@@ -234,13 +428,17 @@ export function createChart(host: HTMLElement, ctx: Ctx, store: Store, io: Inter
     }
 
     clipRect.setAttribute('x', String(geom.x0 - 1));
-    clipRect.setAttribute('y', String(geom.y1 - 10));
+    clipRect.setAttribute('y', String(geom.y1 - 8));
     clipRect.setAttribute('width', String(geom.iw + 2));
-    clipRect.setAttribute('height', String(geom.ih + 12));
+    clipRect.setAttribute('height', String(geom.ih + 8 + geom.m.bottom));
+    stripClipRect.setAttribute('x', String(geom.x0 - 1));
+    stripClipRect.setAttribute('y', '0');
+    stripClipRect.setAttribute('width', String(geom.iw + 2));
+    stripClipRect.setAttribute('height', String(geom.stripH));
 
     const x = currentX();
     const st = store.get();
-    const y = makeY(yDomain, geom, st.yMode);
+    const y = currentY();
     const focus = focusLab();
     const r: RenderCtx = {
       ctx,
@@ -253,8 +451,10 @@ export function createChart(host: HTMLElement, ctx: Ctx, store: Store, io: Inter
       hover: st.hover,
       selected: st.selected,
       focusLab: focus,
+      pinnedLab: st.pinnedLab,
       spotlight: spotlightLabs(computed.labViews, (lab) => store.visible(lab), focus),
       visible: (lab) => store.visible(lab),
+      layerOn: (layer) => layers.on(layer),
       reduced,
       forecast: st.forecast,
       bands: st.bands,
@@ -267,21 +467,39 @@ export function createChart(host: HTMLElement, ctx: Ctx, store: Store, io: Inter
 
     drawGrid(sel('grid'), r);
     drawLadder(sel('ladder'), r, yTicks);
-    drawStripes(sel('stripes'), r);
-    drawTicks(sel('stripes'), r);
     drawBands(sel('bands'), r);
     drawFrontierFan(sel('frontierFan'), r, fanToEdge(computed, x.domain()[1] ?? toDate(ctx.chartEnd)));
     drawFans(sel('fans'), r);
     drawLines(sel('lines'), r);
     drawPoints(sel('points'), r);
     drawTiers(sel('tiers'), r);
-    drawPredictions(sel('markers'), r);
+    const lenses = drawPredictions(sel('markers'), r);
     drawMarkers(sel('markers'), r);
-    drawCrossings(sel('crossings'), r);
+    // The lab end-labels are placed *before* the crossings so a crossing label can step out of
+    // their way (they pile up against NOW, where the crossings are). Paint order is fixed by
+    // LAYER_ORDER, not by the order these are called in.
+    const endLabels = drawLabels(sel('labels'), r);
+    drawCrossings(sel('crossings'), r, endLabels);
     drawBacktest(sel('backtest'), r);
-    drawLabels(sel('labels'), r);
-    drawPace(sel('pace'), r, paceScale());
     const overlay = drawOverlay(sel('overlay'), r);
+
+    // the strip: axis rows, leadership stripe + ticks, pace
+    drawTimeAxis(axisSel(), r);
+    drawStripes(sel('stripes'), r);
+    drawTicks(sel('stripes'), r);
+    drawPace(sel('pace'), r, paceScale());
+
+    families = familyGeometry(r, lenses);
+    // Called after every draw so nodes a data join has just entered (crossings and lenses come
+    // and go with the zoom) pick the state up — but `applyFocus` only walks the whole tree when
+    // the focus itself changed, so panning and pinching cost nothing here.
+    applyFocus(svgEl, focus);
+    applyFocus(stripEl, focus);
+    if (focus !== lastFocus) {
+      lastFocus = focus;
+      host.classList.toggle('has-focus', focus !== null);
+      dock?.sync();
+    }
 
     if (!scrubDetach && overlay.handle) {
       scrubDetach = attachScrub(overlay.handle, {
@@ -292,6 +510,12 @@ export function createChart(host: HTMLElement, ctx: Ctx, store: Store, io: Inter
       });
     }
   }
+
+  // The legend dock (REDESIGN §12.1) — built here so the page needs no extra wiring; the host
+  // is optional so a stripped-down page (paper, tests) still gets a chart.
+  const dockHost = maybe('[data-legend-dock]');
+  const dock = dockHost ? buildLegendDock(dockHost, { ctx, store, layers, focus: focusLab }) : null;
+  const unsubLayers = layers.subscribe(() => schedule());
 
   const ro = new ResizeObserver(() => schedule());
   ro.observe(host);
@@ -309,11 +533,11 @@ export function createChart(host: HTMLElement, ctx: Ctx, store: Store, io: Inter
   let lastForecast = store.get().forecast;
   const unsubscribe = store.subscribe((channels) => {
     if (channels.has('view') && (store.get().range !== lastRange || store.get().forecast !== lastForecast)) {
-      // The base x-domain just changed under the zoom transform; keeping the old one would land
-      // the reader somewhere arbitrary. Snap back to the new default window instead.
+      // The base x-domain just changed under the view; keeping the old one would land the reader
+      // somewhere arbitrary. Snap back to the new default window instead.
       lastRange = store.get().range;
       lastForecast = store.get().forecast;
-      zoomHandle.reset();
+      view.reset();
     }
     if (channels.has('view') || channels.has('filters')) {
       const to = targetYDomain();
@@ -344,30 +568,59 @@ export function createChart(host: HTMLElement, ctx: Ctx, store: Store, io: Inter
       schedule();
     },
     resetZoom(): void {
-      zoomHandle.reset();
+      view.reset();
+      const to = targetYDomain();
+      if (to[0] !== yDomain[0] || to[1] !== yDomain[1]) {
+        yTween = { from: [...yDomain] as [number, number], to, t0: performance.now() };
+      }
       schedule();
     },
     fitView(): void {
-      zoomHandle.reset();
+      // y: the resting domain tweens to the data; x: the view zooms the base scale onto the
+      // occupied date window (both axes fit, REDESIGN §12.1).
       const to = targetYDomain();
       yTween = { from: [...yDomain] as [number, number], to, t0: performance.now() };
+      const dom = targetXDomain();
+      if (dom) {
+        const base = makeX(baseDomain(), geom);
+        const a = base(dom[0]);
+        const b = base(dom[1]);
+        const kx = clampK(geom.iw / Math.max(1, b - a));
+        view.set({ kx, ky: 1, tx: geom.x0 - a * kx, ty: 0 });
+      } else {
+        view.reset();
+      }
       schedule();
     },
     zoomBy(kx: number, ky: number): void {
-      const t = zoomTransform(svgEl);
-      const k = Math.max(1, Math.min(40, t.k * kx));
-      select(svgEl).call(zoomHandle.behavior.transform as never, new ZoomTransform(k, t.x, t.y));
-      void ky;
+      view.zoomBy(kx, ky);
       schedule();
     },
     layers: groups,
+    setLayerVisible(layer, on): void {
+      layers.set(layer, on);
+    },
+    layerVisible(layer): boolean {
+      return layers.on(layer);
+    },
+    view: () => view.view(),
+    focusLab,
     destroy(): void {
       ro.disconnect();
       document.removeEventListener('visibilitychange', onVisible);
+      document.removeEventListener('keydown', onKeyDown);
+      svgEl.removeEventListener('pointermove', onPointerMove);
+      svgEl.removeEventListener('pointerleave', onPointerLeave);
       detachKeys();
       scrubDetach?.();
       unsubscribe();
+      unsubLayers();
+      hover.destroy();
+      view.destroy();
+      hint.destroy();
+      dock?.destroy();
       svgEl.remove();
+      stripEl.remove();
     },
   };
 }

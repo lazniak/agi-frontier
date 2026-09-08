@@ -1,23 +1,22 @@
 /**
- * The level ladder (REDESIGN §2.1, §7.1): hairlines across the plot at each level theta with the
- * label set into the right-hand gutter. Labels are de-duplicated by a 14 px minimum gap — when
- * two levels crowd each other the lower-priority kind yields (`ceiling` > `generation` >
- * `human` > `saturation`). Hovering a label tells the full story: level, benchmark, rating.
+ * The level ladder (REDESIGN §2.1, §7.1, §12.1): hairlines across the plot at each level theta
+ * with the label set into the right-hand gutter. Labels are de-duplicated by a 14 px minimum gap
+ * — when two levels crowd each other the lower-priority kind yields (`speculative` > `ceiling` >
+ * `generation` > `human` > `saturation`). Hovering a label tells the full story: level,
+ * benchmark, rating.
+ *
+ * Above the basket ceiling the ladder also carries the four *speculative* landmarks
+ * (`Computed.speculativeLevels`) in a distinct dotted grey style. Every one of their labels and
+ * tooltips carries the word "speculative"; they never enter crossings, stages or eras.
  */
 import type { Level } from '@agi/shared';
 import { fmtDate } from '../ui/format';
-import { INK, type RenderCtx } from './types';
-import { toDate, type ValueTick } from './scales';
+import { ANNOUNCED, INK, type RenderCtx } from './types';
+import { type ValueTick } from './scales';
 import type { G } from './layers';
 
 const LABEL_GAP = 14;
 const KIND_RANK: Record<Level['kind'], number> = { speculative: -1, ceiling: 0, generation: 1, human: 2, saturation: 3 };
-
-interface LadderRow {
-  level: Level;
-  y: number;
-  shown: boolean;
-}
 
 /** Ascending priority: a crowded label is dropped when a higher-rank label is within the gap. */
 export function thinLevels(levels: Level[], pxOf: (level: Level) => number): Level[] {
@@ -38,18 +37,24 @@ export function thinLevels(levels: Level[], pxOf: (level: Level) => number): Lev
 }
 
 export function drawLadder(g: G, r: RenderCtx, yTicks: ValueTick[]): void {
-  const { geom, x, y, computed } = r;
+  const { geom, y, computed } = r;
+  if (!r.layerOn('ladder')) {
+    g.selectAll('*').remove();
+    return;
+  }
   const gutterX = geom.x1 + 6;
   const compact = geom.compact;
 
-  // Horizontal hairlines at the *tick* positions come with the grid; the ladder adds the levels.
-  const visible = computed.levels.filter((lv) => {
-    const py = y(indexAt(lv));
+  // Horizontal hairlines at the *tick* positions come with the grid; the ladder adds the levels
+  // — the fitted ones and, far above them, the speculative landmarks (REDESIGN §12.1).
+  const all = [...computed.levels, ...computed.speculativeLevels];
+  const visible = all.filter((lv) => {
+    const py = y.theta(lv.theta);
     return py >= geom.y1 - 1 && py <= geom.y0 + 1;
   });
-  const shown = thinLevels(visible, (lv) => y(indexAt(lv)));
+  const shown = thinLevels(visible, (lv) => y.theta(lv.theta));
 
-  // hairlines — inline stroke so they render before T34's stylesheet lands
+  // hairlines — inline stroke so they render before the stylesheet lands
   const lines = g.selectAll<SVGLineElement, Level>('line.level-rule').data(shown, (d) => d.id);
   lines.exit().remove();
   lines
@@ -59,12 +64,14 @@ export function drawLadder(g: G, r: RenderCtx, yTicks: ValueTick[]): void {
     .attr('class', (d) => `level-rule level-rule--${d.kind}`)
     .attr('x1', geom.x0)
     .attr('x2', geom.x1)
-    .attr('y1', (d) => y(indexAt(d)))
-    .attr('y2', (d) => y(indexAt(d)))
-    .attr('stroke', (d) => (d.kind === 'ceiling' || d.kind === 'generation' ? '#111111' : '#6b6b6b'))
-    .attr('stroke-opacity', (d) => (d.kind === 'ceiling' ? 0.35 : 0.22))
+    .attr('y1', (d) => y.theta(d.theta))
+    .attr('y2', (d) => y.theta(d.theta))
+    .attr('stroke', (d) => (d.kind === 'speculative' ? ANNOUNCED : d.kind === 'ceiling' || d.kind === 'generation' ? INK : '#6b6b6b'))
+    .attr('stroke-opacity', (d) => (d.kind === 'speculative' ? 0.7 : d.kind === 'ceiling' ? 0.35 : 0.22))
     .attr('stroke-width', 1)
-    .attr('stroke-dasharray', (d) => (d.kind === 'saturation' ? '2 4' : d.kind === 'human' ? '6 3' : ''))
+    .attr('stroke-dasharray', (d) =>
+      d.kind === 'speculative' ? '1.5 5' : d.kind === 'saturation' ? '2 4' : d.kind === 'human' ? '6 3' : '',
+    )
     .attr('pointer-events', 'none');
 
   // gutter labels
@@ -73,7 +80,6 @@ export function drawLadder(g: G, r: RenderCtx, yTicks: ValueTick[]): void {
   const entered = labels
     .enter()
     .append('text')
-    .attr('class', (d) => `level-label level-label--${d.kind}`)
     .attr('tabindex', 0)
     .attr('role', 'img');
   const merged = entered.merge(labels as never);
@@ -83,13 +89,18 @@ export function drawLadder(g: G, r: RenderCtx, yTicks: ValueTick[]): void {
   // the aria-label carry the full text.
   const maxW = Math.max(24, geom.width - gutterX - 14);
   merged
+    .attr('class', (d) => `level-label level-label--${d.kind}`)
     .attr('x', gutterX)
-    .attr('y', (d) => y(indexAt(d)) + 3.5)
+    .attr('y', (d) => y.theta(d.theta) + 3.5)
     .each(function (d) {
-      // Benchmark first, so an ellipsis eats the suffix and never the name.
-      const candidates = compact
-        ? [compactLabel(d, r.ctx.benchmarks), nameOnly(d, r.ctx.benchmarks)]
-        : [nameFirstLabel(d, r.ctx.benchmarks)];
+      // Benchmark first, so an ellipsis eats the suffix and never the name. Speculative rungs put
+      // the word "speculative" first for the same reason — it must survive the trim.
+      const candidates =
+        d.kind === 'speculative'
+          ? speculativeLabels(d)
+          : compact
+            ? [compactLabel(d, r.ctx.benchmarks), nameOnly(d, r.ctx.benchmarks)]
+            : [nameFirstLabel(d, r.ctx.benchmarks)];
       fitText(this, candidates, maxW);
     })
     .attr('aria-label', (d) => `${d.label}, rating ${Math.round(d.rating)}`)
@@ -108,21 +119,9 @@ export function drawLadder(g: G, r: RenderCtx, yTicks: ValueTick[]): void {
     })
     .on('blur', () => r.io.tipHide());
 
-  void x;
-  void INK;
   void yTicks;
 }
 
-function indexAt(lv: Level): number {
-  return indexFromThetaOf(lv.theta);
-}
-
-function indexFromThetaOf(theta: number): number {
-  // Local to avoid a shared import in three modules; identical maths to frontier-index.
-  return (100 / (1 + Math.exp(-theta)));
-}
-
-/** Mobile: drop the prose, keep the essence. */
 /**
  * Set the first candidate that fits `maxW` px, else the last one trimmed with an ellipsis.
  * `getComputedTextLength` is 0 while the SVG is not rendered — then the first candidate stays.
@@ -139,6 +138,25 @@ function fitText(el: SVGTextElement, candidates: string[], maxW: number): void {
   }
 }
 
+/**
+ * Gutter labels for the speculative landmarks, longest first. "Speculative" leads every
+ * candidate so the ellipsis can only eat the description, never the warning (REDESIGN §12.1).
+ */
+export function speculativeLabels(lv: Level): string[] {
+  switch (lv.id) {
+    case 'spec-10x':
+      return ['Speculative · 10× the basket odds', 'Speculative · 10×'];
+    case 'spec-100x':
+      return ['Speculative · 100× the basket odds', 'Speculative · 100×'];
+    case 'spec-all':
+      return ['Speculative · every benchmark saturated', 'Speculative · all saturated'];
+    case 'spec-singularity':
+      return ['Speculative · technological singularity', 'Speculative · singularity'];
+    default:
+      return [`Speculative · ${lv.label}`, 'Speculative'];
+  }
+}
+
 /** Desktop fallback: "<benchmark> saturated" — the benchmark survives an ellipsis. */
 export function nameFirstLabel(lv: Level, benchmarks?: Map<string, { short: string }>): string {
   const name = lv.benchmark ? (benchmarks?.get(lv.benchmark)?.short ?? lv.benchmark) : '';
@@ -149,6 +167,8 @@ export function nameFirstLabel(lv: Level, benchmarks?: Map<string, { short: stri
       return lv.generation === undefined ? 'Basket saturated' : `Gen ${lv.generation} saturated`;
     case 'human':
       return `${name} · human`;
+    case 'speculative':
+      return speculativeLabels(lv)[0] ?? lv.label;
     default:
       return `${name} saturated`;
   }
@@ -170,6 +190,8 @@ export function compactLabel(lv: Level, benchmarks?: Map<string, { short: string
       return lv.generation === undefined ? 'Saturated' : `Gen ${lv.generation}`;
     case 'human':
       return `${name} · human`;
+    case 'speculative':
+      return speculativeLabels(lv)[1] ?? 'Speculative';
     default:
       return name;
   }
@@ -185,6 +207,8 @@ export function shortLabel(lv: Level, benchmarks?: Map<string, { short: string }
       return lv.generation === undefined ? 'Basket saturated' : `Gen ${lv.generation} saturated`;
     case 'human':
       return `Human · ${name}`;
+    case 'speculative':
+      return speculativeLabels(lv)[0] ?? lv.label;
     default:
       return `Saturated · ${name}`;
   }
@@ -192,10 +216,11 @@ export function shortLabel(lv: Level, benchmarks?: Map<string, { short: string }
 
 /** Tooltip: the level plus when the frontier reached / is expected to reach it. */
 export function levelTooltip(crossings: { level: Level; kind: string; date: string; p16?: string; p84?: string }[], level: Level): string {
-  const xing = crossings.find((c) => c.level.id === level.id);
+  const speculative = level.kind === 'speculative';
+  const xing = speculative ? undefined : crossings.find((c) => c.level.id === level.id);
   const rows: [string, string][] = [
     ['Rating', Math.round(level.rating).toString()],
-    ['Kind', level.kind],
+    ['Kind', speculative ? 'speculative landmark' : level.kind],
   ];
   if (level.benchmark) rows.push(["Benchmark", level.benchmark]);
   if (xing) {
@@ -206,7 +231,10 @@ export function levelTooltip(crossings: { level: Level; kind: string; date: stri
     }
   }
   const body = rows.map(([k, v]) => `<div class="tt-row"><dt>${k}</dt><dd>${v}</dd></div>`).join('');
-  return `<div class="tt-head"><span class="tt-dot" style="background:${INK}"></span>
+  const note = speculative
+    ? `<p class="tt-note">Speculative: a landmark for the scale, not a measurement. It is not derived from data and never enters the crossings, the stages or the eras.</p>`
+    : '';
+  return `<div class="tt-head"><span class="tt-dot" style="background:${speculative ? ANNOUNCED : INK}"></span>
     <span class="tt-name">${level.label}</span></div>
-    <dl class="tt-rows">${body}</dl>`;
+    <dl class="tt-rows">${body}</dl>${note}`;
 }

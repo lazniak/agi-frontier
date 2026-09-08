@@ -32,6 +32,11 @@ export interface StateShape {
   hover: string | null;
   /** Lab under the pointer in the legend — focuses that lab on the chart. */
   hoverLab: LabId | null;
+  /**
+   * Lab pinned by a click on the chart (REDESIGN §12.2): the smart hover keeps this family in
+   * focus until the reader clicks again or presses Esc. Wins over `hoverLab`.
+   */
+  pinnedLab: LabId | null;
   /** Y axis labels: Frontier Rating (default) or the bounded Frontier Index. */
   yMode: YMode;
   /** Left edge of the chart: the first release (`story`) or 2023 (`recent`). */
@@ -65,6 +70,7 @@ export class Store {
       selected: null,
       hover: null,
       hoverLab: null,
+      pinnedLab: null,
       // The pre-redesign page passes 'logit' — normalise anything unknown to the new default
       // so the transient old main.ts cannot put the axis in a dead mode (T34 rewrites main.ts).
       yMode: init.yMode === 'index' || init.yMode === 'rating' ? init.yMode : 'rating',
@@ -133,6 +139,25 @@ export class Store {
     this.setAsOf(this.state.today);
   }
 
+  /**
+   * Release a pin or a legend-hover focus on a lab the last filter change switched off. A focus
+   * on an invisible lab dims every family that *is* drawn with nothing left in focus, and the
+   * smart hover cannot recover by itself: `chart/hover.ts` refuses to move the focus while a pin
+   * is set, so only Esc or a click would clear it. Returns true when something was released.
+   */
+  private dropHiddenFocus(): boolean {
+    let changed = false;
+    if (this.state.pinnedLab !== null && !this.visible(this.state.pinnedLab)) {
+      this.state.pinnedLab = null;
+      changed = true;
+    }
+    if (this.state.hoverLab !== null && !this.visible(this.state.hoverLab)) {
+      this.state.hoverLab = null;
+      changed = true;
+    }
+    return changed;
+  }
+
   toggleLab(lab: LabId): void {
     if (this.state.solo) {
       // Leaving solo mode by clicking any chip restores everything, then applies the click.
@@ -141,12 +166,14 @@ export class Store {
     }
     if (this.state.hidden.has(lab)) this.state.hidden.delete(lab);
     else this.state.hidden.add(lab);
+    if (this.dropHiddenFocus()) this.emit('hover');
     this.emit('filters');
   }
 
   soloLab(lab: LabId): void {
     this.state.solo = this.state.solo === lab ? null : lab;
     this.state.hidden.clear();
+    if (this.dropHiddenFocus()) this.emit('hover');
     this.emit('filters');
   }
 
@@ -171,6 +198,22 @@ export class Store {
   setHoverLab(lab: LabId | null): void {
     if (this.state.hoverLab === lab) return;
     this.state.hoverLab = lab;
+    this.emit('hover');
+  }
+
+  /**
+   * Pin a family (REDESIGN §12.2). Pinning the lab that is already pinned unpins it, so one click
+   * handler can serve both the pin and the unpin gesture; `null` clears explicitly (Esc).
+   */
+  pinLab(lab: LabId | null): void {
+    const next = lab !== null && this.state.pinnedLab === lab ? null : lab;
+    this.setPinLab(next);
+  }
+
+  /** Set (or clear with `null`) the pinned family without the toggle semantics of `pinLab`. */
+  setPinLab(lab: LabId | null): void {
+    if (this.state.pinnedLab === lab) return;
+    this.state.pinnedLab = lab;
     this.emit('hover');
   }
 

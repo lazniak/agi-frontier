@@ -6,7 +6,6 @@
  * Colour: green inside the 68 % window, amber inside 90 %, red outside.
  */
 import type { BacktestRow } from '@agi/shared';
-import { indexFromTheta } from '@agi/shared';
 import { fmtDate, fmtDays } from '../ui/format';
 import { toDate } from './scales';
 import { INK, type RenderCtx } from './types';
@@ -23,7 +22,7 @@ const EN = '–';
 export function drawBacktest(g: G, r: RenderCtx): void {
   const { x, y, computed, geom } = r;
   const rows = computed.backtest.rows;
-  if (!rows || !rows.length) {
+  if (!rows || !rows.length || !r.layerOn('backtest')) {
     g.selectAll('*').remove();
     return;
   }
@@ -56,9 +55,9 @@ export function drawBacktest(g: G, r: RenderCtx): void {
     links.push({
       row,
       px,
-      py: y(indexFromTheta(row.predictedTheta)),
+      py: y.theta(row.predictedTheta),
       ax,
-      ay: y(indexFromTheta(row.actual.theta ?? 0)),
+      ay: y.theta(row.actual.theta ?? 0),
       rd: crossingRadius(fake, x),
       color,
     });

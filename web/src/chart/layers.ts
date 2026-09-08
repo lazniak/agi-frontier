@@ -1,15 +1,19 @@
 /**
  * The chart's drawing layers. Each function owns one <g> and re-joins its data;
  * the groups stay separate so the gyroscope parallax can move them independently.
+ *
+ * Focus (REDESIGN §12.2) is *not* painted here: every per-lab element carries `data-lab`, and the
+ * shell toggles `is-focus` / `is-dim` on them after each draw (`hover.ts#applyFocus`); `chart.css`
+ * animates the opacity and stroke-width. Layers therefore never set an opacity for focus.
  */
 import { select, type Selection } from 'd3-selection';
 import { curveMonotoneX, curveStepAfter, line } from 'd3-shape';
-import { ratingFromTheta, type LeadershipStripe, type ModelRelease } from '@agi/shared';
+import { type LeadershipStripe, type ModelRelease } from '@agi/shared';
 import type { LabView, SeriesPoint } from '../data';
 import { fmtDate, fmtIndex } from '../ui/format';
 import { markerTooltip, releaseTooltip, stripeTooltip, tickTooltip } from './tooltip';
 import { timeTicks, toDate, valueTicks } from './scales';
-import { ANNOUNCED, DIM_LINE, DIM_POINT, INK, type RenderCtx } from './types';
+import { ANNOUNCED, INK, type RenderCtx } from './types';
 
 export type G = Selection<SVGGElement, unknown, null, undefined>;
 
@@ -22,7 +26,7 @@ export function drawGrid(g: G, r: RenderCtx): void {
   const ticks = timeTicks(x, Math.max(3, Math.round(geom.iw / (geom.compact ? 78 : 104))));
   const yTicks = valueTicks(y, geom);
 
-  // horizontal rules
+  // horizontal rules — the whole visible range, whatever the zoom (REDESIGN §12.1)
   const rules = g.selectAll<SVGLineElement, { theta: number; label: string }>('line.grid-h').data(yTicks, (d) => d.label);
   rules.exit().remove();
   rules
@@ -32,8 +36,8 @@ export function drawGrid(g: G, r: RenderCtx): void {
     .merge(rules)
     .attr('x1', geom.x0)
     .attr('x2', geom.x1)
-    .attr('y1', (d) => y(indexFromThetaOf(d.theta)))
-    .attr('y2', (d) => y(indexFromThetaOf(d.theta)));
+    .attr('y1', (d) => y.theta(d.theta))
+    .attr('y2', (d) => y.theta(d.theta));
 
   // The tick numbers live in the right-hand ladder gutter (drawLadder); the left edge keeps a
   // bare axis without duplicated labels.
@@ -46,10 +50,18 @@ export function drawGrid(g: G, r: RenderCtx): void {
     .attr('text-anchor', 'end')
     .merge(yLabels)
     .attr('x', geom.x0 - 10)
-    .attr('y', (d) => y(indexFromThetaOf(d.theta)) + 3.5)
-    .text((d) => d.label);
+    .attr('y', (d) => y.theta(d.theta) + 3.5)
+    .text((d) => d.label)
+    .each(function () {
+      // `text-anchor: end`, so `x` is the label's *right* edge. Zoomed far out the ladder reaches
+      // five-digit ratings, which are wider than the left margin on a phone; rather than let the
+      // viewport shave the first digit, push such a label right until its left edge clears.
+      const len = typeof this.getComputedTextLength === 'function' ? this.getComputedTextLength() : 0;
+      const min = len + 3;
+      if (geom.x0 - 10 < min) this.setAttribute('x', String(min));
+    });
 
-  // vertical rules + date labels
+  // vertical rules — the date labels themselves live in the axis strip (chart/axis.ts)
   const cols = g.selectAll<SVGLineElement, { date: Date }>('line.grid-v').data(ticks, (d) => String(d.date.getTime()));
   cols.exit().remove();
   cols
@@ -61,18 +73,7 @@ export function drawGrid(g: G, r: RenderCtx): void {
     .attr('x2', (d) => x(d.date))
     .attr('y1', geom.y1)
     .attr('y2', geom.y0);
-
-  const xLabels = g.selectAll<SVGTextElement, { date: Date }>('text.grid-x').data(ticks, (d) => String(d.date.getTime()));
-  xLabels.exit().remove();
-  xLabels
-    .enter()
-    .append('text')
-    .attr('text-anchor', 'middle')
-    .merge(xLabels)
-    .attr('class', (d) => `axis-label grid-x${d.major ? ' axis-label--major' : ''}`)
-    .attr('x', (d) => x(d.date))
-    .attr('y', geom.y0 + 30)
-    .text((d) => d.label);
+  g.selectAll('text.grid-x').remove();
 
   // Axis caption — above the plot, flush with the y axis, so it never collides with the 100 tick.
   let cap = g.select<SVGTextElement>('text.axis-title');
@@ -107,9 +108,10 @@ export function drawGrid(g: G, r: RenderCtx): void {
 
 /* ----------------------------------------------------------------- stripes */
 
+/** Leadership stripe — lives in the axis strip, first row (strip coordinates). */
 export function drawStripes(g: G, r: RenderCtx): void {
   const { geom, x, computed, ctx } = r;
-  const bandY = geom.y0 + 12;
+  const bandY = geom.stripeY;
   const endISO = computed.asOf;
   const data = computed.stripes.filter((s) => r.visible(s.lab));
 
@@ -123,10 +125,10 @@ export function drawStripes(g: G, r: RenderCtx): void {
     .attr('height', 6)
     .merge(sel)
     .attr('y', bandY)
+    .attr('data-lab', (d) => d.lab)
     .attr('x', (d) => Math.min(x(toDate(d.from)), x(toDate(d.to ?? endISO))))
     .attr('width', (d) => Math.max(2, Math.abs(x(toDate(d.to ?? endISO)) - x(toDate(d.from)))))
     .attr('fill', (d) => ctx.labs.get(d.lab)?.color ?? INK)
-    .attr('opacity', 0.75)
     .on('pointerenter', function (ev: PointerEvent, d) {
       r.io.tip(stripeTooltip(ctx, d, endISO), ev);
     })
@@ -143,7 +145,7 @@ export function drawStripes(g: G, r: RenderCtx): void {
  */
 export function drawTicks(g: G, r: RenderCtx): void {
   const { geom, x, ctx } = r;
-  const bandY = geom.y0 + 12;
+  const bandY = geom.stripeY;
   const items: ModelRelease[] = [];
   for (const v of r.computed.labViews) if (r.visible(v.lab.id)) items.push(...v.unscored);
 
@@ -159,10 +161,10 @@ export function drawTicks(g: G, r: RenderCtx): void {
     .attr('tabindex', 0)
     .attr('role', 'button')
     .merge(sel)
+    .attr('data-lab', (d) => d.lab)
     .attr('x', (d) => x(toDate(d.date)) - 1)
     .attr('y', bandY - 3)
     .attr('fill', (d) => ctx.labs.get(d.lab)?.color ?? INK)
-    .attr('opacity', (d) => (r.focusLab && r.focusLab !== d.lab ? DIM_POINT : 0.9))
     .attr('aria-label', (d) => `${d.name}, ${ctx.labs.get(d.lab)?.name ?? d.lab}, released ${fmtDate(d.date)}, no index score. Activate for sources.`)
     .on('pointerenter', function (ev: PointerEvent, d) {
       r.io.tip(tickTooltip(ctx, d), ev);
@@ -186,7 +188,7 @@ export function drawTicks(g: G, r: RenderCtx): void {
 /* ------------------------------------------------------------------- lines */
 
 export function drawLines(g: G, r: RenderCtx): void {
-  const { x, y, computed, ctx } = r;
+  const { x, y, computed } = r;
   const path = line<SeriesPoint>()
     .x((d) => x(toDate(d.release.date)))
     .y((d) => y(d.mi.index))
@@ -195,7 +197,7 @@ export function drawLines(g: G, r: RenderCtx): void {
   // A lab line joins qualified releases and nothing else (METHODOLOGY §3). Running it through a
   // provisional point would invent a dive the index never measured — those points stay hollow and
   // off the line. Fewer than two qualified releases means no line at all, just markers.
-  const data = computed.labViews.filter((v) => v.qualified.length > 1);
+  const data = computed.labViews.filter((v) => v.qualified.length > 1 && r.visible(v.lab.id));
   const sel = g.selectAll<SVGPathElement, LabView>('path.lab-line').data(data, (d) => d.lab.id);
   sel.exit().remove();
   sel
@@ -203,10 +205,9 @@ export function drawLines(g: G, r: RenderCtx): void {
     .append('path')
     .attr('class', 'lab-line')
     .merge(sel)
+    .attr('data-lab', (d) => d.lab.id)
     .attr('d', (d) => path(d.qualified) ?? '')
     .attr('stroke', (d) => d.lab.color)
-    .attr('stroke-width', (d) => (r.focusLab === d.lab.id ? 2.25 : 1.5))
-    .attr('opacity', (d) => (!r.visible(d.lab.id) ? 0.07 : r.focusLab && r.focusLab !== d.lab.id ? DIM_LINE : 1))
     .attr('pointer-events', 'none');
 
   // running-maximum envelope, drawn as a step function
@@ -225,9 +226,6 @@ export function drawLines(g: G, r: RenderCtx): void {
 
   // The dotted continuation beyond "now" is the frontier trend fan's median, drawn yellow by
   // chart/crossings.ts (frontier-fan-median) on top of the grey band - not duplicated here.
-  void ctx;
-  void ratingFromTheta;
-  void step;
 }
 
 /* ------------------------------------------------------------------ points */
@@ -277,7 +275,6 @@ export function drawPoints(g: G, r: RenderCtx): void {
     .attr('cy', (d) => y(d.mi.index))
     .attr('fill', (d) => (d.mi.qualified ? colorOf(d) : '#fff'))
     .attr('stroke', (d) => (d.mi.qualified ? '#fff' : colorOf(d)))
-    .attr('opacity', (d) => (r.focusLab && r.focusLab !== d.release.lab ? DIM_POINT : 1))
     .attr('aria-label', (d) =>
       `${d.release.name}, ${ctx.labs.get(d.release.lab)?.name ?? d.release.lab}, released ${fmtDate(d.release.date)}, rating ${Math.round(d.mi.rating)}, index ${fmtIndex(d.mi.index)}${
         d.mi.qualified ? '' : ', provisional'
@@ -354,8 +351,8 @@ export function drawMarkers(g: G, r: RenderCtx): void {
   const merged = enter.merge(sel);
   merged
     .attr('transform', (d) => `translate(${x(toDate(d.date))},${y(markerLevel(r, d))})`)
-    .attr('opacity', (d) => (r.focusLab && r.focusLab !== d.lab ? DIM_POINT : 1))
     .attr('data-id', (d) => d.id)
+    .attr('data-lab', (d) => d.lab)
     .attr(
       'aria-label',
       (d) =>
@@ -409,12 +406,25 @@ const LABEL_GAP = 13;
 /** Beyond this displacement a label needs a leader line to stay attached to its line. */
 const LEADER_MIN = 6;
 
-export function drawLabels(g: G, r: RenderCtx): void {
+/**
+ * The pixel box a placed end-label occupies. Handed to `chart/crossings.ts`, which labels the
+ * same crowded strip of canvas — the last releases hug the NOW rule and so do the crossings, so
+ * "OPENAI" and "Saturated · SWE-bench" would otherwise print on top of each other.
+ */
+export interface LabelBox {
+  x0: number;
+  y0: number;
+  x1: number;
+  y1: number;
+}
+
+/** Draws the lab end-labels and their leaders; returns the boxes they ended up occupying. */
+export function drawLabels(g: G, r: RenderCtx): LabelBox[] {
   const { geom, x, y, computed } = r;
   if (!geom.endLabels) {
     g.selectAll('text.lab-label').remove();
     g.selectAll('line.lab-leader').remove();
-    return;
+    return [];
   }
 
   const raw: EndLabel[] = [];
@@ -473,7 +483,7 @@ export function drawLabels(g: G, r: RenderCtx): void {
     .append('line')
     .attr('class', 'lab-leader')
     .merge(lines)
-    .attr('opacity', (d) => (r.focusLab && r.focusLab !== d.id ? DIM_POINT : 1))
+    .attr('data-lab', (d) => d.id)
     .attr('x1', (d) => d.x + 3)
     .attr('y1', (d) => d.anchorY)
     .attr('x2', (d) => textX(d) - 2)
@@ -482,16 +492,24 @@ export function drawLabels(g: G, r: RenderCtx): void {
 
   const sel = g.selectAll<SVGTextElement, EndLabel>('text.lab-label').data(raw, (d) => d.id);
   sel.exit().remove();
-  sel
-    .enter()
-    .append('text')
-    .attr('class', 'lab-label')
-    .merge(sel)
+  const labels = sel.enter().append('text').attr('class', 'lab-label').merge(sel);
+  labels
+    .attr('data-lab', (d) => d.id)
     .attr('x', textX)
     .attr('y', (d) => d.y + 4)
     .attr('fill', (d) => d.color)
-    .attr('opacity', (d) => (r.focusLab && r.focusLab !== d.id ? DIM_POINT : 1))
     .text((d) => d.short);
+
+  // 11.5 px uppercase Jost with 0.09em tracking runs about 8 px per character — the fallback
+  // when the platform cannot measure (no layout engine in a test DOM).
+  const boxes: LabelBox[] = [];
+  labels.each(function (d) {
+    const w = typeof this.getComputedTextLength === 'function' ? this.getComputedTextLength() : d.short.length * 8;
+    const left = textX(d);
+    const baseline = d.y + 4;
+    boxes.push({ x0: left - 2, y0: baseline - 10, x1: left + w + 2, y1: baseline + 4 });
+  });
+  return boxes;
 }
 
 /* ----------------------------------------------------------------- overlay */
@@ -513,7 +531,7 @@ export function drawOverlay(g: G, r: RenderCtx): OverlayRefs {
 
   let rule = g.select<SVGLineElement>('line.now-line');
   if (rule.empty()) rule = g.append('line').attr('class', 'now-line').attr('pointer-events', 'none');
-  rule.attr('x1', nowX).attr('x2', nowX).attr('y1', geom.y1 - 6).attr('y2', geom.y0 + 22);
+  rule.attr('x1', nowX).attr('x2', nowX).attr('y1', geom.y1 - 6).attr('y2', geom.y0 + geom.m.bottom);
 
   let label = g.select<SVGTextElement>('text.now-label');
   if (label.empty()) label = g.append('text').attr('class', 'now-label').attr('pointer-events', 'none');
@@ -599,7 +617,6 @@ export function drawTiers(g: G, r: RenderCtx): void {
     .attr('fill', '#fff')
     .attr('stroke', (d) => colorOf(d))
     .attr('stroke-width', 1.25)
-    .attr('opacity', (d) => (r.focusLab && r.focusLab !== d.release.lab ? DIM_POINT : 0.9))
     .attr('aria-label', (d) =>
       `${d.release.name}, ${ctx.labs.get(d.release.lab)?.name ?? d.release.lab}, ${(d.release.tier ?? 'flagship')} tier, released ${fmtDate(d.release.date)}, rating ${Math.round(d.mi.rating)}, index ${fmtIndex(d.mi.index)}. Activate for sources.`,
     )
@@ -620,9 +637,4 @@ export function drawTiers(g: G, r: RenderCtx): void {
         r.io.openAudit(d.mi.release_id);
       }
     });
-}
-
-/** theta → the index the y scale reads; local copy of 100·sigma(theta). */
-function indexFromThetaOf(theta: number): number {
-  return 100 / (1 + Math.exp(-theta));
 }
