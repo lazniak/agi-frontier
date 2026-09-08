@@ -219,6 +219,13 @@ export interface ValidateExtractionOptions {
   today: ISODate;
   /** Date used for announced/rumored releases whose page gives no date (usually the item date). */
   fallbackDate: ISODate;
+  /**
+   * A date the caller *knows* from a primary index (an rss `pubDate` on the lab's own news feed),
+   * as opposed to `fallbackDate`'s "when we happened to look". Only set it for a source that
+   * actually dates the launch: unlike `fallbackDate` it is trusted for `released` too, which is
+   * the whole point — the news-index retry exists to supply the date the page did not carry.
+   */
+  knownDate?: { date: ISODate; precision: DatePrecision };
   /** Force every release to this status (used by `discover` for third-party press). */
   forceStatus?: ReleaseStatus;
   /** Drop all scores (press pages never carry official numbers). */
@@ -227,6 +234,47 @@ export interface ValidateExtractionOptions {
   benchmarks?: Benchmark[];
   /** Regexes from the lab's `flagship_hints` — an `unknown` tier matching one resolves to flagship. */
   flagshipHints?: RegExp[];
+  /** The lab's `name_prefixes` (labs.json) — restores "Opus 5" to "Claude Opus 5" before the id is built. */
+  namePrefixes?: Lab['name_prefixes'];
+}
+
+/**
+ * A prefix carrying a digit encodes a generation the bare name cannot restore: "Llama 4 " turns
+ * a future "Behemoth 2" into "Llama 4 Behemoth 2" — a canonical name the lab never published,
+ * written straight into `data/models` (the poll path runs `validateExtraction` too). The rule
+ * exists to restore a family the model dropped, never to invent a version, so a version-bearing
+ * prefix is refused here as well as removed from labs.json: labs.json is data and a later edit
+ * must not be able to mint one.
+ */
+export function prefixInventsVersion(prefix: string): boolean {
+  return /\d/.test(prefix);
+}
+
+/**
+ * Restore a family prefix the model dropped (REDESIGN §12.6). Rules are tried in order and the
+ * first `match` (case-insensitive, tested against the trimmed name) wins; a name that already
+ * starts with the prefix (case-insensitively) is returned unchanged, so the rule is idempotent
+ * and never produces "Claude Claude Opus 5". Invalid regex sources and version-bearing prefixes
+ * are skipped — labs.json is data, not code, and neither a typo nor a bad rule there must be
+ * able to take the extractor down or invent a model name.
+ */
+export function applyNamePrefixes(name: string, rules: Lab['name_prefixes']): string {
+  const trimmed = name.trim();
+  if (!trimmed || !rules || rules.length === 0) return trimmed;
+  for (const rule of rules) {
+    const prefix = rule.prefix;
+    if (!prefix.trim()) continue;
+    if (prefixInventsVersion(prefix)) continue;
+    if (trimmed.toLowerCase().startsWith(prefix.trim().toLowerCase())) continue;
+    let re: RegExp;
+    try {
+      re = new RegExp(rule.match, 'i');
+    } catch {
+      continue;
+    }
+    if (re.test(trimmed)) return `${prefix}${trimmed}`;
+  }
+  return trimmed;
 }
 
 /**
@@ -272,7 +320,9 @@ export function validateExtraction(
   const seenNames = new Set<string>();
 
   for (const raw of extraction.releases) {
-    const name = raw.name.trim();
+    // Prefix restoration happens first: the id, the dedupe key and the eval matching all key
+    // off the final name.
+    const name = applyNamePrefixes(raw.name, opts.namePrefixes);
     if (!name) { dropped.push({ kind: 'release', name: raw.name, reason: 'empty name' }); continue; }
     if (seenNames.has(name.toLowerCase())) { dropped.push({ kind: 'release', name, reason: 'duplicate in response' }); continue; }
 
@@ -368,7 +418,11 @@ function resolveDate(
     return { date: `${value}-01`, precision: capped === 'unknown' ? 'month' : capped };
   }
   if (/^\d{4}$/.test(value)) return { date: `${value}-01-01`, precision: 'year' };
-  // No date on the page: acceptable for announced/rumored (we record when we saw it), never for released.
+  // The page carries no date, but a primary index does: that date is as good as the page's own,
+  // so it counts for `released` too. Without this the news-index retry re-fails on exactly the
+  // condition that triggered it ("no usable date") whenever the launch post states no date.
+  if (opts.knownDate) return { ...opts.knownDate };
+  // Nothing at all: acceptable for announced/rumored (we record when we saw it), never for released.
   if (status === 'released') return null;
   return { date: opts.fallbackDate, precision: 'unknown' };
 }

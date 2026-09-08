@@ -35,14 +35,19 @@ export interface GitPushResult {
 /**
  * `data(bot): <lab>: <summary>` for a single lab; several labs are joined with `+`.
  * Kept short — the full detail lives in `changes.jsonl` and the site changelog.
+ *
+ * `fallbackSummary` is what the subject says when the caller described nothing but the tree is
+ * still dirty (a previous step left uncommitted files behind). It is mandatory so every commit
+ * names the step that made it — the generic "data update" of the first live run told nobody
+ * that the arena step had run.
  */
-export function buildCommitMessage(labs: string[], summaries: string[], maxLength = 100): string {
+export function buildCommitMessage(labs: string[], summaries: string[], fallbackSummary: string, maxLength = 100): string {
   const uniqueLabs = [...new Set(labs.filter(Boolean))];
   const scope = uniqueLabs.length === 0 ? 'data' : uniqueLabs.length <= 3 ? uniqueLabs.join('+') : `${uniqueLabs.length} labs`;
   const uniqueSummaries = [...new Set(summaries.filter(Boolean))];
   let summary = uniqueSummaries.slice(0, 3).join('; ');
   if (uniqueSummaries.length > 3) summary += `; +${uniqueSummaries.length - 3} more`;
-  if (!summary) summary = 'data update';
+  if (!summary) summary = fallbackSummary.trim() || 'uncommitted data changes';
   const head = `data(bot): ${scope}: `;
   const room = Math.max(12, maxLength - head.length);
   if (summary.length > room) summary = summary.slice(0, room - 1).trimEnd() + '…';

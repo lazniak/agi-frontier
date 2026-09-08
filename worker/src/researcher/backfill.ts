@@ -9,7 +9,7 @@
  */
 import { mkdirSync, writeFileSync, existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { LabFileSchema, type Lab, type LabFile, type LabId, type Source } from '@agi/shared';
+import { LabFileSchema, type DatePrecision, type ISODate, type Lab, type LabFile, type LabId, type Source } from '@agi/shared';
 import { readBenchmarks, readLabs, issuesToString } from '../data-store';
 import { isoNow } from '../fetcher';
 import { print } from '../log';
@@ -18,10 +18,65 @@ import { compileHints } from '../candidates';
 import { stringifyLabFile } from '../canonical';
 import { nameKey } from '../text';
 import { uniqueId } from '../merge';
-import { Semaphore } from '../llm';
-import { buildCommitMessage, commitAndPush, dataDirty } from '../git';
+import { applyNamePrefixes } from '../llm';
+import { commitAndPush, dataDirty } from '../git';
+import { mergeSummaryLine, recordUsage, usageDelta } from '../state';
 import type { Runtime } from '../runtime';
-import { discoverModels, type DiscoveredModel, type ScreenedCandidate } from './discovery';
+import {
+  collectAnnouncementLinks,
+  discoverModels,
+  findLaunchPostInNewsIndex,
+  isOverviewUrl,
+  rankLinksForName,
+  type DiscoveredModel,
+  type ScreenedCandidate,
+} from './discovery';
+import type { ResearcherBudget } from '@agi/shared';
+
+/** How many launch posts one overview page may enqueue for one model (cost bound). */
+export const MAX_OVERVIEW_LINKS = 3;
+
+/** A queued extraction: the screened candidate plus where it came from and what was retried. */
+interface QueueEntry extends ScreenedCandidate {
+  /** The overview page this launch post was harvested from. */
+  fromOverview?: string;
+  /** Set on the single news-index retry a dateless extraction gets. */
+  retriedViaNews?: boolean;
+}
+
+/** URL identity for the queue's dedupe: no query, no hash, no trailing slash, lower-case. */
+function urlKey(url: string): string {
+  return url.replace(/[?#].*$/, '').replace(/\/+$/, '').toLowerCase();
+}
+
+/**
+ * The date a news index published for a launch post, as a trusted extraction date. Strict on
+ * purpose: unlike `itemDateOrToday` an unparseable value yields null rather than today, because
+ * this date is trusted for `released` releases and a launch date must never be guessed. The
+ * shorter ISO forms keep their real precision instead of being widened to a day.
+ */
+export function indexDate(raw: string | null | undefined): { date: ISODate; precision: DatePrecision } | null {
+  const value = raw?.trim() ?? '';
+  if (!value) return null;
+  if (/^\d{4}$/.test(value)) return { date: `${value}-01-01`, precision: 'year' };
+  if (/^\d{4}-\d{2}$/.test(value)) return { date: `${value}-01`, precision: 'month' };
+  const t = Date.parse(value);
+  if (!Number.isFinite(t)) return null;
+  return { date: new Date(t).toISOString().slice(0, 10), precision: 'day' };
+}
+
+/** The one-line `last_backfill_summary`, e.g. `backfill: 10 labs, 8 candidates, 1 release / 0 scores, 107 calls · 2.03 USD`. */
+export function formatBackfillSummary(summary: BackfillRunSummary, usage: ResearcherBudget | null): string {
+  const calls = usage ? usage.calls : summary.llmCalls;
+  return (
+    `backfill: ${summary.labs} lab${summary.labs === 1 ? '' : 's'}, ${summary.candidates} candidate${summary.candidates === 1 ? '' : 's'}, ` +
+    `${summary.releasesWritten} release${summary.releasesWritten === 1 ? '' : 's'} / ${summary.scoresWritten} score${summary.scoresWritten === 1 ? '' : 's'}, ` +
+    `${calls} call${calls === 1 ? '' : 's'}` +
+    (usage ? ` · ${usage.usd_estimate.toFixed(2)} USD` : '') +
+    (summary.stoppedEarly ? ' — budget stopped' : '') +
+    (summary.errors > 0 ? ` — ${summary.errors} error${summary.errors === 1 ? '' : 's'}` : '')
+  );
+}
 import {
   Budget,
   labProgress,
@@ -162,20 +217,27 @@ export async function planBackfill(
     }
 
     const entries: BackfillPlanEntry[] = discovery.candidates
-      .map((c): BackfillPlanEntry => ({
-        lab: lab.id,
-        name: c.name,
-        tier: c.tier,
-        date: c.date ?? null,
-        url: c.launch_url,
-        status: incrementalSkip(c, {
-          incremental: opts.incremental === true,
-          doneNames: doneKeys,
-          failedNames: failedKeys,
-          modelNames,
-          today,
-        }) ?? 'pending',
-      }))
+      .map((c): BackfillPlanEntry => {
+        // The real run prefixes the name *before* the skip decision, and progress/models are
+        // keyed off the canonical name — so the plan has to decide on the same name or it
+        // prints `pending` for a candidate the run will skip (and vice versa). The plan is the
+        // operator's preview of what a run will spend money on; it must not disagree.
+        const name = applyNamePrefixes(c.name, lab.name_prefixes);
+        return {
+          lab: lab.id,
+          name,
+          tier: c.tier,
+          date: c.date ?? null,
+          url: c.launch_url,
+          status: incrementalSkip({ ...c, name }, {
+            incremental: opts.incremental === true,
+            doneNames: doneKeys,
+            failedNames: failedKeys,
+            modelNames,
+            today,
+          }) ?? 'pending',
+        };
+      })
       .sort((a, b) => a.name.localeCompare(b.name));
 
     plan.push({ lab, candidates: entries });
@@ -213,14 +275,8 @@ export async function runBackfillImpl(rt: Runtime, opts: BackfillOptions): Promi
     llmCalls: 0, errors: 0, stoppedEarly: false,
   };
   // Per-run usage delta: the client is shared with poll/discover, so subtract the snapshot
-  // taken at the start; lifetime totals stay in the log only.
-  const statsAtStart = rt.openRouter?.stats();
-  const delta = (stats: { calls: number; tokens_in: number; tokens_out: number; usd_estimate: number }) => ({
-    calls: stats.calls - (statsAtStart?.calls ?? 0),
-    tokens_in: stats.tokens_in - (statsAtStart?.tokens_in ?? 0),
-    tokens_out: stats.tokens_out - (statsAtStart?.tokens_out ?? 0),
-    usd_estimate: stats.usd_estimate - (statsAtStart?.usd_estimate ?? 0),
-  });
+  // taken at the start; the lifetime totals are accumulated into the run state at the end.
+  const statsAtStart = rt.openRouter?.stats() ?? null;
   /** Persist progress immediately — a kill or a later schema failure must not lose it. */
   const saveProgress = () => {
     if (!dryRun) writeProgress(rt.config.stateDir, progress);
@@ -281,9 +337,10 @@ export async function runBackfillImpl(rt: Runtime, opts: BackfillOptions): Promi
     const candidates: ScreenedCandidate[] = discovery.candidates
       .map((c) => {
         // Real discovery pre-screens; fakes (tests) and older impls may not — the host filter
-        // is a data-safety rule, so it is re-derived here regardless.
+        // is a data-safety rule, so it is re-derived here regardless. The family prefix is
+        // restored here too, so the candidate name and the extracted name agree.
         const official = 'official' in c && typeof c.official === 'boolean' ? c.official : hostMatches(c.launch_url, hosts);
-        return { ...c, official };
+        return { ...c, name: applyNamePrefixes(c.name, lab.name_prefixes), official };
       })
       .map((c) => ({
         candidate: c,
@@ -308,12 +365,27 @@ export async function runBackfillImpl(rt: Runtime, opts: BackfillOptions): Promi
       already_done: discovery.candidates.length - candidates.length,
     });
 
+    // Work queue rather than a fixed list: an overview page enqueues the launch posts it links
+    // to, and a dateless extraction enqueues one retry through the news index. URLs are
+    // deduped so two overview pages pointing at the same post cost one extraction.
+    const queue: QueueEntry[] = [...candidates];
+    const queuedUrls = new Set(candidates.map((c) => urlKey(c.launch_url)));
+    const enqueue = (entry: QueueEntry): boolean => {
+      const key = urlKey(entry.launch_url);
+      if (queuedUrls.has(key)) return false;
+      queuedUrls.add(key);
+      queue.push(entry);
+      return true;
+    };
+
     /** Extract one candidate; mutate only the local buffers, never `prog` directly. */
-    const processCandidate = async (candidate: ScreenedCandidate): Promise<void> => {
+    const processCandidate = async (candidate: QueueEntry): Promise<void> => {
       if (budget.exhausted) {
         summary.stoppedEarly = true;
         return;
       }
+      // A sibling link (same model, another launch post) already landed the release.
+      if (namesInFile.has(nameKey(candidate.name))) return;
       const page = await rt.fetcher(candidate.launch_url, { minTextLength: 400 });
       if (!page.ok || page.text.length < 40) {
         summary.errors++;
@@ -322,6 +394,37 @@ export async function runBackfillImpl(rt: Runtime, opts: BackfillOptions): Promi
         saveProgress();
         return;
       }
+
+      // Overview pages (catalogues, docs, pricing, the homepage) never date a launch: mine them
+      // for dated announcement links naming the model and extract from those instead.
+      if (isOverviewUrl(candidate.launch_url)) {
+        const links = rankLinksForName(collectAnnouncementLinks(page, hosts), candidate.name, MAX_OVERVIEW_LINKS);
+        // `official` describes the URL being extracted, so it is re-derived for the new URL and
+        // never inherited: a press homepage counts as an overview page, yet the links harvested
+        // from it are host-filtered to the lab's own domains — inheriting `official: false`
+        // would extract a genuine launch post as a scoreless rumour.
+        const added = links.filter((url) =>
+          enqueue({ ...candidate, launch_url: url, official: hostMatches(url, hosts), fromOverview: candidate.launch_url }),
+        );
+        if (added.length === 0) {
+          failedSet.add(candidate.name);
+          labLog.info('overview page — no launch post link names the model, nothing extracted', {
+            name: candidate.name,
+            url: candidate.launch_url,
+            links_on_page: links.length,
+          });
+        } else {
+          labLog.info('overview page — launch posts enqueued instead', { name: candidate.name, url: candidate.launch_url, posts: added });
+        }
+        saveProgress();
+        return;
+      }
+
+      // The retry's `date` came from the lab's own news index — the date the overview page or
+      // teaser lacked. It is the reason the retry exists, so hand it to the extraction as a
+      // trusted date; without it a launch post that states no date fails the retry on the very
+      // condition ("no usable date") that triggered it.
+      const knownDate = candidate.retriedViaNews ? indexDate(candidate.date) : null;
       try {
         const result = await extractFromPage({
           client: rt.openRouter!,
@@ -332,6 +435,7 @@ export async function runBackfillImpl(rt: Runtime, opts: BackfillOptions): Promi
           today,
           page,
           fallbackDate: itemDateOrToday(candidate.date ?? undefined),
+          ...(knownDate ? { knownDate } : {}),
           flagshipHints: hints,
           log: labLog,
           ...(candidate.name ? { pageTitle: candidate.name } : {}),
@@ -344,8 +448,35 @@ export async function runBackfillImpl(rt: Runtime, opts: BackfillOptions): Promi
         const kept = result.releases.filter((r) => r.name.toLowerCase() === candidate.name.toLowerCase() ||
           (r.name.length > 0 && candidate.name.toLowerCase().includes(r.name.toLowerCase())));
         if (kept.length === 0) {
+          const reasons = result.dropped.map((d) => (d.benchmark ? `${d.name}/${d.benchmark}: ${d.reason}` : `${d.name}: ${d.reason}`));
+          // "no usable date" gets exactly one more chance: the lab's own news index, where the
+          // launch post (and its date) lives. Everything else fails here, reason verbatim.
+          const dateless = result.dropped.some((d) => d.kind === 'release' && d.reason === 'no usable date');
+          if (dateless && !candidate.retriedViaNews) {
+            const post = await findLaunchPostInNewsIndex(rt.fetcher, lab, candidate.name, {
+              excludeUrls: new Set([urlKey(candidate.launch_url)]),
+              log: labLog,
+            });
+            // Same rule as the overview harvest: the news index is the lab's own feed, so the
+            // post it points at is official by construction — recompute rather than inherit the
+            // press candidate's `official: false`.
+            if (post && enqueue({
+              ...candidate,
+              launch_url: post.url,
+              official: hostMatches(post.url, hosts),
+              date: post.date ?? candidate.date,
+              retriedViaNews: true,
+            })) {
+              labLog.info('no usable date — retrying once via the news index', {
+                name: candidate.name, url: page.url, retry_url: post.url, retry_title: post.title, reasons,
+              });
+              saveProgress();
+              return;
+            }
+            labLog.info('no usable date and the news index does not name the model — dropped', { name: candidate.name, url: page.url, reasons });
+          }
           failedSet.add(candidate.name);
-          labLog.info('nothing verifiable extracted', { name: candidate.name, url: page.url, dropped: result.dropped.length });
+          labLog.info('nothing verifiable extracted', { name: candidate.name, url: page.url, dropped: result.dropped.length, reasons });
           saveProgress();
           return;
         }
@@ -421,12 +552,19 @@ export async function runBackfillImpl(rt: Runtime, opts: BackfillOptions): Promi
 
     if (dryRun) continue;
 
-    // Concurrency-bounded extraction (RESEARCH_CONCURRENCY). A dedicated semaphore — NOT the
-    // client's: chatJson acquires the client semaphore inside each task, and nesting the same
+    // Concurrency-bounded extraction (RESEARCH_CONCURRENCY): a fixed pool of workers drains
+    // the queue, so entries enqueued mid-run (launch posts, news retries) are still picked up.
+    // NOT the client's semaphore: chatJson acquires that inside each task, and nesting the same
     // semaphore would deadlock once RESEARCH_CONCURRENCY tasks each wait for a slot.
-    const sem = new Semaphore(rt.config.researchConcurrency);
+    const workers = Math.max(1, rt.config.researchConcurrency);
     try {
-      await Promise.all(candidates.map((c) => sem.run(() => processCandidate(c))));
+      await Promise.all(
+        Array.from({ length: workers }, async () => {
+          for (let next = queue.shift(); next !== undefined; next = queue.shift()) {
+            await processCandidate(next);
+          }
+        }),
+      );
     } catch {
       /* processCandidate never throws; kept for safety */
     }
@@ -459,27 +597,21 @@ export async function runBackfillImpl(rt: Runtime, opts: BackfillOptions): Promi
   if (!dryRun) {
     writeProgress(rt.config.stateDir, progress);
     const usageNow = rt.openRouter?.stats();
-    const perRun = usageNow ? delta(usageNow) : null;
+    const perRun = usageNow ? usageDelta(usageNow, statsAtStart) : null;
     const run = rt.state.readRun();
+    const summaryLine = formatBackfillSummary(summary, perRun);
     run.researcher = {
       ...run.researcher,
       version: rt.config.researcherVersion,
       // Set even on a budget-stopped run: the next weekly slot is a week away, and a stopped
       // run resumes from the progress file on whatever run happens next.
       last_backfill_at: now,
-      ...(perRun
-        ? {
-            budget: {
-              calls: perRun.calls,
-              tokens_in: perRun.tokens_in,
-              tokens_out: perRun.tokens_out,
-              usd_estimate: Math.round(perRun.usd_estimate * 1_000_000) / 1_000_000,
-            },
-          }
-        : {}),
+      last_backfill_summary: mergeSummaryLine(run.researcher.last_backfill_summary, summaryLine),
     };
+    // Backfill is a research run: its delta becomes `budget` and joins the lifetime totals.
+    if (perRun) recordUsage(run, perRun, { research: true });
     rt.state.writeRun(run);
-    log.info('openrouter usage (lifetime totals)', usageNow ? { ...usageNow } : {});
+    log.info('openrouter usage (lifetime totals, this process)', usageNow ? { ...usageNow } : {});
 
     // Commit the researcher's own output separately (pathspec `data/researched`) so the hourly
     // poll commit does not sweep untracked researcher files up with it.

@@ -6,9 +6,11 @@ import {
   MAX_QUOTE_CHARS,
   OpenRouterClient,
   OpenRouterError,
+  applyNamePrefixes,
   buildUserPrompt,
   estimateUsd,
   parseJsonContent,
+  prefixInventsVersion,
   priceFor,
   resolveTier,
   scoreInRange,
@@ -16,6 +18,8 @@ import {
   withRetry,
   type Extraction,
 } from '../src/llm';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import type { Benchmark, Lab } from '@agi/shared';
 
 const PAGE = `Introducing GPT-6
@@ -80,6 +84,90 @@ describe('validateExtraction — releases', () => {
     const { releases, dropped } = validateExtraction(two, OPTS);
     expect(releases).toHaveLength(1);
     expect(dropped[0]?.reason).toBe('duplicate in response');
+  });
+});
+
+describe('name prefixes (REDESIGN §12.6)', () => {
+  const ANTHROPIC = [{ match: '^(opus|sonnet|haiku|fable|mythos)\\b', prefix: 'Claude ' }];
+  const MISTRAL = [{ match: '^(large|medium|small)\\b', prefix: 'Mistral ' }];
+
+  test('restores the family prefix for a bare member, case-insensitively', () => {
+    expect(applyNamePrefixes('Opus 5', ANTHROPIC)).toBe('Claude Opus 5');
+    expect(applyNamePrefixes('  opus 5 ', ANTHROPIC)).toBe('Claude opus 5');
+    expect(applyNamePrefixes('Fable 5.1', ANTHROPIC)).toBe('Claude Fable 5.1');
+    expect(applyNamePrefixes('Large 3', MISTRAL)).toBe('Mistral Large 3');
+    expect(applyNamePrefixes('K3', [{ match: '^(k[0-9])\\b', prefix: 'Kimi ' }])).toBe('Kimi K3');
+  });
+
+  test('never doubles a prefix that is already there, whatever the case', () => {
+    expect(applyNamePrefixes('Claude Opus 5', ANTHROPIC)).toBe('Claude Opus 5');
+    expect(applyNamePrefixes('claude opus 5', ANTHROPIC)).toBe('claude opus 5');
+    expect(applyNamePrefixes(applyNamePrefixes('Opus 5', ANTHROPIC), ANTHROPIC)).toBe('Claude Opus 5');
+  });
+
+  test('leaves unrelated names, other Mistral families and word-boundary near-misses alone', () => {
+    expect(applyNamePrefixes('GPT-6', ANTHROPIC)).toBe('GPT-6');
+    expect(applyNamePrefixes('Magistral Medium', MISTRAL)).toBe('Magistral Medium');
+    expect(applyNamePrefixes('Codestral 2', MISTRAL)).toBe('Codestral 2');
+    expect(applyNamePrefixes('Mixtral 8x22B', MISTRAL)).toBe('Mixtral 8x22B');
+    expect(applyNamePrefixes('Opusfoo', ANTHROPIC)).toBe('Opusfoo');
+    expect(applyNamePrefixes('Opus 5', undefined)).toBe('Opus 5');
+    expect(applyNamePrefixes('Opus 5', [])).toBe('Opus 5');
+  });
+
+  test('an invalid regex source in labs.json is skipped, not fatal', () => {
+    expect(applyNamePrefixes('Opus 5', [{ match: '(', prefix: 'Broken ' }, ...ANTHROPIC])).toBe('Claude Opus 5');
+  });
+
+  test('validateExtraction applies the prefix before the name reaches the release (and its dedupe key)', () => {
+    const page = 'Opus 5 is available today in the API for everyone.';
+    const { releases, dropped } = validateExtraction(
+      {
+        releases: [
+          extraction({ name: 'Opus 5', family: 'Claude Opus', announcement_quote: 'Opus 5 is available today in the API', scores: [] }).releases[0]!,
+          extraction({ name: 'Claude Opus 5', family: 'Claude Opus', announcement_quote: 'Opus 5 is available today in the API', scores: [] }).releases[0]!,
+        ],
+      },
+      { ...OPTS, pageText: page, namePrefixes: ANTHROPIC },
+    );
+    expect(releases.map((r) => r.name)).toEqual(['Claude Opus 5']);
+    // The second row became a duplicate once both names were canonical.
+    expect(dropped.map((d) => d.reason)).toEqual(['duplicate in response']);
+  });
+
+  test('a prefix carrying a generation number is refused: the rule restores a family, never a version', () => {
+    // "Llama 4 " would mint "Llama 4 Behemoth 2" for a future Llama 5 member — a canonical name
+    // the lab never published, written straight into data/models via the poll path.
+    const META = [{ match: '^(maverick|scout|behemoth)\\b', prefix: 'Llama 4 ' }];
+    expect(prefixInventsVersion('Llama 4 ')).toBe(true);
+    expect(prefixInventsVersion('Claude ')).toBe(false);
+    expect(applyNamePrefixes('Behemoth 2', META)).toBe('Behemoth 2');
+    expect(applyNamePrefixes('Scout', META)).toBe('Scout');
+    // The rule is skipped, not fatal: a later, valid rule still applies.
+    expect(applyNamePrefixes('Opus 5', [...META, ...ANTHROPIC])).toBe('Claude Opus 5');
+  });
+
+  test('every name_prefixes rule in data/labs.json is version-free and one the lab actually writes', () => {
+    // The two invariants that make a prefix safe to apply to a bare name, checked against the
+    // shipped data rather than a fixture: (1) no generation number in the prefix — the bare name
+    // cannot restore it; (2) the lab really writes names in that shape, so the canonical name
+    // dedupes against data/models instead of inventing a spelling ("Qwen Max" never existed:
+    // every published Qwen fuses the version into the family, "Qwen3-Max").
+    const labs = JSON.parse(readFileSync(join(import.meta.dir, '..', '..', 'data', 'labs.json'), 'utf8')) as Lab[];
+    const withPrefixes = labs.filter((l) => (l.name_prefixes?.length ?? 0) > 0);
+    expect(withPrefixes.length).toBeGreaterThan(0);
+    for (const lab of withPrefixes) {
+      const published = JSON.parse(
+        readFileSync(join(import.meta.dir, '..', '..', 'data', 'models', `${lab.id}.json`), 'utf8'),
+      ) as { releases: { name: string }[] };
+      for (const rule of lab.name_prefixes ?? []) {
+        expect([lab.id, rule.prefix, prefixInventsVersion(rule.prefix)]).toEqual([lab.id, rule.prefix, false]);
+        const used = published.releases.some((r) => r.name.toLowerCase().startsWith(rule.prefix.toLowerCase()));
+        expect([lab.id, rule.prefix, used]).toEqual([lab.id, rule.prefix, true]);
+        // And applying the rules to a name the lab already publishes must change nothing.
+        for (const r of published.releases) expect(applyNamePrefixes(r.name, lab.name_prefixes)).toBe(r.name);
+      }
+    }
   });
 });
 
@@ -198,6 +286,21 @@ describe('validateExtraction — dates and status', () => {
     const { releases } = validateExtraction(extraction(), { ...OPTS, forceStatus: 'rumored', dropScores: true });
     expect(releases[0]?.status).toBe('rumored');
     expect(releases[0]?.scores).toHaveLength(0);
+  });
+
+  test('knownDate dates a released model the page never dated — unlike fallbackDate', () => {
+    // The news-index retry exists to supply this date; without it the retry re-fails on the very
+    // condition that triggered it. fallbackDate ("when we looked") must stay barred for released.
+    const known = { date: '2026-08-30', precision: 'day' as const };
+    const { releases, dropped } = validateExtraction(extraction({ date: null }), { ...OPTS, knownDate: known });
+    expect(dropped).toHaveLength(0);
+    expect(releases[0]?.date).toBe('2026-08-30');
+    expect(releases[0]?.date_precision).toBe('day');
+    // The page's own date still wins when the model found one.
+    expect(validateExtraction(extraction({ date: '2026-05-04' }), { ...OPTS, knownDate: known }).releases[0]?.date).toBe('2026-05-04');
+    // And it carries its real precision when the index only gives a month.
+    const monthly = validateExtraction(extraction({ date: null }), { ...OPTS, knownDate: { date: '2026-08-01', precision: 'month' } });
+    expect(monthly.releases[0]?.date_precision).toBe('month');
   });
 });
 

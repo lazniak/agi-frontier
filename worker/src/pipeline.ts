@@ -3,9 +3,10 @@
  * plus the per-lab workspace that stages a merge, validates it and rolls it back if the
  * result would be invalid. `data/` is never left failing `validate`.
  */
-import type { Benchmark, ChangeEvent, ISODate, Lab, LabFile, LabId, ReleaseStatus } from '@agi/shared';
+import type { Benchmark, ChangeEvent, DatePrecision, ISODate, Lab, LabFile, LabId, ReleaseStatus } from '@agi/shared';
 import {
   appendChanges,
+  formatIssues,
   readOrCreateLabFile,
   restoreLabFile,
   writeLabFile,
@@ -37,6 +38,8 @@ export interface ExtractPageInput {
   page: PageFetch;
   pageTitle?: string;
   fallbackDate: ISODate;
+  /** A launch date known from a primary index (rss `pubDate`); trusted for `released` too. */
+  knownDate?: { date: ISODate; precision: DatePrecision };
   forceStatus?: ReleaseStatus;
   dropScores?: boolean;
   /** Pre-compiled `flagship_hints` for tier resolution; compiled from the lab when omitted. */
@@ -71,7 +74,7 @@ export async function extractFromPage(input: ExtractPageInput): Promise<ExtractP
     input.log?.warn('llm output failed schema validation', {
       lab: input.lab.id,
       url: input.page.url,
-      issues: parsed.error.issues.slice(0, 5).map((i) => `${i.path.join('.')}: ${i.message}`),
+      issues: formatIssues(parsed.error.issues, 5),
     });
     return { releases: [], dropped: [], usedJsonObjectFallback: result.usedJsonObjectFallback };
   }
@@ -80,8 +83,10 @@ export async function extractFromPage(input: ExtractPageInput): Promise<ExtractP
     benchmarkIds: input.benchmarkIds,
     today: input.today,
     fallbackDate: input.fallbackDate,
+    ...(input.knownDate ? { knownDate: input.knownDate } : {}),
     benchmarks: input.benchmarks,
     flagshipHints: input.flagshipHints ?? compileHints(input.lab.flagship_hints),
+    ...(input.lab.name_prefixes ? { namePrefixes: input.lab.name_prefixes } : {}),
     ...(input.forceStatus ? { forceStatus: input.forceStatus } : {}),
     ...(input.dropScores ? { dropScores: input.dropScores } : {}),
   });

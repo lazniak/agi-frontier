@@ -2,29 +2,33 @@ import { describe, expect, test } from 'bun:test';
 import { BOT_EMAIL, BOT_NAME, buildCommitMessage, commitAndPush, dataDirty, type GitRun, type GitRunner } from '../src/git';
 
 describe('buildCommitMessage', () => {
+  const FALLBACK = 'poll: sweep of uncommitted data changes';
+
   test('uses the Conventional-Commits shape the repo requires', () => {
-    expect(buildCommitMessage(['openai'], ['openai: 1 release'])).toBe('data(bot): openai: openai: 1 release');
+    expect(buildCommitMessage(['openai'], ['openai: 1 release'], FALLBACK)).toBe('data(bot): openai: openai: 1 release');
   });
 
   test('joins a couple of labs with +', () => {
-    expect(buildCommitMessage(['openai', 'anthropic'], ['2 scores'])).toBe('data(bot): openai+anthropic: 2 scores');
+    expect(buildCommitMessage(['openai', 'anthropic'], ['2 scores'], FALLBACK)).toBe('data(bot): openai+anthropic: 2 scores');
   });
 
   test('summarises when many labs changed', () => {
     const labs = ['openai', 'anthropic', 'google', 'xai', 'meta'];
-    expect(buildCommitMessage(labs, ['a', 'b', 'c', 'd'])).toBe('data(bot): 5 labs: a; b; c; +1 more');
+    expect(buildCommitMessage(labs, ['a', 'b', 'c', 'd'], FALLBACK)).toBe('data(bot): 5 labs: a; b; c; +1 more');
   });
 
   test('deduplicates labs and summaries', () => {
-    expect(buildCommitMessage(['openai', 'openai'], ['x', 'x'])).toBe('data(bot): openai: x');
+    expect(buildCommitMessage(['openai', 'openai'], ['x', 'x'], FALLBACK)).toBe('data(bot): openai: x');
   });
 
-  test('falls back to a generic subject when nothing was described', () => {
-    expect(buildCommitMessage([], [])).toBe('data(bot): data: data update');
+  test('names the step in the subject when nothing was described — never a bare "data update"', () => {
+    expect(buildCommitMessage([], [], FALLBACK)).toBe(`data(bot): data: ${FALLBACK}`);
+    expect(buildCommitMessage([], [], '   ')).toBe('data(bot): data: uncommitted data changes');
+    expect(buildCommitMessage([], [], FALLBACK)).not.toContain('data update');
   });
 
   test('stays within the subject-line budget', () => {
-    const msg = buildCommitMessage(['openai'], ['x'.repeat(300)]);
+    const msg = buildCommitMessage(['openai'], ['x'.repeat(300)], FALLBACK);
     expect(msg.length).toBeLessThanOrEqual(100);
     expect(msg.startsWith('data(bot): openai: ')).toBe(true);
   });

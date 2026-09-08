@@ -8,13 +8,48 @@
  */
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { LAB_IDS, type Benchmark, type LabId, type ModelRelease, type ResearcherEval } from '@agi/shared';
-import { readBenchmarks } from '../data-store';
+import { LAB_IDS, type Benchmark, type Lab, type LabId, type ModelRelease, type ResearcherEval } from '@agi/shared';
+import { readBenchmarks, readLabs } from '../data-store';
 import { isoNow } from '../fetcher';
 import { print } from '../log';
 import { nameKey } from '../text';
+import { hostMatches, officialHosts } from '../pipeline';
+import { mergeSummaryLine } from '../state';
 import type { Runtime } from '../runtime';
 import { RESEARCHER_EVAL_FILE, researchedDir, writeJsonFile } from './common';
+
+/**
+ * A researched release the gold set lacks, but whose primary source sits on the lab's own host:
+ * probably a real release the answer key never recorded (the first live run found Claude Opus 5
+ * this way). Listed for a human to promote to gold; still counted against precision.
+ */
+export interface UnverifiedExtra {
+  lab: LabId;
+  name: string;
+  date: string;
+  url: string;
+}
+
+/** The worker's eval report: the shared metrics plus the unverified-extras list (REDESIGN §12.6). */
+export interface EvalReport extends ResearcherEval {
+  unverified_extras: UnverifiedExtra[];
+}
+
+/** The URL a release rests on: its first supporting source, else the announcement. */
+export function primarySourceUrl(release: ModelRelease): string {
+  return release.sources?.[0]?.url ?? release.announcement.url;
+}
+
+/**
+ * Extras (found, not in gold) whose primary source is on one of the lab's official hosts — the
+ * same host rule discovery applies when it screens candidates.
+ */
+export function unverifiedExtras(lab: Lab, extraFound: ModelRelease[]): UnverifiedExtra[] {
+  const hosts = officialHosts(lab);
+  return extraFound
+    .filter((r) => hostMatches(primarySourceUrl(r), hosts))
+    .map((r) => ({ lab: lab.id, name: r.name, date: r.date, url: primarySourceUrl(r) }));
+}
 
 export const DATE_TOLERANCE_DAYS = 45;
 export const SCORE_TOLERANCE_PERCENT = 1.0;
@@ -131,9 +166,13 @@ export function computeEval(
   candidate: { lab: LabId; releases: ModelRelease[] }[],
   benchmarks: Benchmark[],
   evaluatedAt: string,
-): ResearcherEval {
+  /** labs.json — needed for the official-host test behind `unverified_extras`; none = no extras listed. */
+  labs: Lab[] = [],
+): EvalReport {
   const goldByLab = new Map(gold.map((g) => [g.lab, g.releases] as const));
   const candByLab = new Map(candidate.map((c) => [c.lab, c.releases] as const));
+  const labById = new Map(labs.map((l) => [l.id, l] as const));
+  const extras: UnverifiedExtra[] = [];
 
   let goldReleases = 0;
   let foundReleases = 0;
@@ -156,7 +195,9 @@ export function computeEval(
   for (const lab of labSet) {
     const goldReleasesForLab = goldByLab.get(lab) ?? [];
     const cand = candByLab.get(lab) ?? [];
-    const { pairs } = matchReleases(goldReleasesForLab, cand);
+    const { pairs, extraFound } = matchReleases(goldReleasesForLab, cand);
+    const labDef = labById.get(lab);
+    if (labDef) extras.push(...unverifiedExtras(labDef, extraFound));
     goldReleases += goldReleasesForLab.length;
     foundReleases += cand.length;
     matchedReleases += pairs.length;
@@ -203,6 +244,7 @@ export function computeEval(
     quotes_verified: quotesVerified,
     quote_verified_rate: quotesTotal > 0 ? round(quotesVerified / quotesTotal) : 0,
     by_lab: byLab,
+    unverified_extras: extras.sort((a, b) => a.lab.localeCompare(b.lab) || a.date.localeCompare(b.date)),
   };
 }
 
@@ -210,7 +252,7 @@ function round(n: number): number {
   return Math.round(n * 10000) / 10000;
 }
 
-export function formatEvalTable(evalResult: ResearcherEval): string {
+export function formatEvalTable(evalResult: ResearcherEval | EvalReport): string {
   const headers = ['lab', 'gold', 'found', 'matched', 'scores gold', 'scores matched'];
   const rows = LAB_IDS.map((lab) => {
     const b = evalResult.by_lab[lab]!;
@@ -219,6 +261,7 @@ export function formatEvalTable(evalResult: ResearcherEval): string {
   const widths = headers.map((h, i) => Math.max(h.length, ...rows.map((r) => (r[i] ?? '').length)));
   const line = (cells: string[]) => cells.map((c, i) => (c ?? '').padEnd(widths[i] ?? 0)).join('  ').trimEnd();
   const table = [line(headers), line(widths.map((w) => '-'.repeat(w))), ...rows.map(line)].join('\n');
+  const extras = 'unverified_extras' in evalResult ? evalResult.unverified_extras : [];
   return [
     table,
     '',
@@ -227,16 +270,38 @@ export function formatEvalTable(evalResult: ResearcherEval): string {
     `scores:   matched ${evalResult.matched_scores}/${evalResult.gold_scores} (recall ${evalResult.score_recall}), ` +
       `MAE ${evalResult.score_mae}`,
     `quotes:   ${evalResult.quotes_verified}/${evalResult.quotes_total} verified (${evalResult.quote_verified_rate})`,
+    ...(extras.length > 0
+      ? [
+          '',
+          `unverified extras (${extras.length}) — found on an official host, missing from gold; counted against precision, review for the gold set:`,
+          ...extras.map((x) => `  ${x.lab}  ${x.date}  ${x.name}  ${x.url}`),
+        ]
+      : []),
   ].join('\n');
+}
+
+/** The one-line `last_backfill_summary` for an eval run. */
+export function formatEvalSummary(evalResult: EvalReport, pass: boolean): string {
+  return (
+    `eval: ${evalResult.matched_releases}/${evalResult.gold_releases} gold matched, ` +
+    `precision ${evalResult.precision_releases}, recall ${evalResult.recall_releases}, score recall ${evalResult.score_recall}` +
+    (evalResult.unverified_extras.length > 0 ? `, ${evalResult.unverified_extras.length} unverified extra${evalResult.unverified_extras.length === 1 ? '' : 's'}` : '') +
+    ` → promote ${pass ? 'PASS' : 'NOT MET'}`
+  );
 }
 
 export async function runEval(rt: Runtime, opts: EvalOptions = {}): Promise<number> {
   const goldDir = opts.goldDir ?? join(rt.config.dataDir, 'gold');
   const candidateDir = opts.candidateDir ?? researchedDir(rt.config.dataDir);
   const benchmarks = readBenchmarks(rt.config.dataDir);
+  const labs = readLabs(rt.config.dataDir);
   const gold = readGoldDir(goldDir);
   const candidate = readCandidateDir(candidateDir);
-  const evalResult = computeEval(gold, candidate, benchmarks, opts.now ?? isoNow());
+  const evalResult = computeEval(gold, candidate, benchmarks, opts.now ?? isoNow(), labs);
+  const pass =
+    evalResult.recall_releases >= rt.config.promoteMinRecall &&
+    evalResult.precision_releases >= rt.config.promoteMinPrecision &&
+    evalResult.score_recall >= rt.config.promoteMinScoreRecall;
 
   writeJsonFile(join(rt.config.stateDir, RESEARCHER_EVAL_FILE), evalResult);
   const run = rt.state.readRun();
@@ -245,14 +310,11 @@ export async function runEval(rt: Runtime, opts: EvalOptions = {}): Promise<numb
     version: rt.config.researcherVersion,
     last_eval_at: evalResult.evaluated_at,
     eval: evalResult,
+    last_backfill_summary: mergeSummaryLine(run.researcher.last_backfill_summary, formatEvalSummary(evalResult, pass)),
   };
   rt.state.writeRun(run);
 
   print(formatEvalTable(evalResult));
-  const pass =
-    evalResult.recall_releases >= rt.config.promoteMinRecall &&
-    evalResult.precision_releases >= rt.config.promoteMinPrecision &&
-    evalResult.score_recall >= rt.config.promoteMinScoreRecall;
   print(
     `promote gates: recall ≥ ${rt.config.promoteMinRecall}, precision ≥ ${rt.config.promoteMinPrecision}, ` +
       `score recall ≥ ${rt.config.promoteMinScoreRecall} → ${pass ? 'PASS' : 'NOT MET'}`,

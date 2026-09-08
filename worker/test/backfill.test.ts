@@ -2,7 +2,17 @@ import { describe, expect, test } from 'bun:test';
 import { existsSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { DRY_RUN_DISCOVERY, INCREMENTAL_WINDOW_DAYS, incrementalSkip, isWithinIncrementalWindow, planBackfill, runBackfillImpl } from '../src/researcher/backfill';
+import {
+  DRY_RUN_DISCOVERY,
+  INCREMENTAL_WINDOW_DAYS,
+  MAX_OVERVIEW_LINKS,
+  formatBackfillSummary,
+  incrementalSkip,
+  indexDate,
+  isWithinIncrementalWindow,
+  planBackfill,
+  runBackfillImpl,
+} from '../src/researcher/backfill';
 import { StateStore } from '../src/state';
 import { nameKey as nameKeyOf } from '../src/text';
 import type { DiscoveryResult } from '../src/researcher/discovery';
@@ -74,6 +84,8 @@ interface Harness {
 async function setup(opts: {
   modelsReleases?: ModelRelease[];
   pageText?: string;
+  /** Per-URL page body (wins over `pageText`); `null` = 404. Matched against the fetched URL, proxy prefix included. */
+  pageFor?: (url: string) => string | null | undefined;
   /** Override the LLM answer keyed by the request body (defaults to EXTRACTION_JSON). */
   extractionFor?: (chatKey: string) => string;
 } = {}): Promise<Harness> {
@@ -114,7 +126,10 @@ async function setup(opts: {
               { status: 200, headers: { 'content-type': 'application/json' } },
             );
           }
-          return new Response(pageText, { status: 200, headers: { 'content-type': 'text/html' } });
+          const custom = opts.pageFor?.(u);
+          if (custom === null) return new Response('not found', { status: 404, headers: { 'content-type': 'text/html' } });
+          const contentType = u.includes('rss.xml') ? 'application/rss+xml' : 'text/html';
+          return new Response(custom ?? pageText, { status: 200, headers: { 'content-type': contentType } });
         }) as unknown as typeof fetch,
         minHostIntervalMs: 0,
       });
@@ -198,6 +213,46 @@ describe('planBackfill', () => {
       'GPT-6': 'already-in-models',
       'GPT-1': 'too-old',
     });
+  });
+
+  test('the plan judges the prefixed name, so it agrees with the run it previews', async () => {
+    // The run prefixes "Opus 5" to "Claude Opus 5" before the skip decision and records that
+    // name in the progress file; a plan deciding on the bare name printed `pending` for a
+    // candidate the run then skipped — and the plan is the operator's cost preview.
+    const h = await setup();
+    const rt = await h.createRt();
+    writeFileSync(
+      join(h.stateDir, 'researcher-progress.json'),
+      JSON.stringify({ updated_at: NOW, labs: { anthropic: { done: ['Claude Opus 5'], failed: ['Claude Sonnet 5'] } } }),
+      'utf8',
+    );
+    const plan = await planBackfill(rt, {
+      lab: 'anthropic',
+      discoverImpl: fakeDiscovery([
+        discovered({ name: 'Opus 5', launch_url: 'https://www.anthropic.com/news/claude-opus-5' }),
+        discovered({ name: 'Sonnet 5', launch_url: 'https://www.anthropic.com/news/claude-sonnet-5' }),
+        discovered({ name: 'Haiku 5', launch_url: 'https://www.anthropic.com/news/claude-haiku-5' }),
+      ]),
+    });
+    expect(Object.fromEntries((plan.labs[0]?.candidates ?? []).map((e) => [e.name, e.status]))).toEqual({
+      'Claude Opus 5': 'done',
+      'Claude Sonnet 5': 'failed-before',
+      'Claude Haiku 5': 'pending',
+    });
+
+    // And the run really does skip the two: only the pending candidate's page is fetched.
+    const before = h.fetchCalls.length;
+    await runBackfillImpl(rt, {
+      lab: 'anthropic',
+      discoverImpl: fakeDiscovery([
+        discovered({ name: 'Opus 5', launch_url: 'https://www.anthropic.com/news/claude-opus-5' }),
+        discovered({ name: 'Sonnet 5', launch_url: 'https://www.anthropic.com/news/claude-sonnet-5' }),
+        discovered({ name: 'Haiku 5', launch_url: 'https://www.anthropic.com/news/claude-haiku-5' }),
+      ]),
+    });
+    const pageFetches = h.fetchCalls.slice(before).filter((c) => !c.url.includes('openrouter'));
+    expect(pageFetches.length).toBeGreaterThan(0);
+    expect(pageFetches.every((c) => c.url.includes('claude-haiku-5'))).toBe(true);
   });
 });
 
@@ -455,6 +510,226 @@ describe('runBackfillImpl', () => {
     expect(new Set(ids).size).toBe(ids.length);
     expect(ids).toContain('openai-gpt-7-2026');
     expect(ids).toContain('openai-gpt-7-2026-2');
+  });
+
+  test('researcher.usage_total accumulates across runs and last_backfill_summary is one line', async () => {
+    const h = await setup();
+    const rt = await h.createRt();
+    await runBackfillImpl(rt, { lab: 'openai', discoverImpl: fakeDiscovery([discovered()]) });
+    const first = new StateStore(h.stateDir).readRun();
+    expect(first.researcher.usage_total).toEqual({ calls: 1, tokens_in: 500, tokens_out: 100, usd_estimate: 0 });
+    expect(first.researcher.budget).toEqual(first.researcher.usage_total);
+    expect(first.researcher.last_backfill_summary).toBe('backfill: 1 lab, 1 candidate, 1 release / 1 score, 1 call · 0.00 USD');
+
+    // A second run on a fresh client (a restart): the candidate is done, so 0 calls — the
+    // lifetime total must survive the restart and the budget must show this run's 0.
+    const rt2 = await h.createRt();
+    await runBackfillImpl(rt2, { lab: 'openai', discoverImpl: fakeDiscovery([discovered()]) });
+    const second = new StateStore(h.stateDir).readRun();
+    expect(second.researcher.usage_total?.calls).toBe(1);
+    expect(second.researcher.budget?.calls).toBe(0);
+    expect(second.researcher.last_backfill_summary).toBe('backfill: 1 lab, 0 candidates, 0 releases / 0 scores, 0 calls · 0.00 USD');
+  });
+
+  test('formatBackfillSummary reads like the REDESIGN example', () => {
+    const line = formatBackfillSummary(
+      { labs: 10, candidates: 8, extracted: 1, releasesWritten: 1, scoresWritten: 0, llmCalls: 107, errors: 0, stoppedEarly: false },
+      { calls: 107, tokens_in: 0, tokens_out: 0, usd_estimate: 2.03 },
+    );
+    expect(line).toBe('backfill: 10 labs, 8 candidates, 1 release / 0 scores, 107 calls · 2.03 USD');
+    expect(
+      formatBackfillSummary({ labs: 1, candidates: 3, extracted: 0, releasesWritten: 0, scoresWritten: 0, llmCalls: 2, errors: 1, stoppedEarly: true }, null),
+    ).toBe('backfill: 1 lab, 3 candidates, 0 releases / 0 scores, 2 calls — budget stopped — 1 error');
+  });
+
+  test('a bare family member gets the lab prefix before the id is built ("Opus 5" → "Claude Opus 5")', async () => {
+    const anthropicPage = [
+      'Introducing Claude Opus 5',
+      '',
+      'Opus 5 is available today in the API and on claude.ai for all paid plans.',
+      'On GPQA Diamond Opus 5 reaches 93.0% with no tools, pass@1.',
+    ].join('\n');
+    const extractionFor = (): string =>
+      JSON.stringify({
+        releases: [
+          {
+            name: 'Opus 5',
+            family: 'Claude Opus',
+            tier: 'flagship',
+            status: 'released',
+            date: '2026-07-24',
+            date_precision: 'day',
+            announcement_quote: 'Opus 5 is available today in the API and on claude.ai for all paid plans.',
+            scores: [{ benchmark: 'gpqa-diamond', value: 93.0, config: 'no tools', quote: 'On GPQA Diamond Opus 5 reaches 93.0% with no tools, pass@1.' }],
+            notes: null,
+          },
+        ],
+      });
+    const h = await setup({ pageText: anthropicPage, extractionFor });
+    const rt = await h.createRt();
+    const candidate = discovered({ name: 'Opus 5', family: 'Claude Opus', launch_url: 'https://www.anthropic.com/news/claude-opus-5', date: '2026-07-24' });
+    const code = await runBackfillImpl(rt, { lab: 'anthropic', discoverImpl: fakeDiscovery([candidate]) });
+    expect(code).toBe(0);
+    const out = JSON.parse(readFileSync(join(h.dataDir, 'researched', 'anthropic.json'), 'utf8')) as LabFile;
+    expect(out.releases).toHaveLength(1);
+    expect(out.releases[0]?.name).toBe('Claude Opus 5');
+    expect(out.releases[0]?.id).toBe('anthropic-claude-opus-5');
+    // The candidate name was prefixed too, so progress records the canonical name.
+    const progress = JSON.parse(readFileSync(join(h.stateDir, 'researcher-progress.json'), 'utf8')) as {
+      labs: Record<string, { done: string[]; failed: string[] }>;
+    };
+    expect(progress.labs['anthropic']?.done).toEqual(['Claude Opus 5']);
+  });
+
+  test('an overview page is mined for launch-post links and never extracted itself', async () => {
+    const overview = 'https://openai.com/models/gpt-7';
+    const launch = 'https://openai.com/index/introducing-gpt-7/';
+    const overviewHtml =
+      '<html><body><h1>Models</h1>' +
+      '<a href="/index/introducing-gpt-7/">Introducing GPT-7</a> ' +
+      '<a href="/index/introducing-gpt-6/">Introducing GPT-6</a> ' +
+      '<a href="/pricing">Pricing</a> <a href="https://x.com/openai">X</a> ' +
+      '<a href="/models/gpt-7/docs/">Docs</a>' +
+      `<p>${'GPT-7 is our most capable model. '.repeat(30)}</p></body></html>`;
+    const h = await setup({
+      pageFor: (u) => (u.includes('/models/gpt-7') ? overviewHtml : u.includes('introducing-gpt-7') ? PAGE_TEXT : undefined),
+    });
+    const rt = await h.createRt();
+    const code = await runBackfillImpl(rt, { lab: 'openai', discoverImpl: fakeDiscovery([discovered({ launch_url: overview })]) });
+    expect(code).toBe(0);
+    const out = JSON.parse(readFileSync(join(h.dataDir, 'researched', 'openai.json'), 'utf8')) as LabFile;
+    expect(out.releases).toHaveLength(1);
+    // The release rests on the launch post, not on the catalogue page.
+    expect(out.releases[0]?.announcement.url).toBe(launch);
+    expect(out.releases[0]?.sources[0]?.url).toBe(launch);
+    // Exactly one LLM call: the overview page cost a fetch, never an extraction.
+    expect(h.fetchCalls.filter((c) => c.url.includes('openrouter')).length).toBe(1);
+    expect(h.fetchCalls.some((c) => c.url.includes('introducing-gpt-6'))).toBe(false);
+    expect(MAX_OVERVIEW_LINKS).toBe(3);
+  });
+
+  test('an overview page with no link naming the model fails the candidate without an LLM call', async () => {
+    const overviewHtml = `<html><body><a href="/index/introducing-gpt-6/">GPT-6</a><p>${'catalogue text. '.repeat(40)}</p></body></html>`;
+    const h = await setup({ pageFor: (u) => (u.includes('/models') ? overviewHtml : undefined) });
+    const rt = await h.createRt();
+    await runBackfillImpl(rt, { lab: 'openai', discoverImpl: fakeDiscovery([discovered({ launch_url: 'https://openai.com/models' })]) });
+    expect(h.fetchCalls.filter((c) => c.url.includes('openrouter')).length).toBe(0);
+    const progress = JSON.parse(readFileSync(join(h.stateDir, 'researcher-progress.json'), 'utf8')) as {
+      labs: Record<string, { done: string[]; failed: string[] }>;
+    };
+    expect(progress.labs['openai']?.failed).toEqual(['GPT-7']);
+  });
+
+  test('a dateless extraction is retried once through the news index, then written from the launch post', async () => {
+    const teaser = 'https://openai.com/index/gpt-7-teaser/';
+    const launch = 'https://openai.com/index/introducing-gpt-7/';
+    const rss = `<?xml version="1.0"?><rss version="2.0"><channel><title>OpenAI</title>
+      <item><title>Introducing GPT-7</title><link>${launch}</link><pubDate>Sun, 30 Aug 2026 17:00:00 GMT</pubDate></item>
+      <item><title>Safety note</title><link>https://openai.com/index/safety/</link></item>
+    </channel></rss>`;
+    const dateless = JSON.parse(EXTRACTION_JSON) as { releases: { date: string | null; date_precision: string }[] };
+    dateless.releases[0]!.date = null;
+    dateless.releases[0]!.date_precision = 'unknown';
+    const h = await setup({
+      pageFor: (u) => (u.includes('rss.xml') ? rss : u.includes('openai.com/news') ? null : undefined),
+      // The teaser page yields no date; the launch post yields the full extraction.
+      extractionFor: (chatKey) => (chatKey.includes('gpt-7-teaser') ? JSON.stringify(dateless) : EXTRACTION_JSON),
+    });
+    const rt = await h.createRt();
+    const code = await runBackfillImpl(rt, { lab: 'openai', discoverImpl: fakeDiscovery([discovered({ launch_url: teaser })]) });
+    expect(code).toBe(0);
+    const out = JSON.parse(readFileSync(join(h.dataDir, 'researched', 'openai.json'), 'utf8')) as LabFile;
+    expect(out.releases).toHaveLength(1);
+    expect(out.releases[0]?.announcement.url).toBe(launch);
+    expect(out.releases[0]?.date).toBe('2026-08-30');
+    // Two extractions: the teaser and its single retry.
+    expect(h.fetchCalls.filter((c) => c.url.includes('openrouter')).length).toBe(2);
+    expect(h.fetchCalls.some((c) => c.url.includes('rss.xml'))).toBe(true);
+  });
+
+  test('a dateless extraction the news index cannot place is dropped after one attempt', async () => {
+    const dateless = JSON.parse(EXTRACTION_JSON) as { releases: { date: string | null; date_precision: string }[] };
+    dateless.releases[0]!.date = null;
+    dateless.releases[0]!.date_precision = 'unknown';
+    const h = await setup({
+      pageFor: (u) => (u.includes('rss.xml') || u.includes('openai.com/news') ? null : undefined),
+      extractionFor: () => JSON.stringify(dateless),
+    });
+    const rt = await h.createRt();
+    await runBackfillImpl(rt, { lab: 'openai', discoverImpl: fakeDiscovery([discovered()]) });
+    expect(h.fetchCalls.filter((c) => c.url.includes('openrouter')).length).toBe(1);
+    const progress = JSON.parse(readFileSync(join(h.stateDir, 'researcher-progress.json'), 'utf8')) as {
+      labs: Record<string, { done: string[]; failed: string[] }>;
+    };
+    expect(progress.labs['openai']?.failed).toEqual(['GPT-7']);
+  });
+
+  test('a launch post harvested from a press page is official — released, with its scores', async () => {
+    // `official` describes the URL being extracted. A press homepage is an overview page, and
+    // collectAnnouncementLinks filters its links to the LAB's hosts, so the post that comes out
+    // is official by construction — inheriting the press candidate's `official: false` turned a
+    // genuine launch post into a scoreless rumour.
+    const launch = 'https://openai.com/index/introducing-gpt-7/';
+    const pressHtml =
+      `<html><body><h1>AI news</h1><a href="${launch}">OpenAI introduces GPT-7</a>` +
+      `<p>${'Reporting on the model industry. '.repeat(30)}</p></body></html>`;
+    const h = await setup({
+      pageFor: (u) => (u.includes('techcrunch.com') ? pressHtml : u.includes('introducing-gpt-7') ? PAGE_TEXT : undefined),
+    });
+    const rt = await h.createRt();
+    const code = await runBackfillImpl(rt, {
+      lab: 'openai',
+      discoverImpl: fakeDiscovery([discovered({ launch_url: 'https://techcrunch.com/' })]),
+    });
+    expect(code).toBe(0);
+    const out = JSON.parse(readFileSync(join(h.dataDir, 'researched', 'openai.json'), 'utf8')) as LabFile;
+    expect(out.releases).toHaveLength(1);
+    expect(out.releases[0]?.status).toBe('released');
+    expect(out.releases[0]?.scores).toHaveLength(1);
+    expect(out.releases[0]?.announcement.url).toBe(launch);
+  });
+
+  test('the news-index date carries a dateless launch post: both extractions give no date', async () => {
+    // The retry exists because the first page had no date; if the launch post states none either,
+    // the rss pubDate the index carried is the date. Before, it was thrown away and the retry
+    // failed on the very condition that triggered it.
+    const teaser = 'https://openai.com/index/gpt-7-teaser/';
+    const launch = 'https://openai.com/index/introducing-gpt-7/';
+    const rss = `<?xml version="1.0"?><rss version="2.0"><channel><title>OpenAI</title>
+      <item><title>Introducing GPT-7</title><link>${launch}</link><pubDate>Sun, 30 Aug 2026 17:00:00 GMT</pubDate></item>
+    </channel></rss>`;
+    const dateless = JSON.parse(EXTRACTION_JSON) as { releases: { date: string | null; date_precision: string }[] };
+    dateless.releases[0]!.date = null;
+    dateless.releases[0]!.date_precision = 'unknown';
+    const h = await setup({
+      pageFor: (u) => (u.includes('rss.xml') ? rss : u.includes('openai.com/news') ? null : undefined),
+      extractionFor: () => JSON.stringify(dateless), // BOTH extractions are dateless
+    });
+    const rt = await h.createRt();
+    // The candidate itself carries no date either, so nothing but the index can supply one.
+    const code = await runBackfillImpl(rt, {
+      lab: 'openai',
+      discoverImpl: fakeDiscovery([discovered({ launch_url: teaser, date: null })]),
+    });
+    expect(code).toBe(0);
+    const out = JSON.parse(readFileSync(join(h.dataDir, 'researched', 'openai.json'), 'utf8')) as LabFile;
+    expect(out.releases).toHaveLength(1);
+    expect(out.releases[0]?.date).toBe('2026-08-30');
+    expect(out.releases[0]?.date_precision).toBe('day');
+    expect(out.releases[0]?.status).toBe('released');
+    expect(out.releases[0]?.announcement.url).toBe(launch);
+  });
+
+  test('indexDate is strict: an unparseable index date is null, never today', () => {
+    expect(indexDate('Sun, 30 Aug 2026 17:00:00 GMT')).toEqual({ date: '2026-08-30', precision: 'day' });
+    expect(indexDate('2026-08-30')).toEqual({ date: '2026-08-30', precision: 'day' });
+    expect(indexDate('2026-08')).toEqual({ date: '2026-08-01', precision: 'month' });
+    expect(indexDate('2026')).toEqual({ date: '2026-01-01', precision: 'year' });
+    // A launch date is never guessed: no date, no knownDate.
+    expect(indexDate('last spring')).toBeNull();
+    expect(indexDate('')).toBeNull();
+    expect(indexDate(null)).toBeNull();
+    expect(indexDate(undefined)).toBeNull();
   });
 
   test('a press-host candidate is forced to rumored and carries zero scores', async () => {

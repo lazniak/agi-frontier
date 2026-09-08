@@ -13,7 +13,7 @@ import { readBenchmarks, readLabs } from '../data-store';
 import { isoNow } from '../fetcher';
 import { hashItems, extractItems, type SourceItem } from '../items';
 import { compileHints, rankCandidates } from '../candidates';
-import { diffSource, sourceKey, summariseRun, type HashState } from '../state';
+import { diffSource, recordUsage, sourceKey, summariseRun, usageDelta, type HashState } from '../state';
 import { LabWorkspace, extractFromPage, itemDateOrToday, todayISO } from '../pipeline';
 import { commitAndPush, buildCommitMessage, dataDirty } from '../git';
 import { print } from '../log';
@@ -169,23 +169,13 @@ export async function runPoll(rt: Runtime, opts: PollOptions = {}): Promise<numb
   run.llm_model = rt.config.openRouterModel;
   if (summary.errors === 0) run.last_success_at = now;
   // Per-run delta: the client is shared with the researcher commands, so subtract the snapshot
-  // taken at run start; the lifetime totals stay in the log below.
-  const statsAtStart = usageAtStart;
+  // taken at run start. A poll only feeds the lifetime `usage_total`; `budget` stays the last
+  // *research* run's delta (REDESIGN §12.6 — the panel used to show the poll's 0 calls there).
   const usage = rt.openRouter?.stats();
-  const perRun = usage && statsAtStart
-    ? {
-        calls: usage.calls - statsAtStart.calls,
-        tokens_in: usage.tokens_in - statsAtStart.tokens_in,
-        tokens_out: usage.tokens_out - statsAtStart.tokens_out,
-        usd_estimate: Math.round((usage.usd_estimate - statsAtStart.usd_estimate) * 1_000_000) / 1_000_000,
-      }
-    : null;
+  const perRun = usage ? usageDelta(usage, usageAtStart) : null;
   if (perRun) {
-    run.researcher = {
-      ...run.researcher,
-      version: rt.config.researcherVersion,
-      budget: perRun,
-    };
+    recordUsage(run, perRun, { research: false });
+    run.researcher = { ...run.researcher, version: rt.config.researcherVersion };
   }
   run.last_run_summary = summariseRun('poll', {
     pages: summary.pagesPolled,
@@ -287,7 +277,9 @@ function maybePush(rt: Runtime, labs: string[], summaries: string[]): void {
     rt.log.debug('nothing to commit under data/');
     return;
   }
-  const message = buildCommitMessage(labs, summaries);
+  // A dirty tree with nothing described means an earlier step (arena, promote, a deferred
+  // push) left files behind — say so instead of the old anonymous "data update".
+  const message = buildCommitMessage(labs, summaries, 'poll: sweep of uncommitted data changes');
   const result = commitAndPush({ cwd: rt.config.repoRoot, log: rt.log }, message);
   rt.log.info('git', { ...result });
 }

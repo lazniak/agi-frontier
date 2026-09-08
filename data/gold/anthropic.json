@@ -1,6 +1,6 @@
 {
   "lab": "anthropic",
-  "updated_at": "2026-09-07T09:34:20Z",
+  "updated_at": "2026-09-07T22:00:00Z",
   "releases": [
     {
       "id": "anthropic-claude-1.3",
@@ -928,7 +928,105 @@
           }
         }
       ],
-      "notes": "Anthropic describes Fable 5 and Mythos 5 as 'the same underlying model' (redeploying-fable-5 post): Fable 5 ships with production safeguards for cybersecurity/biology-chemistry/distillation topics that fall back to Claude Opus 4.8, while Mythos 5 has those safeguards lifted and is restricted to vetted Project Glasswing partners (not a public release, so not recorded as its own entry here). On June 12, 2026 the US government briefly applied export controls to both models, suspending access; access was restored June 30-July 1, 2026 (see the 'Redeploying Claude Fable 5' source). This generation's system card treats GPQA Diamond as saturated and stopped reporting it for Fable 5 specifically (Mythos 5 alone is given at 94.1%, 'averaged over 5 trials'); MMLU/MATH/HumanEval/MMMU are no longer reported for either model, and Terminal-Bench has moved to version 2.1 (not this basket's 2.0), so none of those appear as scores here. Family is recorded as 'Claude Fable' per this project's lineage-fork convention, even though the Opus line (Claude Opus 4.8, and subsequently a further 'Claude Opus 5', per the Fable 5.1 system card's comparison table) continued in parallel rather than being replaced."
+      "notes": "Anthropic describes Fable 5 and Mythos 5 as 'the same underlying model' (redeploying-fable-5 post): Fable 5 ships with production safeguards for cybersecurity/biology-chemistry/distillation topics that fall back to Claude Opus 4.8, while Mythos 5 has those safeguards lifted and is restricted to vetted Project Glasswing partners (not a public release, so not recorded as its own entry here). On June 12, 2026 the US government briefly applied export controls to both models, suspending access; access was restored June 30-July 1, 2026 (see the 'Redeploying Claude Fable 5' source). This generation's system card treats GPQA Diamond as saturated and stopped reporting it for Fable 5 specifically (Mythos 5 alone is given at 94.1%, 'averaged over 5 trials'); MMLU/MATH/HumanEval/MMMU are no longer reported for either model, and Terminal-Bench has moved to version 2.1 (not this basket's 2.0), so none of those appear as scores here. Family is recorded as 'Claude Fable' per this project's lineage-fork convention, even though the Opus line (Claude Opus 4.8, and subsequently Claude Opus 5 on July 24, 2026 — recorded as anthropic-claude-opus-5) continued in parallel rather than being replaced."
+    },
+    {
+      "id": "anthropic-claude-opus-5",
+      "lab": "anthropic",
+      "name": "Claude Opus 5",
+      "family": "Claude Opus",
+      "date": "2026-07-24",
+      "date_precision": "day",
+      "status": "released",
+      "tier": "mid",
+      "announcement": {
+        "url": "https://www.anthropic.com/news/claude-opus-5",
+        "title": "Introducing Claude Opus 5",
+        "quote": "Claude Opus 5 is available today on all platforms, priced at $5 per million input tokens and $25 per million output tokens (the same as Opus 4.8). Developers can get started with claude-opus-5 on the Claude API.",
+        "retrieved_at": "2026-09-07T22:00:00Z"
+      },
+      "sources": [
+        {
+          "url": "https://www-cdn.anthropic.com/ceaf5c7ff2783855203fde8208ec311252dced5b/Claude%20Opus%205%20System%20Card.pdf",
+          "title": "System Card: Claude Opus 5",
+          "retrieved_at": "2026-09-07T22:00:00Z",
+          "note": "Title page dated July 24, 2026 (changelog: August 19, 2026 revision touched Sections 5.2.2.1 and 5.2.2.4 only). Served via the redirect anthropic.com/claude-opus-5-system-card."
+        },
+        {
+          "url": "https://platform.claude.com/docs/en/models/opus-5/overview",
+          "title": "Claude Opus 5 - Claude Platform Docs",
+          "retrieved_at": "2026-09-07T22:00:00Z",
+          "note": "States 'Released July 24, 2026', model id claude-opus-5, and lists Claude Fable 5.1 above Opus 5 in the lineup comparison table."
+        }
+      ],
+      "scores": [
+        {
+          "benchmark": "swe-bench-verified",
+          "value": 96,
+          "config": "adaptive thinking, max effort, averaged over 5 trials",
+          "reported_by": "official",
+          "source": {
+            "url": "https://www-cdn.anthropic.com/ceaf5c7ff2783855203fde8208ec311252dced5b/Claude%20Opus%205%20System%20Card.pdf",
+            "title": "System Card: Claude Opus 5",
+            "quote": "SWE-bench Verified12 is a 500-problem subset, each verified by human engineers as solvable. Claude Opus 5 achieved 96.0%.",
+            "retrieved_at": "2026-09-07T22:00:00Z",
+            "note": "Section 8.2 narrative (SWE-bench Verified is not a row of Table 8.1.A for this release); '12' is a glued footnote marker in the extracted PDF text. Section 8.2 states each SWE-bench score 'is an average over five trials'; the effort/thinking configuration is the table's standard configuration."
+          }
+        },
+        {
+          "benchmark": "hle",
+          "value": 56.3,
+          "config": "no tools",
+          "reported_by": "official",
+          "source": {
+            "url": "https://www-cdn.anthropic.com/ceaf5c7ff2783855203fde8208ec311252dced5b/Claude%20Opus%205%20System%20Card.pdf",
+            "title": "System Card: Claude Opus 5",
+            "quote": "No tools 56.3 49.8 56.5 -",
+            "retrieved_at": "2026-09-07T22:00:00Z",
+            "note": "Table 8.1.A Humanity's Last Exam row, no-tools variant; columns Opus 5 / Opus 4.8 / Fable 5 / GPT 5.6 Sol, so 56.3 is Opus 5's value (with tools: 64.7). The later Fable 5.1 system card re-reports Opus 5's no-tools HLE as 56.6%; the model's own system card figure is used here."
+          }
+        },
+        {
+          "benchmark": "arc-agi-2",
+          "value": 90.42,
+          "config": "ARC Prize verified set (semi-private), max effort",
+          "reported_by": "official",
+          "source": {
+            "url": "https://www-cdn.anthropic.com/ceaf5c7ff2783855203fde8208ec311252dced5b/Claude%20Opus%205%20System%20Card.pdf",
+            "title": "System Card: Claude Opus 5",
+            "quote": "The ARC Prize Foundation reports that Claude Opus 5 achieved a verified score of 97.50% on ARC-AGI-1 and 90.42% on ARC-AGI-2 at max effort on their semi-private datasets.",
+            "retrieved_at": "2026-09-07T22:00:00Z",
+            "note": "Section 8.14.1; Table 8.1.A rounds the same figure to 90.4. ARC-AGI-3 (30.16% at high effort) is a different benchmark and is not in this basket."
+          }
+        },
+        {
+          "benchmark": "swe-bench-pro",
+          "value": 79.2,
+          "config": "adaptive thinking, max effort, averaged over 5 trials",
+          "reported_by": "official",
+          "source": {
+            "url": "https://www-cdn.anthropic.com/ceaf5c7ff2783855203fde8208ec311252dced5b/Claude%20Opus%205%20System%20Card.pdf",
+            "title": "System Card: Claude Opus 5",
+            "quote": "SWE-bench Pro13 is a harder variant composed of problems drawn from actively-maintained repositories with larger, multi-file diffs and reduced public ground-truth leakage. Claude Opus 5 achieved 79.2%.",
+            "retrieved_at": "2026-09-07T22:00:00Z",
+            "note": "Section 8.2 narrative; also the first row of Table 8.1.A (79.2 / 69.2 / 80 / 64.6). '13' is a glued footnote marker in the extracted PDF text."
+          }
+        },
+        {
+          "benchmark": "browsecomp",
+          "value": 90.8,
+          "config": "with browsing tools, adaptive thinking, max effort, averaged over 5 trials",
+          "reported_by": "official",
+          "source": {
+            "url": "https://www-cdn.anthropic.com/ceaf5c7ff2783855203fde8208ec311252dced5b/Claude%20Opus%205%20System%20Card.pdf",
+            "title": "System Card: Claude Opus 5",
+            "quote": "90.8 84.3 87.4 90.4",
+            "retrieved_at": "2026-09-07T22:00:00Z",
+            "note": "Table 8.1.A BrowseComp row, columns Opus 5 / Opus 4.8 / Fable 5 / GPT 5.6 Sol (Codex); 90.8 is Opus 5's value. The row label and its values are separated in the extracted PDF text, so only the value run is quoted. The Section 8.10.2 narrative gives no headline number (figures only)."
+          }
+        }
+      ],
+      "notes": "Launched July 24, 2026 (launch post, platform docs 'Released July 24, 2026', and the system card title page all agree), publicly available the same day on the Claude API (claude-opus-5), Amazon Bedrock, Google Cloud and Microsoft Foundry, and in the Claude apps — status released. Family 'Claude Opus': the numbered Opus line continued past Opus 4.8 in parallel with the Fable/Mythos lineage. Tier is recorded as 'mid' because Anthropic positions Opus 5 below Fable 5 at launch: the launch post calls it a model that 'comes close to the frontier intelligence of Claude Fable 5 at half the price', the system card's executive summary states it 'is not more capable overall than our most capable general-access model, Claude Fable 5', and the platform docs list Fable 5.1 above it; it is nonetheless a step above Opus 4.8 and priced identically ($5/$25 per MTok). Scores are from the system card text (Table 8.1.A plus Sections 8.2 and 8.14.1); the launch post reports benchmark results only qualitatively ('three times as high as the next-best model' on ARC-AGI 3) or as images. Not recorded because absent from Anthropic's reporting for this release: GPQA Diamond, MMLU/MMLU-Pro, MATH, HumanEval, AIME, MMMU/MMMU-Pro, LiveCodeBench and tau2-bench; Terminal-Bench appears only as its successor FrontierBench v0.1 ('a successor to Terminal-Bench 2.1'), and computer use is reported on OSWorld 2.0 (70.57%), a different task set from this basket's OSWorld/OSWorld-Verified, so neither is recorded. Table 8.1.A also lists Opus 5's ARC-AGI-2 alongside the Fable 5.1 card's 90.42% column value, confirming the two documents describe the same model."
     },
     {
       "id": "anthropic-claude-fable-5.1",
@@ -985,7 +1083,7 @@
           }
         }
       ],
-      "notes": "Unlike the 5.0 generation, Anthropic's Table 8.1.A for this release reports a single shared column for 'Claude Fable 5.1/Mythos 5.1' (the two are explicitly 'the same model, but with different levels of safeguards'), so scores above apply to both; Mythos 5.1 is therefore not recorded as a separate entry. Mythos 5.1 remains restricted to vetted cyberdefense/life-sciences partners via trusted access programs (not public). The same comparison table lists a 'Claude Opus 5' column (system card dated July 24, 2026 per public reporting), confirming the Opus numbered line continued past 4.8 in parallel with the Fable/Mythos lineage; it is not separately researched/recorded in this file given the time budget for this pass. GPQA Diamond, MMLU, MATH and HumanEval are no longer reported by Anthropic for this generation (GPQA was declared saturated as of the Fable 5/Mythos 5 system card); Terminal-Bench has moved to versions 4.0 and 'Science 0.1', neither comparable to this basket's Terminal-Bench 2.0, so no terminal-bench-2 score is recorded."
+      "notes": "Unlike the 5.0 generation, Anthropic's Table 8.1.A for this release reports a single shared column for 'Claude Fable 5.1/Mythos 5.1' (the two are explicitly 'the same model, but with different levels of safeguards'), so scores above apply to both; Mythos 5.1 is therefore not recorded as a separate entry. Mythos 5.1 remains restricted to vetted cyberdefense/life-sciences partners via trusted access programs (not public). The same comparison table lists a 'Claude Opus 5' column (system card dated July 24, 2026 per public reporting), confirming the Opus numbered line continued past 4.8 in parallel with the Fable/Mythos lineage; that model is recorded in this file as anthropic-claude-opus-5 (released July 24, 2026). GPQA Diamond, MMLU, MATH and HumanEval are no longer reported by Anthropic for this generation (GPQA was declared saturated as of the Fable 5/Mythos 5 system card); Terminal-Bench has moved to versions 4.0 and 'Science 0.1', neither comparable to this basket's Terminal-Bench 2.0, so no terminal-bench-2 score is recorded."
     }
   ]
 }

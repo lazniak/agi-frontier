@@ -5,17 +5,21 @@ import { join } from 'node:path';
 import {
   computeEval,
   datesWithinTolerance,
+  formatEvalSummary,
   formatEvalTable,
   matchReleases,
   readCandidateDir,
   releasesMatch,
   scoreTolerance,
+  unverifiedExtras,
+  type EvalReport,
 } from '../src/researcher/eval';
 import { RESEARCHER_EVAL_FILE } from '../src/researcher/common';
-import type { Benchmark, ModelRelease, ResearcherEval } from '@agi/shared';
+import type { Benchmark, Lab, ModelRelease, ResearcherEval } from '@agi/shared';
 
 const repoRoot = join(import.meta.dir, '..', '..');
 const BENCHMARKS = JSON.parse(readFileSync(join(repoRoot, 'data', 'benchmarks.json'), 'utf8')) as Benchmark[];
+const LABS = JSON.parse(readFileSync(join(repoRoot, 'data', 'labs.json'), 'utf8')) as Lab[];
 const NOW = '2026-09-07T04:00:00Z';
 
 const release = (over: Partial<ModelRelease> = {}): ModelRelease => ({
@@ -47,6 +51,15 @@ describe('matching rules', () => {
     expect(releasesMatch(release({ name: 'GPT-6' }), release({ name: 'gpt 6', date: '2026-05-20' }))).toBe(true);
     expect(releasesMatch(release(), release({ date: '2026-07-30' }))).toBe(false);
     expect(releasesMatch(release(), release({ name: 'Claude Opus 5' }))).toBe(false);
+  });
+
+  test('"Opus 5" matches "Claude Opus 5" by containment while the dates sit within 45 days (T43 item 7)', () => {
+    // The first live run's 0/102: the gold set simply had no Claude Opus 5 row — the rule
+    // itself matches a bare family member against its full name.
+    const gold = release({ id: 'anthropic-claude-opus-5', lab: 'anthropic', name: 'Claude Opus 5', date: '2026-07-24' });
+    expect(releasesMatch(gold, release({ id: 'anthropic-opus-5', lab: 'anthropic', name: 'Opus 5', date: '2026-07-24' }))).toBe(true);
+    expect(releasesMatch(gold, release({ name: 'Opus 5', date: '2026-09-06' }))).toBe(true); // 44 days
+    expect(releasesMatch(gold, release({ name: 'Opus 5', date: '2026-09-08' }))).toBe(false); // 46 days: the window, not the name, fails
   });
 
   test('score tolerances follow the benchmark unit', () => {
@@ -156,6 +169,47 @@ describe('computeEval metrics', () => {
     expect(perfect.recall_releases).toBe(1);
     expect(perfect.precision_releases).toBe(1);
     expect(perfect.score_recall).toBe(1);
+    expect(perfect.unverified_extras).toEqual([]);
+  });
+});
+
+describe('unverified extras (REDESIGN §12.6)', () => {
+  const anthropic = LABS.find((l) => l.id === 'anthropic')!;
+  const opus5 = release({
+    id: 'anthropic-claude-opus-5', lab: 'anthropic', name: 'Claude Opus 5', date: '2026-07-24', scores: [],
+    announcement: { url: 'https://www.anthropic.com/news/claude-opus-5', quote: 'q', retrieved_at: NOW, verified: true },
+    sources: [{ url: 'https://www.anthropic.com/news/claude-opus-5', quote: 'q', retrieved_at: NOW, verified: true }],
+  });
+  const pressOnly = release({
+    id: 'anthropic-claude-opus-6', lab: 'anthropic', name: 'Claude Opus 6', date: '2026-08-24', status: 'rumored', scores: [],
+    announcement: { url: 'https://techcrunch.com/2026/08/24/opus-6/', quote: 'q', retrieved_at: NOW },
+    sources: [{ url: 'https://techcrunch.com/2026/08/24/opus-6/', quote: 'q', retrieved_at: NOW }],
+  });
+
+  test('unverifiedExtras keeps extras whose first source is on an official host (subdomains included)', () => {
+    const docs = release({ ...opus5, id: 'x', sources: [{ url: 'https://docs.anthropic.com/en/docs/models', quote: 'q', retrieved_at: NOW }] });
+    const out = unverifiedExtras(anthropic, [opus5, pressOnly, docs]);
+    expect(out).toEqual([
+      { lab: 'anthropic', name: 'Claude Opus 5', date: '2026-07-24', url: 'https://www.anthropic.com/news/claude-opus-5' },
+      { lab: 'anthropic', name: 'Claude Opus 5', date: '2026-07-24', url: 'https://docs.anthropic.com/en/docs/models' },
+    ]);
+  });
+
+  test('computeEval lists official-host extras, still counts them against precision, and prints them under the table', () => {
+    const gold = [{ lab: 'anthropic' as const, releases: [release({ id: 'anthropic-claude-fable-5', lab: 'anthropic', name: 'Claude Fable 5', date: '2026-06-09', scores: [] })] }];
+    const candidate = [{ lab: 'anthropic' as const, releases: [opus5, pressOnly] }];
+    const r: EvalReport = computeEval(gold, candidate, BENCHMARKS, NOW, LABS);
+    expect(r.matched_releases).toBe(0);
+    expect(r.found_releases).toBe(2);
+    expect(r.precision_releases).toBe(0); // extras never help precision
+    expect(r.unverified_extras).toEqual([{ lab: 'anthropic', name: 'Claude Opus 5', date: '2026-07-24', url: 'https://www.anthropic.com/news/claude-opus-5' }]);
+    const table = formatEvalTable(r);
+    expect(table).toContain('unverified extras (1)');
+    expect(table).toContain('anthropic  2026-07-24  Claude Opus 5  https://www.anthropic.com/news/claude-opus-5');
+    expect(table).not.toContain('techcrunch');
+    // Without labs.json the list is empty rather than wrong.
+    expect(computeEval(gold, candidate, BENCHMARKS, NOW).unverified_extras).toEqual([]);
+    expect(formatEvalSummary(r, false)).toBe('eval: 0/1 gold matched, precision 0, recall 0, score recall 0, 1 unverified extra → promote NOT MET');
   });
 });
 
@@ -191,6 +245,7 @@ describe('runEval', () => {
     const run = new StateStore(join(root, 'state')).readRun();
     expect(run.researcher.eval?.matched_releases).toBe(written.matched_releases);
     expect(run.researcher.last_eval_at).toBe(NOW);
+    expect(run.researcher.last_backfill_summary).toBe('eval: 0/1 gold matched, precision 0, recall 0, score recall 0 → promote NOT MET');
   });
 });
 

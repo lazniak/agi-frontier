@@ -166,6 +166,15 @@ export function writeBundleFile(dataDir: string, json: string): void {
   writeFileSync(bundlePath(dataDir), json, 'utf8');
 }
 
+/**
+ * One readable line per zod issue, `path: message`, with `<root>` for a top-level issue. Every
+ * log line that reports schema problems goes through here — the first live run logged
+ * `issues: [""]` because a root-level issue has an empty path (REDESIGN §12.6).
+ */
+export function formatIssues(issues: { path: (string | number)[]; message: string }[], limit = issues.length): string[] {
+  return issues.slice(0, limit).map((i) => `${i.path.join('.') || '<root>'}: ${i.message}`);
+}
+
 export function issuesToString(issues: { path: (string | number)[]; message: string }[]): string {
-  return issues.map((i) => `${i.path.join('.') || '<root>'}: ${i.message}`).join('; ');
+  return formatIssues(issues).join('; ');
 }

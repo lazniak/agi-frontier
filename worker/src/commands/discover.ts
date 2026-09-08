@@ -8,9 +8,10 @@
  */
 import { z } from 'zod';
 import type { Lab, LabId } from '@agi/shared';
-import { readBenchmarks, readLabs } from '../data-store';
+import { formatIssues, readBenchmarks, readLabs } from '../data-store';
 import { isoNow } from '../fetcher';
 import { print } from '../log';
+import { recordUsage, usageDelta } from '../state';
 import {
   LabWorkspace,
   extractFromPage,
@@ -74,6 +75,8 @@ export async function runDiscover(rt: Runtime, opts: DiscoverOptions = {}): Prom
   let errors = 0;
   const touchedLabs: string[] = [];
   const summaries: string[] = [];
+  // Snapshot for the per-run usage delta (the client is shared with poll and backfill).
+  const usageAtStart = rt.openRouter.stats();
 
   for (const lab of labs) {
     const log = rt.log.child({ lab: lab.id });
@@ -92,7 +95,7 @@ export async function runDiscover(rt: Runtime, opts: DiscoverOptions = {}): Prom
       budget--;
       const parsed = DiscoverResponseSchema.safeParse(res.json);
       if (!parsed.success) {
-        log.warn('discover response did not match schema', { issues: parsed.error.issues.slice(0, 3) });
+        log.warn('discover response did not match schema', { issues: formatIssues(parsed.error.issues, 3) });
         continue;
       }
       items = parsed.data.items;
@@ -168,12 +171,17 @@ export async function runDiscover(rt: Runtime, opts: DiscoverOptions = {}): Prom
 
   const run = rt.state.readRun();
   run.last_discover_at = now;
+  // Discover is a research run: its delta becomes `budget` and joins the lifetime totals.
+  recordUsage(run, usageDelta(rt.openRouter.stats(), usageAtStart), { research: true });
   rt.state.writeRun(run);
 
   if (touchedLabs.length > 0) {
     runBundle(rt, { quiet: true });
     if (rt.config.gitPush && dataDirty({ cwd: rt.config.repoRoot, log: rt.log })) {
-      const result = commitAndPush({ cwd: rt.config.repoRoot, log: rt.log }, buildCommitMessage(touchedLabs, summaries));
+      const result = commitAndPush(
+        { cwd: rt.config.repoRoot, log: rt.log },
+        buildCommitMessage(touchedLabs, summaries, 'discover: uncommitted data changes'),
+      );
       rt.log.info('git', { ...result });
     }
   }

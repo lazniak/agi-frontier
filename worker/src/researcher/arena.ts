@@ -16,6 +16,8 @@ import { print } from '../log';
 import { change } from '../merge';
 import { nameKey } from '../text';
 import { stringifyLabFile } from '../canonical';
+import { commitAndPush, dataDirty } from '../git';
+import { mergeSummaryLine } from '../state';
 import type { Runtime } from '../runtime';
 import { readResearchedFile, researchedPath } from './common';
 
@@ -633,8 +635,21 @@ export async function runArena(rt: Runtime, opts: ArenaOptions = {}): Promise<nu
 
   // Mark researcher state, published through the bundle.
   const run = rt.state.readRun();
-  run.researcher = { ...run.researcher, version: rt.config.researcherVersion, last_arena_at: now };
+  const summaryLine = formatArenaSummary({ rows: rows.length, matched: matches.length, scores: changes.length, labs: touchedLabs.length, unmatched: unmatched.length });
+  run.researcher = {
+    ...run.researcher,
+    version: rt.config.researcherVersion,
+    last_arena_at: now,
+    last_backfill_summary: mergeSummaryLine(run.researcher.last_backfill_summary, summaryLine),
+  };
   rt.state.writeRun(run);
+
+  // Commit the arena's own output under its own name. Left to the next poll, these files were
+  // swept up under an anonymous "data update" subject (first live run, 2026-09-07).
+  if (rt.config.gitPush && changes.length > 0 && dataDirty({ cwd: rt.config.repoRoot, log: rt.log })) {
+    const result = commitAndPush({ cwd: rt.config.repoRoot, log: rt.log }, arenaCommitMessage(changes.length, touchedLabs.length));
+    rt.log.info('git', { ...result });
+  }
 
   print(
     `arena: ${rows.length} row(s), ${matches.length} matched (${changes.length} score row(s) written to ${touchedLabs.length} lab file(s)), ` +
@@ -644,6 +659,19 @@ export async function runArena(rt: Runtime, opts: ArenaOptions = {}): Promise<nu
     rt.log.info('arena row unmatched', { model: row.model, score: row.score, url: usedUrl });
   }
   return errors > 0 ? 1 : 0;
+}
+
+/** `data(bot): arena 12 scores, 5 labs` — the subject of the arena's own commit. */
+export function arenaCommitMessage(scores: number, labs: number): string {
+  return `data(bot): arena ${scores} score${scores === 1 ? '' : 's'}, ${labs} lab${labs === 1 ? '' : 's'}`;
+}
+
+/** The one-line `last_backfill_summary` for an arena run. */
+export function formatArenaSummary(n: { rows: number; matched: number; scores: number; labs: number; unmatched: number }): string {
+  return (
+    `arena: ${n.rows} row${n.rows === 1 ? '' : 's'}, ${n.matched} matched, ` +
+    `${n.scores} score${n.scores === 1 ? '' : 's'} written to ${n.labs} lab file${n.labs === 1 ? '' : 's'}, ${n.unmatched} unmatched`
+  );
 }
 
 function formatDryRun(matches: ArenaMatch[], unmatched: ArenaRow[], url: string): string {

@@ -183,11 +183,14 @@ describe('poll', () => {
     expect(bundle.releases).toHaveLength(1);
     expect(bundle.worker.llm_model).toBe('google/gemini-2.5-flash-lite');
     expect(bundle.worker.pages_polled).toBeGreaterThan(0);
-    // The published budget is the per-run delta (1 call here), never a lifetime total.
-    const withBudget = JSON.parse(readFileSync(bundlePath(dataDir), 'utf8')) as {
-      worker: { researcher: { budget: { calls: number } | null } };
+    // A poll feeds the lifetime total but never `budget` — that stays the last *research*
+    // run's delta (REDESIGN §12.6: showing the poll's delta there read as "the LLM is broken").
+    const withUsage = JSON.parse(readFileSync(bundlePath(dataDir), 'utf8')) as {
+      worker: { researcher: { budget: { calls: number } | null; usage_total: { calls: number } | null; last_backfill_summary: string | null } };
     };
-    expect(withBudget.worker.researcher.budget?.calls).toBe(mock.llmCalls);
+    expect(withUsage.worker.researcher.usage_total?.calls).toBe(mock.llmCalls);
+    expect(withUsage.worker.researcher.budget).toBeNull();
+    expect(withUsage.worker.researcher.last_backfill_summary).toBeNull();
   });
 
   test('re-running after a successful extraction changes nothing', async () => {

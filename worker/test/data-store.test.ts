@@ -6,6 +6,8 @@ import { fileURLToPath } from 'node:url';
 import {
   appendChange,
   changesPath,
+  formatIssues,
+  issuesToString,
   labFilePath,
   readAll,
   readChanges,
@@ -13,6 +15,7 @@ import {
   readOrCreateLabFile,
   writeLabFile,
 } from '../src/data-store';
+import { z } from 'zod';
 import { validateData } from '../src/validate';
 import { LabWorkspace } from '../src/pipeline';
 import { mergeReleases } from '../src/merge';
@@ -49,6 +52,30 @@ function incoming(over: Partial<NormalisedRelease> = {}): NormalisedRelease {
     ...over,
   };
 }
+
+describe('formatIssues (schema issues verbatim, REDESIGN §12.6)', () => {
+  test('a root-level issue reads "<root>: message" — never an empty string', () => {
+    const parsed = z.object({ models: z.array(z.string()) }).safeParse([]);
+    expect(parsed.success).toBe(false);
+    const lines = formatIssues(parsed.success ? [] : parsed.error.issues);
+    expect(lines.length).toBeGreaterThan(0);
+    for (const line of lines) {
+      expect(line).not.toBe('');
+      expect(line).toMatch(/^<root>: .+/);
+    }
+  });
+
+  test('nested issues carry the dotted path, the limit truncates, and issuesToString joins', () => {
+    const parsed = z.object({ models: z.array(z.object({ name: z.string(), url: z.string() })) }).safeParse({ models: [{ name: 1 }] });
+    const issues = parsed.success ? [] : parsed.error.issues;
+    const lines = formatIssues(issues);
+    expect(lines).toHaveLength(2);
+    expect(lines[0]).toMatch(/^models\.0\.name: /);
+    expect(lines[1]).toMatch(/^models\.0\.url: /);
+    expect(formatIssues(issues, 1)).toHaveLength(1);
+    expect(issuesToString(issues)).toBe(lines.join('; '));
+  });
+});
 
 describe('readAll / validateData on a fresh data dir', () => {
   test('reads the contract files and reports no errors', () => {

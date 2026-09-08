@@ -48,6 +48,9 @@
       "Claude (Opus|Fable|Mythos)",
       "Claude \\d(\\.\\d)? Opus",
       "^Claude (1\\.3|2|2\\.1|3\\.5 Sonnet|3\\.7 Sonnet)$"
+    ],
+    "name_prefixes": [
+      { "match": "^(opus|sonnet|haiku|fable|mythos)\\b", "prefix": "Claude " }
     ]
   },
   {
@@ -207,6 +210,9 @@
     "flagship_hints": [
       "Kimi K\\d(\\.\\d)?",
       "^Kimi Chat$"
+    ],
+    "name_prefixes": [
+      { "match": "^(k[0-9])\\b", "prefix": "Kimi " }
     ]
   },
   {
@@ -263,6 +269,9 @@
       "^Mistral 7B$",
       "^Mixtral",
       "^Mistral Large$"
+    ],
+    "name_prefixes": [
+      { "match": "^(large|medium|small)\\b", "prefix": "Mistral " }
     ]
   }
 ]

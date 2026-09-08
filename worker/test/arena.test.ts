@@ -7,7 +7,9 @@ import {
   ARENA_BENCHMARK,
   ARENA_CONFIG,
   applyArenaMatches,
+  arenaCommitMessage,
   arenaScore,
+  formatArenaSummary,
   mapRowToRelease,
   organizationConsistent,
   parseArenaLeaderboard,
@@ -428,5 +430,41 @@ describe('runArena — write-path guards', () => {
     const published = JSON.parse(readFileSync(join(dataDir, 'models', 'google.json'), 'utf8')) as LabFile;
     expect(published.releases[0]?.scores.some((s) => s.benchmark === ARENA_BENCHMARK && s.value === 1493)).toBe(true);
     expect(existsSync(join(dataDir, 'researched', 'google.json'))).toBe(false);
+    // The run leaves a one-line summary for the site's Researcher panel (REDESIGN §12.6).
+    const { StateStore } = await import('../src/state');
+    const run = new StateStore(join(dataDir, '..', 'state')).readRun();
+    expect(run.researcher.last_backfill_summary).toBe('arena: 5 rows, 1 matched, 1 score written to 1 lab file, 4 unmatched');
+    expect(run.researcher.last_arena_at).toBeTypeOf('string');
+  });
+
+  test('the arena commits under its own subject, never the anonymous "data update"', async () => {
+    const { rt, dataDir } = await arenaRt({ modelsReleases: [release()] });
+    const root = join(dataDir, '..');
+    const { spawnSync } = await import('node:child_process');
+    const git = (args: string[]): void => {
+      const res = spawnSync('git', args, { cwd: root, encoding: 'utf8' });
+      if (res.status !== 0) throw new Error(`git ${args.join(' ')}: ${res.stderr}`);
+    };
+    git(['init', '-q']);
+    git(['config', 'user.email', 'test@example.com']);
+    git(['config', 'user.name', 'test']);
+    git(['add', 'data']);
+    git(['commit', '-q', '-m', 'seed']);
+    const rtWithPush = { ...rt, config: { ...rt.config, gitPush: true } };
+    const code = await runArena(rtWithPush, { urls: ['https://lmarena.test/leaderboard/text'] });
+    expect(code).toBe(0);
+    // HEAD is the bot commit (the rebase/push failed — no origin — but the commit stays local).
+    const head = spawnSync('git', ['show', '--name-only', '--format=%s', 'HEAD'], { cwd: root, encoding: 'utf8' });
+    const lines = (head.stdout ?? '').trim().split('\n');
+    expect(lines[0]).toBe('data(bot): arena 1 score, 1 lab');
+    expect(lines.slice(1).filter(Boolean).sort()).toEqual(['data/history/changes.jsonl', 'data/models/google.json']);
+  });
+
+  test('arenaCommitMessage and formatArenaSummary pluralise', () => {
+    expect(arenaCommitMessage(12, 5)).toBe('data(bot): arena 12 scores, 5 labs');
+    expect(arenaCommitMessage(1, 1)).toBe('data(bot): arena 1 score, 1 lab');
+    expect(formatArenaSummary({ rows: 200, matched: 40, scores: 38, labs: 9, unmatched: 160 })).toBe(
+      'arena: 200 rows, 40 matched, 38 scores written to 9 lab files, 160 unmatched',
+    );
   });
 });
