@@ -617,3 +617,9 @@
 {"at":"2026-09-08T01:42:47Z","actor":"worker","lab":"zhipu","release_id":"zhipu-glm-4.5","kind":"score_updated","summary":"lmarena-text 1411 -> 1411","source_url":"https://lmarena.ai/leaderboard/text"}
 {"at":"2026-09-08T01:42:47Z","actor":"worker","lab":"zhipu","release_id":"zhipu-glm-4-plus","kind":"score_updated","summary":"lmarena-text 1319 -> 1319","source_url":"https://lmarena.ai/leaderboard/text"}
 {"at":"2026-09-08T01:42:47Z","actor":"worker","lab":"zhipu","release_id":"zhipu-chatglm-6b","kind":"score_updated","summary":"lmarena-text 995 -> 995","source_url":"https://lmarena.ai/leaderboard/text"}
+{"at":"2026-09-08T04:56:39Z","actor":"worker","lab":"openai","release_id":"openai-gpt-6-astra","kind":"score_added","summary":"terminal-bench-2 57.9 (Terminal-Bench 4.0)","source_url":"https://openai.com/index/gpt-6-astra/"}
+{"at":"2026-09-08T04:56:39Z","actor":"worker","lab":"openai","release_id":"openai-gpt-6-astra","kind":"score_added","summary":"arc-agi-2 95 (ARC-AGI-2)","source_url":"https://openai.com/index/gpt-6-astra/"}
+{"at":"2026-09-08T04:56:39Z","actor":"worker","lab":"openai","release_id":"openai-gpt-6-astra","kind":"score_added","summary":"mmmu 99.9 (ARC-AGI-3)","source_url":"https://openai.com/index/gpt-6-astra/"}
+{"at":"2026-09-08T04:56:39Z","actor":"worker","lab":"openai","release_id":"openai-gpt-6-astra","kind":"score_added","summary":"browsecomp 91.5","source_url":"https://openai.com/index/gpt-6-astra/"}
+{"at":"2026-09-08T04:56:39Z","actor":"worker","lab":"openai","release_id":"openai-gpt-6-astra","kind":"score_added","summary":"osworld 72.6 (OSWorld 2.0)","source_url":"https://openai.com/index/gpt-6-astra/"}
+{"at":"2026-09-08T04:56:39Z","actor":"worker","lab":"google","release_id":"google-gemini-3.8-flash","kind":"release_added","summary":"Gemini 3.8 Flash — released 2026-09-01","source_url":"https://deepmind.google"}

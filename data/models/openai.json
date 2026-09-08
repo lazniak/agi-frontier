@@ -1,6 +1,6 @@
 {
   "lab": "openai",
-  "updated_at": "2026-09-08T01:42:47Z",
+  "updated_at": "2026-09-08T04:56:39Z",
   "releases": [
     {
       "id": "openai-gpt-1",
@@ -1394,6 +1394,75 @@
             "retrieved_at": "2026-09-07T03:30:00Z",
             "verified": true,
             "verified_at": "2026-09-07T09:33:07Z"
+          }
+        },
+        {
+          "benchmark": "terminal-bench-2",
+          "value": 57.9,
+          "config": "Terminal-Bench 4.0",
+          "reported_by": "official",
+          "source": {
+            "url": "https://openai.com/index/gpt-6-astra/",
+            "title": "GPT-6 Astra",
+            "quote": "Terminal-Bench 4.0 tests agents on complex terminal-based tasks, including software engineering, system configuration, and data analysis. GPT‑6 Astra reaches a new high at 57.9%",
+            "retrieved_at": "2026-09-08T04:56:39Z",
+            "verified": true,
+            "verified_at": "2026-09-08T04:56:39Z"
+          }
+        },
+        {
+          "benchmark": "arc-agi-2",
+          "value": 95,
+          "config": "ARC-AGI-2",
+          "reported_by": "official",
+          "source": {
+            "url": "https://openai.com/index/gpt-6-astra/",
+            "title": "GPT-6 Astra",
+            "quote": "ARC-AGI-2 95.0%",
+            "retrieved_at": "2026-09-08T04:56:39Z",
+            "verified": true,
+            "verified_at": "2026-09-08T04:56:39Z"
+          }
+        },
+        {
+          "benchmark": "mmmu",
+          "value": 99.9,
+          "config": "ARC-AGI-3",
+          "reported_by": "official",
+          "source": {
+            "url": "https://openai.com/index/gpt-6-astra/",
+            "title": "GPT-6 Astra",
+            "quote": "Astra also saturates ARC-AGI-3 with a 99.9% score",
+            "retrieved_at": "2026-09-08T04:56:39Z",
+            "verified": true,
+            "verified_at": "2026-09-08T04:56:39Z"
+          }
+        },
+        {
+          "benchmark": "browsecomp",
+          "value": 91.5,
+          "reported_by": "official",
+          "source": {
+            "url": "https://openai.com/index/gpt-6-astra/",
+            "title": "GPT-6 Astra",
+            "quote": "BrowseComp 91.5%",
+            "retrieved_at": "2026-09-08T04:56:39Z",
+            "verified": true,
+            "verified_at": "2026-09-08T04:56:39Z"
+          }
+        },
+        {
+          "benchmark": "osworld",
+          "value": 72.6,
+          "config": "OSWorld 2.0",
+          "reported_by": "official",
+          "source": {
+            "url": "https://openai.com/index/gpt-6-astra/",
+            "title": "GPT-6 Astra",
+            "quote": "In latency simulations on OSWorld 2.0, Astra achieves higher computer-use performance in about 47% less time per task than GPT‑5.6 Sol, scoring 72.6% at roughly 40 minutes per task",
+            "retrieved_at": "2026-09-08T04:56:39Z",
+            "verified": true,
+            "verified_at": "2026-09-08T04:56:39Z"
           }
         }
       ],

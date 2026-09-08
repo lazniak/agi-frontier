@@ -1,6 +1,6 @@
 {
   "lab": "google",
-  "updated_at": "2026-09-08T01:42:47Z",
+  "updated_at": "2026-09-08T04:56:39Z",
   "releases": [
     {
       "id": "google-palm-2",
@@ -839,6 +839,25 @@
       },
       "scores": [],
       "notes": "Confirmed by Google DeepMind product lead Logan Kilpatrick (via X, reported by TechCrunch) on Jul 21, 2026: pre-training has begun, described by Sundar Pichai on the Q2 2026 earnings call (Jul 23) as needing to be 'significantly larger' than Gemini 3 to compete with rivals, with coding and autonomous agents named as priorities. 'Gemini 4' is the working/rumored name; no architecture, benchmark, price, access plan or release window has been disclosed, so date_precision is 'day' only for the announcement itself and no expected_window is recorded."
+    },
+    {
+      "id": "google-gemini-3.8-flash",
+      "lab": "google",
+      "name": "Gemini 3.8 Flash",
+      "family": "Gemini",
+      "date": "2026-09-01",
+      "date_precision": "month",
+      "status": "released",
+      "tier": "mid",
+      "announcement": {
+        "url": "https://deepmind.google",
+        "title": "Gemini 3.8 Flash",
+        "quote": "Introducing Gemini 3.8 Flash and 3.8 Flash Cyber September 2026 Models",
+        "retrieved_at": "2026-09-08T04:56:39Z",
+        "verified": true,
+        "verified_at": "2026-09-08T04:56:39Z"
+      },
+      "scores": []
     }
   ]
 }
