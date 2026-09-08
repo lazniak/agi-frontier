@@ -1,6 +1,6 @@
 {
   "lab": "moonshot",
-  "updated_at": "2026-09-08T01:42:26Z",
+  "updated_at": "2026-09-08T01:42:36Z",
   "releases": [
     {
       "id": "moonshot-kimi-chat",
@@ -444,9 +444,9 @@
             "url": "https://lmarena.ai/leaderboard/text",
             "title": "LMArena text leaderboard",
             "quote": "67 52 79 kimi-k2.5-thinking Moonshot · Modified MIT 1451 ±3 70,586",
-            "retrieved_at": "2026-09-08T01:42:26Z",
+            "retrieved_at": "2026-09-08T01:42:36Z",
             "verified": true,
-            "verified_at": "2026-09-08T01:42:26Z"
+            "verified_at": "2026-09-08T01:42:36Z"
           }
         }
       ]
@@ -561,9 +561,9 @@
             "url": "https://lmarena.ai/leaderboard/text",
             "title": "LMArena text leaderboard",
             "quote": "50 39 66 kimi-k2.6 Moonshot · Modified MIT 1461 ±5 37,568",
-            "retrieved_at": "2026-09-08T01:42:26Z",
+            "retrieved_at": "2026-09-08T01:42:36Z",
             "verified": true,
-            "verified_at": "2026-09-08T01:42:26Z"
+            "verified_at": "2026-09-08T01:42:36Z"
           }
         }
       ]
@@ -640,9 +640,9 @@
             "url": "https://lmarena.ai/leaderboard/text",
             "title": "LMArena text leaderboard",
             "quote": "12 5 24 kimi-k3-max Moonshot · Kimi K3 license 1489 ±5 18,090",
-            "retrieved_at": "2026-09-08T01:42:26Z",
+            "retrieved_at": "2026-09-08T01:42:36Z",
             "verified": true,
-            "verified_at": "2026-09-08T01:42:26Z"
+            "verified_at": "2026-09-08T01:42:36Z"
           }
         }
       ],

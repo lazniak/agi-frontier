@@ -1,6 +1,6 @@
 {
   "lab": "mistral",
-  "updated_at": "2026-09-08T01:42:26Z",
+  "updated_at": "2026-09-08T01:42:36Z",
   "releases": [
     {
       "id": "mistral-mistral-7b",
@@ -141,9 +141,9 @@
             "url": "https://lmarena.ai/leaderboard/text",
             "title": "LMArena text leaderboard",
             "quote": "383 375 385 mistral-7b-instruct Mistral · Apache 2.0 1110 ±9 8,977",
-            "retrieved_at": "2026-09-08T01:42:26Z",
+            "retrieved_at": "2026-09-08T01:42:36Z",
             "verified": true,
-            "verified_at": "2026-09-08T01:42:26Z"
+            "verified_at": "2026-09-08T01:42:36Z"
           }
         }
       ],
@@ -636,9 +636,9 @@
             "url": "https://lmarena.ai/leaderboard/text",
             "title": "LMArena text leaderboard",
             "quote": "130 113 139 mistral-large-3 Mistral · Apache 2.0 1414 ±3 65,587",
-            "retrieved_at": "2026-09-08T01:42:26Z",
+            "retrieved_at": "2026-09-08T01:42:36Z",
             "verified": true,
-            "verified_at": "2026-09-08T01:42:26Z"
+            "verified_at": "2026-09-08T01:42:36Z"
           }
         }
       ],

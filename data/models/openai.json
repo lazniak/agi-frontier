@@ -1,6 +1,6 @@
 {
   "lab": "openai",
-  "updated_at": "2026-09-08T01:42:26Z",
+  "updated_at": "2026-09-08T01:42:36Z",
   "releases": [
     {
       "id": "openai-gpt-1",
@@ -499,9 +499,9 @@
             "url": "https://lmarena.ai/leaderboard/text",
             "title": "LMArena text leaderboard",
             "quote": "237 229 254 gpt-4-turbo-2024-04-09 OpenAI · Proprietary 1324 ±4 98,114",
-            "retrieved_at": "2026-09-08T01:42:26Z",
+            "retrieved_at": "2026-09-08T01:42:36Z",
             "verified": true,
-            "verified_at": "2026-09-08T01:42:26Z"
+            "verified_at": "2026-09-08T01:42:36Z"
           }
         }
       ],
@@ -589,9 +589,9 @@
             "url": "https://lmarena.ai/leaderboard/text",
             "title": "LMArena text leaderboard",
             "quote": "211 196 221 gpt-4o-2024-05-13 OpenAI · Proprietary 1346 ±3 112,881",
-            "retrieved_at": "2026-09-08T01:42:26Z",
+            "retrieved_at": "2026-09-08T01:42:36Z",
             "verified": true,
-            "verified_at": "2026-09-08T01:42:26Z"
+            "verified_at": "2026-09-08T01:42:36Z"
           }
         }
       ],
@@ -637,9 +637,9 @@
             "url": "https://lmarena.ai/leaderboard/text",
             "title": "LMArena text leaderboard",
             "quote": "162 149 173 o1-preview OpenAI · Proprietary 1388 ±5 31,122",
-            "retrieved_at": "2026-09-08T01:42:26Z",
+            "retrieved_at": "2026-09-08T01:42:36Z",
             "verified": true,
-            "verified_at": "2026-09-08T01:42:26Z"
+            "verified_at": "2026-09-08T01:42:36Z"
           }
         }
       ],
@@ -726,9 +726,9 @@
             "url": "https://lmarena.ai/leaderboard/text",
             "title": "LMArena text leaderboard",
             "quote": "76 64 94 gpt-4.5-preview-2025-02-27 OpenAI · Proprietary 1445 ±6 14,547",
-            "retrieved_at": "2026-09-08T01:42:26Z",
+            "retrieved_at": "2026-09-08T01:42:36Z",
             "verified": true,
-            "verified_at": "2026-09-08T01:42:26Z"
+            "verified_at": "2026-09-08T01:42:36Z"
           }
         }
       ],
@@ -902,9 +902,9 @@
             "url": "https://lmarena.ai/leaderboard/text",
             "title": "LMArena text leaderboard",
             "quote": "93 79 109 gpt-5-high OpenAI · Proprietary 1434 ±5 31,433",
-            "retrieved_at": "2026-09-08T01:42:26Z",
+            "retrieved_at": "2026-09-08T01:42:36Z",
             "verified": true,
-            "verified_at": "2026-09-08T01:42:26Z"
+            "verified_at": "2026-09-08T01:42:36Z"
           }
         }
       ],
@@ -997,9 +997,9 @@
             "url": "https://lmarena.ai/leaderboard/text",
             "title": "LMArena text leaderboard",
             "quote": "84 74 100 gpt-5.1 OpenAI · Proprietary 1439 ±4 43,008",
-            "retrieved_at": "2026-09-08T01:42:26Z",
+            "retrieved_at": "2026-09-08T01:42:36Z",
             "verified": true,
-            "verified_at": "2026-09-08T01:42:26Z"
+            "verified_at": "2026-09-08T01:42:36Z"
           }
         }
       ],
@@ -1097,9 +1097,9 @@
             "url": "https://lmarena.ai/leaderboard/text",
             "title": "LMArena text leaderboard",
             "quote": "88 79 105 gpt-5.2 OpenAI · Proprietary 1436 ±3 79,070",
-            "retrieved_at": "2026-09-08T01:42:26Z",
+            "retrieved_at": "2026-09-08T01:42:36Z",
             "verified": true,
-            "verified_at": "2026-09-08T01:42:26Z"
+            "verified_at": "2026-09-08T01:42:36Z"
           }
         }
       ],
@@ -1185,9 +1185,9 @@
             "url": "https://lmarena.ai/leaderboard/text",
             "title": "LMArena text leaderboard",
             "quote": "46 29 57 gpt-5.4 OpenAI · Proprietary 1466 ±4 63,588",
-            "retrieved_at": "2026-09-08T01:42:26Z",
+            "retrieved_at": "2026-09-08T01:42:36Z",
             "verified": true,
-            "verified_at": "2026-09-08T01:42:26Z"
+            "verified_at": "2026-09-08T01:42:36Z"
           }
         }
       ],
@@ -1271,9 +1271,9 @@
             "url": "https://lmarena.ai/leaderboard/text",
             "title": "LMArena text leaderboard",
             "quote": "24 17 39 gpt-5.5 OpenAI · Proprietary 1477 ±4 64,977",
-            "retrieved_at": "2026-09-08T01:42:26Z",
+            "retrieved_at": "2026-09-08T01:42:36Z",
             "verified": true,
-            "verified_at": "2026-09-08T01:42:26Z"
+            "verified_at": "2026-09-08T01:42:36Z"
           }
         }
       ],
@@ -1332,9 +1332,9 @@
             "url": "https://lmarena.ai/leaderboard/text",
             "title": "LMArena text leaderboard",
             "quote": "17 9 32 gpt-5.6-sol-xhigh OpenAI · Proprietary 1483 ±5 23,413",
-            "retrieved_at": "2026-09-08T01:42:26Z",
+            "retrieved_at": "2026-09-08T01:42:36Z",
             "verified": true,
-            "verified_at": "2026-09-08T01:42:26Z"
+            "verified_at": "2026-09-08T01:42:36Z"
           }
         }
       ],

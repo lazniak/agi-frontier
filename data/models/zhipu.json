@@ -1,6 +1,6 @@
 {
   "lab": "zhipu",
-  "updated_at": "2026-09-08T01:42:26Z",
+  "updated_at": "2026-09-08T01:42:36Z",
   "releases": [
     {
       "id": "zhipu-glm-130b",
@@ -79,9 +79,9 @@
             "url": "https://lmarena.ai/leaderboard/text",
             "title": "LMArena text leaderboard",
             "quote": "396 396 399 chatglm-6b Non-commercial 995 ±13 4,914",
-            "retrieved_at": "2026-09-08T01:42:26Z",
+            "retrieved_at": "2026-09-08T01:42:36Z",
             "verified": true,
-            "verified_at": "2026-09-08T01:42:26Z"
+            "verified_at": "2026-09-08T01:42:36Z"
           }
         }
       ],
@@ -271,9 +271,9 @@
             "url": "https://lmarena.ai/leaderboard/text",
             "title": "LMArena text leaderboard",
             "quote": "246 230 261 glm-4-plus Z.ai · Proprietary 1319 ±5 26,126",
-            "retrieved_at": "2026-09-08T01:42:26Z",
+            "retrieved_at": "2026-09-08T01:42:36Z",
             "verified": true,
-            "verified_at": "2026-09-08T01:42:26Z"
+            "verified_at": "2026-09-08T01:42:36Z"
           }
         }
       ]
@@ -395,9 +395,9 @@
             "url": "https://lmarena.ai/leaderboard/text",
             "title": "LMArena text leaderboard",
             "quote": "134 113 146 glm-4.5 Z.ai · MIT 1411 ±5 23,715",
-            "retrieved_at": "2026-09-08T01:42:26Z",
+            "retrieved_at": "2026-09-08T01:42:36Z",
             "verified": true,
-            "verified_at": "2026-09-08T01:42:26Z"
+            "verified_at": "2026-09-08T01:42:36Z"
           }
         }
       ]
@@ -552,9 +552,9 @@
             "url": "https://lmarena.ai/leaderboard/text",
             "title": "LMArena text leaderboard",
             "quote": "110 94 125 glm-4.6 Z.ai · MIT 1425 ±4 35,068",
-            "retrieved_at": "2026-09-08T01:42:26Z",
+            "retrieved_at": "2026-09-08T01:42:36Z",
             "verified": true,
-            "verified_at": "2026-09-08T01:42:26Z"
+            "verified_at": "2026-09-08T01:42:36Z"
           }
         }
       ],
@@ -710,9 +710,9 @@
             "url": "https://lmarena.ai/leaderboard/text",
             "title": "LMArena text leaderboard",
             "quote": "81 64 100 glm-4.7 Z.ai · MIT 1442 ±6 11,889",
-            "retrieved_at": "2026-09-08T01:42:26Z",
+            "retrieved_at": "2026-09-08T01:42:36Z",
             "verified": true,
-            "verified_at": "2026-09-08T01:42:26Z"
+            "verified_at": "2026-09-08T01:42:36Z"
           }
         }
       ]
@@ -840,9 +840,9 @@
             "url": "https://lmarena.ai/leaderboard/text",
             "title": "LMArena text leaderboard",
             "quote": "56 44 68 glm-5 Z.ai · MIT 1458 ±4 27,647",
-            "retrieved_at": "2026-09-08T01:42:26Z",
+            "retrieved_at": "2026-09-08T01:42:36Z",
             "verified": true,
-            "verified_at": "2026-09-08T01:42:26Z"
+            "verified_at": "2026-09-08T01:42:36Z"
           }
         }
       ]
@@ -948,9 +948,9 @@
             "url": "https://lmarena.ai/leaderboard/text",
             "title": "LMArena text leaderboard",
             "quote": "44 28 56 glm-5.1 Z.ai · MIT 1466 ±4 45,650",
-            "retrieved_at": "2026-09-08T01:42:26Z",
+            "retrieved_at": "2026-09-08T01:42:36Z",
             "verified": true,
-            "verified_at": "2026-09-08T01:42:26Z"
+            "verified_at": "2026-09-08T01:42:36Z"
           }
         }
       ]
@@ -1041,9 +1041,9 @@
             "url": "https://lmarena.ai/leaderboard/text",
             "title": "LMArena text leaderboard",
             "quote": "37 20 51 glm-5.2-max Z.ai · MIT 1472 ±5 33,966",
-            "retrieved_at": "2026-09-08T01:42:26Z",
+            "retrieved_at": "2026-09-08T01:42:36Z",
             "verified": true,
-            "verified_at": "2026-09-08T01:42:26Z"
+            "verified_at": "2026-09-08T01:42:36Z"
           }
         }
       ],
@@ -1092,9 +1092,9 @@
             "url": "https://lmarena.ai/leaderboard/text",
             "title": "LMArena text leaderboard",
             "quote": "20 7 38 glm-5.3-max Z.ai · MIT 1482 ±7 7,668",
-            "retrieved_at": "2026-09-08T01:42:26Z",
+            "retrieved_at": "2026-09-08T01:42:36Z",
             "verified": true,
-            "verified_at": "2026-09-08T01:42:26Z"
+            "verified_at": "2026-09-08T01:42:36Z"
           }
         }
       ],

@@ -1,6 +1,6 @@
 {
   "lab": "alibaba",
-  "updated_at": "2026-09-08T01:42:26Z",
+  "updated_at": "2026-09-08T01:42:36Z",
   "releases": [
     {
       "id": "alibaba-qwen-7b",
@@ -155,9 +155,9 @@
             "url": "https://lmarena.ai/leaderboard/text",
             "title": "LMArena text leaderboard",
             "quote": "368 355 379 qwen-14b-chat Alibaba · Qianwen LICENSE 1139 ±11 4,964",
-            "retrieved_at": "2026-09-08T01:42:26Z",
+            "retrieved_at": "2026-09-08T01:42:36Z",
             "verified": true,
-            "verified_at": "2026-09-08T01:42:26Z"
+            "verified_at": "2026-09-08T01:42:36Z"
           }
         }
       ],
@@ -355,9 +355,9 @@
             "url": "https://lmarena.ai/leaderboard/text",
             "title": "LMArena text leaderboard",
             "quote": "312 307 322 qwen1.5-110b-chat Alibaba · Qianwen LICENSE 1234 ±6 26,195",
-            "retrieved_at": "2026-09-08T01:42:26Z",
+            "retrieved_at": "2026-09-08T01:42:36Z",
             "verified": true,
-            "verified_at": "2026-09-08T01:42:26Z"
+            "verified_at": "2026-09-08T01:42:36Z"
           }
         }
       ]
@@ -523,9 +523,9 @@
             "url": "https://lmarena.ai/leaderboard/text",
             "title": "LMArena text leaderboard",
             "quote": "299 293 306 qwen2-72b-instruct Alibaba · Qianwen LICENSE 1261 ±5 37,325",
-            "retrieved_at": "2026-09-08T01:42:26Z",
+            "retrieved_at": "2026-09-08T01:42:36Z",
             "verified": true,
-            "verified_at": "2026-09-08T01:42:26Z"
+            "verified_at": "2026-09-08T01:42:36Z"
           }
         }
       ]
@@ -643,9 +643,9 @@
             "url": "https://lmarena.ai/leaderboard/text",
             "title": "LMArena text leaderboard",
             "quote": "270 257 274 qwen2.5-72b-instruct Alibaba · Qwen 1303 ±4 39,406",
-            "retrieved_at": "2026-09-08T01:42:26Z",
+            "retrieved_at": "2026-09-08T01:42:36Z",
             "verified": true,
-            "verified_at": "2026-09-08T01:42:26Z"
+            "verified_at": "2026-09-08T01:42:36Z"
           }
         }
       ]
@@ -676,9 +676,9 @@
             "url": "https://lmarena.ai/leaderboard/text",
             "title": "LMArena text leaderboard",
             "quote": "178 170 185 qwen2.5-max Alibaba · Proprietary 1374 ±4 32,417",
-            "retrieved_at": "2026-09-08T01:42:26Z",
+            "retrieved_at": "2026-09-08T01:42:36Z",
             "verified": true,
-            "verified_at": "2026-09-08T01:42:26Z"
+            "verified_at": "2026-09-08T01:42:36Z"
           }
         }
       ],
@@ -753,9 +753,9 @@
             "url": "https://lmarena.ai/leaderboard/text",
             "title": "LMArena text leaderboard",
             "quote": "176 167 184 qwen3-235b-a22b Alibaba · Apache 2.0 1375 ±5 25,864",
-            "retrieved_at": "2026-09-08T01:42:26Z",
+            "retrieved_at": "2026-09-08T01:42:36Z",
             "verified": true,
-            "verified_at": "2026-09-08T01:42:26Z"
+            "verified_at": "2026-09-08T01:42:36Z"
           }
         }
       ]
@@ -894,9 +894,9 @@
             "url": "https://lmarena.ai/leaderboard/text",
             "title": "LMArena text leaderboard",
             "quote": "22 10 39 qwen3.8-max Alibaba · Proprietary 1480 ±6 13,346",
-            "retrieved_at": "2026-09-08T01:42:26Z",
+            "retrieved_at": "2026-09-08T01:42:36Z",
             "verified": true,
-            "verified_at": "2026-09-08T01:42:26Z"
+            "verified_at": "2026-09-08T01:42:36Z"
           }
         }
       ]
