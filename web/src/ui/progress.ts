@@ -1,15 +1,20 @@
 /**
- * "Next research in 42 min" — the header progress bar (REDESIGN §7.2, §6.3).
+ * "Next research in 3 days" — the header progress bar (REDESIGN §7.2, §6.3, §12.8).
  *
- * Everything comes from `bundle.worker`: the bar fills with the share of the interval that has
- * elapsed since `last_run_at`, and it re-reads the clock every 30 s and whenever the tab becomes
- * visible again (a backgrounded tab does not tick). Four states: counting down, running,
- * schedule unknown, overdue.
+ * The bar counts down to the next *research* run, not to the next loop wake. Those used to be the
+ * same thing; since the cadence scales with how many people read the site (§12.8) they are not,
+ * and the loop wakes hourly to poll whatever the research interval is. So the bar prefers
+ * `researcher.cadence.next_research_at` and falls back to the loop's own `next_run_at` — relabelled
+ * as a check, because that is what it is — on a bundle from a worker that has no cadence yet.
+ *
+ * It fills with the share of the interval that has elapsed, re-reads the clock every 30 s and
+ * whenever the tab becomes visible again (a backgrounded tab does not tick). Four states: counting
+ * down, running, schedule unknown, overdue.
  */
 import type { WorkerState } from '@agi/shared';
 import type { Ctx } from '../data';
 import { clear, el, maybe } from '../dom';
-import { fmtDuration, fmtTimestamp } from './format';
+import { cadenceReaders, cadenceTier, fmtDuration, fmtTimestamp } from './format';
 
 /** How often the countdown re-reads the clock. */
 const TICK_MS = 30_000;
@@ -30,14 +35,55 @@ function ms(ts: string | null): number | null {
   return Number.isNaN(t) ? null : t;
 }
 
-/** Everything the tooltip says: what the last run did, which model, which researcher. */
+/**
+ * What the bar is counting down to. The research schedule wins when the worker publishes one;
+ * `start` is the last research run, so the bar measures the wait the reader is actually in.
+ */
+interface Schedule {
+  kind: 'research' | 'check';
+  next: number;
+  /** The stamp the `next` came from, kept so the overdue message can print it as published. */
+  nextAt: string;
+  start: number;
+  intervalMs: number;
+}
+
+function schedule(w: WorkerState): Schedule | null {
+  const cadence = w.researcher.cadence;
+  const researchAt = cadence?.next_research_at ?? null;
+  const research = ms(researchAt);
+  if (cadence && researchAt !== null && research !== null) {
+    const intervalMs = Math.max(1, cadence.interval_hours) * 3_600_000;
+    return {
+      kind: 'research',
+      next: research,
+      nextAt: researchAt,
+      start: ms(w.researcher.last_backfill_at) ?? research - intervalMs,
+      intervalMs,
+    };
+  }
+  const nextAt = w.next_run_at;
+  const next = ms(nextAt);
+  if (nextAt === null || next === null) return null;
+  const intervalMs = Math.max(1, w.interval_minutes) * 60_000;
+  // With no run recorded yet, walk one interval back from the scheduled wake so the bar still
+  // means "how much of the wait has elapsed".
+  return { kind: 'check', next, nextAt, start: ms(w.last_run_at) ?? next - intervalMs, intervalMs };
+}
+
+/** Everything the tooltip says: what the last run did, which model, which researcher, how often. */
 function tooltip(w: WorkerState): string {
   const lines = [
     w.last_run_summary ? `Last run: ${w.last_run_summary}` : `Last run: ${fmtTimestamp(w.last_run_at)}`,
     `Extractor model: ${w.llm_model ?? 'none recorded'}`,
     `Researcher: v${w.researcher.version}`,
-    `Interval: ${w.interval_minutes} min`,
+    `Loop wakes every ${w.interval_minutes} min`,
   ];
+  const c = w.researcher.cadence;
+  if (c) {
+    lines.push(`Research ${cadenceTier(c.tier)} · ${cadenceReaders(c)}`);
+    if (c.capped) lines.push('Slowed to the floor: the monthly research budget is spent.');
+  }
   return lines.join('\n');
 }
 
@@ -71,25 +117,22 @@ export function initProgress(ctx: Ctx): ProgressApi {
       return;
     }
 
-    const next = ms(w.next_run_at);
-    if (next === null) {
+    const s = schedule(w);
+    if (s === null) {
       paint('unknown', 'Research schedule unknown', 0);
       return;
     }
 
-    const intervalMs = Math.max(1, w.interval_minutes) * 60_000;
-    if (now - next > OVERDUE_FACTOR * intervalMs) {
-      paint('overdue', `Research overdue since ${fmtTimestamp(w.next_run_at)}`, 1);
+    const noun = s.kind === 'research' ? 'Research' : 'Check';
+    if (now - s.next > OVERDUE_FACTOR * s.intervalMs) {
+      paint('overdue', `${noun} overdue since ${fmtTimestamp(s.nextAt)}`, 1);
       return;
     }
 
-    // `last_run_at` is the start of the bar; with no run recorded yet, walk one interval back
-    // from the scheduled wake so the bar still means "how much of the wait has elapsed".
-    const start = ms(w.last_run_at) ?? next - intervalMs;
-    const span = Math.max(1, next - start);
-    const ratio = (now - start) / span;
-    const left = Math.max(0, next - now);
-    paint('idle', `Next research in ${fmtDuration(left)}`, ratio);
+    const span = Math.max(1, s.next - s.start);
+    const ratio = (now - s.start) / span;
+    const left = Math.max(0, s.next - now);
+    paint('idle', `Next ${noun.toLowerCase()} in ${fmtDuration(left)}`, ratio);
   }
 
   refresh();

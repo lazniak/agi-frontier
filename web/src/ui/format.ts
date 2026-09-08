@@ -168,3 +168,27 @@ export function shortUrl(url: string, max = 58): string {
   const clean = url.replace(/^https?:\/\//, '').replace(/\/$/, '');
   return clean.length <= max ? clean : `${clean.slice(0, max - 1)}…`;
 }
+
+/* ---------------------------------------------------------- research cadence */
+/* How often the researcher runs is decided by how many people actually read the site
+   (REDESIGN §12.8), so the tier ids the worker publishes have to read as English in three places:
+   the header countdown, its tooltip and the Researcher panel. */
+
+const CADENCE_TIER: Record<string, string> = {
+  weekly: 'weekly',
+  often: 'every 3 days',
+  daily: 'daily',
+  'twice-daily': 'twice a day',
+  frequent: 'every 6 hours',
+};
+
+/** A tier id as a phrase. An id this build does not know prints itself rather than nothing. */
+export function cadenceTier(tier: string): string {
+  return CADENCE_TIER[tier] ?? tier;
+}
+
+/** The readership the cadence was chosen from, or why there is none yet. */
+export function cadenceReaders(c: { visitors_per_day: number; days_measured: number }): string {
+  if (c.days_measured <= 0) return 'no traffic measured yet';
+  return `${fmtNumber(c.visitors_per_day, 1)} readers a day over ${pluralise(c.days_measured, 'day')}`;
+}

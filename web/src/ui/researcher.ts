@@ -13,7 +13,7 @@
 import type { LabId, ResearcherBudget, ResearcherEval, WorkerState } from '@agi/shared';
 import type { Ctx } from '../data';
 import { clear, el, maybe } from '../dom';
-import { EN_DASH, esc, fmtPercent, fmtTimestamp, pluralise } from './format';
+import { cadenceReaders, cadenceTier, EN_DASH, esc, fmtPercent, fmtTimestamp, pluralise } from './format';
 
 /** A run whose success stamp lags its start stamp by more than this is treated as failed. */
 const SUCCESS_LAG_MS = 2 * 60 * 60 * 1000;
@@ -165,12 +165,23 @@ export function renderResearcher(ctx: Ctx): void {
   }
 
   /* -------------------------------------------------------------- status */
+  // The loop wakes hourly to poll the lab pages; the research runs on its own, slower clock, set
+  // by how many people read the site (REDESIGN §12.8). Two schedules, so two rows — conflating
+  // them is what made an earlier version of this panel claim the LLM was idle mid-backfill.
+  const cadence = r.cadence;
   const status = el('dl', { class: 'rfacts' });
   status.innerHTML =
     fact('Status', w.run_status === 'running' ? 'running' : 'idle', w.run_step ?? `every ${w.interval_minutes} min`) +
     llmFact(w) +
     fact('Last run', fmtTimestamp(w.last_run_at), `last success ${fmtTimestamp(w.last_success_at)}`) +
-    fact('Next run', fmtTimestamp(w.next_run_at)) +
+    fact('Next check', fmtTimestamp(w.next_run_at), 'the hourly poll of the lab pages') +
+    (cadence
+      ? fact(
+          'Research cadence',
+          cadenceTier(cadence.tier),
+          cadence.capped ? `${cadenceReaders(cadence)} · slowed: the monthly budget is spent` : cadenceReaders(cadence),
+        ) + fact('Next research', fmtTimestamp(cadence.next_research_at))
+      : fact('Research cadence', 'weekly', 'no traffic measured — the default schedule')) +
     fact('Version', `v${r.version}`, w.llm_model ?? 'no extractor model recorded') +
     fact('Last backfill', fmtTimestamp(r.last_backfill_at)) +
     fact('Last LMArena', fmtTimestamp(r.last_arena_at));
