@@ -284,6 +284,14 @@
   font-size: 14px;
 }
 
+/* +/− (REDESIGN §12.1): the discoverable way to zoom both axes now that the wheel needs modifiers. */
+.cbtn--zoom {
+  font-size: 17px;
+  font-weight: 300;
+  line-height: 1;
+  color: var(--ink-1);
+}
+
 .cbtn--quiet {
   border-color: transparent;
   color: var(--ink-3);
@@ -361,6 +369,14 @@
     padding-bottom: 96px;
   }
 
+  /* Same clearance, second place it is needed: while the stage fills the viewport the legend dock
+     is the bottom-most thing on screen, and the pill (47 px tall, 14 px up) sat on its last chip
+     row — the last lab chip and the last layer chip could not be tapped at all. The clearance
+     belongs to the pill rather than to the dock, so it is declared with the pill. */
+  .legend-dock {
+    padding-bottom: 72px;
+  }
+
   .controlbar {
     position: fixed;
     z-index: 39;
@@ -419,6 +435,15 @@
 
   .cbtn {
     min-height: 44px;
+  }
+
+  /* `.cbtn` above raises the height but nothing widened these, so the +/− pair rendered 32 × 44 px
+     — two 32 px targets side by side, and they are now the discoverable way to zoom (the wheel
+     needs Ctrl + Shift). Square them off at the 44 px the lens spec asks for. */
+  .cbtn--round {
+    width: 44px;
+    min-width: 44px;
+    height: 44px;
   }
 
   .cgroup__row {

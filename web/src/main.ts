@@ -31,6 +31,7 @@ import { createControlBar } from './ui/controls';
 import { Drawer } from './ui/drawer';
 import { fmtDate } from './ui/format';
 import { renderNotice, renderStamp, renderStats, renderWorkerHealth } from './ui/intro';
+import { renderLifetimes } from './ui/lifetimes';
 import { initParallax } from './ui/parallax';
 import { readView, writeView } from './ui/persist';
 import { initProgress } from './ui/progress';
@@ -160,6 +161,8 @@ async function boot(): Promise<void> {
       store.setFitY(false);
       chart.resetZoom();
     },
+    // +/− zoom both axes (REDESIGN §12.1); the chart decides the centre.
+    zoom: (k) => chart.zoomBy(k, k),
     backToToday: () => tweenAsOf(store.get().asOf, ctx.today),
     help: () => sheet.open(),
   });
@@ -198,6 +201,7 @@ async function boot(): Promise<void> {
     renderBacktest(ctx, c);
     renderWatch(ctx, c, (id) => store.select(id));
     renderRankings(ctx, c, store, (id) => store.select(id));
+    renderLifetimes(ctx, c);
     drawer.sync(c);
     controls.sync();
 

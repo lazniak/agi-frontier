@@ -19,6 +19,8 @@ export interface ControlBarDeps {
   fit(): void;
   /** "Reset" — hand back to the chart. */
   reset(): void;
+  /** "+" / "−" — zoom both axes by `k` about the plot centre (`ChartApi.zoomBy(k, k)`). */
+  zoom(k: number): void;
   /** "Back to today" — main.ts eases the scrubber instead of jumping. */
   backToToday(): void;
   /** "?" — open the shortcut sheet. */
@@ -43,6 +45,10 @@ interface SegOption<T extends string> {
 
 /** ≤ 720 px: the bar lives in a bottom sheet. */
 const SHEET_QUERY = '(max-width: 720px)';
+
+/** One step of the +/− buttons and keys, on both axes (REDESIGN §12.1). */
+export const ZOOM_IN = 1.25;
+export const ZOOM_OUT = 0.8;
 
 export function createControlBar(deps: ControlBarDeps): ControlBar {
   const { ctx, store } = deps;
@@ -202,7 +208,25 @@ export function createControlBar(deps: ControlBarDeps): ControlBar {
     deps.reset();
     if (isSheet()) closeSheet();
   });
-  viewRow.append(fitBtn, resetBtn);
+  // +/− act on both axes at once (REDESIGN §12.1); the wheel needs Ctrl + Shift for the same,
+  // so the buttons are the discoverable way in — hence the tooltips spell out the modifiers.
+  const zoomIn = el('button', {
+    type: 'button',
+    class: 'cbtn cbtn--round cbtn--zoom',
+    'aria-label': 'Zoom in, both axes',
+    title: 'Zoom in — both axes (+). Ctrl + Shift + scroll does the same on the chart',
+    text: '+',
+  });
+  zoomIn.addEventListener('click', () => deps.zoom(ZOOM_IN));
+  const zoomOut = el('button', {
+    type: 'button',
+    class: 'cbtn cbtn--round cbtn--zoom',
+    'aria-label': 'Zoom out, both axes',
+    title: 'Zoom out — both axes (−). Ctrl + Shift + scroll does the same on the chart',
+    text: '−',
+  });
+  zoomOut.addEventListener('click', () => deps.zoom(ZOOM_OUT));
+  viewRow.append(zoomIn, zoomOut, fitBtn, resetBtn);
   viewGroup.append(viewRow);
   inner.append(viewGroup);
 

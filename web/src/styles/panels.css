@@ -399,12 +399,113 @@
   color: var(--ink-1);
 }
 
+/* The LLM status dot (REDESIGN §12.6): green = the last run succeeded and calls were billed,
+   amber = a run is on the clock right now, grey = nothing to judge yet, red = the last run
+   started and never reported success. */
+.llm-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-right: 8px;
+  vertical-align: 0.1em;
+  background: var(--announced);
+  box-shadow: 0 0 0 3px rgba(154, 160, 166, 0.18);
+}
+
+.llm-dot--ok {
+  background: #10a37f;
+  box-shadow: 0 0 0 3px rgba(16, 163, 127, 0.18);
+}
+
+.llm-dot--fail {
+  background: #be2e2e;
+  box-shadow: 0 0 0 3px rgba(190, 46, 46, 0.16);
+}
+
+/* In progress: the site's prediction yellow, the colour it already uses for "not settled yet".
+   The halo breathes so a glance can tell a live run from a finished one without reading. */
+.llm-dot--busy {
+  background: var(--predict);
+  box-shadow: 0 0 0 3px var(--predict-wash);
+  animation: llm-pulse 1.8s ease-in-out infinite;
+}
+
+@keyframes llm-pulse {
+  50% {
+    box-shadow: 0 0 0 6px rgba(245, 196, 0, 0.06);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .llm-dot--busy {
+    animation: none;
+  }
+}
+
+.rfact--llm dd {
+  font-size: 18px;
+  font-weight: 300;
+  white-space: nowrap;
+}
+
+/* The label stays on one line; the note under it must not — it carries sentences like
+   "no successful run yet · 12 calls lifetime" and was spilling across the next fact's column. */
+.rfact--llm dd small {
+  white-space: normal;
+}
+
+/* Lifetime totals and the last research run side by side; one column under 720 px. */
+.rusage {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 22px clamp(18px, 3vw, 40px);
+}
+
+.rusage__col {
+  padding: 18px 20px 20px;
+  border: 1px solid var(--hair-soft);
+  border-radius: var(--radius-sm);
+  background: var(--paper-2);
+}
+
+.rusage__title {
+  margin: 0 0 14px;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+
+.rusage__empty {
+  margin: 0;
+  font-size: 13px;
+  color: var(--ink-3);
+}
+
+.rfacts--tight {
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 14px 18px;
+}
+
+.rfacts--tight dd {
+  font-size: 20px;
+}
+
 /* --------------------------------------------------- rankings (rating-led) */
 .rank-rating {
   font-size: 20px;
   font-weight: 300;
   color: var(--ink-1);
   letter-spacing: -0.015em;
+  white-space: nowrap;
+}
+
+/* The thin thousands space in "1 517" is a break opportunity; with seven columns on a phone the
+   cell would otherwise split the rating over three lines. */
+.rank-table td:has(> .rank-rating) {
+  white-space: nowrap;
 }
 
 .rank-row--provisional .rank-rating {
@@ -441,4 +542,445 @@
   display: inline-flex;
   vertical-align: middle;
   max-width: 340px;
+}
+
+/* Coverage + release date folded into the model cell — only used under 720 px (see below). */
+.rank-model__meta {
+  display: none;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Age column (REDESIGN §12.5): months since release, "new" under one month. */
+.rank-age {
+  font-size: 15px;
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+
+.rank-age small {
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-left: 3px;
+}
+
+.rank-age__new {
+  display: inline-block;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--predict-ink);
+  background: var(--predict-wash);
+  border-radius: 999px;
+  padding: 3px 9px;
+}
+
+/*
+ * Rankings on a phone. Seven columns need 760 px; a 390 px viewport gives the wrapper 354 px, so
+ * the table used to scroll sideways with only #, model and rating reachable — and the nineteen
+ * benchmark chips wrapped inside a 178 px cell into a dozen lines, making every row ~300 px tall
+ * and the whole table ~2600 px of page. Four columns fit without scrolling: #, model, rating and
+ * age. Index restates the rating, the chip list and the exact coverage are one tap away in the
+ * audit drawer, and coverage plus the release date (at the precision the dataset claims) ride
+ * along under the lab name, so nothing on screen is lost — only the horizontal scrollbar is.
+ */
+@media (max-width: 720px) {
+  .rank-table {
+    min-width: 0;
+    font-size: 13px;
+  }
+
+  .rank-table th,
+  .rank-table td {
+    padding: 11px 9px;
+  }
+
+  /* Index (4), Benchmarks used (5) and Released (6). The divider and family rows carry a single
+     colspan cell, so they are never touched by these nth-child rules. */
+  .rank-table thead th:nth-child(4),
+  .rank-table thead th:nth-child(5),
+  .rank-table thead th:nth-child(6),
+  .rank-table tbody td:nth-child(4),
+  .rank-table tbody td:nth-child(5),
+  .rank-table tbody td:nth-child(6) {
+    display: none;
+  }
+
+  .rank-model__meta {
+    display: block;
+  }
+
+  .rank-model {
+    gap: 8px;
+  }
+
+  /* The name may wrap now: the column is ~210 px, not the desktop's 168 px of a 760 px table. */
+  .rank-model__name {
+    white-space: normal;
+  }
+
+  .rank-rating {
+    font-size: 17px;
+  }
+
+  .rank-se {
+    display: block;
+    margin-left: 0;
+  }
+
+  .rank-cell-rank {
+    font-size: 15px;
+  }
+
+  .rank-age {
+    font-size: 14px;
+  }
+}
+
+/* --------------------------------------------------- benchmark lifetimes strip */
+/* One Gantt row per benchmark: label · time track · end label. Percent positions along a shared
+   axis (ui/lifetimes.ts), so the strip re-flows with the column it sits in. */
+.lifetimes {
+  margin-top: 30px;
+  padding-top: 26px;
+  border-top: 1px solid var(--hair);
+}
+
+.lifetimes:empty {
+  display: none;
+}
+
+.lifetimes__title {
+  margin-bottom: 8px;
+}
+
+.lifetimes__copy {
+  margin-bottom: 22px;
+}
+
+.lt-strip {
+  --lt-label: 132px;
+  --lt-end: 190px;
+  position: relative;
+}
+
+.lt-axis {
+  position: relative;
+  height: 18px;
+  margin: 0 var(--lt-end) 6px var(--lt-label);
+  border-bottom: 1px solid var(--hair);
+}
+
+.lt-axis__tick {
+  position: absolute;
+  bottom: 3px;
+  transform: translateX(-50%);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+}
+
+.lt-axis__tick:first-child {
+  transform: none;
+}
+
+.lt-rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 2px;
+}
+
+/* `--lt-tint` is set per row by ui/lifetimes.ts — the generation ink every mark below inherits. */
+.lt-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: var(--lt-label) minmax(0, 1fr) var(--lt-end);
+  grid-template-areas: 'label track end';
+  align-items: center;
+  gap: 0 12px;
+  min-height: 26px;
+  padding: 2px 0;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.16s ease;
+}
+
+.lt-row:hover,
+.lt-row:focus-visible {
+  background: var(--paper-2);
+}
+
+.lt-row:focus-visible {
+  outline: 2px solid var(--ink-1);
+  outline-offset: 2px;
+}
+
+/*
+ * The per-row facts (δ, coverage, first score, "not in the index"). Clipped rather than removed
+ * while closed, so they are part of the row's accessible name whatever its state — a `title`
+ * alone reached neither the keyboard nor a touch screen, which is where this strip has to work.
+ */
+.lt-detail {
+  grid-area: detail;
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+
+.lt-row:not(.is-open) .lt-detail {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.lt-row.is-open {
+  background: var(--paper-2);
+  grid-template-areas:
+    'label track end'
+    'detail detail detail';
+  padding-bottom: 8px;
+}
+
+.lt-label {
+  grid-area: label;
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  min-width: 0;
+  font-size: 12.5px;
+  color: var(--ink-1);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lt-label__name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lt-label__gen {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+/* The chip carries the row's generation tint, so the label and the bar say the same thing.
+   The hairline keeps gen 1 (the palest tint) visible on white. */
+.lt-gen-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  background: var(--lt-tint, var(--hair-strong));
+  box-shadow: inset 0 0 0 1px var(--hair);
+}
+
+.lt-track {
+  grid-area: track;
+  position: relative;
+  display: block;
+  height: 10px;
+  border-radius: 5px;
+  background: var(--hair-soft);
+  overflow: visible;
+}
+
+.lt-bar {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  border-radius: 5px;
+  background: var(--lt-tint, var(--hair-strong));
+}
+
+/* Introduced but not yet on any released model's card — the pale head of the bar. At 0.28 the
+   generation ramp collapsed underneath it: a gen 1 and a gen 2 head were nine sRGB values apart,
+   which is why unscored rows read as one grey. 0.5 keeps the head clearly lighter than the body
+   while leaving the four tints ~25 values apart. */
+.lt-bar--head {
+  opacity: 0.5;
+}
+
+/* Alive as of the scrubbed date: the bar runs out instead of stopping. */
+.lt-bar--open {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  mask-image: linear-gradient(to right, #000 calc(100% - 18px), transparent);
+  -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 18px), transparent);
+}
+
+/* Saturated: a filled cap on the release that hit the ceiling. */
+.lt-cap {
+  position: absolute;
+  top: -3px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  transform: translateX(-50%);
+  background: var(--lt-tint, var(--hair-strong));
+  box-shadow: 0 0 0 2px var(--paper);
+}
+
+.lt-now {
+  position: absolute;
+  top: -5px;
+  bottom: -5px;
+  width: 0;
+  border-left: 1px dashed var(--predict-ink);
+  opacity: 0.55;
+  transform: translateX(-0.5px);
+}
+
+.lt-end {
+  grid-area: end;
+  font-size: 11.5px;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lt-row--saturated .lt-end {
+  color: var(--ink-2);
+}
+
+.lt-row--fresh .lt-end {
+  color: var(--predict-ink);
+}
+
+/* Legacy rows are still fitted (they anchor the early models) but read as history. */
+.lt-row--legacy {
+  opacity: 0.6;
+}
+
+.lt-row--off-index .lt-label__name {
+  color: var(--ink-3);
+}
+
+.lt-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  margin: 14px 0 0 var(--lt-label);
+  font-size: 11px;
+  color: var(--ink-3);
+}
+
+.lt-legend__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  white-space: nowrap;
+}
+
+.lt-swatch {
+  display: inline-block;
+  width: 18px;
+  height: 8px;
+  border-radius: 4px;
+  background: rgba(17, 17, 17, 0.6);
+}
+
+.lt-swatch--head {
+  opacity: 0.28;
+}
+
+.lt-swatch--cap {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.lt-swatch--now {
+  width: 0;
+  height: 12px;
+  border-left: 1px dashed var(--predict-ink);
+  border-radius: 0;
+  background: none;
+}
+
+/* The generation ramp, spelled out: without this row four ink tints are just four greys. */
+.lt-legend--gen {
+  margin-top: 8px;
+  gap: 6px 14px;
+}
+
+.lt-legend__label {
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-size: 9.5px;
+  color: var(--ink-3);
+}
+
+.lt-swatch--gen {
+  width: 22px;
+  box-shadow: inset 0 0 0 1px var(--hair);
+}
+
+/* Under 720 px the label and the end label wrap around the track. */
+@media (max-width: 720px) {
+  .lt-strip {
+    --lt-label: 0px;
+    --lt-end: 0px;
+  }
+
+  .lt-axis {
+    margin: 0 0 8px;
+  }
+
+  .lt-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      'label end'
+      'track track';
+    gap: 4px 12px;
+    /* A tappable row, so it carries the 44 px target the rest of the phone layout uses. */
+    min-height: 44px;
+    padding: 8px 0;
+  }
+
+  .lt-row.is-open {
+    grid-template-areas:
+      'label end'
+      'track track'
+      'detail detail';
+  }
+
+  .lt-label {
+    white-space: normal;
+  }
+
+  .lt-end {
+    text-align: right;
+  }
+
+  .lt-legend {
+    margin-left: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lt-row {
+    transition: none;
+  }
 }

@@ -1,6 +1,6 @@
 /**
  * The first-visit tour — four steps that name the four things a reader cannot guess:
- * the axis, the forecast circle, the NOW rule and the Stages column.
+ * the axis, the release lens, the NOW rule (and how the chart is zoomed) and the Stages column.
  *
  * Anchors are resolved by selector at show-time (the chart draws them, so they may not exist
  * on an empty dataset) and a step whose anchors are all missing is skipped rather than pointing
@@ -26,12 +26,14 @@ const STEPS: Step[] = [
       'points, generation ceilings — fitted from the same numbers, not drawn by hand.',
   },
   {
-    anchors: ['.pred-circle', '.pred-whisker', '.fan', '[data-chart-canvas]'],
-    title: 'Every circle is a release window',
+    // No `.pred-circle`: the forecast circle was replaced by the lens and the class is gone from
+    // the chart, so the fallback could never resolve — it only suggested circles still exist.
+    anchors: ['.pred-lens', '.pred-whisker', '.fan', '[data-chart-canvas]'],
+    title: 'Every lens is a release window',
     body:
-      'A yellow circle sits on the median predicted launch date; its diameter is the 68 % window, widened by ' +
-      'the σ scale the backtest earned. It shrinks as the launch nears, because time that has already passed ' +
-      'without a release cuts the distribution from the left.',
+      'A yellow lens sits on the median predicted launch date; the denser it is, the likelier that date. Its ' +
+      'span is the 68 % window, widened by the σ scale the backtest earned. It shrinks as the launch nears, ' +
+      'because time that has already passed without a release cuts the distribution from the left.',
   },
   {
     anchors: ['.now-handle', '#scrub', '.scrubber'],
@@ -39,7 +41,8 @@ const STEPS: Step[] = [
     body:
       'The whole page — the fit, the frontier, the rankings, every forecast — is recomputed as of the date you ' +
       'scrub to. Drag it back and the Backtest card appears: what the model predicted then, against what ' +
-      'actually shipped.',
+      'actually shipped. On the chart, plain scrolling moves the page: hold Ctrl + Shift and scroll to zoom ' +
+      'both axes, drag to pan, and click a family to pin it (Esc unpins).',
   },
   {
     anchors: ['#stages', '[data-stages]'],

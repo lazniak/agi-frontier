@@ -6,14 +6,87 @@
  * whatever each lab shipped most recently and adds a one-line summary of the family band under
  * the lab's row.
  */
-import { MIN_QUALIFIED_SCORES } from '@agi/shared';
-import type { LabId, ModelIndex, ModelTier } from '@agi/shared';
+import { MIN_QUALIFIED_SCORES, comparability, daysBetween } from '@agi/shared';
+import type { Comparability, DatePrecision, ISODate, LabId, ModelIndex, ModelTier } from '@agi/shared';
 import type { Computed, Ctx, SeriesPoint } from '../data';
 import { announce, badge, clear, el, maybe, qs } from '../dom';
 import type { Store, TierView } from '../state';
-import { EN_DASH, esc, fmtDate, fmtIndex, fmtNumber, fmtRating, fmtRatingSe, precisionLabel } from './format';
+import {
+  EN_DASH,
+  esc,
+  fmtDate,
+  fmtDatePrecision,
+  fmtIndex,
+  fmtNumber,
+  fmtRating,
+  fmtRatingSe,
+  pluralise,
+  precisionLabel,
+} from './format';
 
-const COLUMNS = 6;
+/** Header columns: #, Model, Rating, Index, Benchmarks used, Released, Age (the last one is added here). */
+const COLUMNS = 7;
+
+/** Mean Gregorian month — the unit of the Age column. */
+const DAYS_PER_MONTH = 365.25 / 12;
+
+/** The comparability window the tooltip quotes (REDESIGN §12.5). */
+const NEIGHBOUR_MONTHS = 18;
+
+/**
+ * Age of a release as of a date, in whole months — `null` under one month, which the column
+ * prints as "new". Negative ages cannot occur: the rankings only list releases ≤ asOf.
+ */
+export function ageMonths(released: ISODate, asOf: ISODate): number | null {
+  const months = Math.floor(daysBetween(released, asOf) / DAYS_PER_MONTH);
+  return months < 1 ? null : months;
+}
+
+/**
+ * The Age cell: "new" under a month, else `14 mo`.
+ *
+ * The tooltip only quotes a day count when the dataset actually knows the day. `date_precision`
+ * says how sure the release date is, and the Released cell two columns to the left already prints
+ * "month precision" — an exact "438 days since release" next to it claimed a precision the data
+ * rules forbid us to invent, so a month/quarter/year-dated release gets a hedged month figure and
+ * the precision it rests on.
+ */
+function ageCell(released: ISODate, asOf: ISODate, precision: DatePrecision): string {
+  const months = ageMonths(released, asOf);
+  const stamp = `as of ${fmtDate(asOf)}`;
+  const hedge =
+    precision === 'unknown'
+      ? 'the launch date was never pinned down'
+      : `the launch date is only known to the ${precision}`;
+  const title =
+    precision === 'day'
+      ? `${pluralise(daysBetween(released, asOf), 'day')} since release, ${stamp}`
+      : months === null
+        ? `less than a month since release, ${stamp} (${hedge})`
+        : `about ${pluralise(months, 'month')} since release, ${stamp} (${hedge})`;
+  return months === null
+    ? `<td class="num rank-age"><span class="rank-age__new" title="${esc(title)}">new</span></td>`
+    : `<td class="num rank-age"><span title="${esc(title)}">${months}<small>mo</small></span></td>`;
+}
+
+/** The coverage tooltip: what the Rasch comparison for this model actually rests on. */
+function coverageTitle(cmp: Comparability | undefined): string {
+  if (!cmp) return 'Not in the current fit — no shared-benchmark comparison to report.';
+  if (cmp.neighbours === 0) return `No frontier neighbour within ±${NEIGHBOUR_MONTHS} months — compared only through the fit’s δ.`;
+  return `Shares ${pluralise(cmp.shared, 'benchmark')} with ${pluralise(cmp.neighbours, 'frontier neighbour')} (±${NEIGHBOUR_MONTHS} months)`;
+}
+
+/**
+ * `index.html` ships the six static columns; the Age header is appended here so the markup and
+ * `COLUMNS` cannot drift apart. Idempotent — the header is added once and reused.
+ */
+function ensureAgeHeader(table: HTMLTableElement): void {
+  const row = table.tHead?.rows[0];
+  if (!row || row.querySelector('[data-col="age"]')) return;
+  const th = el('th', { scope: 'col', class: 'num', 'data-col': 'age', text: 'Age' });
+  th.title = 'Months since release, as of the scrubbed date';
+  row.append(th);
+}
 
 const TIER_OPTIONS: { value: TierView; label: string; title: string }[] = [
   { value: 'flagship', label: 'Flagship', title: 'Only each lab’s most capable tier' },
@@ -68,6 +141,7 @@ export function renderRankings(ctx: Ctx, c: Computed, store: Store, onSelect: (i
   syncFilter(store);
 
   const table = qs<HTMLTableElement>('[data-rankings]');
+  ensureAgeHeader(table);
   const body = table.tBodies[0];
   if (!body) return;
   clear(body);
@@ -94,6 +168,9 @@ export function renderRankings(ctx: Ctx, c: Computed, store: Store, onSelect: (i
   }
 
   const basket = ctx.indexBenchmarks;
+  // Shared-benchmark comparability of every fitted model with its ±18-month frontier neighbours,
+  // computed once per render from the same fit the rankings come from (REDESIGN §12.5).
+  const cmp = comparability(c.fit, ctx.bundle.releases, { asOf: c.asOf, windowMonths: NEIGHBOUR_MONTHS });
   // `rankCurrentFlagships` returns qualified first, then provisional, so one divider before the
   // first provisional row is enough. Rank numbers keep counting straight through it.
   let dividerDone = false;
@@ -122,6 +199,10 @@ export function renderRankings(ctx: Ctx, c: Computed, store: Store, onSelect: (i
       .join('');
 
     const tier = mi.tier;
+    // `rank-model__meta` is hidden above 720 px (panels.css). On a phone the Index, Benchmarks-used
+    // and Released columns are dropped — seven columns will not fit in 354 px, and the chip list
+    // alone made every row ~300 px tall — so coverage and the release date, at the precision the
+    // dataset actually claims, ride along inside the model cell instead of scrolling off the edge.
     const tr = el('tr');
     tr.tabIndex = 0;
     tr.setAttribute('role', 'button');
@@ -136,13 +217,17 @@ export function renderRankings(ctx: Ctx, c: Computed, store: Store, onSelect: (i
         <span><span class="rank-model__name">${esc(release.name)}</span>${
           tier === 'flagship' ? '' : ` ${badge('tier', tier)}`
         }${mi.qualified ? '' : ` ${badge('provisional', 'provisional')}`}<br />
-        <span class="rank-model__lab">${esc(lab?.short ?? mi.lab)}</span></span></span></td>` +
+        <span class="rank-model__lab">${esc(lab?.short ?? mi.lab)}</span>
+        <small class="rank-model__meta">${mi.n} of ${basket.length} · ${esc(
+          fmtDatePrecision(release.date, release.date_precision),
+        )}</small></span></span></td>` +
       `<td class="num"><span class="rank-rating">${esc(fmtRating(mi.rating))}</span><span class="rank-se">${esc(fmtRatingSe(mi.se))}</span></td>` +
       `<td class="num"><span class="rank-index">${fmtIndex(mi.index)}</span></td>` +
-      `<td><span class="rank-coverage">${mi.n}/${basket.length}
+      `<td><span class="rank-coverage" title="${esc(coverageTitle(cmp.get(mi.release_id)))}">${mi.n}/${basket.length}
         <span class="coverage-bar"><span style="width:${(mi.coverage * 100).toFixed(0)}%"></span></span></span>
         <span class="bchips">${chips}</span></td>` +
-      `<td class="rank-date">${esc(fmtDate(release.date))}<small>${esc(precisionLabel(release.date_precision))}</small></td>`;
+      `<td class="rank-date">${esc(fmtDate(release.date))}<small>${esc(precisionLabel(release.date_precision))}</small></td>` +
+      ageCell(release.date, c.asOf, release.date_precision);
 
     tr.addEventListener('click', () => onSelect(mi.release_id));
     tr.addEventListener('keydown', (ev) => {

@@ -6,15 +6,26 @@
  * nothing while the reader is typing in a field (the date pill is one), and nothing while a
  * modal is open except closing it.
  */
+import type { LabId } from '@agi/shared';
 import type { Store } from '../state';
 import { announce, el, maybe } from '../dom';
+import { ZOOM_IN, ZOOM_OUT } from './controls';
 
 export interface ShortcutRow {
   keys: string[];
   action: string;
+  /**
+   * `chord`: every key is held together ("Ctrl + Shift + scroll"). Without it the row reads as
+   * alternatives ("+ / −"), except a three-key row whose first key is a modifier ("Shift + ← / →").
+   */
+  chord?: boolean;
 }
 
-/** The one list — the sheet renders it and the handler below implements exactly these. */
+/**
+ * The one list — the sheet renders it and the handler below implements exactly these keys. The
+ * mouse rows (wheel, click) are listed here too because this sheet is where readers look for
+ * "how do I zoom": the chart itself only captures the wheel with Ctrl + Shift (REDESIGN §12.1).
+ */
 export const SHORTCUTS: ShortcutRow[] = [
   { keys: ['R'], action: 'Frontier Rating axis' },
   { keys: ['I'], action: 'Frontier Index axis' },
@@ -23,13 +34,21 @@ export const SHORTCUTS: ShortcutRow[] = [
   { keys: ['B'], action: 'Family bands on / off' },
   { keys: ['T'], action: 'Tiers — flagship only / all tiers' },
   { keys: ['0'], action: 'Fit the axes to the visible data' },
-  { keys: ['Esc'], action: 'Reset the zoom (or close this sheet)' },
+  { keys: ['Esc'], action: 'Unpin the family, then reset the zoom' },
   { keys: ['←', '→'], action: 'Move NOW by 30 days' },
   { keys: ['Shift', '←', '→'], action: 'Move NOW by one year' },
   { keys: ['Home'], action: 'Back to today' },
-  { keys: ['+', '−'], action: 'Zoom the time axis in / out' },
+  { keys: ['+', '−'], action: 'Zoom in / out (both axes)' },
+  { keys: ['Ctrl', 'Shift', 'scroll'], action: 'Zoom the chart · scroll alone moves the page', chord: true },
+  { keys: ['Click'], action: 'Click a family to pin it · Esc unpins' },
   { keys: ['?'], action: 'This sheet' },
 ];
+
+/** The separator between two keys of a row, by the row's reading (see `ShortcutRow.chord`). */
+export function keySeparator(row: ShortcutRow, index: number): string {
+  if (row.chord) return '+';
+  return row.keys.length > 2 && index === 1 ? '+' : '/';
+}
 
 export interface ShortcutSheet {
   open(): void;
@@ -52,7 +71,7 @@ export function createShortcutSheet(): ShortcutSheet {
   for (const row of SHORTCUTS) {
     const dt = el('dt');
     row.keys.forEach((k, i) => {
-      if (i > 0) dt.append(el('span', { class: 'sheet__plus', text: row.keys.length > 2 && i === 1 ? '+' : '/' }));
+      if (i > 0) dt.append(el('span', { class: 'sheet__plus', text: keySeparator(row, i) }));
       dt.append(el('kbd', { text: k }));
     });
     list.append(dt, el('dd', { text: row.action }));
@@ -60,7 +79,9 @@ export function createShortcutSheet(): ShortcutSheet {
 
   const foot = el('p', {
     class: 'sheet__foot',
-    text: 'Shortcuts are ignored while you are typing. On the chart itself: drag to pan, wheel to zoom time, shift + wheel to zoom the axis, and drag the NOW rule to replay the past.',
+    text:
+      'Shortcuts are ignored while you are typing. On the chart itself: drag to pan, Ctrl + Shift + scroll to zoom both axes ' +
+      '(Ctrl + scroll: time only, Shift + scroll: rating only), plain scroll moves the page, and drag the NOW rule to replay the past.',
   });
 
   dialog.append(head, list, foot);
@@ -106,19 +127,52 @@ function typing(target: EventTarget | null): boolean {
 export function attachShortcuts(deps: ShortcutDeps): () => void {
   const { store, sheet } = deps;
 
+  /**
+   * Escape has two owners on this page and exactly one of them may act per press (REDESIGN §12.2).
+   *
+   * The chart (`chart/index.ts`) releases the pinned family and consumes the event; this handler
+   * resets the zoom. Both listen on `document` in the bubble phase and the chart's is registered
+   * first (`createChart` runs before `attachShortcuts` in main.ts), so by the time we look
+   * `store.pinnedLab` is already `null` — reading it here is what made one press unpin *and*
+   * reset. `pinnedAtKeydown` is the store's own answer, asked in the capture phase before any
+   * bubble listener has touched it: not a second copy of the state, just an earlier read of it.
+   *
+   * That keeps the contract true from both sides: if the chart consumes the press
+   * (`preventDefault`) we still know why, and if it ever stops consuming it we still do not reset.
+   */
+  let pinnedAtKeydown: LabId | null = null;
+  const onKeyCapture = (ev: KeyboardEvent): void => {
+    if (ev.key === 'Escape') pinnedAtKeydown = store.get().pinnedLab;
+  };
+
   const onKey = (ev: KeyboardEvent): void => {
-    if (ev.defaultPrevented || ev.metaKey || ev.ctrlKey || ev.altKey) return;
+    if (ev.metaKey || ev.ctrlKey || ev.altKey) return;
     if (typing(ev.target)) return;
 
     if (ev.key === 'Escape') {
-      // Native <dialog> already closes itself; the drawer handles its own Escape. Anything left
-      // over means "reset the chart".
+      const pinned = pinnedAtKeydown;
+      pinnedAtKeydown = null;
+      // Native <dialog> already closes itself; the drawer, the tour and the mobile control sheet
+      // handle their own Escape. Anything left over means "the chart".
       if (sheet.isOpen()) return;
       if (!maybe('[data-drawer]')?.hidden) return;
+      // A pinned family is the more local state: this press was spent releasing it (by the chart,
+      // or here if the chart is not listening), the next one resets the zoom.
+      if (pinned !== null) {
+        store.setPinLab(null);
+        // Mirror the chart: the hover focus the pin carried goes with it, so the family falls
+        // quiet at once and the next pointer move decides afresh.
+        store.setHoverLab(null);
+        announce('Family unpinned');
+        ev.preventDefault();
+        return;
+      }
+      if (ev.defaultPrevented) return;
       deps.reset();
       announce('Zoom reset');
       return;
     }
+    if (ev.defaultPrevented) return;
     if (sheet.isOpen()) return;
 
     const hit = (msg: string): void => {
@@ -185,20 +239,25 @@ export function attachShortcuts(deps: ShortcutDeps): () => void {
         store.backToToday();
         hit('Back to today');
         return;
+      // Same step as the +/− buttons so a key press and a click land on the same view.
       case '+':
       case '=':
-        deps.zoom(1.4);
-        ev.preventDefault();
+        deps.zoom(ZOOM_IN);
+        hit('Zoomed in, both axes');
         return;
       case '-':
       case '_':
-        deps.zoom(1 / 1.4);
-        ev.preventDefault();
+        deps.zoom(ZOOM_OUT);
+        hit('Zoomed out, both axes');
         return;
       default:
     }
   };
 
+  document.addEventListener('keydown', onKeyCapture, true);
   document.addEventListener('keydown', onKey);
-  return () => document.removeEventListener('keydown', onKey);
+  return () => {
+    document.removeEventListener('keydown', onKeyCapture, true);
+    document.removeEventListener('keydown', onKey);
+  };
 }
