@@ -612,3 +612,58 @@ default, daily once we have 10 visitors a day, graded nicely."
 - **Tests.** Parser (forwarded-for with several addresses takes the first; bots dropped; day
   boundaries UTC), tier mapping with hysteresis, monthly cap, truncation after ingest (temp file),
   loop gate uses the cadence.
+
+### 12.9 Evidence, not arithmetic: why an old model ranked above new ones (measured 2026-09-08)
+
+The user's objection — "the chart rests on fragmentary benchmark data, and Gemini 3.1 Pro (February
+2026) is already outdated yet ranks near the top" — was tested rather than argued. Three
+measurements, reproducible from `data/` at this commit:
+
+**1. Shrinkage is not the culprit.** The ridge (λ = 0.05) pulls a model's θ toward 0 by
+`λ / (Σw + λ)`. For the ten highest-rated models that is 2–8 rating points — far below the gaps
+being complained about. The estimator is not biased against thin evidence in any meaningful way.
+
+**2. Evidence per model collapsed in the current half-year.**
+
+| half-year | fitted released models | mean index benchmarks per model |
+|---|---|---|
+| 2025-H1 | 15 | 4.5 |
+| 2025-H2 | 18 | 5.7 |
+| 2026-H1 | 13 | 5.5 |
+| **2026-H2** | **8** | **2.6** |
+
+Gemini 3.1 Pro carries 8 benchmarks; GPT-6 Astra and Claude Fable 5.1 carry 3; Grok 4.5 and
+Grok 4.6 carry **one each — LMArena and nothing else**. The standard errors say the same thing:
+Gemini 3.1 Pro is 1298 ± 36 while GLM-5.3 is 1292 ± 72 and Kimi K3 is 1269 ± 51. Those are ties,
+and the ranking presented them as an order. The scale itself is sound — every 2026-H2 flagship
+shares 2–4 benchmarks with Gemini 3.1 Pro, so the cohorts are properly linked in the Rasch sense —
+but a list ordered by a point estimate hides that the data cannot separate the top of it.
+
+**3. The real cause is missing releases, not missing maths.** Matching the live LMArena
+leaderboard against `data/models`: **23 of the arena's top 45 models are absent from the
+dataset** — Google 6 (Gemini 3.5 / 3.6 / 3.7 / 3.8 Flash), Anthropic 5 (Claude Opus 4.7, Opus 5,
+Sonnet 4.6), SpaceXAI 3 (Grok 4.20 betas), Meta 2 (Muse Spark 1.1 / 1.2), OpenAI 2, Alibaba 2,
+plus Z.ai, Xiaomi and Baidu. Gemini 3.1 Pro leads Google's row for the simple reason that it is
+the newest Google model the dataset knows about; the researcher dropped Gemini 3.8 Flash and
+Gemini 3.5 Flash-Lite as "no usable date" because it was reading a model *overview* page instead
+of a launch post (fixed in §12.6). So the chart is thin because the researcher is under-fed, and
+the cure is more research, not a different estimator — which is also why the traffic-scaled
+cadence of §12.8 matters more than it first appears.
+
+**T48 — rank honestly (web-ui + shared).**
+- `rankTies(models)`: consecutive models whose 68 % rating intervals overlap form one **tied
+  group**; the rankings table numbers the group once (`=4`) and draws a hairline bracket down its
+  rows, with the caption "the data cannot separate these".
+- Every row shows its evidence weight: the benchmark count as a small bar (1 of 8 filled …), and
+  a row whose only evidence is LMArena is labelled **"community Elo only"** rather than merely
+  "provisional" — a single Elo score is a different kind of claim from three official test scores.
+- The rating column keeps `± 173.72 · se`; sorting stays by the point estimate (any other order
+  invites a different complaint), but the tie brackets make the uncertainty impossible to miss.
+- The Method copy gains one paragraph with the table above: the honest statement that the newest
+  cohort is measured by a third of the evidence of the one before it, and that the site's answer
+  is to research harder, not to guess.
+
+**T46 (already queued) is the cure**, and its priority rises accordingly: a full, non-incremental
+`backfill` over all ten labs (≈ 3.3 USD) plus the §12.6 discovery fixes should close most of the
+23-model gap. The arena step already writes `lmarena-text` for anything it can match, so every
+release the backfill adds immediately gains a community Elo too.
