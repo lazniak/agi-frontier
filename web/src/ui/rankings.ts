@@ -332,7 +332,7 @@ export function renderRankings(ctx: Ctx, c: Computed, store: Store, onSelect: (i
     tr.className = classes.join(' ');
     tr.setAttribute(
       'aria-label',
-      `Audit ${release.name}, ${row.tied ? `joint rank ${row.rank} of ${row.size} tied models` : `rank ${row.rank}`}` +
+      `Audit ${release.name}, ${row.tied ? `joint rank ${row.rank}, one of ${row.size} tied models` : `rank ${row.rank}`}` +
         `, rating ${fmtRating(mi.rating)} plus or minus ${margin}` +
         `, ${pluralise(evidence.n, 'index benchmark')}${evidence.label ? `, ${evidence.label}` : ''}` +
         `${mi.qualified ? '' : ', provisional'}`,
