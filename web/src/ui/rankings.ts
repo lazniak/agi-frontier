@@ -5,9 +5,23 @@
  * what the chart draws (REDESIGN §3): `flagship` ranks each lab's most capable tier, `all` ranks
  * whatever each lab shipped most recently and adds a one-line summary of the family band under
  * the lab's row.
+ *
+ * The table is honest about the two things a league table normally hides (REDESIGN §12.9): rows
+ * the data cannot separate share one rank inside a hairline bracket, and every row reports how
+ * much evidence its rating rests on, because a rating fitted from one community Elo score is a
+ * different kind of claim from one fitted from five official test results.
  */
-import { MIN_QUALIFIED_SCORES, comparability, daysBetween } from '@agi/shared';
-import type { Comparability, DatePrecision, ISODate, LabId, ModelIndex, ModelTier } from '@agi/shared';
+import { MIN_QUALIFIED_SCORES, comparability, daysBetween, evidenceOf, rankTies, ratingMargin } from '@agi/shared';
+import type {
+  Comparability,
+  DatePrecision,
+  Evidence,
+  ISODate,
+  LabId,
+  ModelIndex,
+  ModelTier,
+  TieGroup,
+} from '@agi/shared';
 import type { Computed, Ctx, SeriesPoint } from '../data';
 import { announce, badge, clear, el, maybe, qs } from '../dom';
 import type { Store, TierView } from '../state';
@@ -19,7 +33,6 @@ import {
   fmtIndex,
   fmtNumber,
   fmtRating,
-  fmtRatingSe,
   pluralise,
   precisionLabel,
 } from './format';
@@ -32,6 +45,9 @@ const DAYS_PER_MONTH = 365.25 / 12;
 
 /** The comparability window the tooltip quotes (REDESIGN §12.5). */
 const NEIGHBOUR_MONTHS = 18;
+
+/** The nominal coverage of `TIE_Z` (= 1 standard error), spelled out for the reader. */
+const TIE_COVERAGE = '68 %';
 
 /**
  * Age of a release as of a date, in whole months — `null` under one month, which the column
@@ -74,6 +90,88 @@ function coverageTitle(cmp: Comparability | undefined): string {
   if (!cmp) return 'Not in the current fit — no shared-benchmark comparison to report.';
   if (cmp.neighbours === 0) return `No frontier neighbour within ±${NEIGHBOUR_MONTHS} months — compared only through the fit’s δ.`;
   return `Shares ${pluralise(cmp.shared, 'benchmark')} with ${pluralise(cmp.neighbours, 'frontier neighbour')} (±${NEIGHBOUR_MONTHS} months)`;
+}
+
+/**
+ * The ranks of one rendering, tie groups included.
+ *
+ * `rankCurrentFlagships` returns qualified models first and provisional ones after, each block
+ * sorted by index — so the whole array is *not* descending in rating, and `rankTies` (which
+ * requires a descending list) has to be asked one block at a time. Grouping across the divider
+ * would be meaningless anyway: the divider already says the two blocks rest on different amounts
+ * of evidence. The provisional ranks are offset by the size of the first block so the numbers
+ * keep counting straight through the divider, exactly as they did before.
+ */
+function rankGroups(rows: ModelIndex[]): TieGroup[] {
+  const qualified = rows.filter((m) => m.qualified);
+  const provisional = rows.filter((m) => !m.qualified);
+  return [
+    ...rankTies(qualified),
+    ...rankTies(provisional).map((g) => ({ ...g, rank: g.rank + qualified.length })),
+  ];
+}
+
+/** One rendered row: the model plus where it sits inside its tie group. */
+interface RankedRow {
+  mi: ModelIndex;
+  /** The rank shown for the whole group; ranks skip after a tie. */
+  rank: number;
+  tied: boolean;
+  /** 0-based position inside the group, and the group's size. */
+  pos: number;
+  size: number;
+}
+
+function flattenGroups(groups: TieGroup[]): RankedRow[] {
+  return groups.flatMap((g) =>
+    g.members.map((mi, pos) => ({ mi, rank: g.rank, tied: g.tied, pos, size: g.members.length })),
+  );
+}
+
+/**
+ * The rank cell. A tied group prints `=2` once and leaves its continuation rows blank, the way a
+ * league table does — but blank is invisible to a screen reader walking the table cell by cell,
+ * so every row carries the joint rank as a visually-hidden phrase.
+ */
+function rankCell(row: RankedRow): string {
+  if (!row.tied) return `<td class="num rank-cell-rank">${row.rank}</td>`;
+  const shared = `joint rank ${row.rank}, ${pluralise(row.size, 'model')} tied`;
+  const shown = row.pos === 0 ? `<span aria-hidden="true">=${row.rank}</span>` : '';
+  return `<td class="num rank-cell-rank">${shown}<span class="visually-hidden">${esc(shared)}</span></td>`;
+}
+
+/** How the rating interval reads in prose, for the ± tooltip and the row's accessible name. */
+function marginTitle(mi: ModelIndex, margin: number): string {
+  const lo = fmtRating(mi.rating - margin);
+  const hi = fmtRating(mi.rating + margin);
+  return `${TIE_COVERAGE} interval: ${lo} ${EN_DASH} ${hi}. Models whose intervals overlap share a rank.`;
+}
+
+/**
+ * The evidence meter: one slot per index benchmark, lit for the ones the fit actually used. A
+ * bar filled to a percentage cannot distinguish "one score of nineteen" from "two of nineteen"
+ * at this size, and that difference is the whole point of the column.
+ */
+function evidenceDots(mi: ModelIndex, basket: number, e: Evidence): string {
+  const weak = e.kind === 'community-only' || e.kind === 'none';
+  const dots = Array.from({ length: basket }, (_, i) =>
+    i < mi.n ? `<span class="edot edot--on${weak ? ' edot--weak' : ''}"></span>` : '<span class="edot"></span>',
+  ).join('');
+  return `<span class="edots" aria-hidden="true">${dots}</span>`;
+}
+
+/** What the evidence cell says on hover: how many benchmarks, of what kind, against what. */
+function evidenceTitle(e: Evidence, basket: number, cmp: Comparability | undefined): string {
+  if (e.n === 0) return `No index benchmark backs this rating. ${coverageTitle(cmp)}`;
+  const kind =
+    e.community === 0
+      ? 'all of them official test results'
+      : e.community === e.n
+        ? e.n === 1
+          ? 'and it is a community Elo score, not a test result'
+          : 'all of them community Elo scores, not test results'
+        : `${e.community} of them community Elo`;
+  return `Fitted from ${pluralise(e.n, 'index benchmark')} of ${basket}, ${kind}. ${coverageTitle(cmp)}`;
 }
 
 /**
@@ -151,9 +249,16 @@ export function renderRankings(ctx: Ctx, c: Computed, store: Store, onSelect: (i
 
   const caption = maybe('[data-rankings-note]');
   if (caption) {
-    caption.textContent = showAll
-      ? 'The newest released model per lab, whatever its tier, ranked by Frontier Rating. Mid and small models carry a tier badge and a family line showing the lab’s current lineup. Select a row to open its audit.'
-      : 'The newest released flagship per lab, ranked by Frontier Rating — 400 points is ten times the odds of solving an average basket item. Coverage is how many index benchmarks the lab reported. Select a row to open its audit.';
+    const lead = showAll
+      ? 'The newest released model per lab, whatever its tier, ranked by Frontier Rating. Mid and small models carry a tier badge and a family line showing the lab’s current lineup.'
+      : 'The newest released flagship per lab, ranked by Frontier Rating — 400 points is ten times the odds of solving an average basket item.';
+    // The two sentences the order itself cannot say: where it is not supported, and how much
+    // evidence each row rests on (REDESIGN §12.9).
+    caption.textContent =
+      `${lead} Rows bracketed together share a rank (=2): their ${TIE_COVERAGE} rating intervals — ` +
+      `the ± beside each rating — overlap, so the data cannot separate them. Evidence counts the ` +
+      `index benchmarks the rating was fitted from, and flags a rating resting on community Elo ` +
+      `alone. Select a row to open its audit.`;
   }
 
   if (rows.length === 0) {
@@ -171,16 +276,23 @@ export function renderRankings(ctx: Ctx, c: Computed, store: Store, onSelect: (i
   // Shared-benchmark comparability of every fitted model with its ±18-month frontier neighbours,
   // computed once per render from the same fit the rankings come from (REDESIGN §12.5).
   const cmp = comparability(c.fit, ctx.bundle.releases, { asOf: c.asOf, windowMonths: NEIGHBOUR_MONTHS });
+  // Which benchmarks are community-run rather than a test the lab sat: the flag travels on the
+  // bundle, so LMArena is never hardcoded here (CLAUDE.md, data rules).
+  const community = new Set(ctx.benchmarkList.filter((b) => b.community).map((b) => b.id));
   // `rankCurrentFlagships` returns qualified first, then provisional, so one divider before the
   // first provisional row is enough. Rank numbers keep counting straight through it.
   let dividerDone = false;
   const familyDone = new Set<LabId>();
+  const ranked = flattenGroups(rankGroups(rows));
 
-  rows.forEach((mi, i) => {
+  ranked.forEach((row) => {
+    const mi = row.mi;
     const release = ctx.releasesById.get(mi.release_id);
     if (!release) return;
     const lab = ctx.labs.get(mi.lab);
     const used = new Map(mi.used.map((u) => [u.benchmark, u]));
+    const evidence = evidenceOf(mi, community);
+    const margin = Math.round(ratingMargin(mi));
 
     if (!mi.qualified && !dividerDone) {
       dividerDone = true;
@@ -206,25 +318,43 @@ export function renderRankings(ctx: Ctx, c: Computed, store: Store, onSelect: (i
     const tr = el('tr');
     tr.tabIndex = 0;
     tr.setAttribute('role', 'button');
-    if (!mi.qualified) tr.className = 'rank-row--provisional';
+    // The evidence warning rides in the model cell, not the evidence column, because that column
+    // is one of the three a phone drops — and "this rating is one community Elo score" is exactly
+    // the caveat a reader must not lose on the narrow layout.
+    const flag = evidence.label ? ` ${badge('evidence', esc(evidence.label))}` : '';
+    const classes = ['rank-row'];
+    if (!mi.qualified) classes.push('rank-row--provisional');
+    if (row.tied) {
+      classes.push('rank-row--tied');
+      if (row.pos === 0) classes.push('is-tie-start');
+      if (row.pos === row.size - 1) classes.push('is-tie-end');
+    }
+    tr.className = classes.join(' ');
     tr.setAttribute(
       'aria-label',
-      `Audit ${release.name}, rank ${i + 1}, rating ${fmtRating(mi.rating)}${mi.qualified ? '' : ', provisional'}`,
+      `Audit ${release.name}, ${row.tied ? `joint rank ${row.rank} of ${row.size} tied models` : `rank ${row.rank}`}` +
+        `, rating ${fmtRating(mi.rating)} plus or minus ${margin}` +
+        `, ${pluralise(evidence.n, 'index benchmark')}${evidence.label ? `, ${evidence.label}` : ''}` +
+        `${mi.qualified ? '' : ', provisional'}`,
     );
     tr.innerHTML =
-      `<td class="num rank-cell-rank">${i + 1}</td>` +
+      rankCell(row) +
       `<td><span class="rank-model"><span class="rank-dot" style="background:${esc(lab?.color ?? '#111')}"></span>
         <span><span class="rank-model__name">${esc(release.name)}</span>${
           tier === 'flagship' ? '' : ` ${badge('tier', tier)}`
-        }${mi.qualified ? '' : ` ${badge('provisional', 'provisional')}`}<br />
+        }${mi.qualified ? '' : ` ${badge('provisional', 'provisional')}`}${flag}<br />
         <span class="rank-model__lab">${esc(lab?.short ?? mi.lab)}</span>
         <small class="rank-model__meta">${mi.n} of ${basket.length} · ${esc(
           fmtDatePrecision(release.date, release.date_precision),
         )}</small></span></span></td>` +
-      `<td class="num"><span class="rank-rating">${esc(fmtRating(mi.rating))}</span><span class="rank-se">${esc(fmtRatingSe(mi.se))}</span></td>` +
+      `<td class="num"><span class="rank-rating">${esc(fmtRating(mi.rating))}</span><span class="rank-se" title="${esc(
+        marginTitle(mi, margin),
+      )}">± ${margin}</span></td>` +
       `<td class="num"><span class="rank-index">${fmtIndex(mi.index)}</span></td>` +
-      `<td><span class="rank-coverage" title="${esc(coverageTitle(cmp.get(mi.release_id)))}">${mi.n}/${basket.length}
-        <span class="coverage-bar"><span style="width:${(mi.coverage * 100).toFixed(0)}%"></span></span></span>
+      `<td><span class="rank-coverage rank-evidence" title="${esc(
+        evidenceTitle(evidence, basket.length, cmp.get(mi.release_id)),
+      )}"><span class="rank-evidence__n">${evidence.n}</span><small>of ${basket.length}</small>
+        ${evidenceDots(mi, basket.length, evidence)}</span>
         <span class="bchips">${chips}</span></td>` +
       `<td class="rank-date">${esc(fmtDate(release.date))}<small>${esc(precisionLabel(release.date_precision))}</small></td>` +
       ageCell(release.date, c.asOf, release.date_precision);
@@ -246,7 +376,10 @@ export function renderRankings(ctx: Ctx, c: Computed, store: Store, onSelect: (i
         const ratings = family.map((p) => p.mi.rating);
         const lo = Math.min(...ratings);
         const hi = Math.max(...ratings);
-        const line = el('tr', { class: 'rank-family' });
+        // A family line inserted between two tied rows would cut their bracket in half, so it
+        // carries the bracket through itself instead.
+        const inside = row.tied && row.pos < row.size - 1;
+        const line = el('tr', { class: `rank-family${inside ? ' rank-row--tied is-tie-mid' : ''}` });
         line.innerHTML =
           `<td colspan="${COLUMNS}">Family: ${family.length} models · band ${esc(fmtRating(lo))} ${EN_DASH} ${esc(fmtRating(hi))}` +
           ` · ${esc(family.map((p) => p.release.name).join(', '))}</td>`;

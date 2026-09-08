@@ -295,6 +295,57 @@
               backtest earned. Scrubbing back in time re-runs the whole fit as of that date, which is how
               you check whether the forecast would have called what actually happened.
             </p>
+            <p class="method-copy">
+              A rating is only as strong as the evidence under it, and the evidence has thinned. A
+              model released in the first half of 2026 carries a mean of 5.5 index benchmarks; a
+              model released since July carries 2.6, and some 2026 H2 flagships carry exactly one
+              score — an LMArena Elo, which is a vote count rather than a test result. Two models a
+              hundred rating points apart can therefore be statistically indistinguishable, so the
+              rankings bracket rows the data cannot separate under a shared rank and report the
+              evidence each rating rests on instead of an order alone.
+            </p>
+            <div class="method-table">
+              <table>
+                <caption>
+                  Index benchmarks per released model, by half-year. Measured 8 Sep 2026.
+                </caption>
+                <thead>
+                  <tr>
+                    <th scope="col">Released</th>
+                    <th scope="col" class="num">Models</th>
+                    <th scope="col" class="num">Index benchmarks each</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope="row">2025 H1</th>
+                    <td class="num">15</td>
+                    <td class="num">4.5</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">2025 H2</th>
+                    <td class="num">18</td>
+                    <td class="num">5.7</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">2026 H1</th>
+                    <td class="num">13</td>
+                    <td class="num">5.5</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">2026 H2</th>
+                    <td class="num">8</td>
+                    <td class="num">2.6</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p class="method-copy">
+              The dataset is also behind the field: on 8 Sep 2026, 23 of the LMArena top 45 models
+              were not in it at all. The newest model a lab has here can lead its family without being that lab's
+              newest model in the world, and a lab whose latest release has one score sits on a
+              wider interval than one whose latest release has seven.
+            </p>
             <div class="lifetimes" data-lifetimes aria-label="Benchmark lifetimes"></div>
             <p>
               <a class="link-out" href="/paper.html">Read the paper — the standard in full</a>

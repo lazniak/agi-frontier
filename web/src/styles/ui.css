@@ -290,24 +290,6 @@
   color: var(--ink-2);
 }
 
-.coverage-bar {
-  display: inline-block;
-  width: 42px;
-  height: 3px;
-  border-radius: 2px;
-  background: var(--hair-soft);
-  margin-left: 8px;
-  vertical-align: middle;
-  overflow: hidden;
-}
-
-.coverage-bar span {
-  display: block;
-  height: 100%;
-  background: var(--ink-1);
-  opacity: 0.5;
-}
-
 .bchips {
   display: flex;
   gap: 3px;

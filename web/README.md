@@ -130,6 +130,7 @@ Nothing numeric is implemented here. `src/data.ts` calls, and only calls, `@agi/
 | “+1.1 logits / yr”, “odds double every 7.3 months” | `frontierVelocity`, `frontierPace` |
 | the coloured band under the x axis | `leadershipStripes` |
 | the rankings table and its tier filter | `rankCurrentFlagships` |
+| the shared ranks, the ± beside each rating, and the evidence a rating rests on | `rankTies`, `ratingMargin`, `evidenceOf` |
 | the level ladder, the trend, the crossings, the eras | `benchmarkLevels`, `frontierTrend`, `frontierCrossings`, `paceEras` |
 | the dotted grey rungs above the ceiling | `speculativeLevels` |
 | the grey/yellow frontier continuation | `frontierFan` |
@@ -352,11 +353,27 @@ overdue since …" once it is more than two intervals late.
 - **Rankings** (`ui/rankings.ts`) lead with the rating (± 173.72·se) and carry the tier filter,
   which is bound to the same `store.tierView` the chart uses. Columns are #, Model, Rating,
   Index, Benchmarks used, Released and **Age** (whole months since release, "new" under one
-  month) — an old model at the top of a lab's row is a fact worth seeing. The benchmark-count
-  cell's tooltip comes from `comparability`: how many index benchmarks the model shares with the
-  fitted flagships released within ±18 months of it, i.e. what its Rasch comparison actually
-  rests on. Under `All tiers` each lab's best row is followed by a family line ("Family: 3
-  models · band 1 180 – 1 305") built from the lab's current lineup.
+  month) — an old model at the top of a lab's row is a fact worth seeing. Under `All tiers` each
+  lab's best row is followed by a family line ("Family: 3 models · band 1 180 – 1 305") built
+  from the lab's current lineup.
+  - **Ties** (REDESIGN §12.9). Models whose 68 % rating intervals overlap cannot be ordered by
+    this data, so `rankTies` groups them: the group prints its rank once as `=2`, its
+    continuation rows leave the cell blank, and a hairline bracket down the left margin says how
+    far the tie runs (`.rank-row--tied` plus `is-tie-start` / `is-tie-end` in `panels.css`; a
+    family line landing inside a group carries the bracket through itself). Blank cells are
+    invisible to a screen reader, so every row of a group also carries "joint rank 2, 3 models
+    tied" as visually-hidden text, and the row's own `aria-label` says the same.
+  - **Evidence.** `rankTies` is asked one block at a time — `rankCurrentFlagships` returns
+    qualified models first and provisional ones after, so the array as a whole is not descending
+    in rating — and the provisional ranks are offset so the numbers still count straight through
+    the divider. The Benchmarks-used cell reports `evidenceOf`: the count, a strip of one slot
+    per index benchmark lit for the ones the fit used (a percentage-width bar cannot tell one of
+    nineteen from two), and, when the rating rests on community benchmarks alone, a "community
+    Elo only" chip. The chip rides in the *model* cell, which the narrow layout keeps. Community
+    benchmarks are those flagged `community` in `benchmarks.json`, read off the bundle — LMArena
+    is never named in the web code. The cell's tooltip still ends with `comparability`: how many
+    index benchmarks the model shares with the fitted flagships released within ±18 months of
+    it, i.e. what its Rasch comparison actually rests on.
 
 ### The paper page
 
