@@ -7,6 +7,7 @@ export * from './rating';
 export * from './stages';
 export * from './prediction';
 export * from './lineup';
+export * from './ranking';
 export * from './lifetimes';
 export * from './backtest';
 export * from './bundle';
