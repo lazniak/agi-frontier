@@ -62,6 +62,37 @@ is flagged; LMArena scores are always `maintainer`. Third-party aggregators are 
 When a lab reports several configurations we prefer the one in `preferred_config` (e.g. no
 tools, semi-private set) and always record the configuration actually used.
 
+### 2.1 Benchmark lifetimes
+
+A benchmark is born, gets scored, saturates and is eventually retired. That life is a fact about
+the ruler, not about the models, and the site draws it as a strip under the Method copy
+(`benchmarkLifetimes`, `shared/src/lifetimes.ts`). For every benchmark, as of the viewed date:
+
+| field | meaning |
+|---|---|
+| `introduced` | the year the benchmark was published |
+| `firstScore` | the launch date of the first released model to report it |
+| `nScores` | how many released models report it (one per model, any configuration) |
+| `saturatedAt` | the first release date at which a released model's best **official** score reached 95 % of the benchmark's range (`SATURATION_SHARE`) |
+| `state` | `fresh` · `active` · `saturated` · `legacy` |
+| `delta` | the fitted difficulty δ_b |
+| `coverageOfFrontier` | the share of the flagships released in the last 365 days that report it |
+
+`state` is decided in that order: `legacy` when the curator retired the benchmark in
+`benchmarks.json` — the same flag that keeps it out of the anchor, and the curator's retirement
+beats the data; otherwise `saturated` once `saturatedAt` is set; otherwise `fresh` while it is
+less than a year old (`FRESH_DAYS`); otherwise `active`. Because `introduced` is only a year, the
+introduction date is taken at that year's midpoint, so a 2026 benchmark stays fresh through
+mid-2027. Elo has no ceiling, so **LMArena never saturates**. Saturation is read from `official`
+scores only: it is a statement about what the labs themselves claim. δ is `null` unless some
+fitted model actually reported the benchmark — an unobserved index benchmark sits at exactly 0,
+and that proves nothing. A benchmark whose introduction still lies ahead of the scrub date is
+left out of the strip entirely, unless it already carries a score at that date, in which case the
+observed evidence beats the curator's rounding.
+
+Nothing in the fit depends on this classification; the strip exists so that a reader can see
+which part of the basket was still discriminating when a given model was measured.
+
 ## 3. Frontier Rating and Frontier Index
 
 Averaging raw percentages is biased: a model that only reports easy benchmarks looks better
@@ -107,6 +138,50 @@ the −1 is the mean(δ) = 0 constraint. Each θ carries a standard error from t
 publish every δ_b and every θ_m with its standard error in `latest.json`, and the UI shows
 **coverage** (n reported / n in basket).
 
+**Shared benchmarks — what the fit actually compares.** The intuitive way to compare two models
+is to look at the benchmarks they both reported. The Rasch fit is that comparison generalised: it
+never compares two models directly, it compares each of them with the *items* they reported, and
+the items are shared with their neighbours. Model A and model C may have no benchmark in common
+and still sit on one scale, because both share benchmarks with B. `comparability`
+(`shared/src/lifetimes.ts`) reports, per model, the two numbers this rests on: `neighbours`, the
+fitted flagships released within ±18 months of it, and `shared`, the number of index benchmarks it
+was fitted on that at least one of those neighbours was fitted on too. A model with `shared = 0`
+is floating; the rankings show the count as the coverage tooltip.
+
+This is also why the death of a benchmark costs the scale nothing. When a benchmark saturates it
+stops discriminating, but it does not leave: it stays in the fit as an easy item, and the
+difficulty δ_b it measured — the whole of the information it ever carried — stays with it. The
+models that once needed it are still placed by it; the models that came after are separated by
+the harder items only they report. Retiring a benchmark to `legacy` removes it from the anchor,
+i.e. from the definition of "average current difficulty", and from nothing else.
+
+**How much evidence each rating rests on.** The mechanism above is sound; the data feeding it are
+not evenly thick, and the honest place to say so is here. Measured on 2026-09-08 over the
+published dataset:
+
+| half-year | fitted released models | mean index benchmarks per model |
+|---|---|---|
+| 2025-H1 | 15 | 4.5 |
+| 2025-H2 | 18 | 5.7 |
+| 2026-H1 | 13 | 5.5 |
+| **2026-H2** | **8** | **2.6** |
+
+The newest cohort is measured with about a third of the evidence of the one before it. Some of
+its rows rest on a single community Elo score and nothing else, and at that point a rating is one
+number away from being a guess. The gaps between the top ratings of that cohort are smaller than
+their standard errors, which means the data cannot order them however confidently the table
+prints them; a row's ± is not decoration. The cause is not the estimator — the ridge pulls a
+top-ten θ toward zero by only 2–8 rating points, and every 2026-H2 flagship still shares two to
+four benchmarks with the cohort's highest-rated model, so the cohorts are properly linked in the
+Rasch sense. The cause is missing research: matching the live LMArena leaderboard against
+`data/models` on the same date, **23 of the arena's top 45 models were absent from the dataset
+altogether**, so a lab's row can be led by the newest model the dataset happens to know rather
+than the newest model that exists.
+
+The remedy is therefore more research, not a different scale (§7), and the reader's rule of
+thumb is simple: weigh a row by its benchmark count and its ±, and treat the most recent months
+as provisional until the researcher has caught up with them.
+
 **Frontier Rating.**
 
     R = 1000 + (400 / ln 10) · θ  ≈ 1000 + 173.72 · θ
@@ -133,10 +208,27 @@ the residual to say anything about that model.
 400 points depending on zoom; in index mode the ladder is …10 · 20 · 30 · 50 · 70 · 80 · 90 ·
 95 · 98 · 99…, thinned by pixel distance. The axis pans and zooms; nothing is clamped.
 
-**Family bands.** For each lab the chart fills, in the lab colour at 10 %, the area between the
-current flagship's θ and the lowest θ in the lab's current lineup (latest released model per
-tier as of each date). A lab with one tier has no band. Lower tiers are drawn as small hollow
-markers off the flagship line when "All tiers" is on.
+**Family ribbons.** The chart fills, per lab and in the lab colour, the vertical band between the
+best and the weakest member of that lab's **current family** — the real-data counterpart of the
+forecast fan, and the shape that answers "what is this lab shipping right now" rather than "what
+is its single best number".
+
+`familyRibbon` (`shared/src/lineup.ts`) builds it. At every date on which the lab released
+something (same-day launches collapsing into one knot), the current family is every released,
+fitted model of that lab launched within the trailing **365 days** (`windowDays`); the ribbon's
+upper edge `hiTheta` is the highest θ in that set and its lower edge `loTheta` the lowest, each
+carrying the id of the model that set it. The band is a step path, and a final knot is emitted at
+the scrub date so it can be drawn up to "now". When only one model is current the two edges
+coincide and the ribbon **collapses onto the lab's line** — correctly: a lab with one live model
+has no spread. When the window is empty, i.e. the lab has shipped nothing for over a year, the
+family degenerates to its single latest model and the ribbon collapses rather than vanishing.
+
+The window is the point of the difference from the older lineup band, which keeps one slot per
+tier for ever: a family ribbon *forgets* a model once it is older than a year, so the band shows
+the lineup a buyer could actually pick from today. The lineup band survives as the family line in
+the rankings ("Family: 3 models · band 1 180 – 1 305"). The ribbon is drawn at 14 % opacity, 34 %
+while its family is focused, and fades after the scrub date. Lower tiers are also drawn as small
+hollow markers off the flagship line when "All tiers" is on.
 
 **Frontier line and pace.** The **frontier line** is the running maximum of θ over released,
 qualified flagships sorted by date; a point is emitted only where the maximum increases.
@@ -161,6 +253,28 @@ points between updates. Every bundle records the δ vector it used.
 
 Elo benchmarks have no saturation level. Only benchmarks with at least one observation get
 levels; levels closer than a pixel gap are thinned in the UI.
+
+**Speculative landmarks.** The rating axis is unbounded and the chart lets you scroll up it
+without end, which leaves a great deal of empty space above the ceiling and nothing to read it
+by. `speculativeLevels` (`shared/src/stages.ts`) puts four labelled landmarks there, at θ_c + k·ln 10
+for k = 1…4 above the ceiling θ_c — one order of magnitude in the odds of solving the whole
+current basket per rung, 400 rating points each:
+
+| rung | label |
+|---|---|
+| θ_c + ln 10 | Ten times the odds of the whole basket (speculative) |
+| θ_c + 2 ln 10 | A hundred times the odds of the whole basket (speculative) |
+| θ_c + 3 ln 10 | Every benchmark ever written saturated (speculative) |
+| θ_c + 4 ln 10 | Technological singularity — speculative landmark, not derived from data |
+
+They are signposts on an empty axis and nothing else. They are not fitted, they are not measured,
+they are not extrapolated: the arithmetic is four multiples of ln 10 above a level that *is*
+fitted, and the last two labels are names, not predictions. They are returned by a separate
+function from `benchmarkLevels` precisely so that nothing downstream can mistake them for data,
+they are drawn in a distinct dotted grey with the word *speculative* in the label and the tooltip,
+and `frontierCrossings` skips every level whose kind is `speculative`, so no crossing date is ever
+computed for one. They appear in no crossing, no stage, no era, no ranking and no result in this
+document or in the paper.
 
 **Frontier trend.** The same regression as the pace, keeping intercept, slope standard error
 se_b and residual σ_res, so that it can be extrapolated: the **frontier fan** is
@@ -209,20 +323,49 @@ h days) is read at the pulled-back time m · (t / m)^(1/s). The median — the c
 never moves with s; only the width does. (Scaling σ instead would drag the conditional median
 later: at s = 2.4 it moved the centre 110 days, which is why the stretch is defined this way.)
 
-**Timing — the shrinking circle.** Given elapsed time t₀ since the last release, the next
+**Timing — the conditional law.** Given elapsed time t₀ since the last release, the next
 release date follows the conditional distribution T | T > t₀ of a log-normal(μ_lab, σ_lab):
 its q-th quantile is F⁻¹(F(t₀) + q · (1 − F(t₀))), and P(release within h days) is
 (F(t₀ + h) − F(t₀)) / (1 − F(t₀)). When less than 1e-9 of the probability mass is left above
 t₀ the lab is **overdue** and the conditional law is numerically undefined; we then report the
 median as t₀ + 1 day and the probability as 1, rather than an arbitrary large number.
 
-We draw: the conditional **median** as the circle centre; the circle **diameter** as the
-16th–84th percentile window mapped on the time axis. As t₀ grows, the mass below t₀ is cut
-away and the window narrows — the circle shrinks as the launch nears. This is a property of the
-conditional law, not a drawing rule, and a unit test asserts that the 68 % window is
-non-increasing in t₀ over the lab's typical cadence. Once the lab is overdue by its own history
-the heavy tail takes over and the window opens again: the model is honestly less sure. The Release Watch cards show **P(release within 30 / 90
-days)**; circle styling uses **certainty** = 1 / (1 + w / 90), where w is the 68 % window in days.
+**The release lens.** A circle says only "somewhere around here". The forecast is drawn instead
+as a **lens**: a shape centred on the predicted rating whose half-thickness at date t is
+proportional to the probability that the launch falls on that day. It is thickest at the mode and
+tapers to nothing at the tails, so the reader sees the *shape* of the belief and not just its
+extent, and the ink lands where the probability is.
+
+The density comes from `releaseDensity` (`shared/src/prediction.ts`), sampled at 48 points between
+the 2nd and 98th percentile dates and normalised so the mode is 1; `releaseDensityRaw` returns the
+same samples unnormalised, in probability per day, so the shape can be checked by integration.
+The law is the one that placed the prediction in the first place, re-derived from the same
+quantities:
+
+- **k = 1, statistical.** The finite-difference derivative of the stretched conditional CDF
+  (`stretchedConditionalCdf`, the conformally stretched form of the law above), differenced over
+  one day. Each sample is therefore literally P(the launch lands on that day).
+- **k ≥ 2, chained.** The log-normal density of the offset from the chain anchor with log-σ
+  σ_lab · s · √k — exactly the law whose quantiles the chain publishes.
+- **Announced.** A lab that published a window stated a window, not a law. Its lens is a flat
+  **trapezoid**: level across the stated 16th–84th window and falling linearly to zero at the 5th
+  and 95th dates. Nothing about a press release justifies a peak in the middle, so none is drawn.
+
+Half-thickness at the mode is half the 68 % rating window in pixels, clamped to 6–42 px so a lens
+is never a hairline nor a wall; the fill runs from 0.10 opacity at the tails to 0.55 at the mode.
+The **68 % window is the inner outline and the 90 % window the outer edge**, with a tick on the
+median. Degenerate cases — an overdue lab whose conditional law has collapsed onto tomorrow, a σ
+of zero — give a window under a day wide; it is padded to one day and drawn flat, so there is
+always a shape rather than an error.
+
+The lens **narrows on its own as the launch approaches**, exactly as the circle did, and for the
+same reason: as t₀ grows the mass below t₀ is cut away and the conditional window shrinks. That is
+a property of the law, not a drawing rule, and a unit test asserts that the 68 % window is
+non-increasing in t₀ over the lab's typical cadence. Once a lab is overdue by its own history the
+heavy tail takes over and the lens opens again — the model is honestly less sure. The Release
+Watch cards show **P(release within 30 / 90 days)**; lens styling uses **certainty** =
+1 / (1 + w / 90), where w is the 68 % window in days. Labs outside the forecast spotlight keep a
+plain whisker from the 16th to the 84th percentile date.
 
 **Chained releases — no horizon.** Release k ≥ 2 is placed one unconditional median interval,
 exp(μ_lab), after release k − 1. Its percentile dates are an approximation rather than an exact
@@ -245,9 +388,9 @@ itself.
 
 Announced models with an `expected_window` override the statistical forecast for that
 release and are drawn in grey: the window becomes the 16th–84th percentile band, its midpoint
-the median, and the 5th/95th dates sit 15 % of the window length outside each end. The
-statistical chain then continues from that midpoint as release 2. A window that has already
-opened at the scrub date is ignored.
+the median, and the 5th/95th dates sit 15 % of the window length outside each end. Their lens is
+the flat trapezoid described above. The statistical chain then continues from that midpoint as
+release 2. A window that has already opened at the scrub date is ignored.
 
 ## 6. Backtest and calibration
 
@@ -295,12 +438,43 @@ an LLM behind OpenRouter:
    (tier, date, launch URL); only URLs on the lab's official hosts or an allow-listed press host
    proceed; each launch page is fetched and extracted as above; results go to
    `data/researched/`.
+
+   **Launch posts, not catalogues.** A model *overview* page — `/models`, `/models/gemini/`, a
+   docs or pricing page — lists what exists but not when it shipped, and an extraction with no
+   usable date is dropped. Reading those pages as if they were announcements is what made the
+   researcher lose real releases. So a URL that looks like a catalogue is now used only as a
+   *source of links*: the same-host announcement links on it are harvested, ranked by how well
+   they name the model being looked for, and at most three are queued as launch posts for that
+   model (a bound on cost as much as on noise). If the extraction still comes back without a
+   date, it gets exactly one retry through the lab's own news index, and the date the index
+   publishes for the post is passed into that retry as a known date — so a launch post that
+   states no date in its body no longer fails on the one thing its index already knew.
+
+   **Family prefixes.** An extraction that returns a bare family member ("Opus 5") would be
+   stored under the wrong name and the wrong id. Each lab may declare `name_prefixes` in
+   `data/labs.json` — pairs of a regular expression and a prefix, e.g.
+   `^(opus|sonnet|haiku|fable|mythos)\b` → `Claude `, `^(k[0-9])\b` → `Kimi ` — applied when the
+   extraction is validated. The rule is deliberately unable to
+   invent anything: it only prepends, it is skipped when the name already starts with the prefix
+   (so it cannot produce "Claude Claude Opus 5"), a prefix that carries a version number is
+   rejected outright, and an invalid regular expression is skipped rather than allowed to take
+   the extractor down. `labs.json` is data, not code.
 2. `arena` — weekly, the LMArena text leaderboard is fetched and its rows mapped to known
    releases by canonical name; each match becomes one `maintainer` score with the row as quote.
 3. `eval` — the researcher's output is graded against `data/gold/`, the frozen human-curated
    seed that is never published: release precision and recall (canonical name and date within
    45 days), score recall (same benchmark, |Δ| ≤ 1 point or ≤ 15 Elo), score MAE, quote
    verification rate, per lab.
+
+   **Unverified extras.** Grading against a fixed answer key has one failure mode: a release the
+   researcher found *correctly* and the gold set never recorded counts as a false positive, and
+   the researcher is punished for being right. Those cases are now surfaced instead of being
+   swallowed. Every extra release whose primary source is on one of the lab's own official hosts
+   — the same host test discovery applies — is listed in the report as an **unverified extra**
+   with its name, date and URL. It is still counted against precision, because the eval must not
+   be able to grade itself; but a human can read the list, check the source and promote a genuine
+   find into the gold set. The first live run surfaced Claude Opus 5, which the gold set
+   mentioned in a note but had never recorded as a release; it has since been added to it.
 4. `promote` — only when recall ≥ 0.85, precision ≥ 0.95 and score recall ≥ 0.8 is the output
    merged into `data/models/`: adding what the researcher found, never overwriting a verified
    score, never deleting. The eval report is published in the bundle.
@@ -309,3 +483,87 @@ The OpenRouter client retries 429/5xx with exponential backoff and jitter, honou
 `Retry-After`, limits concurrency, and accounts every call (tokens, USD estimate). The worker
 publishes `next_run_at`, `run_status` and `run_step`; the header shows a progress bar to the
 next research run.
+
+**What the run reports say.** Two accounts of the spend are published side by side and mean
+different things: `usage_total` is the **lifetime** total across poll, discover and backfill,
+while `budget` is the delta of the **last research run** alone. Reading the second as the first
+is what made the panel claim the LLM had made zero calls on a day it had made a hundred. Each
+step — backfill, arena, eval — writes its own one-line summary into `last_backfill_summary`
+(`backfill: 10 labs, 8 candidates, 1 release / 0 scores, 107 calls · 2.03 USD`), so the panel can
+say what actually happened rather than what the last poll happened to see. Schema failures are
+logged with every zod issue rendered verbatim as `path: message`, root-level issues included.
+
+**How often it runs.** Research costs money per run, so it is scaled to how many people actually
+read the result. The bundle publishes `worker.researcher.cadence` — `tier`, `interval_hours`,
+`visitors_per_day`, `days_measured`, `capped`, `next_research_at` — and the schedule is:
+
+| visitors / day (7-day mean) | tier | research every |
+|---|---|---|
+| under 3 | `weekly` | 7 days (the default) |
+| 3 – 9 | `often` | 3 days |
+| 10 – 29 | `daily` | 24 hours |
+| 30 – 99 | `twice-daily` | 12 hours |
+| 100 or more | `frequent` | 6 hours |
+
+A tier steps up as soon as the average qualifies and steps down only after two consecutive days
+below the band, so a quiet weekend does not flip it. A monthly spend guard
+(`RESEARCH_MONTHLY_USD`, default 60 USD) computed from `usage_total` month-to-date forces the
+weekly tier and sets `capped`. With no day of traffic measured yet the weekly default applies;
+`cadence` is the single place to look for which tier is in force. The hourly poll is unaffected —
+it costs an LLM call only when a page's hash has actually changed.
+
+**How a visit is counted, and what is not stored.** There is no analytics script on the site, no
+cookie and no third-party request; the page makes exactly one network call, for `/latest.json`.
+A visit is one such request in the web server's own access log. Privacy is the constraint the
+rest of the design follows from, because the only thing wanted is a count and the only thing an
+access log naturally keeps is addresses:
+
+- No raw address is written to the run state, to a log line of ours, or anywhere else. Addresses
+  exist as local variables while the log is being folded in, and the log itself is truncated as
+  soon as it has been counted.
+- The **open** day holds a set of `sha256(salt : address)` truncated to 12 hex characters. The
+  salt is 16 random bytes minted when the day opens and destroyed when it closes, so two days'
+  hashes are unlinkable even for the same visitor — there is no key that turns one day's set into
+  another's, and nobody holding the state file can ask "was this address here on day D".
+- A **closed** day keeps `{ date, unique }` and nothing else: one integer. At most 14 closed days
+  are retained.
+- Obvious bots are dropped by user agent.
+
+Only the cadence summary above is published; the day counts behind it are not.
+
+## 8. Reading the chart
+
+The chart is a **stage**: a control bar, the plot, a time-axis strip pinned to the stage's bottom
+edge so the dates never leave the screen while the plot pans vertically, and a legend dock of lab
+and layer chips.
+
+**Scrolling and zooming.** A plain wheel scrolls the page — that is what a wheel does everywhere
+else, and a chart that swallows it traps the reader on it. Zooming is therefore explicit:
+
+| gesture | effect |
+|---|---|
+| wheel (no modifier) | scrolls the page — the chart does not capture it |
+| Ctrl + Shift + wheel | zoom both axes about the pointer |
+| Ctrl + wheel | zoom time only |
+| Shift + wheel | zoom rating only |
+| drag | pan both axes |
+| pinch | zoom both axes |
+| `+` / `−` | zoom both axes about the centre of the plot |
+| `0` | fit the axes to what is on screen · `Esc` resets the zoom |
+
+Cmd counts as Ctrl on a Mac. The first plain wheel over the plot shows the hint "Ctrl + Shift +
+scroll to zoom · drag to pan · + / − buttons" for four seconds, once per browser. The rating axis
+is unbounded upwards — keep zooming out and the forecast fans open like scissors, with the
+speculative landmarks of §4 far above the data.
+
+**Hovering picks a family.** The pointer does not have to hit a line. The nearest family — its
+line, its points, its release lens — is emphasised and the others quieten to 18 %. To stop that
+focus flickering between two families running side by side, it moves only when another family is
+at least 14 px closer than the current one, or the current one is more than 60 px away, and only
+after the pointer has rested for 90 ms; leaving the plot clears it after 250 ms. Nothing beyond
+80 px takes the focus at all. **Click pins** a family, clicking again or **Escape** unpins it,
+and while a family is pinned the pointer does not move the focus. The same focus drives the
+legend chips and the tooltip header. `prefers-reduced-motion` removes the cross-fade.
+
+The **NOW rule** is the time scrubber: drag it into the past and the fit, the frontier, the
+forecasts, the rankings and the watch cards are all recomputed as of that date (§6).

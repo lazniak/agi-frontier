@@ -8,6 +8,13 @@ The site makes **exactly one network request**: `GET /latest.json`. Fonts are se
 third-party script. Everything on the page — the index fit, the forecasts, the rankings — is
 computed in the browser from that single bundle.
 
+That one request is also the only readership signal: the worker counts `/latest.json` hits per
+UTC day from the server's own access log and scales its research cadence to them
+(METHODOLOGY §7). The open day holds truncated hashes under a random salt that is destroyed when
+the day closes; a closed day keeps a single integer. No script, no cookie, no address stored,
+nothing sent anywhere. `ui/progress.ts` refreshes from memory rather than refetching, so its
+30-second repaint does not inflate the count.
+
 ## Run it
 
 ```bash
@@ -74,14 +81,17 @@ src/dom.ts            tiny el()/svg()/qs() helpers, reduced-motion + live-region
 
 src/chart/index.ts        the <svg> shell, layer stack, redraw loop, y-domain tween
 src/chart/scales.ts       geometry, x/y scales, the adaptive time-tick ladder
+src/chart/axis.ts         the pinned time-axis strip (a second SVG on the same x scale)
+src/chart/legend.ts       the legend dock: lab chips and layer toggles
 src/chart/layers.ts       grid, leadership stripes, lab lines, points, tiers, markers, labels, overlay
-src/chart/ladder.ts       the level ladder in the right-hand gutter
-src/chart/bands.ts        the per-lab family bands
+src/chart/ladder.ts       the level ladder in the right-hand gutter, speculative rungs included
+src/chart/bands.ts        the per-lab family ribbons
 src/chart/crossings.ts    the frontier trend fan and the predicted level crossings
-src/chart/forecast.ts     capability fans, dashed medians, release-window circles
+src/chart/forecast.ts     capability fans, dashed medians, release lenses, whiskers
 src/chart/backtest.ts     predicted-vs-actual hairlines, drawn while scrubbed
 src/chart/pace.ts         the quarterly pace strip under the x axis
-src/chart/interaction.ts  d3-zoom, the draggable "now" scrubber, arrow-key traversal, legend
+src/chart/interaction.ts  wheel/drag/pinch gestures, the draggable "now" scrubber, arrow-key traversal
+src/chart/hover.ts        nearest-family hit-testing, focus hysteresis, pinning
 src/chart/tooltip.ts      the floating tooltip and its content builders
 src/chart/types.ts        RenderCtx / Interactions contracts + the shared palette constants
 
@@ -92,7 +102,8 @@ src/ui/progress.ts    the header "next research in …" bar (idle / running / un
 src/ui/intro.ts       header stamp, the three live stats, worker health, notices
 src/ui/stages.ts      the Stages column: predicted crossings · NOW · eras · past crossings
 src/ui/backtest.ts    the Backtest card (per-lab rows + report + calibration curve)
-src/ui/researcher.ts  researcher status, gold-set evaluation, budget
+src/ui/researcher.ts  researcher status, gold-set evaluation, lifetime vs last-run budget
+src/ui/lifetimes.ts   the benchmark-lifetimes strip under the Method copy
 src/ui/watch.ts       release-watch cards (P30/P90 bars, median window, sparkline)
 src/ui/rankings.ts    rating-led table with the tier filter and family lines
 src/ui/changes.ts     the audit-log feed
@@ -120,9 +131,13 @@ Nothing numeric is implemented here. `src/data.ts` calls, and only calls, `@agi/
 | the coloured band under the x axis | `leadershipStripes` |
 | the rankings table and its tier filter | `rankCurrentFlagships` |
 | the level ladder, the trend, the crossings, the eras | `benchmarkLevels`, `frontierTrend`, `frontierCrossings`, `paceEras` |
+| the dotted grey rungs above the ceiling | `speculativeLevels` |
 | the grey/yellow frontier continuation | `frontierFan` |
-| the family bands | `lineupBand` |
+| the family ribbons on the chart | `familyRibbon` |
+| the family line under a lab's row in the rankings | `lineupBand` |
+| the benchmark-lifetimes strip and the per-model shared-benchmark count | `benchmarkLifetimes`, `comparability` |
 | P(30 d), P(90 d), median date, 68 % window, chained releases | `cadencePrior` + `forecastAll` |
+| the shape of a release lens | `releaseDensity` |
 | the yellow per-lab fan | `capabilityFan` |
 | the Backtest card's per-lab rows | `backtestAsOf` (the report itself is `bundle.backtest`) |
 | what exists at a scrubbed date | `releasesAsOf`, `latestPerLab` |
@@ -140,11 +155,25 @@ given a depth). The wide fills — `bands`, `frontierFan`, `fans`, `tiers`, `mar
 `backtest` — are clipped to the plot rect; the others are not, so lab labels and the level ladder
 can sit in the right-hand gutter and the stripe band below the axis.
 
+- The chart, its date axis and its legend are one **stage**. The x axis lives in a *second* SVG
+  pinned to the stage's bottom edge (`chart/axis.ts`) sharing the plot's x scale and zoom
+  transform, so the plot can pan vertically without the dates leaving the screen; `stripes` and
+  `pace` are drawn into that strip (`STRIP_LAYERS`). The **legend dock** (`chart/legend.ts`)
+  carries the lab chips (visibility + hover focus) and the layer toggles — `ribbons`, `fans`,
+  `frontierFan`, `lens`, `ladder`, `crossings`, `backtest`, `pace`, `tiers` (`LayerToggle`).
 - **x** is time and never ends: the default domain runs from a little before the first release
   (GPT-1, 2018) to today + 3 years, and **Range · Recent 2023→** moves the left edge to the start
-  of the modern basket era. Either way `d3-zoom` pans and scales it (wheel, drag, pinch).
-  Scrolling *out* at the default zoom is deliberately **not** captured, so the page keeps
-  scrolling normally; scrolling *in* zooms.
+  of the modern basket era.
+- **Gestures** (`chart/interaction.ts`, REDESIGN §12.1). d3-zoom's own wheel handling is off; the
+  layer owns the wheel. A **plain wheel is not captured** — the page scrolls, which is what a
+  reader expects of a page. **Ctrl + Shift + wheel** zooms both axes about the pointer,
+  **Ctrl + wheel** zooms time only, **Shift + wheel** zooms rating only (Cmd counts as Ctrl;
+  Shift+wheel arrives as `deltaX` on some platforms, and line/page delta modes are converted to
+  pixels). Drag pans both axes, two fingers pinch. The first plain wheel over the canvas raises
+  `.chart-hint` ("Ctrl + Shift + scroll to zoom · drag to pan · + / − buttons") for four seconds,
+  remembered under `agi:chart-hint` — and it is a live region, so it is announced rather than
+  read out of context. `ChartApi.zoomBy(kx, ky)` scales each axis independently; `+` / `−` pass
+  the same factor to both.
 - **Forecast · Next / Long** is the depth switch. `Next` (the default) shows one release ahead
   per lab; `Long` restores the full chained forecast (up to 24, REDESIGN §4). Flipping it resets
   the zoom, because the base x-domain it was built on has just changed.
@@ -153,8 +182,21 @@ can sit in the right-hand gutter and the stripe band below the axis.
   (1000 + 173.72·θ, the default) or the bounded 0–100 Frontier Index. The resting domain is the
   extent of the data and its near fans as of *today* rather than as of the scrubber, so the axis
   does not breathe while dragging; **Fit** tweens it to whatever the legend is currently showing.
-  The right-hand gutter carries the **level ladder** — human baselines, saturation points and
-  generation ceilings, all fitted from the benchmark difficulties.
+  The axis is **unbounded upwards** — zoom out far enough and the fans open like scissors — so the
+  tick ladder has to produce readable steps for any domain, and the grid is drawn over the whole
+  visible range. The right-hand gutter carries the **level ladder** — human baselines, saturation
+  points and generation ceilings, all fitted from the benchmark difficulties, plus the four
+  **speculative** rungs above the ceiling (`speculativeLevels`) in a dotted grey style with the
+  word *speculative* in both label and tooltip. They are landmarks on an empty axis:
+  `frontierCrossings` skips `kind === 'speculative'`, so no crossing, stage or era can ever
+  contain one.
+- **Family ribbons** (`chart/bands.ts`, `familyRibbon` in shared). A filled band per lab between
+  the best and the weakest model that lab has shipped in the trailing 365 days, stepped at each
+  release date and extended to the scrub date — the real-data counterpart of the forecast fan.
+  It collapses onto the lab's line when only one model is current, and again when the lab has
+  shipped nothing for over a year (the family degenerates to its latest model rather than
+  vanishing). Drawn at 14 %, 34 % while the family is focused, fading after `asOf`. The older
+  `lineupBand` — one slot per tier, kept for ever — survives only as the rankings' family line.
 - **Pace strip** (`chart/pace.ts`): under the x axis, one bar per calendar quarter, height =
   the frontier's gain in θ that quarter (`frontierGains` in shared), scaled to the largest
   quarter as of today so bars do not re-scale under the scrubber; the trailing-year slope and
@@ -163,6 +205,19 @@ can sit in the right-hand gutter and the stripe band below the axis.
   (`RenderCtx.focusLab`, from `store.hoverLab` → hovered/selected release's lab → solo). The
   other labs' lines drop to 16 % and their points/labels to 28 % (`DIM_LINE`, `DIM_POINT`), the
   focused line thickens, and the focused lab joins the forecast spotlight.
+- **Smart hover** (`chart/hover.ts`). The pointer does not have to hit anything: `nearestFamily`
+  measures the distance to every lab's polyline (segment distance in screen pixels at the current
+  zoom), its points and its lens footprints, and the nearest family is emphasised. Two lines
+  running side by side would otherwise strobe, so the focus is hysteretic: it moves only when the
+  candidate is at least `SWITCH_MARGIN` (14 px) closer than the current focus or the current
+  focus is beyond `FAR_PX` (60 px), and only after the pointer has rested `REST_MS` (90 ms);
+  nothing past `CAPTURE_PX` (80 px) takes focus at all, and leaving the plot clears it after
+  `LEAVE_MS` (250 ms). **Click pins** (`store.pinnedLab`), clicking again or **Escape** unpins,
+  and a pinned family ignores the pointer. Escape has two owners on the page and exactly one may
+  act per press — the shortcut layer reads the pinned state at keydown to decide. The classes
+  `is-focus` / `is-dim` are toggled on the per-lab groups (`applyFocus`) and `chart.css`
+  transitions opacity and stroke width over 260 ms; `prefers-reduced-motion` drops the
+  transition.
 - **Unscored releases.** A released flagship with no index score at all (GPT-1, the first Kimi)
   has no height, so `drawTicks` puts a 2 px tick in the lab colour on the leadership strip;
   hover explains, click opens the audit drawer.
@@ -175,23 +230,23 @@ can sit in the right-hand gutter and the stripe band below the axis.
   “Back to today” eases back over ~0.5 s.
 - **Overlapping translucency is composited, not stacked.** Ten labs' fans drawn at 14 % each
   would add up to a solid yellow block, so the fills are opaque inside a group that carries the
-  opacity: the union sits at exactly 14 % however many labs are on. Prediction-circle fills use
-  the same trick at 10 %; their strokes stay outside it so each window still reads as a ring.
+  opacity: the union sits at exactly 14 % however many labs are on. Lens fills use the same trick;
+  their outlines stay outside it so the 68 % and 90 % windows still read as edges.
   The future tint right of the “now” rule is a separate 3.2 % wash — deliberately below the fan,
   so the region reads as “after today”, never as a forecast.
 - **Spotlight, not ten fans.** Ten labs forecast into the same three months, so the layer draws
   two tiers (`chart/forecast.ts: spotlightLabs`): the three visible labs with the highest
   P(30 d) — always joined by the focus lab, and all of them when four or fewer are on — get the
-  fan, the dashed median and the window circle; every other lab gets a **whisker**, a 1.25 px bar
+  fan, the dashed median and the release lens; every other lab gets a **whisker**, a 1.25 px bar
   from the 16th to the 84th percentile date at its expected index with a dot on the median, at
   55 % opacity, hoverable and focusable with the same tooltip. Same information, a tenth of the
   ink.
 - **The default view draws one release ahead, not five.** Each spotlight lab's fan runs from the
   scrubbed date to its own k = 1 `p95Date` + 30 days (`data.ts: nearFanEnd`, kept as
-  `LabView.fanNear` beside the full-horizon `fan`); only the k = 1 circle is drawn. **Forecast ·
+  `LabView.fanNear` beside the full-horizon `fan`); only the k = 1 lens is drawn. **Forecast ·
   Long** restores the full chain (fading with the chain index) for the spotlight labs and the
   long-horizon fans.
-- The **k = 1 circle of the lab with the highest P(30 d)** carries a soft yellow halo (25 %,
+- The **k = 1 lens of the lab with the highest P(30 d)** carries a soft yellow halo (25 %,
   a 6 px blur from a `feGaussianBlur` filter the chart shell puts in `<defs>`), so the eye lands
   on the release the cadence model actually expects first.
 - **Qualified vs provisional** (METHODOLOGY §3) is drawn everywhere the index is shown. A release
@@ -207,11 +262,17 @@ can sit in the right-hand gutter and the stripe band below the axis.
   numbers keep counting), badges the model and drops its rows to `--ink-2`; the release-watch card
   badges a provisional flagship and links to `docs/DATA-GUIDE.md`; the audit drawer badges the
   header and names the missing index benchmarks as grey chips.
-- Each predicted release is a **true circle** whose *diameter* is the pixel distance from
-  `p16Date` to `p84Date` (clamped 8–160 px, and to 16 % of the plot width and 60 % of the plot
-  height, so a circle can never swallow the axis), centred on the median date at the expected
-  index. Under **Forecast · Long** opacity falls with the chain index (1, .7, .5, .35, .25).
-  Announced-sourced predictions are grey instead of yellow.
+- Each predicted release is a **release lens** (`chart/forecast.ts`), not a circle. `releaseDensity`
+  returns 48 samples of the launch-date density between the 2nd and 98th percentile, normalised so
+  the mode is 1; the shape's half-thickness at each sample is `h · p`, where `h` is half the 68 %
+  rating window in pixels clamped to `LENS_H_MIN`–`LENS_H_MAX` (6–42 px) so a lens is never a
+  hairline nor a wall. The fill is a gradient along time from `LENS_TAIL_OPACITY` (0.10) at the
+  tails to `LENS_MODE_OPACITY` (0.55) at the mode; the **68 % window is the inner outline, the
+  90 % window the outer edge**, with a tick on the median. The lens narrows as `asOf` approaches
+  the launch for the same reason the old circle shrank — the conditional law narrows — and no
+  drawing rule does it. An **announced** prediction is a flat trapezoid in grey (a published
+  window is not a law). Under **Forecast · Long** opacity falls with the chain index
+  (1, .7, .5, .35, .25). All of the maths is in `@agi/shared`; the layer only maps `p` to pixels.
 - **Announced / rumored / cancelled markers have no scores**, so their height is *indicative* and
   is chosen to be the least misleading value available (`chart/layers.ts: markerLevel`): the k = 1
   predicted index for a future date, the lab's last qualified index before that date for a past
@@ -240,7 +301,8 @@ One **control bar** (`ui/controls.ts`) replaces the old row of pills. Each group
 | Now | ◀ · date pill · ▶ · Back to today | `←` `→` (shift = one year) · `Home` |
 | — | shortcut sheet | `?` |
 
-`+` / `−` zoom the time axis. The handler ignores every keystroke that starts in an input, a
+`+` / `−` zoom **both** axes about the plot centre (`ChartApi.zoomBy(k, k)`); the wheel is where
+the axes are zoomed separately. The handler ignores every keystroke that starts in an input, a
 textarea or a contenteditable (the date pill becomes an `<input type="date">` when clicked), and
 while the `?` sheet — a native `<dialog>`, so the focus trap and Escape are the platform's — is
 open. Axis, range, forecast, bands and tiers are persisted as one JSON object under **`agi:view`**
@@ -251,9 +313,9 @@ Below 720 px the bar becomes a **bottom sheet** behind a fixed "Controls" button
 44 px targets, closes on a selection or a tap on the scrim.
 
 The **tour** (`ui/tour.ts`) runs once per browser (`agi:tour`) and is reopened by the header's
-"Tour" link. Four steps — the axis, a forecast circle, the NOW rule, Stages — each anchored by
-selector *at show-time* and skipped when nothing matches, so an empty dataset cannot point at
-a circle that was never drawn.
+"Tour" link. Its steps — the axis, a release lens, the NOW rule, Stages, and the wheel/zoom
+contract — are each anchored by selector *at show-time* and skipped when nothing matches, so an
+empty dataset cannot point at a lens that was never drawn.
 
 The header's **progress bar** (`ui/progress.ts`) reads `bundle.worker`: it fills with
 `(now − last_run_at) / (next_run_at − last_run_at)`, re-reads the clock every 30 s and on
@@ -276,11 +338,25 @@ overdue since …" once it is more than two intervals late.
   cadence drift, and an inline calibration curve.
 - **Researcher** (`ui/researcher.ts`) publishes the loop's schedule and step, the evaluation
   against the frozen gold set, the budget, and — while `ctx.researched` is false — a notice that
-  the published dataset is still the human-curated seed.
+  the published dataset is still the human-curated seed. Two budgets are shown side by side and
+  they are not the same number: **Lifetime** (`researcher.usage_total`, all calls across poll,
+  discover and backfill) and **Last research run** (`researcher.budget`, that run's delta alone).
+  Showing the second where the first belonged is what made the panel report "0 calls, 0 %" on a
+  day the researcher had made a hundred. `researcher.last_backfill_summary` carries the per-step
+  one-liners (backfill · arena · eval) under "What changed last".
+- **Lifetimes** (`ui/lifetimes.ts`) draws `benchmarkLifetimes` into `[data-lifetimes]` under the
+  Method copy: one row per benchmark from its introduction to its saturation (or to today),
+  coloured by generation, saturated rows ending in a filled cap, with the count of scores. It is
+  the visual answer to "your basket keeps changing" — and the copy beside it says why a dead
+  benchmark costs the fit nothing.
 - **Rankings** (`ui/rankings.ts`) lead with the rating (± 173.72·se) and carry the tier filter,
-  which is bound to the same `store.tierView` the chart uses. Under `All tiers` each lab's best
-  row is followed by a family line ("Family: 3 models · band 1 180 – 1 305") built from the lab's
-  current lineup.
+  which is bound to the same `store.tierView` the chart uses. Columns are #, Model, Rating,
+  Index, Benchmarks used, Released and **Age** (whole months since release, "new" under one
+  month) — an old model at the top of a lab's row is a fact worth seeing. The benchmark-count
+  cell's tooltip comes from `comparability`: how many index benchmarks the model shares with the
+  fitted flagships released within ±18 months of it, i.e. what its Rasch comparison actually
+  rests on. Under `All tiers` each lab's best row is followed by a family line ("Family: 3
+  models · band 1 180 – 1 305") built from the lab's current lineup.
 
 ### The paper page
 
@@ -297,8 +373,9 @@ horizontal scroller, and marks external links `target="_blank" rel="noopener"`.
 
 Semantic landmarks and one `h1`; every interactive element is focusable; chart points are
 `role="button"` with a full sentence as their label, and arrow keys walk a lab's own line
-(up/down jumps to the nearest point on another lab). Prediction circles carry an invisible
-14 px hit-ring so a 2 px stroke is not the only target. The audit drawer is a dialog with
+(up/down jumps to the nearest point on another lab). Release lenses carry an invisible hit shape
+so a thin tail is not the only target, and their accessible name is unchanged in content by the
+new geometry — median, 68 % window, expected rating. The audit drawer is a dialog with
 Escape-to-close and focus restore. The control bar's groups are `role="radiogroup"` with roving
 tabindex and arrow-key selection, the `?` sheet is a native `<dialog>` (platform focus trap) and
 the tour traps Tab across its three buttons. Every state change is announced in the polite live

@@ -129,6 +129,24 @@ their saturation does not drag the origin.
 **Qualification.** A model with fewer than three benchmarks on the basket is drawn but marked
 provisional; it does not form the frontier line.
 
+**Lifetimes.** A benchmark has a life: it is published, it is reported for a few years, its best
+official score reaches 95 % of its range — at which point it has stopped discriminating and is
+said to be saturated — and eventually a curator retires it. The standard records that life
+explicitly (introduction year, first score, number of scores, saturation date, state, share of
+the last year's flagships still reporting it) because it is the honest answer to the objection
+that a chart built on a moving basket cannot be compared with itself. It can, and the reason is
+structural rather than rhetorical. The Rasch fit never compares two models directly; it compares
+each model with the items it reported, and the items are shared with its neighbours, so two
+models with no benchmark in common are still placed on one scale through the models between
+them. That is the everyday "compare them on the benchmarks they both ran" generalised to a whole
+dataset, and the standard publishes, per model, how many benchmarks it shares with the fitted
+flagships released within eighteen months of it. A saturated benchmark then costs the scale
+nothing: it does not leave the fit, it becomes an easy item, and the difficulty δ_b it measured —
+the entirety of what it ever contributed — stays in the fit with it. Retiring it to legacy
+removes it from the anchor, that is from the definition of *average current difficulty*, and from
+nothing else. What a dying basket does cost is **evidence**, and that is a data problem, not a
+scale problem: see §10.
+
 #### 3.3 The Frontier Rating
 
     R = 1000 + (400 / ln 10) · θ  ≈ 1000 + 173.72 · θ
@@ -179,6 +197,17 @@ Every level is a θ derived from the fit, never hand-placed:
   saturated").
 - **Ceiling**: the highest saturation level in the current basket — the point at which the
   standard itself needs new benchmarks.
+
+**Speculative landmarks — a disclaimer.** Because the rating is unbounded the axis can be
+scrolled far above the ceiling, into a region where nothing has been measured and nothing can be.
+The reference implementation places four labelled landmarks there, at θ_c + k·ln 10 above the
+ceiling θ_c for k = 1…4 — ten times the odds of solving the whole current basket, a hundred
+times, every benchmark ever written saturated, and, at the top, technological singularity. They
+are signposts on an empty axis, drawn so that a reader who has zoomed out knows what the space
+means in odds. They are not part of the standard. Nothing is fitted to them, no crossing date is
+computed for one (the crossing procedure of §4.3 skips every level of this kind), they enter no
+era, no stage and no ranking, and they appear in no result in this paper. Their labels say
+*speculative* for the same reason.
 
 #### 4.3 Crossings
 
@@ -247,18 +276,31 @@ every lab) moves each lab's μ to the forecast date, clamped to ±1 in log-days.
 window is **stretched about its median** by the conformal scale s of §7: the q-quantile becomes
 m · (q / m)^s with m the conditional median, so s widens the circle without moving its centre.
 
-#### 6.2 The shrinking circle
+#### 6.2 The shrinking window and the release lens
 
 Given the time t₀ elapsed since the last launch, the next launch date follows the conditional
-law T | T > t₀. Its q-th quantile is F⁻¹(F(t₀) + q·(1 − F(t₀))). On the chart the circle is centred
-on the conditional **median** and its diameter is the **16th–84th percentile window** on the time
-axis. As t₀ grows the mass below t₀ is cut away, so the window narrows: the closer a launch, the
-smaller the circle. This is not a drawing convention; it is a property of the conditional law, and
-a unit test asserts that the window is non-increasing in t₀ over the lab's typical cadence. Once
-a lab is overdue by its own history the heavy tail of the log-normal takes over and the window
-opens again — the model becomes honestly less sure, and the circle grows. When a lab announces
-a launch window, that window replaces the statistical band (the circle collapses to it, drawn in
-grey) and the chain continues from its midpoint.
+law T | T > t₀. Its q-th quantile is F⁻¹(F(t₀) + q·(1 − F(t₀))). As t₀ grows the mass below t₀ is
+cut away, so the window narrows: the closer a launch, the smaller the window. This is not a
+drawing convention; it is a property of the conditional law, and a unit test asserts that the
+window is non-increasing in t₀ over the lab's typical cadence. Once a lab is overdue by its own
+history the heavy tail of the log-normal takes over and the window opens again — the model
+becomes honestly less sure.
+
+**The figure convention: a lens, not a circle.** A prediction is drawn as a shape whose
+half-thickness at date t is proportional to the probability density of the launch falling on that
+day, centred on the predicted ability: thickest at the mode, tapering to nothing at the tails,
+with the 68 % window as its inner outline and the 90 % window as its outer edge and a tick on the
+median. A circle states an interval; a **lens** states the distribution, and the reader's eye
+lands where the probability is. For the k = 1 statistical case the density is the derivative of
+the same stretched conditional law that placed the median — differenced over one day, so each
+sample is literally the probability that the launch falls on that day — and for k ≥ 2 it is the
+log-normal density of the chained offset with log-σ widened by √k. The lens therefore narrows as
+the launch approaches for exactly the reason the window does, with no drawing rule of its own.
+
+When a lab **announces** a launch window, that window replaces the statistical band and the lens
+becomes a flat trapezoid, level across the announced window and falling linearly to zero outside
+it, drawn in grey. A published window is a statement, not a law, and nothing about a press
+release justifies a peak in the middle. The chain then continues from the window's midpoint.
 
 #### 6.3 Chained releases — the curve does not end
 
@@ -317,7 +359,11 @@ OpenRouter, so that the whole pipeline can be re-run by anyone with the same key
 
 1. **Discovery.** For each lab the online-search model is asked, under a strict JSON schema, for
    every model the lab has released, with tier, launch date and launch-page URL. Only URLs on the
-   lab's official hosts (or an allow-listed press host) proceed.
+   lab's official hosts (or an allow-listed press host) proceed. A model *catalogue* — an
+   overview, docs or pricing page — is never read as an announcement, because it says what exists
+   and not when it shipped, and an undated extraction has to be discarded; it is used only to
+   harvest links to the dated launch posts it points at. An extraction that still lacks a date
+   gets one retry through the lab's own news index, which supplies the date its post omitted.
 2. **Extraction.** Each launch page or model card is fetched and the extraction model returns
    releases and basket scores **with verbatim quotes**. A score is written only if its quote is a
    substring of the fetched page. Nothing an LLM says reaches the chart without a matching quote.
@@ -326,6 +372,16 @@ OpenRouter, so that the whole pipeline can be re-run by anyone with the same key
 4. **Evaluation.** The researcher's output is graded against the frozen gold set: release
    precision and recall (canonical name and date within 45 days), score recall (same benchmark,
    |Δ| ≤ 1 point or ≤ 15 Elo), score mean absolute error, quote-verification rate, per lab.
+
+   Grading against a fixed answer key has one systematic failure: a release the researcher found
+   *correctly* and the key never recorded is scored as a false positive, so the researcher is
+   penalised for out-performing its own gold set, and the evidence of that is destroyed by the
+   metric that produced it. The standard therefore requires such cases to be **surfaced rather
+   than absorbed**. Every extra release whose primary source lies on one of the lab's own
+   official hosts is listed in the report as an *unverified extra*, with name, date and URL. It
+   remains counted against precision — an evaluation that may excuse itself measures nothing —
+   but it is placed in front of a human, who can check the source and, if it holds, promote the
+   find into the gold set. The gold set improves through evidence rather than through drift.
 5. **Promotion.** Only when recall ≥ 0.85, precision ≥ 0.95 and score recall ≥ 0.8 is the output
    merged into the published dataset — adding what the researcher found, never overwriting a
    verified score. The evaluation report itself is published.
@@ -338,14 +394,25 @@ call; the site shows the last run, the current step and a progress bar to the ne
 ### 9. Reading the chart
 
 - **Y axis**: Frontier Rating, ladder of levels on the right. Toggle to Index for the bounded
-  reading. Zoom and pan on both axes; the time axis is infinite to the right.
-- **Lines**: one per lab, flagship θ over time, with the family band (flagship to smallest current
-  tier) filled at 10 %. Lower tiers are hollow markers off the line.
+  reading. The axis is unbounded upwards; far above the ceiling sit the speculative landmarks of
+  §4.2, which are labels and not data.
+- **Zooming.** A plain wheel scrolls the page, as it does everywhere else on the web. The chart
+  zooms on Ctrl + Shift + wheel (both axes), Ctrl + wheel (time) or Shift + wheel (rating); drag
+  pans, pinch zooms, `+` and `−` zoom both axes about the centre. The time axis is infinite to
+  the right.
+- **Lines and ribbons**: one line per lab, flagship θ over time, inside a **family ribbon** — a
+  filled band between the best and the weakest model the lab has shipped in the trailing year.
+  It is the real-data counterpart of the forecast fan, and it collapses onto the line when the
+  lab has only one current model. Lower tiers are hollow markers off the line.
 - **Frontier**: the running maximum, with its pace in the strip below and its dotted, fanning
   continuation to the right.
-- **Circles**: the next predicted launches per lab; centre = median date, diameter = 68 % window,
-  height = ability band. Grey circles are announced windows. Smaller circle = nearer, more certain
-  launch.
+- **Lenses**: the next predicted launches per lab; the shape's thickness is the probability
+  density of the launch date, its inner outline the 68 % window, its outer edge the 90 % window,
+  its height the ability band. Grey trapezoids are announced windows. A narrower lens is a nearer,
+  better-determined launch.
+- **Hovering** emphasises the family nearest the pointer and quietens the others, with enough
+  hysteresis that the focus does not flicker between neighbours; clicking pins a family and
+  Escape unpins it.
 - **Level circles** on the frontier continuation: predicted crossings of human baselines,
   saturation points and generation ceilings.
 - **NOW rule**: drag it into the past to replay the forecast against what happened; the Backtest
@@ -367,6 +434,17 @@ call; the site shows the last run, the current step and a progress bar to the ne
   is exactly what the eras are designed to reveal, not what the trend can anticipate.
 - The researcher only sees what labs publish on their own pages. Unpublished models, and models
   whose pages resist fetching, are missing until they surface.
+- **The evidence is thinner than the scale.** The estimator is not the weak point; the dataset
+  is. Measured on 2026-09-08, models released in the first half of 2026 carried a mean of 5.5
+  index benchmarks each, and those released in the second half carried 2.6 — some of them a
+  single community Elo score and nothing else — while 23 of the 45 highest-rated models on the
+  public LMArena leaderboard were absent from the dataset altogether. Under those conditions the
+  gaps between the newest ratings are smaller than their standard errors: they are ties that a
+  sorted table presents as an order, and a lab's row can be led by the newest model the dataset
+  happens to know rather than the newest model that exists. The remedy is more research, not a
+  different estimator, and it is the reason the researcher of §8 matters as much as the scale of
+  §3. A reader should weigh each row by its benchmark count and its ±, and treat the most recent
+  months as provisional.
 
 ---
 
