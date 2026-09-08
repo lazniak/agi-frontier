@@ -1,6 +1,6 @@
 {
   "lab": "xai",
-  "updated_at": "2026-09-08T01:42:36Z",
+  "updated_at": "2026-09-08T01:42:47Z",
   "releases": [
     {
       "id": "xai-grok-1",
@@ -275,9 +275,9 @@
             "url": "https://lmarena.ai/leaderboard/text",
             "title": "LMArena text leaderboard",
             "quote": "225 207 234 grok-2-2024-08-13 SpaceXAI · Proprietary 1335 ±4 63,498",
-            "retrieved_at": "2026-09-08T01:42:36Z",
+            "retrieved_at": "2026-09-08T01:42:47Z",
             "verified": true,
-            "verified_at": "2026-09-08T01:42:36Z"
+            "verified_at": "2026-09-08T01:42:47Z"
           }
         }
       ],
@@ -494,9 +494,9 @@
             "url": "https://lmarena.ai/leaderboard/text",
             "title": "LMArena text leaderboard",
             "quote": "53 43 66 grok-4.1 SpaceXAI · Proprietary 1459 ±3 66,382",
-            "retrieved_at": "2026-09-08T01:42:36Z",
+            "retrieved_at": "2026-09-08T01:42:47Z",
             "verified": true,
-            "verified_at": "2026-09-08T01:42:36Z"
+            "verified_at": "2026-09-08T01:42:47Z"
           }
         }
       ],
@@ -577,9 +577,9 @@
             "url": "https://lmarena.ai/leaderboard/text",
             "title": "LMArena text leaderboard",
             "quote": "38 20 51 grok-4.5 SpaceXAI · Proprietary 1471 ±5 26,158",
-            "retrieved_at": "2026-09-08T01:42:36Z",
+            "retrieved_at": "2026-09-08T01:42:47Z",
             "verified": true,
-            "verified_at": "2026-09-08T01:42:36Z"
+            "verified_at": "2026-09-08T01:42:47Z"
           }
         }
       ],
@@ -611,9 +611,9 @@
             "url": "https://lmarena.ai/leaderboard/text",
             "title": "LMArena text leaderboard",
             "quote": "49 27 72 grok-4.6-high SpaceXAI · Proprietary 1461 ±10 Preliminary 3,453",
-            "retrieved_at": "2026-09-08T01:42:36Z",
+            "retrieved_at": "2026-09-08T01:42:47Z",
             "verified": true,
-            "verified_at": "2026-09-08T01:42:36Z"
+            "verified_at": "2026-09-08T01:42:47Z"
           }
         }
       ],
