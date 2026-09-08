@@ -76,10 +76,10 @@ const END_LABEL_MIN_WIDTH = 560;
 /** Fixed height of the time-axis rows of the strip (REDESIGN §12.1: 40 px). */
 export const AXIS_H = 40;
 /** Height of the pace bars block under the axis rows. */
-const PACE_H = 40;
-const PACE_H_COMPACT = 30;
+const PACE_H = 28;
+const PACE_H_COMPACT = 22;
 /** Room above the pace bars for their caption. */
-const PACE_CAP = 16;
+const PACE_CAP = 12;
 /** Right-hand gutter: the level ladder lives here (REDESIGN §7.1). */
 export const GUTTER_RIGHT = 150;
 export const GUTTER_RIGHT_COMPACT = 100;

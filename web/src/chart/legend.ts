@@ -26,6 +26,8 @@ export interface LayerState {
 }
 
 const LAYERS_KEY = 'agi:layers';
+/** Whether the marks reference is folded open. Default closed — the plot needs the two lines. */
+const MARKS_KEY = 'agi:legend-marks';
 
 /**
  * Which optional layers are drawn. `ribbons` and `tiers` read and write the store (they were
@@ -133,7 +135,9 @@ const LAYER_CHIPS: LayerChip[] = [
   {
     layer: 'lens',
     swatch: 'lens',
-    label: 'release lens — the denser, the likelier that launch date',
+    // The full sentence lived in the chip until it wrapped the layers row onto a second line of
+    // a stage the plot needs (T49); the tooltip still spells it out.
+    label: 'release lens',
     title: 'Release lens — its thickness at a date follows the probability of the launch landing there; inner edge 68 %, outer edge 90 %',
   },
   { layer: 'ladder', swatch: 'ladder', label: 'ladder', title: 'Level ladder — human baselines, saturations, generation ceilings and the speculative landmarks' },
@@ -217,9 +221,13 @@ export function buildLegendDock(host: HTMLElement, deps: LegendDockDeps): Legend
   }
   labRow.append(chips);
 
-  /* marks */
-  const markRow = el('div', { class: 'legend-row legend-row--marks' });
-  markRow.append(el('span', { class: 'legend-row__label', text: 'Marks' }));
+  /* marks — reference the reader consults once, so it folds away (T49). The labs and layers rows
+     are controls and stay open; these eight explanations cost two lines of a stage whose plot was
+     measured at 328 px of 780. `<details>` gives the disclosure semantics for free. */
+  const markRow = el('details', { class: 'legend-row legend-row--marks' }) as HTMLDetailsElement;
+  const summary = el('summary', { class: 'legend-row__label legend-row__label--toggle' });
+  summary.append(el('span', { text: 'Marks' }));
+  markRow.append(summary);
   const marks = el('div', { class: 'legend-chips legend-chips--marks' });
   for (const m of MARKS) {
     const swatches = (Array.isArray(m.swatch) ? m.swatch : [m.swatch]).map((s) =>
@@ -228,6 +236,18 @@ export function buildLegendDock(host: HTMLElement, deps: LegendDockDeps): Legend
     marks.append(el('span', { class: 'legend-mark' }, ...swatches, el('span', { text: m.label })));
   }
   markRow.append(marks);
+  try {
+    markRow.open = localStorage.getItem(MARKS_KEY) === '1';
+  } catch {
+    /* private mode: stay closed */
+  }
+  markRow.addEventListener('toggle', () => {
+    try {
+      localStorage.setItem(MARKS_KEY, markRow.open ? '1' : '0');
+    } catch {
+      /* nothing to remember it with */
+    }
+  });
 
   /* layers */
   const layerRow = el('div', { class: 'legend-row legend-row--layers', role: 'group', 'aria-label': 'Layers — toggle what is drawn' });

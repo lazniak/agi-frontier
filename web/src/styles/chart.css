@@ -75,7 +75,7 @@
 .chart-stage {
   display: flex;
   flex-direction: column;
-  height: clamp(560px, calc(100vh - 120px), 1000px);
+  height: clamp(560px, calc(100vh - 96px), 1000px);
   /* A tall control bar or a dock that wrapped onto more rows grows the stage instead of pushing
      itself past the bottom edge — the budget is a target, never a clip. */
   min-height: min-content;
@@ -795,9 +795,9 @@
 /* Replaces the static key (REDESIGN §12.1): labs · marks · layers. */
 .legend-dock {
   display: grid;
-  gap: 8px;
-  margin-top: 14px;
-  padding-top: 12px;
+  gap: 6px;
+  margin-top: 10px;
+  padding-top: 10px;
   border-top: 1px solid var(--hair-soft);
 }
 
@@ -817,6 +817,57 @@
   color: var(--ink-3);
 }
 
+/* The marks row is a <details>: its label is the summary, so it needs the grid cell the other
+   rows' <span> occupies, plus a caret. Folding it away buys the plot two lines of stage (T49). */
+.legend-row--marks {
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr);
+  gap: inherit;
+}
+
+.legend-row__label--toggle {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  list-style: none;
+  border-radius: 4px;
+  outline: none;
+}
+
+.legend-row__label--toggle::-webkit-details-marker {
+  display: none;
+}
+
+.legend-row__label--toggle::after {
+  content: '';
+  width: 5px;
+  height: 5px;
+  border-right: 1.2px solid currentColor;
+  border-bottom: 1.2px solid currentColor;
+  transform: rotate(45deg) translate(-1px, -1px);
+  transition: transform 160ms ease;
+}
+
+.legend-row--marks[open] > .legend-row__label--toggle::after {
+  transform: rotate(-135deg) translate(-2px, -2px);
+}
+
+.legend-row__label--toggle:hover,
+.legend-row__label--toggle:focus-visible {
+  color: var(--ink-2);
+}
+
+.legend-row__label--toggle:focus-visible {
+  box-shadow: 0 0 0 2px var(--focus, #1a73e8);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .legend-row__label--toggle::after {
+    transition: none;
+  }
+}
+
 .legend-chips {
   display: flex;
   flex-wrap: wrap;
@@ -827,6 +878,29 @@
 .legend-chips--marks {
   gap: 4px 16px;
   padding-top: 6px;
+}
+
+/* A short laptop screen: every dock row that wraps steals a line from a plot that has none to
+   spare (T49 — 252 px of a 604 px stage at 1366 × 700). The chips stop wrapping and scroll
+   sideways instead, the same trade the phone layout already makes, so the dock costs three
+   lines whatever the lab count. */
+@media (min-width: 721px) and (max-height: 780px) {
+  .legend-dock {
+    gap: 4px;
+    margin-top: 8px;
+    padding-top: 8px;
+  }
+
+  .legend-chips {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: thin;
+    padding-bottom: 2px;
+  }
+
+  .legend-chips--marks {
+    padding-top: 2px;
+  }
 }
 
 .legend-mark {
