@@ -13,6 +13,8 @@ import { runBackfill } from '../researcher/backfill';
 import { runEval } from '../researcher/eval';
 import { isoNow } from '../fetcher';
 import { markIdle, markRunning, summariseRun } from '../state';
+import { computeCadence, ingestTrafficLog } from '../traffic';
+import type { ResearchCadence } from '@agi/shared';
 import type { Runtime } from '../runtime';
 
 export const MAX_BACKOFF_MS = 6 * 60 * 60 * 1000;
@@ -51,12 +53,74 @@ export function shouldRunWeekly(lastAt: string | null, nowMs: number, enabled: b
   return nowMs - t >= intervalMs;
 }
 
-export function shouldArena(lastArenaAt: string | null, nowMs: number, enabled: boolean): boolean {
-  return shouldRunWeekly(lastArenaAt, nowMs, enabled);
+/**
+ * The research gates. `intervalMs` comes from the traffic-scaled cadence (REDESIGN §12.8) and
+ * defaults to the old fixed week, so a worker with no traffic log behaves exactly as before.
+ * A null stamp still means "never ran" — the first run after a deploy happens immediately.
+ */
+export function shouldArena(
+  lastArenaAt: string | null,
+  nowMs: number,
+  enabled: boolean,
+  intervalMs = WEEKLY_INTERVAL_MS,
+): boolean {
+  return shouldRunWeekly(lastArenaAt, nowMs, enabled, intervalMs);
 }
 
-export function shouldBackfill(lastBackfillAt: string | null, nowMs: number, enabled: boolean): boolean {
-  return shouldRunWeekly(lastBackfillAt, nowMs, enabled);
+export function shouldBackfill(
+  lastBackfillAt: string | null,
+  nowMs: number,
+  enabled: boolean,
+  intervalMs = WEEKLY_INTERVAL_MS,
+): boolean {
+  return shouldRunWeekly(lastBackfillAt, nowMs, enabled, intervalMs);
+}
+
+/**
+ * Ingest the nginx traffic log, recompute the cadence and publish it in the run state so the next
+ * bundle carries it. Returns the cadence for the gates below.
+ *
+ * Called at the top of every iteration (before `poll`, which writes the bundle) and again after
+ * the research steps, so `next_research_at` reflects the run that just happened rather than the
+ * previous one. Running it twice is safe: the fold is idempotent and the hysteresis advances at
+ * most once per closed day.
+ */
+export function refreshCadence(rt: Runtime, nowMs: number): ResearchCadence {
+  const run = rt.state.readRun();
+  const ingest = ingestTrafficLog({
+    path: rt.config.trafficLog,
+    state: run.traffic,
+    now: nowMs,
+    // Persist before the log is truncated — a crash then re-reads instead of losing a day.
+    commit: (traffic) => {
+      const latest = rt.state.readRun();
+      rt.state.writeRun({ ...latest, traffic });
+    },
+  });
+  const { traffic, cadence } = computeCadence({
+    traffic: ingest.state,
+    usageTotalUsd: run.researcher.usage_total?.usd_estimate ?? 0,
+    monthlyBudgetUsd: rt.config.researchMonthlyUsd,
+    lastResearchAt: run.researcher.last_backfill_at,
+    now: nowMs,
+  });
+  const latest = rt.state.readRun();
+  rt.state.writeRun({ ...latest, traffic, researcher: { ...latest.researcher, cadence } });
+  if (ingest.read) {
+    rt.log.info('traffic ingested', {
+      visits: ingest.visits.length,
+      bots: ingest.bots,
+      ignored: ingest.ignored,
+      malformed: ingest.malformed,
+      truncated: ingest.truncated,
+      visitors_per_day: cadence.visitors_per_day,
+      days_measured: cadence.days_measured,
+      tier: cadence.tier,
+      interval_hours: cadence.interval_hours,
+      capped: cadence.capped,
+    });
+  }
+  return cadence;
 }
 
 const defaultSleep = (ms: number, signal: AbortSignal): Promise<void> =>
@@ -111,6 +175,9 @@ export async function runLoop(rt: Runtime, opts: LoopOptions = {}): Promise<numb
   while (!stopping) {
     iterations++;
 
+    // Before `poll`, because `poll` writes the bundle and the site should see today's cadence.
+    const researchIntervalMs = refreshCadence(rt, now()).interval_hours * 3_600_000;
+
     const pollCode = await guarded(rt, 'poll', () => runPoll(rt, {}));
     failures = pollCode === 0 ? 0 : failures + 1;
     if (pollCode !== 0) rt.log.warn('poll reported errors', { consecutive_failures: failures });
@@ -119,17 +186,24 @@ export async function runLoop(rt: Runtime, opts: LoopOptions = {}): Promise<numb
       await guarded(rt, 'discover', () => runDiscover(rt, {}));
     }
 
-    if (!stopping && shouldArena(rt.state.readRun().researcher.last_arena_at, now(), rt.config.arenaEnabled)) {
+    let researched = false;
+    if (!stopping && shouldArena(rt.state.readRun().researcher.last_arena_at, now(), rt.config.arenaEnabled, researchIntervalMs)) {
       const arenaCode = await guarded(rt, 'arena', () => runArena(rt, {}));
       if (arenaCode !== 0) rt.log.warn('arena reported errors');
+      researched = true;
     }
 
-    if (!stopping && shouldBackfill(rt.state.readRun().researcher.last_backfill_at, now(), rt.config.backfillEnabled)) {
+    if (!stopping && shouldBackfill(rt.state.readRun().researcher.last_backfill_at, now(), rt.config.backfillEnabled, researchIntervalMs)) {
       const backfillCode = await guarded(rt, 'backfill --incremental', () => runBackfill(rt, { incremental: true }));
       if (backfillCode !== 0) rt.log.warn('backfill reported errors');
       // The eval only means something fresh right after the candidate set moved.
       await guarded(rt, 'eval', () => runEval(rt, {}));
+      researched = true;
     }
+
+    // `next_research_at` was computed from the previous run's stamp; re-stamp it now that the
+    // research has actually happened, so the site's second progress bar counts down from here.
+    if (researched) refreshCadence(rt, now());
 
     if (opts.maxIterations !== undefined && iterations >= opts.maxIterations) break;
     if (stopping) break;

@@ -12,6 +12,8 @@ services:
     volumes:
       # live data bundle written by the worker; nginx serves it at /latest.json
       - ../data/public:/data/public:ro
+      # traffic.log — one line per /latest.json fetch, read and truncated by the worker (§12.8)
+      - weblogs:/var/log/nginx
     depends_on:
       - worker
 
@@ -29,9 +31,17 @@ services:
       STATE_DIR: /repo/worker/.state
       GIT_SSH_COMMAND: ssh -i /root/.ssh/id_ed25519 -o StrictHostKeyChecking=accept-new
       LOOP_INTERVAL_MINUTES: "60"
+      TRAFFIC_LOG: /logs/traffic.log
     volumes:
       # the whole checkout: the worker edits data/ and commits into the host repo
       - ..:/repo
       - /root/.ssh/agi_frontier_bot:/root/.ssh/id_ed25519:ro
+      # read-write: the worker counts the visits, then truncates the log (copytruncate)
+      - weblogs:/logs
     working_dir: /repo
     command: ["bun", "run", "worker/src/cli.ts", "loop"]
+
+volumes:
+  # nginx's log directory, shared with the worker. Holds only traffic.log; the worker turns it
+  # into daily unique-visitor counts and empties it, so no address is ever stored (REDESIGN §12.8).
+  weblogs:

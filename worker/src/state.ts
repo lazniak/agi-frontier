@@ -8,10 +8,18 @@ import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { EMPTY_WORKER_STATE, type ResearcherBudget, type WorkerState } from '@agi/shared';
 import { isoNow } from './fetcher';
+import { EMPTY_TRAFFIC_STATE, type TrafficState } from './traffic';
 
 export interface RunState extends WorkerState {
   /** Last successful `discover` run — the 24 h gate in `loop`. */
   last_discover_at: string | null;
+  /**
+   * Visitor measurement behind the research cadence (REDESIGN §12.8). Loop-internal and
+   * deliberately *not* published: the bundle gets only the `researcher.cadence` summary, because
+   * the open day's salted hashes are the one part of this file that is about people rather than
+   * about the worker. See `traffic.ts` for the privacy properties.
+   */
+  traffic: TrafficState;
 }
 
 /**
@@ -132,8 +140,9 @@ export type HashState = Record<string, SourceState>;
 
 export const EMPTY_RUN_STATE: RunState = {
   ...EMPTY_WORKER_STATE,
-  researcher: { ...EMPTY_WORKER_STATE.researcher, usage_total: null, last_backfill_summary: null },
+  researcher: { ...EMPTY_WORKER_STATE.researcher, usage_total: null, last_backfill_summary: null, cadence: null },
   last_discover_at: null,
+  traffic: EMPTY_TRAFFIC_STATE,
 };
 
 /** Comfortably larger than the biggest source window (OpenAI's feed carries 400+ items). */
@@ -148,7 +157,10 @@ export class StateStore {
 
   readRun(): RunState {
     const raw = readJson<Partial<RunState>>(join(this.dir, 'state.json'));
-    return { ...EMPTY_RUN_STATE, ...(raw ?? {}) };
+    const merged = { ...EMPTY_RUN_STATE, ...(raw ?? {}) };
+    // `traffic` gained fields after the first deploy, so fill the block rather than trusting it:
+    // a half-populated one would make the cadence read as "never measured" forever.
+    return { ...merged, traffic: { ...EMPTY_TRAFFIC_STATE, ...(merged.traffic ?? {}) } };
   }
 
   writeRun(state: RunState): void {
@@ -163,10 +175,14 @@ export class StateStore {
     writeJson(join(this.dir, 'hashes.json'), hashes);
   }
 
-  /** The public bundle exposes everything except the loop-internal bookkeeping. */
+  /**
+   * The public bundle exposes everything except the loop-internal bookkeeping. `traffic` is
+   * destructured away here and nowhere else: the visitor measurement never leaves the worker, and
+   * the site sees only the `researcher.cadence` summary derived from it (REDESIGN §12.8).
+   */
   static toWorkerState(run: RunState): WorkerState {
-    const { last_discover_at: _discover, ...pub } = run;
-    // Older state.json files predate these two fields; publish them as explicit nulls so the
+    const { last_discover_at: _discover, traffic: _traffic, ...pub } = run;
+    // Older state.json files predate these three fields; publish them as explicit nulls so the
     // site can tell "never measured" from "missing key".
     return {
       ...pub,
@@ -174,6 +190,7 @@ export class StateStore {
         ...pub.researcher,
         usage_total: pub.researcher.usage_total ?? null,
         last_backfill_summary: pub.researcher.last_backfill_summary ?? null,
+        cadence: pub.researcher.cadence ?? null,
       },
     };
   }

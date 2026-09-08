@@ -50,6 +50,17 @@ export interface Config {
   promoteMinScoreRecall: number;
   /** Version stamped on researcher-written releases and in the bundle. */
   researcherVersion: string;
+  /**
+   * nginx access log the web container writes one line per `GET /latest.json` to (REDESIGN §12.8).
+   * Absent file = no traffic measured = the default weekly cadence, so the worker runs unchanged
+   * anywhere the volume is not mounted.
+   */
+  trafficLog: string;
+  /**
+   * Monthly OpenRouter spend guard in USD. Once the month-to-date estimate reaches it the cadence
+   * is forced to its slowest tier. Zero or negative disables the guard.
+   */
+  researchMonthlyUsd: number;
   /** USD per 1M tokens; when set they override the built-in price table. */
   openRouterPriceIn: number | null;
   openRouterPriceOut: number | null;
@@ -147,6 +158,9 @@ export function loadConfig(overrides: Partial<Config> = {}): Config {
     promoteMinPrecision: envFloat('PROMOTE_MIN_PRECISION', 0.95) ?? 0.95,
     promoteMinScoreRecall: envFloat('PROMOTE_MIN_SCORE_RECALL', 0.8) ?? 0.8,
     researcherVersion: env('RESEARCHER_VERSION') ?? '2.0.0',
+    // Container path from docker-compose (volume `weblogs`); harmless when it does not exist.
+    trafficLog: env('TRAFFIC_LOG') ?? '/logs/traffic.log',
+    researchMonthlyUsd: envFloat('RESEARCH_MONTHLY_USD', 60) ?? 60,
     openRouterPriceIn: envFloat('OPENROUTER_PRICE_IN', null),
     openRouterPriceOut: envFloat('OPENROUTER_PRICE_OUT', null),
   };
