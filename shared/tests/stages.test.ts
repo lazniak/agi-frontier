@@ -9,9 +9,12 @@ import {
   projectedEra,
   regimeOf,
   SATURATION_P,
+  speculativeLevels,
 } from '../src/stages';
 import { fitFrontierIndex, frontierLine, indexFromTheta, logit, thetaFromIndex } from '../src/frontier-index';
 import type { FrontierPoint } from '../src/frontier-index';
+import { ratingFromTheta } from '../src/rating';
+import type { Level } from '../src/types';
 import { addDays, dateToDayNumber } from '../src/timeline';
 import { benchmark, raschFixture, release, score } from './test-helpers';
 
@@ -269,5 +272,62 @@ describe('paceEras and regimes', () => {
     const trend = frontierTrend(thetaRamp(365, perDay), asOf);
     expect(projectedEra(trend)).toBe('takeoff');
     expect(projectedEra(null)).toBeNull();
+  });
+});
+
+describe('speculativeLevels', () => {
+  const ceiling: Level = { id: 'ceiling', kind: 'ceiling', label: 'Current basket ceiling', theta: 2.5, rating: ratingFromTheta(2.5) };
+
+  test('four landmarks at θ_c + k·ln 10, ascending, all speculative', () => {
+    const spec = speculativeLevels(ceiling);
+    expect(spec.map((l) => l.id)).toEqual(['spec-10x', 'spec-100x', 'spec-all', 'spec-singularity']);
+    spec.forEach((l, i) => {
+      expect(l.kind).toBe('speculative');
+      expect(l.theta).toBeCloseTo(2.5 + (i + 1) * Math.LN10, 12);
+      expect(l.rating).toBeCloseTo(ratingFromTheta(l.theta), 12);
+      // Each rung is exactly 400 rating points (one order of magnitude in the odds) above the last.
+      expect(l.rating - (i === 0 ? ceiling.rating : spec[i - 1]!.rating)).toBeCloseTo(400, 9);
+      expect(l.label.toLowerCase()).toContain('speculative');
+      if (i > 0) expect(l.theta).toBeGreaterThan(spec[i - 1]!.theta);
+    });
+    expect(spec[3]!.label).toContain('singularity');
+  });
+
+  test('is not part of benchmarkLevels and never enters crossings unless passed explicitly', () => {
+    const benches = [benchmark('gpqa'), benchmark('arc')];
+    const releases = [release('m1', 'openai', '2025-01-01', [score('gpqa', 60), score('arc', 30)])];
+    const fit = fitFrontierIndex(releases, benches);
+    const levels = benchmarkLevels(fit, benches);
+    expect(levels.some((l) => l.kind === 'speculative')).toBe(false);
+    const line = frontierLine(fit);
+    const crossings = frontierCrossings(line, levels, '2025-06-01');
+    expect(crossings.some((c) => c.level.kind === 'speculative')).toBe(false);
+  });
+
+  test('frontierCrossings itself refuses a speculative level, however it is handed one', () => {
+    // The ladder layer concatenates `[...levels, ...speculativeLevels(ceiling)]` to draw the
+    // axis; §12.1 says a landmark can never acquire a date, so the guard lives in the maths and
+    // not in the discipline of every caller.
+    const perDay = 0.003;
+    const asOf = addDays('2025-01-01', 364);
+    const line = thetaRamp(365, perDay, '2025-01-01', 0, 0.05);
+    const measured: Level[] = [
+      { id: 'passed', kind: 'ceiling', label: 'passed', theta: 0.2, rating: ratingFromTheta(0.2) },
+      { id: 'ahead', kind: 'ceiling', label: 'ahead', theta: 1.4, rating: ratingFromTheta(1.4) },
+    ];
+    const ceiling = measured[1]!;
+    const spec = speculativeLevels(ceiling);
+    // Without the guard the first landmark would be dated: it is only ln 10 above `ahead`, well
+    // inside the 15-year horizon at this slope.
+    expect((spec[0]!.theta - 1.4) / perDay).toBeLessThan(15 * 365);
+
+    const measuredOnly = frontierCrossings(line, measured, asOf);
+    const withLandmarks = frontierCrossings(line, [...measured, ...spec], asOf);
+    expect(measuredOnly.map((c) => c.kind)).toEqual(['past', 'predicted']);
+    expect(withLandmarks.some((c) => c.level.kind === 'speculative')).toBe(false);
+    // Nothing else changes: the measured levels keep exactly the crossings they had.
+    expect(withLandmarks.map((c) => `${c.level.id}:${c.kind}:${c.date}`)).toEqual(
+      measuredOnly.map((c) => `${c.level.id}:${c.kind}:${c.date}`),
+    );
   });
 });

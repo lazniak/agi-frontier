@@ -13,6 +13,7 @@ import {
   lognormalQuantile,
   mean,
   normalInverseCdf,
+  normalPdf,
   populationSd,
   populationVariance,
 } from './stats';
@@ -204,17 +205,37 @@ export function stretchedConditionalQuantile(mu: number, sigma: number, t0: numb
 }
 
 /**
- * P(T' <= t0 + horizon | T' > t0) under the stretched law T' = m · (T / m)^s — i.e. the
- * unstretched probability at the pulled-back time m · (t / m)^(1/s).
+ * CDF of the stretched conditional law at the absolute time `t` (days since the anchor release):
+ * P(T' ≤ t) with T' = m · (T / m)^s — the unstretched conditional probability at the pulled-back
+ * time m · (t / m)^(1/s). This is the exact inverse of {@link stretchedConditionalQuantile}:
+ * `stretchedConditionalCdf(…, stretchedConditionalQuantile(…, q, s), s) === q`.
+ *
+ * It is deliberately **not** truncated at `t0`. For s > 1 and a lab still inside its cycle
+ * (t0 < the conditional median m) the stretch maps the left tail to times before `t0`: the
+ * support of T' begins at m · (t0/m)^s, which is earlier than `t0`. That is the same mass the
+ * stretched quantiles already report — `forecastLab` writes p05/p16 dates before asOf in exactly
+ * this situation — so a density that refuses to show it has to dump it somewhere. Truncating at
+ * `t0` (what {@link stretchedConditionalProb} does, correctly for its own question) turns it
+ * into a jump of the CDF at asOf, i.e. a point mass on whichever lens sample straddles today.
+ */
+export function stretchedConditionalCdf(mu: number, sigma: number, t0: number, t: number, s: number): number {
+  if (!(s > 0) || s === 1) return lognormalConditionalProb(mu, sigma, t0, t - t0);
+  if (!(t > 0)) return 0;
+  const m = lognormalConditionalQuantile(mu, sigma, t0, 0.5);
+  if (!(m > 0)) return lognormalConditionalProb(mu, sigma, t0, t - t0);
+  return lognormalConditionalProb(mu, sigma, t0, m * Math.pow(t / m, 1 / s) - t0);
+}
+
+/**
+ * P(T' <= t0 + horizon) under the stretched law T' = m · (T / m)^s, floored at 0 for a horizon
+ * that has already passed — the "will it land within the next `horizon` days" number (p30, p90).
+ * Equal to {@link stretchedConditionalCdf} for every horizon > 0; the two differ only on the
+ * stretched law's left tail, which lies before asOf and is not part of that question.
  */
 export function stretchedConditionalProb(mu: number, sigma: number, t0: number, horizon: number, s: number): number {
   if (!(s > 0) || s === 1) return lognormalConditionalProb(mu, sigma, t0, horizon);
   if (!(horizon > 0)) return 0;
-  const m = lognormalConditionalQuantile(mu, sigma, t0, 0.5);
-  const t = t0 + horizon;
-  if (!(m > 0) || !(t > 0)) return lognormalConditionalProb(mu, sigma, t0, horizon);
-  const back = m * Math.pow(t / m, 1 / s);
-  return lognormalConditionalProb(mu, sigma, t0, Math.max(0, back - t0));
+  return stretchedConditionalCdf(mu, sigma, t0, t0 + horizon, s);
 }
 
 /** Distinct release dates of a lab, ascending, restricted to tiers. Same-day launches count as one event. */
@@ -691,4 +712,149 @@ export function capabilityFan(
     });
   }
   return out;
+}
+
+/* ------------------------------------------------------------- release lens */
+
+/** One sample of the release-date density (REDESIGN §12.4). */
+export interface DensitySample {
+  /** Calendar day of the sample (rounded from `day`). */
+  date: ISODate;
+  /**
+   * Fractional day number of the sample (same origin as `timeline.dateToDayNumber`), so a lens
+   * over a window of a few days can still be drawn smoothly — `date` alone would repeat.
+   */
+  day: number;
+  /** Density: mode = 1 in `releaseDensity`; probability per day in `releaseDensityRaw`. */
+  p: number;
+}
+
+/** Fewest samples a lens ever gets, so even a days-wide window is a shape and not a line. */
+export const MIN_DENSITY_SAMPLES = 8;
+
+/** Quantile levels bounding the sampled window of the lens (REDESIGN §12.4: 2nd–98th). */
+const LENS_Q_LOW = 0.02;
+const LENS_Q_HIGH = 0.98;
+
+/**
+ * The unnormalised release-date density of one prediction, in probability **per day**, sampled
+ * on `n` (≥ {@link MIN_DENSITY_SAMPLES}) equally spaced days between the prediction's 2nd and
+ * 98th percentile dates. Integrating `p` over the window (Riemann sum × step) therefore gives
+ * ≈ 0.96 for a statistical prediction. `releaseDensity` is this divided by its maximum.
+ *
+ * The law is the one `forecastLab` used to place the prediction, re-derived from the same
+ * quantities (REDESIGN §12.4):
+ *
+ * - k = 1, statistical: the finite-difference derivative of the stretched conditional CDF
+ *   `stretchedConditionalCdf(f.mu, f.sigma, f.elapsedDays, T, f.sigmaScale)` with `T` = days
+ *   since `f.lastRelease.date`, differenced over one day — so `p` is literally P(the launch
+ *   lands on that day). With `sigmaScale > 1` the stretch reaches back before `asOf`, exactly
+ *   as the p05/p16 dates `forecastLab` publishes do, so the leading samples of the window carry
+ *   real mass; taking the derivative of `stretchedConditionalProb` instead would floor that
+ *   tail at `asOf` and pile it onto one sample as a needle.
+ * - k ≥ 2: the log-normal pdf of the offset `X` from the chain anchor with median
+ *   `m = daysBetween(anchor, pred.medianDate)` and log-σ `f.sigma · f.sigmaScale · √k` — exactly
+ *   the law whose quantiles `forecastLab` writes (`anchor + m·exp(σ_k·z_q)`). The anchor is not
+ *   stored on `PredictedRelease`, so it is recovered the way the chain was built: the announced
+ *   k = 1 median when `f.next[0].source === 'announced'`, else the last release date.
+ * - k = 1, `announced`: the lab published a window, not a law. The lens is a trapezoid — flat
+ *   over `[p16, p84]` (the window itself) falling linearly to 0 at `p05` / `p95`, and sampled
+ *   over `[p05, p95]` because there are no 2nd/98th percentiles to speak of.
+ *
+ * Degenerate cases (an overdue lab whose conditional law has collapsed to "tomorrow", a σ of
+ * 0) give a window under a day wide; it is padded to one day and the density made flat, so the
+ * caller always gets a drawable shape. Empty only when the lab has no release at all.
+ */
+export function releaseDensityRaw(
+  f: LabForecast,
+  pred: PredictedRelease,
+  n: number = 48,
+): { samples: DensitySample[]; stepDays: number } {
+  const last = f.lastRelease;
+  if (!last) return { samples: [], stepDays: 0 };
+  const count = Math.max(MIN_DENSITY_SAMPLES, Math.round(n));
+
+  let lowDay: number;
+  let highDay: number;
+  let pdf: (day: number) => number;
+
+  if (pred.source === 'announced') {
+    const d05 = dateToDayNumber(pred.p05Date);
+    const d16 = dateToDayNumber(pred.p16Date);
+    const d84 = dateToDayNumber(pred.p84Date);
+    const d95 = dateToDayNumber(pred.p95Date);
+    lowDay = d05;
+    highDay = d95;
+    // Trapezoid with unit plateau, then scaled to integrate to 1 over [p05, p95].
+    const area = (d84 - d16) + 0.5 * (d16 - d05) + 0.5 * (d95 - d84);
+    const scale = area > 0 ? 1 / area : 1;
+    pdf = (day) => {
+      if (day <= d05 || day >= d95) return 0;
+      if (day < d16) return scale * ((day - d05) / Math.max(1e-9, d16 - d05));
+      if (day > d84) return scale * ((d95 - day) / Math.max(1e-9, d95 - d84));
+      return scale;
+    };
+  } else if (pred.k <= 1) {
+    const anchorDay = dateToDayNumber(last.date);
+    const t0 = f.elapsedDays;
+    const s = f.sigmaScale;
+    // stretchedConditionalCdf, not stretchedConditionalProb: the latter is floored at t0, which
+    // would gather everything the stretch pushed before asOf onto the single sample straddling
+    // today (a needle where the lens should have a shoulder). See its doc comment.
+    const cdf = (T: number) => stretchedConditionalCdf(f.mu, f.sigma, t0, T, s);
+    lowDay = anchorDay + clampOffset(stretchedConditionalQuantile(f.mu, f.sigma, t0, LENS_Q_LOW, s));
+    highDay = anchorDay + clampOffset(stretchedConditionalQuantile(f.mu, f.sigma, t0, LENS_Q_HIGH, s));
+    // Central difference over one day: P(T ∈ [T − ½, T + ½]).
+    pdf = (day) => Math.max(0, cdf(day - anchorDay + 0.5) - cdf(day - anchorDay - 0.5));
+  } else {
+    const first = f.next[0];
+    const anchorDate = first !== undefined && first.source === 'announced' ? first.medianDate : last.date;
+    const anchorDay = dateToDayNumber(anchorDate);
+    const m = Math.max(1, daysBetween(anchorDate, pred.medianDate));
+    const sigmaK = f.sigma * f.sigmaScale * Math.sqrt(pred.k);
+    lowDay = anchorDay + clampOffset(m * Math.exp(sigmaK * normalInverseCdf(LENS_Q_LOW)));
+    highDay = anchorDay + clampOffset(m * Math.exp(sigmaK * normalInverseCdf(LENS_Q_HIGH)));
+    const lnM = Math.log(m);
+    pdf = (day) => {
+      const x = day - anchorDay;
+      if (!(x > 0) || !(sigmaK > 0)) return 0;
+      return normalPdf((Math.log(x) - lnM) / sigmaK) / (x * sigmaK);
+    };
+  }
+
+  // A window under a day wide cannot be sampled meaningfully: pad it and draw it flat.
+  let flat = false;
+  if (!(highDay - lowDay >= 1)) {
+    const centre = (lowDay + highDay) / 2;
+    lowDay = centre - 0.5;
+    highDay = centre + 0.5;
+    flat = true;
+  }
+
+  const stepDays = (highDay - lowDay) / (count - 1);
+  const samples: DensitySample[] = [];
+  let anyMass = false;
+  for (let i = 0; i < count; i++) {
+    const day = lowDay + i * stepDays;
+    const p = flat ? 1 : pdf(day);
+    if (p > 0 && Number.isFinite(p)) anyMass = true;
+    samples.push({ date: dayNumberToDate(day), day, p: Number.isFinite(p) ? Math.max(0, p) : 0 });
+  }
+  // A numerically dead law (all zeros) is drawn flat rather than not at all.
+  if (!anyMass) for (const smp of samples) smp.p = 1;
+  return { samples, stepDays };
+}
+
+/**
+ * Release-date density of one prediction, normalised so its mode is 1 (REDESIGN §12.4) — the
+ * shape of the "release lens": `n` samples between the 2nd and 98th percentile dates, `p ≥ 0`
+ * everywhere, at least {@link MIN_DENSITY_SAMPLES} samples. See {@link releaseDensityRaw} for
+ * the law behind each `k` and the unnormalised probability-per-day form.
+ */
+export function releaseDensity(f: LabForecast, pred: PredictedRelease, n: number = 48): DensitySample[] {
+  const { samples } = releaseDensityRaw(f, pred, n);
+  let max = 0;
+  for (const s of samples) if (s.p > max) max = s.p;
+  if (!(max > 0)) return samples;
+  return samples.map((s) => ({ ...s, p: s.p / max }));
 }

@@ -2,12 +2,18 @@ import { describe, expect, test } from 'bun:test';
 import {
   DEFAULT_PRIOR_MU,
   DEFAULT_PRIOR_SIGMA,
+  MIN_DENSITY_SAMPLES,
   cadencePrior,
   capabilityFan,
   forecastAll,
   forecastLab,
   lognormalConditionalProb,
   lognormalConditionalQuantile,
+  releaseDensity,
+  releaseDensityRaw,
+  stretchedConditionalCdf,
+  stretchedConditionalProb,
+  stretchedConditionalQuantile,
 } from '../src/prediction';
 import { fitFrontierIndex, logit } from '../src/frontier-index';
 import { addDays, dateToDayNumber, daysBetween } from '../src/timeline';
@@ -787,5 +793,161 @@ describe('forecastLab — drift shift (T31 it. 3)', () => {
       clamp(prior2.driftPerDay * (dateToDayNumber(ASOF) - prior2.tBar), -1, 1),
       9,
     );
+  });
+});
+
+/* ------------------------------------------- the release lens (REDESIGN §12.4) */
+
+describe('stretchedConditionalCdf', () => {
+  const mu = Math.log(120);
+  const sigma = 0.5;
+  const t0 = 90;
+
+  test('inverts stretchedConditionalQuantile exactly, for every scale', () => {
+    for (const s of [1, 1.4, 2.5]) {
+      for (const q of [0.02, 0.05, 0.16, 0.5, 0.84, 0.95, 0.98]) {
+        const t = stretchedConditionalQuantile(mu, sigma, t0, q, s);
+        expect(stretchedConditionalCdf(mu, sigma, t0, t, s)).toBeCloseTo(q, 9);
+      }
+    }
+  });
+
+  test('agrees with stretchedConditionalProb everywhere after t0, and is continuous across it', () => {
+    const s = 1.4;
+    for (const h of [0.5, 1, 10, 100, 400]) {
+      expect(stretchedConditionalCdf(mu, sigma, t0, t0 + h, s)).toBeCloseTo(
+        stretchedConditionalProb(mu, sigma, t0, h, s),
+        12,
+      );
+    }
+    // The stretch pushes the left tail before t0, so the CDF is already positive there and
+    // rises smoothly through today; stretchedConditionalProb floors that whole tail onto t0.
+    const justBefore = stretchedConditionalCdf(mu, sigma, t0, t0 - 0.5, s);
+    const justAfter = stretchedConditionalCdf(mu, sigma, t0, t0 + 0.5, s);
+    expect(justBefore).toBeGreaterThan(0);
+    expect(justAfter - justBefore).toBeLessThan(0.02); // no jump — the old atom was ≈ 0.17
+    expect(stretchedConditionalProb(mu, sigma, t0, -0.5, s)).toBe(0);
+  });
+
+  test('monotone, and 0 below the support of the stretched law', () => {
+    const s = 2;
+    let prev = -1;
+    for (let t = 1; t <= 600; t += 1) {
+      const p = stretchedConditionalCdf(mu, sigma, t0, t, s);
+      expect(p).toBeGreaterThanOrEqual(prev);
+      prev = p;
+    }
+    // Support floor m·(t0/m)^s: everything below it is genuinely impossible under the stretch.
+    const m = stretchedConditionalQuantile(mu, sigma, t0, 0.5, s);
+    const floor = m * Math.pow(t0 / m, s);
+    expect(floor).toBeLessThan(t0); // the stretch really does reach before asOf here
+    expect(stretchedConditionalCdf(mu, sigma, t0, floor - 1, s)).toBe(0);
+    expect(stretchedConditionalCdf(mu, sigma, t0, floor + 1, s)).toBeGreaterThan(0);
+  });
+});
+
+describe('releaseDensity — the k = 1 lens under a production sigmaScale', () => {
+  /**
+   * Irregular gaps (80/150/95/165 d) so the fitted σ is genuinely positive — a lab on a perfect
+   * metronome fits σ = 0 and every lens collapses to a flat day. asOf is 90 days after the last
+   * release, i.e. mid-cycle, which is where the stretch reaches back before today.
+   */
+  const OFFSETS = [0, 80, 230, 325, 490];
+  const lensReleases = OFFSETS.map((off, i) =>
+    release(`lens-m${i}`, 'openai', addDays('2023-06-01', off), [score('a', 45 + 6 * i), score('b', 38 + 6 * i)]),
+  );
+  const lensFit = fitOf(lensReleases);
+  const forecastAt = (sigmaScale: number) =>
+    forecastAll(['openai'], lensReleases, lensFit, { asOf: ASOF, sigmaScale })[0]!;
+
+  /** Riemann sum of the unnormalised density: the mass between the 2nd and 98th percentiles. */
+  const massOf = (sigmaScale: number, n: number): number => {
+    const f = forecastAt(sigmaScale);
+    const { samples, stepDays } = releaseDensityRaw(f, f.next[0]!, n);
+    return samples.reduce((acc, s) => acc + s.p * stepDays, 0);
+  };
+
+  const modeIndex = (samples: { p: number }[]): number => {
+    let best = 0;
+    for (let i = 0; i < samples.length; i++) if (samples[i]!.p > samples[best]!.p) best = i;
+    return best;
+  };
+
+  test('the lab is mid-cycle, so the stretch really does reach behind asOf', () => {
+    const f = forecastAt(1.4);
+    expect(f.elapsedDays).toBeGreaterThan(0);
+    expect(f.sigma).toBeGreaterThan(0);
+    // With s > 1 forecastLab itself publishes a p05 before today; the lens must tell the same story.
+    expect(f.next[0]!.p05Date < ASOF).toBe(true);
+  });
+
+  test('integrates to the sampled 96 % at every scale and sample count', () => {
+    // Before the atom was removed these were 0.86 (s = 1.4, n = 48), 1.43 (n = 44 — a grid whose
+    // samples straddle asOf) and 10.67 (s = 2.5, n = 15): mass either vanished between samples
+    // or was counted as a needle several times its true height.
+    for (const s of [1, 1.4, 2.5]) {
+      for (const n of [15, 44, 48, 96]) {
+        expect(massOf(s, n)).toBeGreaterThan(0.9);
+        expect(massOf(s, n)).toBeLessThan(1.1);
+      }
+    }
+  });
+
+  test('no needle at asOf: the shape is a smooth bump at sigmaScale 1.4', () => {
+    const f = forecastAt(1.4);
+    const pred = f.next[0]!;
+    for (const n of [44, 48]) {
+      const samples = releaseDensity(f, pred, n);
+      const mode = modeIndex(samples);
+      let nearest = 0;
+      for (let i = 0; i < samples.length; i++) {
+        if (Math.abs(daysBetween(ASOF, samples[i]!.date)) < Math.abs(daysBetween(ASOF, samples[nearest]!.date))) {
+          nearest = i;
+        }
+      }
+      // The old code put the whole pre-asOf tail on this one sample and made it the mode.
+      expect(mode).not.toBe(nearest);
+      expect(samples[mode]!.date >= pred.p16Date && samples[mode]!.date <= pred.p84Date).toBe(true);
+      // Every sample carries mass (the truncated CDF left the leading samples at exactly 0) …
+      for (const smp of samples) expect(smp.p).toBeGreaterThan(0);
+      // … and the shape rises to the mode and falls after it, with no cliff between neighbours.
+      for (let i = 1; i < samples.length; i++) {
+        expect(Math.abs(samples[i]!.p - samples[i - 1]!.p)).toBeLessThan(0.2);
+        if (i <= mode) expect(samples[i]!.p).toBeGreaterThanOrEqual(samples[i - 1]!.p);
+        else expect(samples[i]!.p).toBeLessThanOrEqual(samples[i - 1]!.p);
+      }
+    }
+  });
+
+  test('an extreme scale still gives one bump inside the published window', () => {
+    const f = forecastAt(2.5);
+    const pred = f.next[0]!;
+    const samples = releaseDensity(f, pred, 48);
+    const mode = modeIndex(samples);
+    // A wide stretch moves the mode of the law itself earlier — it may sit before p16 — but it
+    // stays inside the window forecastLab published, and the lens stays continuous.
+    expect(samples[mode]!.date >= pred.p05Date && samples[mode]!.date <= pred.p95Date).toBe(true);
+    for (let i = 1; i < samples.length; i++) {
+      expect(samples[i]!.p).toBeGreaterThan(0);
+      expect(Math.abs(samples[i]!.p - samples[i - 1]!.p)).toBeLessThan(0.2);
+    }
+  });
+
+  test('shape invariants: mode 1, never negative, never fewer than MIN_DENSITY_SAMPLES', () => {
+    const f = forecastAt(1.4);
+    const samples = releaseDensity(f, f.next[0]!, 2);
+    expect(samples.length).toBe(MIN_DENSITY_SAMPLES);
+    expect(Math.max(...samples.map((s) => s.p))).toBeCloseTo(1, 12);
+    for (const s of samples) {
+      expect(s.p).toBeGreaterThanOrEqual(0);
+      expect(Number.isFinite(s.day)).toBe(true);
+    }
+    // A chained (k ≥ 2) prediction uses the log-normal branch and must stay drawable too.
+    const chained = releaseDensity(f, f.next[2]!, 32);
+    expect(chained.length).toBe(32);
+    expect(Math.max(...chained.map((s) => s.p))).toBeCloseTo(1, 12);
+    // A lab with no release at all has no lens.
+    const empty = forecastAll(['meta'], lensReleases, lensFit, { asOf: ASOF })[0]!;
+    expect(releaseDensity(empty, { ...f.next[0]! }, 16)).toEqual([]);
   });
 });

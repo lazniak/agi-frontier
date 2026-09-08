@@ -156,6 +156,7 @@ export const BundleSchema = z.object({
       budget: z.any().nullable(),
       usage_total: z.any().nullable().optional(),
       last_backfill_summary: z.string().nullable().optional(),
+      cadence: z.any().nullable().optional(),
     }).strict(),
   }).strict(),
 }).strict();

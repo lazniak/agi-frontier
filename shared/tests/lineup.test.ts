@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test';
-import { labLineup, lineupBand, tierOf } from '../src/lineup';
+import { familyRibbon, labLineup, lineupBand, tierOf } from '../src/lineup';
 import { fitFrontierIndex } from '../src/frontier-index';
 import { benchmark, release, score } from './test-helpers';
 import type { ModelRelease } from '../src/types';
@@ -145,5 +145,88 @@ describe('lineupBand', () => {
     expect(band[0]!.hiTheta).toBe(band[0]!.loTheta);
     expect(band[2]!.hiId).toBe('f1');
     expect(band[2]!.loId).toBe('s2');
+  });
+});
+
+describe('familyRibbon', () => {
+  /**
+   * Ages at the 2025-05-15 knot: f1 = 500 d (evicted by the default 365-day window), f2 = 300 d
+   * (still current), f3 = 0 d. θ ranks f1 > f3 > f2, so the eviction is *observable*: with the
+   * window the top edge is f3, without it f1 would keep the slot for ever. Any regression that
+   * stopped advancing `from` changes `hiId` here.
+   */
+  const releases = [
+    release('f1', 'openai', '2024-01-01', [score('a', 60), score('b', 50), score('c', 45)]),
+    release('f2', 'openai', '2024-07-19', [score('a', 30), score('b', 25), score('c', 20)]),
+    release('f3', 'openai', '2025-05-15', [score('a', 45), score('b', 40), score('c', 33)]),
+  ];
+  const fit = fitFrontierIndex(releases, BMS);
+  const theta = (id: string) => fit.models[id]!.theta;
+
+  test('the fixture really is ordered f1 > f3 > f2 in θ', () => {
+    expect(theta('f1')).toBeGreaterThan(theta('f3'));
+    expect(theta('f3')).toBeGreaterThan(theta('f2'));
+  });
+
+  test('a model older than the window drops out of the family and gives up its edge', () => {
+    const band = familyRibbon(fit, releases, 'openai', { asOf: '2025-05-15' });
+    expect(band.map((p) => p.date)).toEqual(['2024-01-01', '2024-07-19', '2025-05-15']);
+
+    // 2024-07-19: f1 is 200 days old, still current — it holds the top edge.
+    expect(band[1]!.hiId).toBe('f1');
+    expect(band[1]!.loId).toBe('f2');
+
+    // 2025-05-15: f1 is 500 days old and gone; f2 is 300 days old and stays, so the family is
+    // {f2, f3} and the top edge moves down from f1's θ to f3's.
+    expect(band[2]!.hiId).toBe('f3');
+    expect(band[2]!.loId).toBe('f2');
+    expect(band[2]!.hiTheta).toBeCloseTo(theta('f3'), 12);
+    expect(band[2]!.hiTheta).toBeLessThan(band[1]!.hiTheta);
+  });
+
+  test('windowDays widened past the oldest release keeps every model in the family', () => {
+    const band = familyRibbon(fit, releases, 'openai', { asOf: '2025-05-15', windowDays: 600 });
+    expect(band[2]!.hiId).toBe('f1'); // 500 d < 600 d, so f1 is still current
+    expect(band[2]!.loId).toBe('f2');
+  });
+
+  test('a tight window evicts at the earlier knot too', () => {
+    const band = familyRibbon(fit, releases, 'openai', { asOf: '2025-05-15', windowDays: 30 });
+    // Every gap here is larger than 30 days, so each knot sees only its own release.
+    for (const p of band) expect(p.hiId).toBe(p.loId);
+    expect(band[1]!.hiId).toBe('f2');
+    expect(band[2]!.hiId).toBe('f3');
+  });
+
+  test('the asOf knot collapses onto the latest model when the window has emptied', () => {
+    // 2026-06-01: f2 is 682 d old and f3 382 d — nobody is inside the 365-day window, so rather
+    // than vanishing the ribbon degenerates to the single latest model.
+    const band = familyRibbon(fit, releases, 'openai', { asOf: '2026-06-01' });
+    const last = band[band.length - 1]!;
+    expect(last.date).toBe('2026-06-01');
+    expect(last.hiId).toBe('f3');
+    expect(last.loId).toBe('f3');
+    expect(last.hiTheta).toBeCloseTo(last.loTheta, 12);
+  });
+
+  test('tiers filter and same-day collapse', () => {
+    const mixed = [
+      release('f1', 'google', '2024-01-01', [score('a', 60), score('b', 50), score('c', 45)]),
+      tierRelease('s1', 'google', '2024-02-01', [score('a', 30), score('b', 22), score('c', 18)], 'small'),
+      tierRelease('s2', 'google', '2024-02-01', [score('a', 33), score('b', 25), score('c', 20)], 'small'),
+    ];
+    const mixedFit = fitFrontierIndex(mixed, BMS);
+    const all = familyRibbon(mixedFit, mixed, 'google', { asOf: '2024-03-01' });
+    expect(all.map((p) => p.date)).toEqual(['2024-01-01', '2024-02-01', '2024-03-01']);
+    expect(all[1]!.hiId).toBe('f1');
+    expect(all[1]!.loId).toBe('s1'); // the weaker of the two same-day smalls
+
+    const flagshipsOnly = familyRibbon(mixedFit, mixed, 'google', { asOf: '2024-03-01', tiers: ['flagship'] });
+    expect(flagshipsOnly.map((p) => p.date)).toEqual(['2024-01-01', '2024-03-01']);
+    for (const p of flagshipsOnly) expect(p.hiId).toBe('f1');
+  });
+
+  test('a lab with nothing fitted has no ribbon', () => {
+    expect(familyRibbon(fit, releases, 'meta', { asOf: '2025-05-15' })).toEqual([]);
   });
 });

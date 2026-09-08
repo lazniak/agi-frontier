@@ -4,6 +4,7 @@
  */
 import type { BandPoint, ISODate, LabId, ModelRelease, ModelTier } from './types';
 import type { IndexFit, ModelIndex } from './frontier-index';
+import { daysBetween } from './timeline';
 
 export const ALL_TIERS: ModelTier[] = ['flagship', 'mid', 'small'];
 
@@ -93,6 +94,98 @@ export function lineupBand(
     // row of that date — the later id in sort order has then won each tier slot.
     const nextSameDay = i + 1 < rows.length && rows[i + 1]!.date === r.date;
     if (!nextSameDay) emit(r.date);
+  }
+  return out;
+}
+
+/** Options of {@link familyRibbon}. */
+export interface FamilyRibbonOptions {
+  /** Only releases with `date <= asOf` count; the ribbon is also extended to this date. */
+  asOf?: ISODate | undefined;
+  /** How long a release stays in the "current family" after its launch (default 365 days). */
+  windowDays?: number | undefined;
+  /** Lineup tiers that may enter the family (default all three). */
+  tiers?: ModelTier[] | undefined;
+}
+
+/**
+ * Real-data family ribbon (REDESIGN §12.3): a filled band per lab through time whose edges are
+ * the best and the weakest member of the lab's *current family*.
+ *
+ * At every date `t` in the lab's release dates (≤ `asOf`, same-day launches collapsing into
+ * one knot) the current family is every released, fitted model of the lab in `tiers` with
+ * `t − windowDays ≤ date ≤ t`; `hiTheta` / `loTheta` are the max / min θ over that set (ids in
+ * `hiId` / `loId`). A final knot is emitted at `asOf` (when it lies after the last release) so
+ * the band can be drawn to "now"; there the window may be empty — a lab that has not shipped
+ * for over a year — and the family then degenerates to the single latest model, so the ribbon
+ * collapses onto its line rather than vanishing. With one current model hi = lo everywhere.
+ *
+ * This is deliberately *not* `lineupBand`: that one keeps one slot per tier forever, this one
+ * forgets a model once it is older than the window, which is what "the family's upper and
+ * lower bound" means on a chart that shows every tier.
+ */
+export function familyRibbon(
+  fit: IndexFit,
+  releases: ModelRelease[],
+  lab: LabId,
+  opts: FamilyRibbonOptions = {},
+): BandPoint[] {
+  const asOf = opts.asOf;
+  const windowDays = Math.max(0, opts.windowDays ?? 365);
+  const tiers = new Set<ModelTier>(opts.tiers ?? ALL_TIERS);
+
+  const rows = releases
+    .filter(
+      (r) =>
+        r.lab === lab &&
+        r.status === 'released' &&
+        (asOf === undefined || r.date <= asOf) &&
+        tiers.has(tierOf(r)) &&
+        fit.models[r.id] !== undefined,
+    )
+    .sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : a.id.localeCompare(b.id)));
+  if (rows.length === 0) return [];
+
+  /** hi/lo over `rows[from..to]` (inclusive), which is never empty when called. */
+  const knot = (date: ISODate, from: number, to: number): BandPoint => {
+    let hiTheta = Number.NEGATIVE_INFINITY;
+    let hiId = '';
+    let loTheta = Number.POSITIVE_INFINITY;
+    let loId = '';
+    for (let i = from; i <= to; i++) {
+      const r = rows[i]!;
+      const theta = fit.models[r.id]!.theta;
+      // Strict comparisons keep the earliest row on ties, so the ids are deterministic.
+      if (theta > hiTheta) {
+        hiTheta = theta;
+        hiId = r.id;
+      }
+      if (theta < loTheta) {
+        loTheta = theta;
+        loId = r.id;
+      }
+    }
+    return { date, hiTheta, loTheta, hiId, loId };
+  };
+
+  const out: BandPoint[] = [];
+  let from = 0; // first row still inside the window — only ever moves forward
+  for (let i = 0; i < rows.length; i++) {
+    const r = rows[i]!;
+    const nextSameDay = i + 1 < rows.length && rows[i + 1]!.date === r.date;
+    if (nextSameDay) continue; // collapse same-day launches into one knot
+    while (from < i && daysBetween(rows[from]!.date, r.date) > windowDays) from++;
+    out.push(knot(r.date, from, i));
+  }
+
+  // Extend to asOf so the last state is visible up to "now".
+  const lastDate = rows[rows.length - 1]!.date;
+  if (asOf !== undefined && asOf > lastDate) {
+    const last = rows.length - 1;
+    while (from < last && daysBetween(rows[from]!.date, asOf) > windowDays) from++;
+    // Window empty at asOf ⇒ the single latest model (which may itself be outside the window).
+    const start = daysBetween(rows[from]!.date, asOf) > windowDays ? last : from;
+    out.push(knot(asOf, start, last));
   }
   return out;
 }

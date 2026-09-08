@@ -215,6 +215,22 @@ export interface ResearcherBudget {
   usd_estimate: number;
 }
 
+/**
+ * Research cadence derived from site traffic (REDESIGN §12.8). Visits are counted server-side as
+ * daily unique salted-hash addresses — no analytics script, no cookies, no address is ever stored.
+ */
+export interface ResearchCadence {
+  /** Tier id: weekly | often | daily | twice-daily | frequent. */
+  tier: string;
+  interval_hours: number;
+  /** Mean unique visitors per day over the last closed days (up to 7). */
+  visitors_per_day: number;
+  days_measured: number;
+  /** True when the monthly spend guard forced the slowest tier. */
+  capped: boolean;
+  next_research_at: ISOTimestamp | null;
+}
+
 /** Worker health + researcher status, published in the bundle (REDESIGN §6.3). */
 export interface WorkerState {
   last_run_at: ISOTimestamp | null;
@@ -241,6 +257,8 @@ export interface WorkerState {
     usage_total?: ResearcherBudget | null | undefined;
     /** One line about the last backfill / arena / eval, e.g. "backfill: 10 labs, 8 candidates …". */
     last_backfill_summary?: string | null | undefined;
+    /** How often the researcher runs, scaled to how many people actually visit (REDESIGN §12.8). */
+    cadence?: ResearchCadence | null | undefined;
   };
 }
 

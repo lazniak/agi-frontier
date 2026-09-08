@@ -128,6 +128,28 @@ export function benchmarkLevels(fit: IndexFit, benchmarks: Benchmark[]): Level[]
 }
 
 /**
+ * The four speculative landmarks above the basket ceiling (REDESIGN §12.1), ascending: at
+ * `θ_c + k·ln 10` for k = 1..4, i.e. every rung is another order of magnitude in the odds of
+ * solving the whole current basket (400 rating points each). They are drawn as landmarks so the
+ * unbounded rating axis has something to read far above the data; they are **not** derived from
+ * data, and every label says so. Never fed to `frontierCrossings`, `paceEras` or the paper —
+ * they are returned separately from `benchmarkLevels` precisely so nothing downstream can
+ * mistake them for a measured level.
+ */
+export function speculativeLevels(ceiling: Level): Level[] {
+  const rungs: { id: string; label: string }[] = [
+    { id: 'spec-10x', label: 'Ten times the odds of the whole basket (speculative)' },
+    { id: 'spec-100x', label: 'A hundred times the odds of the whole basket (speculative)' },
+    { id: 'spec-all', label: 'Every benchmark ever written saturated (speculative)' },
+    { id: 'spec-singularity', label: 'Technological singularity — speculative landmark, not derived from data' },
+  ];
+  return rungs.map((r, i) => {
+    const theta = ceiling.theta + (i + 1) * Math.LN10;
+    return { id: r.id, kind: 'speculative', label: r.label, theta, rating: ratingFromTheta(theta) };
+  });
+}
+
+/**
  * OLS of θ (= thetaFromIndex(index)) of the running-maximum step function, sampled daily over
  * the trailing `windowDays` ending at `asOf` — the same sampling rules as `frontierPace`:
  * days before the first knot are excluded and fewer than 2 knots in the window give null
@@ -265,6 +287,13 @@ export function frontierCrossings(
   const maxDays = (opts.maxYears ?? 15) * 365;
 
   for (const level of levels) {
+    // §12.1: a speculative landmark is not a measured level, so it can have no crossing —
+    // dating one would print a banded prediction for "Technological singularity" as if it were
+    // derived from data. `speculativeLevels` is returned separately from `benchmarkLevels` for
+    // that reason, but callers concatenate the two to draw the ladder, so the invariant is
+    // enforced here rather than left to caller discipline.
+    if (level.kind === 'speculative') continue;
+
     let passedAt: FrontierPoint | null = null;
     for (const p of line) {
       if (thetaFromIndex(p.index) >= level.theta) {
