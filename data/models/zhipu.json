@@ -1,6 +1,6 @@
 {
   "lab": "zhipu",
-  "updated_at": "2026-09-08T01:42:47Z",
+  "updated_at": "2026-09-09T05:58:51Z",
   "releases": [
     {
       "id": "zhipu-glm-130b",
@@ -1095,6 +1095,21 @@
             "retrieved_at": "2026-09-08T01:42:47Z",
             "verified": true,
             "verified_at": "2026-09-08T01:42:47Z"
+          }
+        },
+        {
+          "benchmark": "terminal-bench-2",
+          "value": 28.3,
+          "config": "Claude Code 2.1.207 harness, reasoning effort=max, 400K context, 128K maximum output, avg@3",
+          "reported_by": "official",
+          "source": {
+            "url": "https://z.ai/blog/glm-5.3",
+            "title": "GLM-5.3",
+            "quote": "GLM-5.3 improves from 4.6 to 28.3 on Terminal-Bench 3.0",
+            "retrieved_at": "2026-09-09T05:58:51Z",
+            "verified": true,
+            "verified_at": "2026-09-09T05:58:51Z",
+            "via": "r.jina.ai"
           }
         }
       ],

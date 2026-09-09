@@ -1,6 +1,6 @@
 {
   "lab": "openai",
-  "updated_at": "2026-09-08T04:56:39Z",
+  "updated_at": "2026-09-09T05:58:51Z",
   "releases": [
     {
       "id": "openai-gpt-1",
@@ -1463,6 +1463,60 @@
             "retrieved_at": "2026-09-08T04:56:39Z",
             "verified": true,
             "verified_at": "2026-09-08T04:56:39Z"
+          }
+        },
+        {
+          "benchmark": "gpqa-diamond",
+          "value": 96,
+          "reported_by": "official",
+          "source": {
+            "url": "https://openai.com/index/gpt-6-astra/",
+            "title": "GPT-6 Astra",
+            "quote": "GPQA Diamond tests graduate-level scientific reasoning in biology, chemistry, and physics. GPT‑6 Astra reaches a new high in the comparison shown at 96.0%.",
+            "retrieved_at": "2026-09-09T05:58:51Z",
+            "verified": true,
+            "verified_at": "2026-09-09T05:58:51Z"
+          }
+        },
+        {
+          "benchmark": "arc-agi-2",
+          "value": 95,
+          "reported_by": "official",
+          "source": {
+            "url": "https://openai.com/index/gpt-6-astra/",
+            "title": "GPT-6 Astra",
+            "quote": "ARC-AGI-2 95.0% 92.5% 90.0% 89.2% 90.4% -",
+            "retrieved_at": "2026-09-09T05:58:51Z",
+            "verified": true,
+            "verified_at": "2026-09-09T05:58:51Z"
+          }
+        },
+        {
+          "benchmark": "mmmu",
+          "value": 72.6,
+          "config": "OSWorld 2.0",
+          "reported_by": "official",
+          "source": {
+            "url": "https://openai.com/index/gpt-6-astra/",
+            "title": "GPT-6 Astra",
+            "quote": "In latency simulations on OSWorld 2.0, Astra achieves higher computer-use performance in about 47% less time per task than GPT‑5.6 Sol, scoring 72.6% at roughly 40 minutes per task",
+            "retrieved_at": "2026-09-09T05:58:51Z",
+            "verified": true,
+            "verified_at": "2026-09-09T05:58:51Z"
+          }
+        },
+        {
+          "benchmark": "tau2-bench",
+          "value": 59.3,
+          "config": "Agents' Last Exam",
+          "reported_by": "official",
+          "source": {
+            "url": "https://openai.com/index/gpt-6-astra/",
+            "title": "GPT-6 Astra",
+            "quote": "Agents’ Last Exam tests agents on complex professional tasks in real software, from financial modeling to engineering and media production. GPT‑6 Astra reaches a new high in the comparison shown, scoring 59.3%",
+            "retrieved_at": "2026-09-09T05:58:51Z",
+            "verified": true,
+            "verified_at": "2026-09-09T05:58:51Z"
           }
         }
       ],
