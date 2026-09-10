@@ -1,6 +1,6 @@
 {
   "lab": "google",
-  "updated_at": "2026-09-08T04:56:39Z",
+  "updated_at": "2026-09-10T06:58:20Z",
   "releases": [
     {
       "id": "google-palm-2",
@@ -845,8 +845,8 @@
       "lab": "google",
       "name": "Gemini 3.8 Flash",
       "family": "Gemini",
-      "date": "2026-09-01",
-      "date_precision": "month",
+      "date": "2026-09-02",
+      "date_precision": "day",
       "status": "released",
       "tier": "mid",
       "announcement": {
@@ -857,7 +857,67 @@
         "verified": true,
         "verified_at": "2026-09-08T04:56:39Z"
       },
-      "scores": []
+      "sources": [
+        {
+          "url": "https://deepmind.google/blog/introducing-gemini-3-8-flash-and-38-flash-cyber/",
+          "title": "Gemini 3.8 Flash",
+          "quote": "Building on the momentum of 3.7 Flash from three weeks ago and marking our third Flash release in only six weeks, today we’re introducing Gemini 3.8, our best reasoning and coding model yet, at the same speed and low cost of 3.7.",
+          "retrieved_at": "2026-09-10T06:58:20Z",
+          "verified": true,
+          "verified_at": "2026-09-10T06:58:20Z"
+        }
+      ],
+      "scores": [
+        {
+          "benchmark": "hle",
+          "value": 54.9,
+          "config": "HLE-Verified",
+          "reported_by": "official",
+          "source": {
+            "url": "https://deepmind.google/blog/introducing-gemini-3-8-flash-and-38-flash-cyber/",
+            "title": "Gemini 3.8 Flash",
+            "quote": "3.8 Flash also achieves a 54.9% on HLE-Verified, demonstrating its ability to handle multi-step reasoning across STEM, humanities, and professional fields.",
+            "retrieved_at": "2026-09-10T06:58:20Z",
+            "verified": true,
+            "verified_at": "2026-09-10T06:58:20Z"
+          }
+        }
+      ]
+    },
+    {
+      "id": "google-gemini-3.8-flash-cyber",
+      "lab": "google",
+      "name": "Gemini 3.8 Flash Cyber",
+      "family": "Gemini",
+      "date": "2026-09-02",
+      "date_precision": "day",
+      "status": "released",
+      "tier": "mid",
+      "announcement": {
+        "url": "https://deepmind.google/blog/introducing-gemini-3-8-flash-and-38-flash-cyber/",
+        "title": "Gemini 3.8 Flash",
+        "quote": "Building on the momentum of 3.7 Flash from three weeks ago and marking our third Flash release in only six weeks, today we’re introducing Gemini 3.8, our best reasoning and coding model yet, at the same speed and low cost of 3.7.",
+        "retrieved_at": "2026-09-10T06:58:20Z",
+        "verified": true,
+        "verified_at": "2026-09-10T06:58:20Z"
+      },
+      "scores": [
+        {
+          "benchmark": "humaneval",
+          "value": 47.2,
+          "config": "CWE-Bench, pass@1",
+          "reported_by": "official",
+          "source": {
+            "url": "https://deepmind.google/blog/introducing-gemini-3-8-flash-and-38-flash-cyber/",
+            "title": "Gemini 3.8 Flash",
+            "quote": "On this benchmark, Gemini 3.8 Flash Cyber is on the Pareto frontier: with a pass@1 of 47.2% compared to a leading frontier model at 47.8%, yet offered at a significantly lower cost.",
+            "retrieved_at": "2026-09-10T06:58:20Z",
+            "verified": true,
+            "verified_at": "2026-09-10T06:58:20Z"
+          }
+        }
+      ],
+      "notes": "Available to trusted defenders through the Fairwind Program."
     }
   ]
 }

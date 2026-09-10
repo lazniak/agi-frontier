@@ -1,6 +1,6 @@
 {
   "lab": "alibaba",
-  "updated_at": "2026-09-08T01:42:47Z",
+  "updated_at": "2026-09-10T06:58:20Z",
   "releases": [
     {
       "id": "alibaba-qwen-7b",
@@ -920,6 +920,26 @@
       },
       "scores": [],
       "notes": "Alibaba has not published a dedicated Qwen4 announcement, name-confirmed spec, benchmark score, or expected release date. This entry tracks the lab's own acknowledgment (via the Qwen3.8-Flash-Next model card, described as an architecture preview for Qwen4) that a Qwen4 generation is in development. Press speculation (e.g. a rumored September 2026 window sourced to a single leak) is not lab-confirmed and is deliberately omitted from expected_window."
+    },
+    {
+      "id": "alibaba-qwen3.8-flash-next",
+      "lab": "alibaba",
+      "name": "Qwen3.8-Flash-Next",
+      "family": "Qwen",
+      "date": "2026-08-26",
+      "date_precision": "day",
+      "status": "released",
+      "tier": "small",
+      "announcement": {
+        "url": "https://qwen.ai",
+        "title": "Qwen3.8-Flash-Next",
+        "quote": "In this release we are opening the weights of Qwen3.8-Flash-Next, a multimodal MoE model that also serves as an early preview of the architecture used in Qwen4.",
+        "retrieved_at": "2026-09-10T06:58:20Z",
+        "verified": true,
+        "verified_at": "2026-09-10T06:58:20Z",
+        "via": "r.jina.ai"
+      },
+      "scores": []
     }
   ]
 }
