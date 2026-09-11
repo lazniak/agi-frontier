@@ -1,6 +1,6 @@
 {
   "lab": "meta",
-  "updated_at": "2026-09-08T01:42:47Z",
+  "updated_at": "2026-09-11T02:17:09Z",
   "releases": [
     {
       "id": "meta-llama-1-65b",
@@ -243,9 +243,9 @@
             "url": "https://lmarena.ai/leaderboard/text",
             "title": "LMArena text leaderboard",
             "quote": "351 339 358 llama-2-70b-chat Meta · Llama 2 Community 1170 ±5 38,492",
-            "retrieved_at": "2026-09-08T01:42:47Z",
+            "retrieved_at": "2026-09-11T02:17:09Z",
             "verified": true,
-            "verified_at": "2026-09-08T01:42:47Z"
+            "verified_at": "2026-09-11T02:17:09Z"
           }
         }
       ]
@@ -349,9 +349,9 @@
             "url": "https://lmarena.ai/leaderboard/text",
             "title": "LMArena text leaderboard",
             "quote": "289 281 295 llama-3-70b-instruct Meta · Llama 3 Community 1276 ±4 156,876",
-            "retrieved_at": "2026-09-08T01:42:47Z",
+            "retrieved_at": "2026-09-11T02:17:09Z",
             "verified": true,
-            "verified_at": "2026-09-08T01:42:47Z"
+            "verified_at": "2026-09-11T02:17:09Z"
           }
         }
       ]
@@ -655,9 +655,9 @@
             "url": "https://lmarena.ai/leaderboard/text",
             "title": "LMArena text leaderboard",
             "quote": "13 5 25 muse-spark Meta · Proprietary 1488 ±6 13,572",
-            "retrieved_at": "2026-09-08T01:42:47Z",
+            "retrieved_at": "2026-09-11T02:17:09Z",
             "verified": true,
-            "verified_at": "2026-09-08T01:42:47Z"
+            "verified_at": "2026-09-11T02:17:09Z"
           }
         }
       ],
