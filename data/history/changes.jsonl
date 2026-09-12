@@ -695,3 +695,6 @@
 {"at":"2026-09-11T02:17:09Z","actor":"worker","lab":"zhipu","release_id":"zhipu-glm-4.5","kind":"score_updated","summary":"lmarena-text 1411 -> 1411","source_url":"https://lmarena.ai/leaderboard/text"}
 {"at":"2026-09-11T02:17:09Z","actor":"worker","lab":"zhipu","release_id":"zhipu-glm-4-plus","kind":"score_updated","summary":"lmarena-text 1319 -> 1319","source_url":"https://lmarena.ai/leaderboard/text"}
 {"at":"2026-09-11T02:17:09Z","actor":"worker","lab":"zhipu","release_id":"zhipu-chatglm-6b","kind":"score_updated","summary":"lmarena-text 995 -> 995","source_url":"https://lmarena.ai/leaderboard/text"}
+{"at":"2026-09-12T07:47:51Z","actor":"worker","lab":"anthropic","release_id":"anthropic-claude-mythos-5.1","kind":"release_added","summary":"Claude Mythos 5.1 — released 2026-09-01","source_url":"https://www.anthropic.com"}
+{"at":"2026-09-12T07:47:51Z","actor":"worker","lab":"anthropic","release_id":"anthropic-claude-opus-5","kind":"release_added","summary":"Claude Opus 5 — released 2026-07-01","source_url":"https://www.anthropic.com"}
+{"at":"2026-09-12T07:47:51Z","actor":"worker","lab":"anthropic","release_id":"anthropic-claude-sonnet-5","kind":"release_added","summary":"Claude Sonnet 5 — released 2026-06-01","source_url":"https://www.anthropic.com"}

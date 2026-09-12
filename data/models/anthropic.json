@@ -1,6 +1,6 @@
 {
   "lab": "anthropic",
-  "updated_at": "2026-09-11T02:17:09Z",
+  "updated_at": "2026-09-12T07:47:51Z",
   "releases": [
     {
       "id": "anthropic-claude-1.3",
@@ -996,6 +996,25 @@
       "notes": "System card title page date (May 28, 2026) is exact, dated the same day as the launch post. Anthropic's own Table 8.1 note: 'Changes to the Opus 4.7 BrowseComp/OSWorld scores' imply Opus 4.7 existed as an immediate predecessor (reported ~April 2026 per press, e.g. technology.org); Opus 4.7 is not recorded as its own release in this file given its very short 41-day lifespan and the research time budget for this pass. This system card switches to Terminal-Bench 2.1 (not 2.0), so no terminal-bench-2 score is recorded here to avoid mixing incompatible benchmark versions."
     },
     {
+      "id": "anthropic-claude-sonnet-5",
+      "lab": "anthropic",
+      "name": "Claude Sonnet 5",
+      "family": "Claude Sonnet",
+      "date": "2026-06-01",
+      "date_precision": "month",
+      "status": "released",
+      "tier": "mid",
+      "announcement": {
+        "url": "https://www.anthropic.com",
+        "title": "Claude Fable 5.1",
+        "quote": "Introducing Sonnet 5 Our most agentic Sonnet yet, with top tier intelligence for coding and everyday professional work.",
+        "retrieved_at": "2026-09-12T07:47:51Z",
+        "verified": true,
+        "verified_at": "2026-09-12T07:47:51Z"
+      },
+      "scores": []
+    },
+    {
       "id": "anthropic-claude-fable-5",
       "lab": "anthropic",
       "name": "Claude Fable 5",
@@ -1056,6 +1075,25 @@
         }
       ],
       "notes": "Anthropic describes Fable 5 and Mythos 5 as 'the same underlying model' (redeploying-fable-5 post): Fable 5 ships with production safeguards for cybersecurity/biology-chemistry/distillation topics that fall back to Claude Opus 4.8, while Mythos 5 has those safeguards lifted and is restricted to vetted Project Glasswing partners (not a public release, so not recorded as its own entry here). On June 12, 2026 the US government briefly applied export controls to both models, suspending access; access was restored June 30-July 1, 2026 (see the 'Redeploying Claude Fable 5' source). This generation's system card treats GPQA Diamond as saturated and stopped reporting it for Fable 5 specifically (Mythos 5 alone is given at 94.1%, 'averaged over 5 trials'); MMLU/MATH/HumanEval/MMMU are no longer reported for either model, and Terminal-Bench has moved to version 2.1 (not this basket's 2.0), so none of those appear as scores here. Family is recorded as 'Claude Fable' per this project's lineage-fork convention, even though the Opus line (Claude Opus 4.8, and subsequently a further 'Claude Opus 5', per the Fable 5.1 system card's comparison table) continued in parallel rather than being replaced."
+    },
+    {
+      "id": "anthropic-claude-opus-5",
+      "lab": "anthropic",
+      "name": "Claude Opus 5",
+      "family": "Claude Opus",
+      "date": "2026-07-01",
+      "date_precision": "month",
+      "status": "released",
+      "tier": "flagship",
+      "announcement": {
+        "url": "https://www.anthropic.com",
+        "title": "Claude Fable 5.1",
+        "quote": "Introducing Opus 5 Opus 5 is a step change for the Opus tier: stronger coding, more capable agents, and sharper professional work.",
+        "retrieved_at": "2026-09-12T07:47:51Z",
+        "verified": true,
+        "verified_at": "2026-09-12T07:47:51Z"
+      },
+      "scores": []
     },
     {
       "id": "anthropic-claude-fable-5.1",
@@ -1127,6 +1165,25 @@
         }
       ],
       "notes": "Unlike the 5.0 generation, Anthropic's Table 8.1.A for this release reports a single shared column for 'Claude Fable 5.1/Mythos 5.1' (the two are explicitly 'the same model, but with different levels of safeguards'), so scores above apply to both; Mythos 5.1 is therefore not recorded as a separate entry. Mythos 5.1 remains restricted to vetted cyberdefense/life-sciences partners via trusted access programs (not public). The same comparison table lists a 'Claude Opus 5' column (system card dated July 24, 2026 per public reporting), confirming the Opus numbered line continued past 4.8 in parallel with the Fable/Mythos lineage; it is not separately researched/recorded in this file given the time budget for this pass. GPQA Diamond, MMLU, MATH and HumanEval are no longer reported by Anthropic for this generation (GPQA was declared saturated as of the Fable 5/Mythos 5 system card); Terminal-Bench has moved to versions 4.0 and 'Science 0.1', neither comparable to this basket's Terminal-Bench 2.0, so no terminal-bench-2 score is recorded."
+    },
+    {
+      "id": "anthropic-claude-mythos-5.1",
+      "lab": "anthropic",
+      "name": "Claude Mythos 5.1",
+      "family": "Claude Mythos",
+      "date": "2026-09-01",
+      "date_precision": "month",
+      "status": "released",
+      "tier": "flagship",
+      "announcement": {
+        "url": "https://www.anthropic.com",
+        "title": "Claude Fable 5.1",
+        "quote": "Introducing Fable 5.1 and Mythos 5.1 Our most advanced models for coding and knowledge work.",
+        "retrieved_at": "2026-09-12T07:47:51Z",
+        "verified": true,
+        "verified_at": "2026-09-12T07:47:51Z"
+      },
+      "scores": []
     }
   ]
 }
