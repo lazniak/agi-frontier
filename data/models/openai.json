@@ -1,6 +1,6 @@
 {
   "lab": "openai",
-  "updated_at": "2026-09-11T02:17:09Z",
+  "updated_at": "2026-09-13T08:07:48Z",
   "releases": [
     {
       "id": "openai-gpt-1",
@@ -1517,6 +1517,62 @@
             "retrieved_at": "2026-09-09T05:58:51Z",
             "verified": true,
             "verified_at": "2026-09-09T05:58:51Z"
+          }
+        },
+        {
+          "benchmark": "swe-bench-verified",
+          "value": 74.1,
+          "config": "DeepSWE v1.1",
+          "reported_by": "official",
+          "source": {
+            "url": "https://openai.com/index/gpt-6-astra/",
+            "title": "GPT-6 Astra",
+            "quote": "DeepSWE v1.1 74.1%",
+            "retrieved_at": "2026-09-13T08:07:48Z",
+            "verified": true,
+            "verified_at": "2026-09-13T08:07:48Z"
+          }
+        },
+        {
+          "benchmark": "mmlu-pro",
+          "value": 99.9,
+          "config": "ARC-AGI-3",
+          "reported_by": "official",
+          "source": {
+            "url": "https://openai.com/index/gpt-6-astra/",
+            "title": "GPT-6 Astra",
+            "quote": "ARC-AGI-3 99.9% 1",
+            "retrieved_at": "2026-09-13T08:07:48Z",
+            "verified": true,
+            "verified_at": "2026-09-13T08:07:48Z"
+          }
+        },
+        {
+          "benchmark": "hle",
+          "value": 57.2,
+          "config": "w/ tools",
+          "reported_by": "official",
+          "source": {
+            "url": "https://openai.com/index/gpt-6-astra/",
+            "title": "GPT-6 Astra",
+            "quote": "Humanity's Last Exam (w/ tools) 57.2%",
+            "retrieved_at": "2026-09-13T08:07:48Z",
+            "verified": true,
+            "verified_at": "2026-09-13T08:07:48Z"
+          }
+        },
+        {
+          "benchmark": "mmmu",
+          "value": 92.7,
+          "config": "ScreenSpot-Pro (no tools)",
+          "reported_by": "official",
+          "source": {
+            "url": "https://openai.com/index/gpt-6-astra/",
+            "title": "GPT-6 Astra",
+            "quote": "ScreenSpot-Pro (no tools) 92.7%",
+            "retrieved_at": "2026-09-13T08:07:48Z",
+            "verified": true,
+            "verified_at": "2026-09-13T08:07:48Z"
           }
         }
       ],
