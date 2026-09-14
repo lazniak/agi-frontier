@@ -1,6 +1,6 @@
 {
   "lab": "openai",
-  "updated_at": "2026-09-14T03:14:12Z",
+  "updated_at": "2026-09-14T08:10:54Z",
   "releases": [
     {
       "id": "openai-gpt-1",
@@ -1573,6 +1573,20 @@
             "retrieved_at": "2026-09-13T08:07:48Z",
             "verified": true,
             "verified_at": "2026-09-13T08:07:48Z"
+          }
+        },
+        {
+          "benchmark": "osworld",
+          "value": 72.6,
+          "config": "OSWorld 2.0 (v2026.08.08, offline set, partial score)",
+          "reported_by": "official",
+          "source": {
+            "url": "https://openai.com/index/gpt-6-astra/",
+            "title": "GPT-6 Astra",
+            "quote": "OSWorld 2.0 (v2026.08.08, offline set, partial score) 72.6%",
+            "retrieved_at": "2026-09-14T08:10:54Z",
+            "verified": true,
+            "verified_at": "2026-09-14T08:10:54Z"
           }
         }
       ],

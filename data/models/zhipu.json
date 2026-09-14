@@ -1,6 +1,6 @@
 {
   "lab": "zhipu",
-  "updated_at": "2026-09-14T03:14:12Z",
+  "updated_at": "2026-09-14T08:10:54Z",
   "releases": [
     {
       "id": "zhipu-glm-130b",
@@ -1109,6 +1109,36 @@
             "retrieved_at": "2026-09-09T05:58:51Z",
             "verified": true,
             "verified_at": "2026-09-09T05:58:51Z",
+            "via": "r.jina.ai"
+          }
+        },
+        {
+          "benchmark": "terminal-bench-2",
+          "value": 88.2,
+          "config": "Claude Code 2.1.207, temperature=1.0, top_p=1, max_new_tokens=65536, 6h timeout",
+          "reported_by": "official",
+          "source": {
+            "url": "https://z.ai/blog/glm-5.3",
+            "title": "GLM-5.3",
+            "quote": "Terminal Bench 2.1 | 88.2",
+            "retrieved_at": "2026-09-14T08:10:54Z",
+            "verified": true,
+            "verified_at": "2026-09-14T08:10:54Z",
+            "via": "r.jina.ai"
+          }
+        },
+        {
+          "benchmark": "mmmu",
+          "value": 62.5,
+          "config": "HLE w/ Tools",
+          "reported_by": "official",
+          "source": {
+            "url": "https://z.ai/blog/glm-5.3",
+            "title": "GLM-5.3",
+            "quote": "HLE w/ Tools | 62.5",
+            "retrieved_at": "2026-09-14T08:10:54Z",
+            "verified": true,
+            "verified_at": "2026-09-14T08:10:54Z",
             "via": "r.jina.ai"
           }
         }

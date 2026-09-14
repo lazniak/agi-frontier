@@ -1,6 +1,6 @@
 {
   "lab": "anthropic",
-  "updated_at": "2026-09-14T03:14:12Z",
+  "updated_at": "2026-09-14T08:10:54Z",
   "releases": [
     {
       "id": "anthropic-claude-1.3",
@@ -996,40 +996,6 @@
       "notes": "System card title page date (May 28, 2026) is exact, dated the same day as the launch post. Anthropic's own Table 8.1 note: 'Changes to the Opus 4.7 BrowseComp/OSWorld scores' imply Opus 4.7 existed as an immediate predecessor (reported ~April 2026 per press, e.g. technology.org); Opus 4.7 is not recorded as its own release in this file given its very short 41-day lifespan and the research time budget for this pass. This system card switches to Terminal-Bench 2.1 (not 2.0), so no terminal-bench-2 score is recorded here to avoid mixing incompatible benchmark versions."
     },
     {
-      "id": "anthropic-claude-sonnet-5",
-      "lab": "anthropic",
-      "name": "Claude Sonnet 5",
-      "family": "Claude Sonnet",
-      "date": "2026-06-01",
-      "date_precision": "month",
-      "status": "released",
-      "tier": "mid",
-      "announcement": {
-        "url": "https://www.anthropic.com",
-        "title": "Claude Fable 5.1",
-        "quote": "Introducing Sonnet 5 Our most agentic Sonnet yet, with top tier intelligence for coding and everyday professional work.",
-        "retrieved_at": "2026-09-12T07:47:51Z",
-        "verified": true,
-        "verified_at": "2026-09-12T07:47:51Z"
-      },
-      "scores": [
-        {
-          "benchmark": "lmarena-text",
-          "value": 1462,
-          "config": "text, style control",
-          "reported_by": "maintainer",
-          "source": {
-            "url": "https://lmarena.ai/leaderboard/text",
-            "title": "LMArena text leaderboard",
-            "quote": "48 35 65 claude-sonnet-5-high Anthropic · Proprietary 1462 ±5 31,387",
-            "retrieved_at": "2026-09-14T03:14:12Z",
-            "verified": true,
-            "verified_at": "2026-09-14T03:14:12Z"
-          }
-        }
-      ]
-    },
-    {
       "id": "anthropic-claude-fable-5",
       "lab": "anthropic",
       "name": "Claude Fable 5",
@@ -1092,12 +1058,46 @@
       "notes": "Anthropic describes Fable 5 and Mythos 5 as 'the same underlying model' (redeploying-fable-5 post): Fable 5 ships with production safeguards for cybersecurity/biology-chemistry/distillation topics that fall back to Claude Opus 4.8, while Mythos 5 has those safeguards lifted and is restricted to vetted Project Glasswing partners (not a public release, so not recorded as its own entry here). On June 12, 2026 the US government briefly applied export controls to both models, suspending access; access was restored June 30-July 1, 2026 (see the 'Redeploying Claude Fable 5' source). This generation's system card treats GPQA Diamond as saturated and stopped reporting it for Fable 5 specifically (Mythos 5 alone is given at 94.1%, 'averaged over 5 trials'); MMLU/MATH/HumanEval/MMMU are no longer reported for either model, and Terminal-Bench has moved to version 2.1 (not this basket's 2.0), so none of those appear as scores here. Family is recorded as 'Claude Fable' per this project's lineage-fork convention, even though the Opus line (Claude Opus 4.8, and subsequently a further 'Claude Opus 5', per the Fable 5.1 system card's comparison table) continued in parallel rather than being replaced."
     },
     {
+      "id": "anthropic-claude-sonnet-5",
+      "lab": "anthropic",
+      "name": "Claude Sonnet 5",
+      "family": "Claude Sonnet",
+      "date": "2026-06-30",
+      "date_precision": "day",
+      "status": "released",
+      "tier": "mid",
+      "announcement": {
+        "url": "https://www.anthropic.com",
+        "title": "Claude Fable 5.1",
+        "quote": "Introducing Sonnet 5 Our most agentic Sonnet yet, with top tier intelligence for coding and everyday professional work.",
+        "retrieved_at": "2026-09-12T07:47:51Z",
+        "verified": true,
+        "verified_at": "2026-09-12T07:47:51Z"
+      },
+      "scores": [
+        {
+          "benchmark": "lmarena-text",
+          "value": 1462,
+          "config": "text, style control",
+          "reported_by": "maintainer",
+          "source": {
+            "url": "https://lmarena.ai/leaderboard/text",
+            "title": "LMArena text leaderboard",
+            "quote": "48 35 65 claude-sonnet-5-high Anthropic · Proprietary 1462 ±5 31,387",
+            "retrieved_at": "2026-09-14T03:14:12Z",
+            "verified": true,
+            "verified_at": "2026-09-14T03:14:12Z"
+          }
+        }
+      ]
+    },
+    {
       "id": "anthropic-claude-opus-5",
       "lab": "anthropic",
       "name": "Claude Opus 5",
       "family": "Claude Opus",
-      "date": "2026-07-01",
-      "date_precision": "month",
+      "date": "2026-07-24",
+      "date_precision": "day",
       "status": "released",
       "tier": "flagship",
       "announcement": {
@@ -1202,7 +1202,7 @@
       "name": "Claude Mythos 5.1",
       "family": "Claude Mythos",
       "date": "2026-09-01",
-      "date_precision": "month",
+      "date_precision": "day",
       "status": "released",
       "tier": "flagship",
       "announcement": {
