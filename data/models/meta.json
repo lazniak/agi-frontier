@@ -1,6 +1,6 @@
 {
   "lab": "meta",
-  "updated_at": "2026-09-14T03:14:12Z",
+  "updated_at": "2026-09-15T08:55:15Z",
   "releases": [
     {
       "id": "meta-llama-1-65b",
@@ -662,6 +662,26 @@
         }
       ],
       "notes": "First model from Meta Superintelligence Labs (led by Alexandr Wang), closed-weight, available via meta.ai / Meta AI app with a private API preview. Point updates (Muse Spark 1.1, ~May 2026; reportedly 1.3 later) rolled the same model out further (voice, glasses, shopping) rather than establishing a new flagship generation, so they are treated as updates to this release rather than separate entries."
+    },
+    {
+      "id": "meta-muse-spark-1.3",
+      "lab": "meta",
+      "name": "Muse Spark 1.3",
+      "family": "Muse",
+      "date": "2026-09-02",
+      "date_precision": "day",
+      "status": "released",
+      "tier": "flagship",
+      "announcement": {
+        "url": "https://ai.meta.com",
+        "title": "Muse Spark 1.3",
+        "quote": "Introducing Muse Spark 1.3 SEP 2, 2026",
+        "retrieved_at": "2026-09-15T08:55:15Z",
+        "verified": true,
+        "verified_at": "2026-09-15T08:55:15Z",
+        "via": "r.jina.ai"
+      },
+      "scores": []
     }
   ]
 }

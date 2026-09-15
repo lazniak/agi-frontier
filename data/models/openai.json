@@ -1,6 +1,6 @@
 {
   "lab": "openai",
-  "updated_at": "2026-09-14T08:10:54Z",
+  "updated_at": "2026-09-15T08:55:15Z",
   "releases": [
     {
       "id": "openai-gpt-1",
@@ -1587,6 +1587,32 @@
             "retrieved_at": "2026-09-14T08:10:54Z",
             "verified": true,
             "verified_at": "2026-09-14T08:10:54Z"
+          }
+        },
+        {
+          "benchmark": "mmlu-pro",
+          "value": 99.9,
+          "reported_by": "official",
+          "source": {
+            "url": "https://openai.com/index/gpt-6-astra/",
+            "title": "GPT-6 Astra",
+            "quote": "ARC-AGI-3 99.9% 1",
+            "retrieved_at": "2026-09-15T08:55:15Z",
+            "verified": true,
+            "verified_at": "2026-09-15T08:55:15Z"
+          }
+        },
+        {
+          "benchmark": "tau2-bench",
+          "value": 59.3,
+          "reported_by": "official",
+          "source": {
+            "url": "https://openai.com/index/gpt-6-astra/",
+            "title": "GPT-6 Astra",
+            "quote": "Agents’ Last Exam 59.3%",
+            "retrieved_at": "2026-09-15T08:55:15Z",
+            "verified": true,
+            "verified_at": "2026-09-15T08:55:15Z"
           }
         }
       ],

@@ -773,3 +773,6 @@
 {"at":"2026-09-14T08:10:54Z","actor":"worker","lab":"anthropic","release_id":"anthropic-claude-sonnet-5","kind":"release_updated","summary":"date 2026-06-01 (month) -> 2026-06-30 (day)","source_url":"https://www.anthropic.com"}
 {"at":"2026-09-14T08:10:54Z","actor":"worker","lab":"zhipu","release_id":"zhipu-glm-5.3","kind":"score_added","summary":"terminal-bench-2 88.2 (Claude Code 2.1.207, temperature=1.0, top_p=1, max_new_tokens=65536, 6h timeout)","source_url":"https://z.ai/blog/glm-5.3"}
 {"at":"2026-09-14T08:10:54Z","actor":"worker","lab":"zhipu","release_id":"zhipu-glm-5.3","kind":"score_added","summary":"mmmu 62.5 (HLE w/ Tools)","source_url":"https://z.ai/blog/glm-5.3"}
+{"at":"2026-09-15T08:55:15Z","actor":"worker","lab":"openai","release_id":"openai-gpt-6-astra","kind":"score_added","summary":"mmlu-pro 99.9","source_url":"https://openai.com/index/gpt-6-astra/"}
+{"at":"2026-09-15T08:55:15Z","actor":"worker","lab":"openai","release_id":"openai-gpt-6-astra","kind":"score_added","summary":"tau2-bench 59.3","source_url":"https://openai.com/index/gpt-6-astra/"}
+{"at":"2026-09-15T08:55:15Z","actor":"worker","lab":"meta","release_id":"meta-muse-spark-1.3","kind":"release_added","summary":"Muse Spark 1.3 — released 2026-09-02","source_url":"https://ai.meta.com"}
