@@ -1,6 +1,6 @@
 {
   "lab": "zhipu",
-  "updated_at": "2026-09-14T08:10:54Z",
+  "updated_at": "2026-09-16T09:51:32Z",
   "releases": [
     {
       "id": "zhipu-glm-130b",
@@ -1139,6 +1139,21 @@
             "retrieved_at": "2026-09-14T08:10:54Z",
             "verified": true,
             "verified_at": "2026-09-14T08:10:54Z",
+            "via": "r.jina.ai"
+          }
+        },
+        {
+          "benchmark": "hle",
+          "value": 62.5,
+          "config": "text-only",
+          "reported_by": "official",
+          "source": {
+            "url": "https://z.ai/blog/glm-5.3",
+            "title": "GLM-5.3",
+            "quote": "HLE w/ Tools | 62.5",
+            "retrieved_at": "2026-09-16T09:51:32Z",
+            "verified": true,
+            "verified_at": "2026-09-16T09:51:32Z",
             "via": "r.jina.ai"
           }
         }

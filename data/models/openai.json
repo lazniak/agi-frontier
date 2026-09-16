@@ -1,6 +1,6 @@
 {
   "lab": "openai",
-  "updated_at": "2026-09-15T08:55:15Z",
+  "updated_at": "2026-09-16T09:51:32Z",
   "releases": [
     {
       "id": "openai-gpt-1",
@@ -1613,6 +1613,20 @@
             "retrieved_at": "2026-09-15T08:55:15Z",
             "verified": true,
             "verified_at": "2026-09-15T08:55:15Z"
+          }
+        },
+        {
+          "benchmark": "mmmu",
+          "value": 57.2,
+          "config": "Humanity's Last Exam (w/ tools)",
+          "reported_by": "official",
+          "source": {
+            "url": "https://openai.com/index/gpt-6-astra/",
+            "title": "GPT-6 Astra",
+            "quote": "Humanity's Last Exam (w/ tools) 57.2%",
+            "retrieved_at": "2026-09-16T09:51:32Z",
+            "verified": true,
+            "verified_at": "2026-09-16T09:51:32Z"
           }
         }
       ],
