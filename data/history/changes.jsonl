@@ -778,3 +778,4 @@
 {"at":"2026-09-15T08:55:15Z","actor":"worker","lab":"meta","release_id":"meta-muse-spark-1.3","kind":"release_added","summary":"Muse Spark 1.3 — released 2026-09-02","source_url":"https://ai.meta.com"}
 {"at":"2026-09-16T09:51:32Z","actor":"worker","lab":"openai","release_id":"openai-gpt-6-astra","kind":"score_added","summary":"mmmu 57.2 (Humanity's Last Exam (w/ tools))","source_url":"https://openai.com/index/gpt-6-astra/"}
 {"at":"2026-09-16T09:51:32Z","actor":"worker","lab":"zhipu","release_id":"zhipu-glm-5.3","kind":"score_added","summary":"hle 62.5 (text-only)","source_url":"https://z.ai/blog/glm-5.3"}
+{"at":"2026-09-17T10:34:32Z","actor":"worker","lab":"anthropic","release_id":"anthropic-claude-fable-5.1","kind":"release_updated","summary":"tier mid","source_url":"https://www.anthropic.com"}
