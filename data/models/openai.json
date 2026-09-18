@@ -1,6 +1,6 @@
 {
   "lab": "openai",
-  "updated_at": "2026-09-16T09:51:32Z",
+  "updated_at": "2026-09-18T11:14:58Z",
   "releases": [
     {
       "id": "openai-gpt-1",
@@ -1627,6 +1627,33 @@
             "retrieved_at": "2026-09-16T09:51:32Z",
             "verified": true,
             "verified_at": "2026-09-16T09:51:32Z"
+          }
+        },
+        {
+          "benchmark": "gpqa-diamond",
+          "value": 96,
+          "config": "no tools, pass@1",
+          "reported_by": "official",
+          "source": {
+            "url": "https://openai.com/index/gpt-6-astra/",
+            "title": "GPT-6 Astra",
+            "quote": "GPQA Diamond tests graduate-level scientific reasoning in biology, chemistry, and physics. GPT‑6 Astra reaches a new high in the comparison shown at 96.0%.",
+            "retrieved_at": "2026-09-18T11:14:58Z",
+            "verified": true,
+            "verified_at": "2026-09-18T11:14:58Z"
+          }
+        },
+        {
+          "benchmark": "mmmu",
+          "value": 0,
+          "reported_by": "official",
+          "source": {
+            "url": "https://openai.com/index/gpt-6-astra/",
+            "title": "GPT-6 Astra",
+            "quote": "Astra also saturates ARC-AGI-3 with a 99.9% score and ExploitBench with a 100% score.",
+            "retrieved_at": "2026-09-18T11:14:58Z",
+            "verified": true,
+            "verified_at": "2026-09-18T11:14:58Z"
           }
         }
       ],
