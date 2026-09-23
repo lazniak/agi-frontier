@@ -1,6 +1,6 @@
 {
   "lab": "anthropic",
-  "updated_at": "2026-09-16T17:36:23Z",
+  "updated_at": "2026-09-23T18:22:09Z",
   "releases": [
     {
       "id": "anthropic-opus-5",
@@ -29,6 +29,74 @@
         }
       ],
       "scores": []
+    },
+    {
+      "id": "anthropic-claude-opus-5.5",
+      "lab": "anthropic",
+      "name": "Claude Opus 5.5",
+      "family": "Claude",
+      "date": "2026-09-22",
+      "date_precision": "day",
+      "status": "released",
+      "origin": "researcher",
+      "announcement": {
+        "url": "https://www.anthropic.com/news/claude-opus-5-5",
+        "title": "Claude Opus 5.5",
+        "quote": "We’re introducing Claude Opus 5.5, the first model in our new Claude 5.5 family.",
+        "retrieved_at": "2026-09-23T18:22:09Z",
+        "verified": true,
+        "verified_at": "2026-09-23T18:22:09Z"
+      },
+      "sources": [
+        {
+          "url": "https://www.anthropic.com/news/claude-opus-5-5",
+          "quote": "We’re introducing Claude Opus 5.5, the first model in our new Claude 5.5 family.",
+          "retrieved_at": "2026-09-23T18:22:09Z",
+          "verified": true,
+          "verified_at": "2026-09-23T18:22:09Z"
+        }
+      ],
+      "scores": [
+        {
+          "benchmark": "terminal-bench-2",
+          "value": 66.4,
+          "config": "Terminal-Bench 4.0",
+          "reported_by": "official",
+          "source": {
+            "url": "https://www.anthropic.com/news/claude-opus-5-5",
+            "quote": "Agentic coding Terminal-Bench 4.0¹ 66.4%",
+            "retrieved_at": "2026-09-23T18:22:09Z",
+            "verified": true,
+            "verified_at": "2026-09-23T18:22:09Z"
+          }
+        },
+        {
+          "benchmark": "hle",
+          "value": 67.7,
+          "config": "with tools",
+          "reported_by": "official",
+          "source": {
+            "url": "https://www.anthropic.com/news/claude-opus-5-5",
+            "quote": "Multidisciplinary reasoning Humanity's Last Exam 67.7% with tools",
+            "retrieved_at": "2026-09-23T18:22:09Z",
+            "verified": true,
+            "verified_at": "2026-09-23T18:22:09Z"
+          }
+        },
+        {
+          "benchmark": "osworld",
+          "value": 81.8,
+          "config": "OSWorld 2.0",
+          "reported_by": "official",
+          "source": {
+            "url": "https://www.anthropic.com/news/claude-opus-5-5",
+            "quote": "Computer use OSWorld 2.0 81.8% partial",
+            "retrieved_at": "2026-09-23T18:22:09Z",
+            "verified": true,
+            "verified_at": "2026-09-23T18:22:09Z"
+          }
+        }
+      ]
     }
   ]
 }
