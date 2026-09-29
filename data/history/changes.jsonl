@@ -912,3 +912,5 @@
 {"at":"2026-09-28T04:54:06Z","actor":"worker","lab":"zhipu","release_id":"zhipu-glm-4.5","kind":"score_updated","summary":"lmarena-text 1411 -> 1411","source_url":"https://lmarena.ai/leaderboard/text"}
 {"at":"2026-09-28T04:54:06Z","actor":"worker","lab":"zhipu","release_id":"zhipu-glm-4-plus","kind":"score_updated","summary":"lmarena-text 1319 -> 1319","source_url":"https://lmarena.ai/leaderboard/text"}
 {"at":"2026-09-28T04:54:06Z","actor":"worker","lab":"zhipu","release_id":"zhipu-chatglm-6b","kind":"score_updated","summary":"lmarena-text 995 -> 995","source_url":"https://lmarena.ai/leaderboard/text"}
+{"at":"2026-09-29T17:15:04Z","actor":"worker","lab":"openai","release_id":"openai-gpt-6-sol","kind":"release_added","summary":"GPT-6 Sol — released 2026-09-29","source_url":"https://openai.com/index/introducing-gpt-6-sol-and-luna/"}
+{"at":"2026-09-29T17:15:04Z","actor":"worker","lab":"openai","release_id":"openai-gpt-6-luna","kind":"release_added","summary":"GPT-6 Luna — released 2026-09-29","source_url":"https://openai.com/index/introducing-gpt-6-sol-and-luna/"}
