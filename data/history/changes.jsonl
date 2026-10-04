@@ -921,3 +921,4 @@
 {"at":"2026-09-30T17:23:01Z","actor":"worker","lab":"openai","release_id":"openai-gpt-6-sol","kind":"score_added","summary":"osworld 60.5 (xhigh effort, OSWorld 2.0 offline)","source_url":"https://openai.com/index/introducing-gpt-6-sol-and-luna/"}
 {"at":"2026-09-30T17:23:01Z","actor":"worker","lab":"openai","release_id":"openai-gpt-6-luna","kind":"score_added","summary":"swe-bench-verified 66.6 (max effort)","source_url":"https://openai.com/index/introducing-gpt-6-sol-and-luna/"}
 {"at":"2026-09-30T17:23:01Z","actor":"worker","lab":"openai","release_id":"openai-gpt-6.1-sol","kind":"release_added","summary":"GPT-6.1 Sol — released 2026-09-30","source_url":"https://openai.com/index/introducing-gpt-6-1-sol/"}
+{"at":"2026-10-04T19:19:32Z","actor":"worker","lab":"google","release_id":"google-gemini-3.7-flash","kind":"release_added","summary":"Gemini 3.7 Flash — released 2026-08-01","source_url":"https://deepmind.google"}
