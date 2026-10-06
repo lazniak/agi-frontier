@@ -1,6 +1,6 @@
 {
   "lab": "mistral",
-  "updated_at": "2026-10-05T05:13:07Z",
+  "updated_at": "2026-10-06T20:42:11Z",
   "releases": [
     {
       "id": "mistral-mistral-7b",
@@ -643,6 +643,26 @@
         }
       ],
       "notes": "No official numeric benchmark scores could be sourced: the launch post's performance comparisons are rendered as images only ('Chart Base Models', 'Model Performance Comparison (instruct)', GPQA Diamond chart), the model's Hugging Face README has no benchmark table, the docs.mistral.ai model page has no extractable benchmark text, and no dedicated technical report for Mistral Large 3 was found as of the retrieval date (re-checked 2026-09-07). The launch post's only readable numeric capability figure (85% on AIME '25) belongs to the separate Ministral 14B reasoning variant, a non-flagship mini tier excluded by this project's rules."
+    },
+    {
+      "id": "mistral-mistral-large-4",
+      "lab": "mistral",
+      "name": "Mistral Large 4",
+      "family": "Mistral Large",
+      "date": "2026-10-06",
+      "date_precision": "day",
+      "status": "released",
+      "tier": "flagship",
+      "announcement": {
+        "url": "https://mistral.ai/news/mistral-large-4/",
+        "title": "Mistral Large 4",
+        "quote": "Today, we’re launching a public preview of Mistral Large 4.",
+        "retrieved_at": "2026-10-06T20:42:11Z",
+        "verified": true,
+        "verified_at": "2026-10-06T20:42:11Z"
+      },
+      "scores": [],
+      "notes": "The page mentions the model is a 1 trillion-parameter natively multimodal model with 49 billion active parameters and is the lab's largest and most capable model to date."
     }
   ]
 }

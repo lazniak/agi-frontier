@@ -988,3 +988,4 @@
 {"at":"2026-10-05T05:13:07Z","actor":"worker","lab":"zhipu","release_id":"zhipu-glm-4.5","kind":"score_updated","summary":"lmarena-text 1411 -> 1411","source_url":"https://lmarena.ai/leaderboard/text"}
 {"at":"2026-10-05T05:13:07Z","actor":"worker","lab":"zhipu","release_id":"zhipu-glm-4-plus","kind":"score_updated","summary":"lmarena-text 1319 -> 1319","source_url":"https://lmarena.ai/leaderboard/text"}
 {"at":"2026-10-05T05:13:07Z","actor":"worker","lab":"zhipu","release_id":"zhipu-chatglm-6b","kind":"score_updated","summary":"lmarena-text 995 -> 995","source_url":"https://lmarena.ai/leaderboard/text"}
+{"at":"2026-10-06T20:42:11Z","actor":"worker","lab":"mistral","release_id":"mistral-mistral-large-4","kind":"release_added","summary":"Mistral Large 4 — released 2026-10-06","source_url":"https://mistral.ai/news/mistral-large-4/"}
