@@ -1,6 +1,6 @@
 {
   "lab": "mistral",
-  "updated_at": "2026-10-12T05:44:11Z",
+  "updated_at": "2026-10-12T22:37:22Z",
   "releases": [
     {
       "id": "mistral-mistral-7b",
@@ -661,7 +661,22 @@
         "verified": true,
         "verified_at": "2026-10-06T20:42:11Z"
       },
-      "scores": [],
+      "scores": [
+        {
+          "benchmark": "terminal-bench-2",
+          "value": 28.3,
+          "config": "Terminal-Bench 4",
+          "reported_by": "official",
+          "source": {
+            "url": "https://mistral.ai/news/mistral-large-4/",
+            "title": "Mistral Large 4",
+            "quote": "ML4 excels across software engineering, repository understanding, and complex terminal workflows, scoring 61.7% on DeepSWE v1.1, 59.4% on SWE-Atlas-QnA, and 28.3% on Terminal-Bench 4.",
+            "retrieved_at": "2026-10-12T22:37:22Z",
+            "verified": true,
+            "verified_at": "2026-10-12T22:37:22Z"
+          }
+        }
+      ],
       "notes": "The page mentions the model is a 1 trillion-parameter natively multimodal model with 49 billion active parameters and is the lab's largest and most capable model to date."
     }
   ]
