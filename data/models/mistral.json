@@ -1,6 +1,6 @@
 {
   "lab": "mistral",
-  "updated_at": "2026-10-12T22:37:22Z",
+  "updated_at": "2026-10-13T23:26:17Z",
   "releases": [
     {
       "id": "mistral-mistral-7b",
@@ -674,6 +674,19 @@
             "retrieved_at": "2026-10-12T22:37:22Z",
             "verified": true,
             "verified_at": "2026-10-12T22:37:22Z"
+          }
+        },
+        {
+          "benchmark": "terminal-bench-2",
+          "value": 28.3,
+          "reported_by": "official",
+          "source": {
+            "url": "https://mistral.ai/news/mistral-large-4/",
+            "title": "Mistral Large 4",
+            "quote": "ML4 excels across software engineering, repository understanding, and complex terminal workflows, scoring 61.7% on DeepSWE v1.1, 59.4% on SWE-Atlas-QnA, and 28.3% on Terminal-Bench 4.",
+            "retrieved_at": "2026-10-13T23:26:17Z",
+            "verified": true,
+            "verified_at": "2026-10-13T23:26:17Z"
           }
         }
       ],
