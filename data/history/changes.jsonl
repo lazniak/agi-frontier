@@ -1057,3 +1057,5 @@
 {"at":"2026-10-12T05:44:11Z","actor":"worker","lab":"zhipu","release_id":"zhipu-chatglm-6b","kind":"score_updated","summary":"lmarena-text 995 -> 995","source_url":"https://lmarena.ai/leaderboard/text"}
 {"at":"2026-10-12T22:37:22Z","actor":"worker","lab":"mistral","release_id":"mistral-mistral-large-4","kind":"score_added","summary":"terminal-bench-2 28.3 (Terminal-Bench 4)","source_url":"https://mistral.ai/news/mistral-large-4/"}
 {"at":"2026-10-13T23:26:17Z","actor":"worker","lab":"mistral","release_id":"mistral-mistral-large-4","kind":"score_added","summary":"terminal-bench-2 28.3","source_url":"https://mistral.ai/news/mistral-large-4/"}
+{"at":"2026-10-17T00:27:11Z","actor":"worker","lab":"meta","release_id":"meta-muse","kind":"release_added","summary":"Muse — released 2026-09-08","source_url":"https://ai.meta.com"}
+{"at":"2026-10-17T00:27:11Z","actor":"worker","lab":"meta","release_id":"meta-muse-spark-1.2","kind":"release_added","summary":"Muse Spark 1.2 — released 2026-08-05","source_url":"https://ai.meta.com"}
