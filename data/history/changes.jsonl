@@ -1059,3 +1059,5 @@
 {"at":"2026-10-13T23:26:17Z","actor":"worker","lab":"mistral","release_id":"mistral-mistral-large-4","kind":"score_added","summary":"terminal-bench-2 28.3","source_url":"https://mistral.ai/news/mistral-large-4/"}
 {"at":"2026-10-17T00:27:11Z","actor":"worker","lab":"meta","release_id":"meta-muse","kind":"release_added","summary":"Muse — released 2026-09-08","source_url":"https://ai.meta.com"}
 {"at":"2026-10-17T00:27:11Z","actor":"worker","lab":"meta","release_id":"meta-muse-spark-1.2","kind":"release_added","summary":"Muse Spark 1.2 — released 2026-08-05","source_url":"https://ai.meta.com"}
+{"at":"2026-10-18T00:12:50Z","actor":"worker","lab":"openai","release_id":"openai-gpt-6","kind":"release_added","summary":"GPT-6 — released 2026-10-07","source_url":"https://openai.com/index/gpt-6-for-everyone"}
+{"at":"2026-10-18T00:12:50Z","actor":"worker","lab":"openai","release_id":"openai-gpt-live-1","kind":"release_added","summary":"GPT-Live-1 — released 2026-10-14","source_url":"https://openai.com/index/amp-beyond-coding"}
