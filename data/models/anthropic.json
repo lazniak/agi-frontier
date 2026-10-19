@@ -1,6 +1,6 @@
 {
   "lab": "anthropic",
-  "updated_at": "2026-10-12T05:44:11Z",
+  "updated_at": "2026-10-19T02:12:51Z",
   "releases": [
     {
       "id": "anthropic-claude-1.3",
@@ -1274,6 +1274,20 @@
             "retrieved_at": "2026-09-27T15:42:05Z",
             "verified": true,
             "verified_at": "2026-09-27T15:42:05Z"
+          }
+        },
+        {
+          "benchmark": "osworld",
+          "value": 81.8,
+          "config": "OSWorld 2.1",
+          "reported_by": "official",
+          "source": {
+            "url": "https://www.anthropic.com/news/claude-opus-5-5",
+            "title": "Claude Opus 5.5",
+            "quote": "Computer use OSWorld 2.1 81.8% partial",
+            "retrieved_at": "2026-10-19T02:12:51Z",
+            "verified": true,
+            "verified_at": "2026-10-19T02:12:51Z"
           }
         }
       ],
