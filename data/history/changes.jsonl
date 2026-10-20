@@ -1062,3 +1062,6 @@
 {"at":"2026-10-18T00:12:50Z","actor":"worker","lab":"openai","release_id":"openai-gpt-6","kind":"release_added","summary":"GPT-6 — released 2026-10-07","source_url":"https://openai.com/index/gpt-6-for-everyone"}
 {"at":"2026-10-18T00:12:50Z","actor":"worker","lab":"openai","release_id":"openai-gpt-live-1","kind":"release_added","summary":"GPT-Live-1 — released 2026-10-14","source_url":"https://openai.com/index/amp-beyond-coding"}
 {"at":"2026-10-19T02:12:51Z","actor":"worker","lab":"anthropic","release_id":"anthropic-claude-opus-5.5","kind":"score_added","summary":"osworld 81.8 (OSWorld 2.1)","source_url":"https://www.anthropic.com/news/claude-opus-5-5"}
+{"at":"2026-10-20T02:53:19Z","actor":"worker","lab":"anthropic","release_id":"anthropic-claude-sonnet-5.5","kind":"release_added","summary":"Claude Sonnet 5.5 — released 2026-09-28","source_url":"https://www.anthropic.com/news/claude-sonnet-5-5"}
+{"at":"2026-10-20T02:53:19Z","actor":"worker","lab":"google","release_id":"google-gemini-4-argon","kind":"release_added","summary":"Gemini 4 Argon — released 2026-10-20","source_url":"https://blog.google"}
+{"at":"2026-10-20T02:53:19Z","actor":"worker","lab":"xai","release_id":"xai-grok-voice-3.0","kind":"release_added","summary":"Grok Voice 3.0 — released 2026-10-14","source_url":"https://x.ai"}

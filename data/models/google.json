@@ -1,6 +1,6 @@
 {
   "lab": "google",
-  "updated_at": "2026-10-12T05:44:11Z",
+  "updated_at": "2026-10-20T02:53:19Z",
   "releases": [
     {
       "id": "google-palm-2",
@@ -966,6 +966,25 @@
         }
       ],
       "notes": "Available to trusted defenders through the Fairwind Program."
+    },
+    {
+      "id": "google-gemini-4-argon",
+      "lab": "google",
+      "name": "Gemini 4 Argon",
+      "family": "Gemini",
+      "date": "2026-10-20",
+      "date_precision": "day",
+      "status": "released",
+      "tier": "flagship",
+      "announcement": {
+        "url": "https://blog.google",
+        "title": "Gemini 4 Argon",
+        "quote": "Gemini 4 Argon is now available in the Gemini app, delivering frontier reasoning and improved performance across complex tasks.",
+        "retrieved_at": "2026-10-20T02:53:19Z",
+        "verified": true,
+        "verified_at": "2026-10-20T02:53:19Z"
+      },
+      "scores": []
     }
   ]
 }

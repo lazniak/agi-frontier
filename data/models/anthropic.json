@@ -1,6 +1,6 @@
 {
   "lab": "anthropic",
-  "updated_at": "2026-10-19T02:12:51Z",
+  "updated_at": "2026-10-20T02:53:19Z",
   "releases": [
     {
       "id": "anthropic-claude-1.3",
@@ -1292,6 +1292,69 @@
         }
       ],
       "notes": "Terminal-Bench 4.0 results are reported for Claude Opus 5.5 at xhigh effort. GDPval-AA v2.1 is an Elo benchmark."
+    },
+    {
+      "id": "anthropic-claude-sonnet-5.5",
+      "lab": "anthropic",
+      "name": "Claude Sonnet 5.5",
+      "family": "Claude Sonnet",
+      "date": "2026-09-28",
+      "date_precision": "day",
+      "status": "released",
+      "tier": "mid",
+      "announcement": {
+        "url": "https://www.anthropic.com/news/claude-sonnet-5-5",
+        "title": "Claude Sonnet 5.5",
+        "quote": "Introducing Claude Sonnet 5.5, the second model in the Claude 5.5 family.",
+        "retrieved_at": "2026-10-20T02:53:19Z",
+        "verified": true,
+        "verified_at": "2026-10-20T02:53:19Z"
+      },
+      "scores": [
+        {
+          "benchmark": "terminal-bench-2",
+          "value": 70.6,
+          "config": "Terminal-Bench 4.0",
+          "reported_by": "official",
+          "source": {
+            "url": "https://www.anthropic.com/news/claude-sonnet-5-5",
+            "title": "Claude Sonnet 5.5",
+            "quote": "Sonnet 5.5 scores 70.6% on Terminal-Bench 4.0, an agentic coding evaluation, compared to Sonnet 5’s 10.3%.",
+            "retrieved_at": "2026-10-20T02:53:19Z",
+            "verified": true,
+            "verified_at": "2026-10-20T02:53:19Z"
+          }
+        },
+        {
+          "benchmark": "hle",
+          "value": 64.5,
+          "config": "with tools",
+          "reported_by": "official",
+          "source": {
+            "url": "https://www.anthropic.com/news/claude-sonnet-5-5",
+            "title": "Claude Sonnet 5.5",
+            "quote": "Multidisciplinary reasoning Humanity’s Last Exam 64.5% with tools",
+            "retrieved_at": "2026-10-20T02:53:19Z",
+            "verified": true,
+            "verified_at": "2026-10-20T02:53:19Z"
+          }
+        },
+        {
+          "benchmark": "osworld",
+          "value": 80.1,
+          "config": "OSWorld 2.1, partial",
+          "reported_by": "official",
+          "source": {
+            "url": "https://www.anthropic.com/news/claude-sonnet-5-5",
+            "title": "Claude Sonnet 5.5",
+            "quote": "Computer use OSWorld 2.1 80.1% partial",
+            "retrieved_at": "2026-10-20T02:53:19Z",
+            "verified": true,
+            "verified_at": "2026-10-20T02:53:19Z"
+          }
+        }
+      ],
+      "notes": "Terminal-Bench 4.0 is used as the benchmark for terminal-bench-2. OSWorld 2.1 is used for osworld."
     }
   ]
 }
