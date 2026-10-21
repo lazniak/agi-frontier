@@ -1,6 +1,6 @@
 {
   "lab": "anthropic",
-  "updated_at": "2026-10-14T18:49:51Z",
+  "updated_at": "2026-10-21T19:21:52Z",
   "releases": [
     {
       "id": "anthropic-opus-5",
@@ -97,6 +97,35 @@
           }
         }
       ]
+    },
+    {
+      "id": "anthropic-claude-haiku-5.5",
+      "lab": "anthropic",
+      "name": "Claude Haiku 5.5",
+      "family": "Claude",
+      "date": "2026-10-07",
+      "date_precision": "day",
+      "status": "released",
+      "tier": "small",
+      "origin": "researcher",
+      "announcement": {
+        "url": "https://www.anthropic.com/news",
+        "title": "Claude Haiku 5.5",
+        "quote": "Introducing Claude Haiku 5.5",
+        "retrieved_at": "2026-10-21T19:21:52Z",
+        "verified": true,
+        "verified_at": "2026-10-21T19:21:52Z"
+      },
+      "sources": [
+        {
+          "url": "https://www.anthropic.com/news",
+          "quote": "Introducing Claude Haiku 5.5",
+          "retrieved_at": "2026-10-21T19:21:52Z",
+          "verified": true,
+          "verified_at": "2026-10-21T19:21:52Z"
+        }
+      ],
+      "scores": []
     }
   ]
 }
