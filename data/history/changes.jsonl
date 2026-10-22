@@ -1065,3 +1065,4 @@
 {"at":"2026-10-20T02:53:19Z","actor":"worker","lab":"anthropic","release_id":"anthropic-claude-sonnet-5.5","kind":"release_added","summary":"Claude Sonnet 5.5 — released 2026-09-28","source_url":"https://www.anthropic.com/news/claude-sonnet-5-5"}
 {"at":"2026-10-20T02:53:19Z","actor":"worker","lab":"google","release_id":"google-gemini-4-argon","kind":"release_added","summary":"Gemini 4 Argon — released 2026-10-20","source_url":"https://blog.google"}
 {"at":"2026-10-20T02:53:19Z","actor":"worker","lab":"xai","release_id":"xai-grok-voice-3.0","kind":"release_added","summary":"Grok Voice 3.0 — released 2026-10-14","source_url":"https://x.ai"}
+{"at":"2026-10-22T03:27:32Z","actor":"worker","lab":"anthropic","release_id":"anthropic-claude-haiku-5.5","kind":"release_added","summary":"Claude Haiku 5.5 — released 2026-10-07","source_url":"https://www.anthropic.com"}
