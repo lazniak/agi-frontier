@@ -1,6 +1,6 @@
 {
   "lab": "openai",
-  "updated_at": "2026-10-18T00:12:50Z",
+  "updated_at": "2026-10-23T15:15:39Z",
   "releases": [
     {
       "id": "openai-gpt-1",
@@ -1830,7 +1830,32 @@
         "verified": true,
         "verified_at": "2026-09-30T17:23:01Z"
       },
-      "scores": [],
+      "sources": [
+        {
+          "url": "https://openai.com/index/terminal-x",
+          "title": "Terminal X matches senior investor judgment 88.6% with GPT-6.1",
+          "quote": "OpenAI October 20, 2026 Startup Terminal X matches senior investor judgment 88.6% with GPT‑6.1",
+          "retrieved_at": "2026-10-23T15:15:39Z",
+          "verified": true,
+          "verified_at": "2026-10-23T15:15:39Z"
+        }
+      ],
+      "scores": [
+        {
+          "benchmark": "terminal-bench-2",
+          "value": 88.6,
+          "config": "Eval Agent",
+          "reported_by": "official",
+          "source": {
+            "url": "https://openai.com/index/terminal-x",
+            "title": "Terminal X matches senior investor judgment 88.6% with GPT-6.1",
+            "quote": "Across 500 scored judgments, its Eval Agent on GPT‑6.1 Sol agreed with the senior human reviewer 88.6% of the time",
+            "retrieved_at": "2026-10-23T15:15:39Z",
+            "verified": true,
+            "verified_at": "2026-10-23T15:15:39Z"
+          }
+        }
+      ],
       "notes": "The page describes GPT-6.1 Sol as an upgrade to GPT-6 Sol and compares it to the flagship GPT-6 Astra, positioning it as a mid-tier model."
     },
     {

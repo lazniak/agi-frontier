@@ -1066,3 +1066,8 @@
 {"at":"2026-10-20T02:53:19Z","actor":"worker","lab":"google","release_id":"google-gemini-4-argon","kind":"release_added","summary":"Gemini 4 Argon — released 2026-10-20","source_url":"https://blog.google"}
 {"at":"2026-10-20T02:53:19Z","actor":"worker","lab":"xai","release_id":"xai-grok-voice-3.0","kind":"release_added","summary":"Grok Voice 3.0 — released 2026-10-14","source_url":"https://x.ai"}
 {"at":"2026-10-22T03:27:32Z","actor":"worker","lab":"anthropic","release_id":"anthropic-claude-haiku-5.5","kind":"release_added","summary":"Claude Haiku 5.5 — released 2026-10-07","source_url":"https://www.anthropic.com"}
+{"at":"2026-10-23T15:15:39Z","actor":"worker","lab":"openai","release_id":"openai-gpt-6.1-sol","kind":"score_added","summary":"terminal-bench-2 88.6 (Eval Agent)","source_url":"https://openai.com/index/terminal-x"}
+{"at":"2026-10-23T15:15:39Z","actor":"worker","lab":"anthropic","release_id":"anthropic-claude-mythos","kind":"release_added","summary":"Claude Mythos — released 2026-09-15","source_url":"https://www.anthropic.com/news"}
+{"at":"2026-10-23T15:15:39Z","actor":"worker","lab":"anthropic","release_id":"anthropic-claude-haiku-4.5","kind":"release_added","summary":"Claude Haiku 4.5 — released 2025-12-01","source_url":"https://www.anthropic.com/features/project-deal"}
+{"at":"2026-10-23T15:15:39Z","actor":"worker","lab":"google","release_id":"google-nano-banana-2.1","kind":"release_added","summary":"Nano Banana 2.1 — released 2026-10-01","source_url":"https://blog.google/innovation-and-ai/products/gemini-app/new-tools-small-business-owners/"}
+{"at":"2026-10-23T15:15:39Z","actor":"worker","lab":"xai","release_id":"xai-grok-4.7","kind":"release_added","summary":"Grok 4.7 — released 2026-09-22","source_url":"https://x.ai/news"}

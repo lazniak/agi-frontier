@@ -1,6 +1,6 @@
 {
   "lab": "google",
-  "updated_at": "2026-10-20T02:53:19Z",
+  "updated_at": "2026-10-23T15:15:39Z",
   "releases": [
     {
       "id": "google-palm-2",
@@ -966,6 +966,26 @@
         }
       ],
       "notes": "Available to trusted defenders through the Fairwind Program."
+    },
+    {
+      "id": "google-nano-banana-2.1",
+      "lab": "google",
+      "name": "Nano Banana 2.1",
+      "family": "Nano Banana",
+      "date": "2026-10-01",
+      "date_precision": "month",
+      "status": "released",
+      "tier": "small",
+      "announcement": {
+        "url": "https://blog.google/innovation-and-ai/products/gemini-app/new-tools-small-business-owners/",
+        "title": "New Gemini tools for small business owners",
+        "quote": "When paired with the power of Nano Banana 2.1 (our latest image generation model), Gemini can now deliver end-to-end visual results for new product launches or ongoing marketing campaigns.",
+        "retrieved_at": "2026-10-23T15:15:39Z",
+        "verified": true,
+        "verified_at": "2026-10-23T15:15:39Z"
+      },
+      "scores": [],
+      "notes": "The page identifies this as an image generation model."
     },
     {
       "id": "google-gemini-4-argon",
