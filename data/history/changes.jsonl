@@ -1072,3 +1072,4 @@
 {"at":"2026-10-23T15:15:39Z","actor":"worker","lab":"google","release_id":"google-nano-banana-2.1","kind":"release_added","summary":"Nano Banana 2.1 — released 2026-10-01","source_url":"https://blog.google/innovation-and-ai/products/gemini-app/new-tools-small-business-owners/"}
 {"at":"2026-10-23T15:15:39Z","actor":"worker","lab":"xai","release_id":"xai-grok-4.7","kind":"release_added","summary":"Grok 4.7 — released 2026-09-22","source_url":"https://x.ai/news"}
 {"at":"2026-10-24T00:02:36Z","actor":"worker","lab":"openai","release_id":"openai-gpt-6-astra-cyber","kind":"release_added","summary":"GPT-6 Astra Cyber — announced 2026-10-23","source_url":"https://openai.com/index/securing-our-frontier-model-training-environment"}
+{"at":"2026-10-24T04:05:47Z","actor":"worker","lab":"deepseek","release_id":"deepseek-deepseek-v4.1-flash-1017","kind":"release_added","summary":"DeepSeek-V4.1-Flash-1017 — released 2026-10-01","source_url":"https://deepseek.com"}

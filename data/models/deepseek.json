@@ -1,6 +1,6 @@
 {
   "lab": "deepseek",
-  "updated_at": "2026-10-12T05:44:11Z",
+  "updated_at": "2026-10-24T04:05:47Z",
   "releases": [
     {
       "id": "deepseek-llm-67b",
@@ -1279,6 +1279,25 @@
         }
       ],
       "notes": "1.6T-parameter (49B active) MoE model; DeepSeek-V4-Flash (284B/13B active) launched the same day as a smaller tier and is excluded here. Preview weights went live and open-sourced 2026-04-24; reasoning-effort modes (low/high/max) and the V4-Pro-0813 checkpoint shipped at GA on 2026-08-13. deepseek-chat/deepseek-reasoner API aliases were retired in favor of deepseek-v4-* on 2026-07-24."
+    },
+    {
+      "id": "deepseek-deepseek-v4.1-flash-1017",
+      "lab": "deepseek",
+      "name": "DeepSeek-V4.1-Flash-1017",
+      "family": "DeepSeek-V4",
+      "date": "2026-10-01",
+      "date_precision": "month",
+      "status": "released",
+      "tier": "small",
+      "announcement": {
+        "url": "https://deepseek.com",
+        "title": "DeepSeek-V4.1-Flash-1017",
+        "quote": "DeepSeek V4.1 Flash 现已更新至 V4.1-Flash-1017 版本，项目开发能力提升显著，更低成本、更快速度完成任务；新增 API 支持网页搜索与抓取，欢迎测试和反馈",
+        "retrieved_at": "2026-10-24T04:05:47Z",
+        "verified": true,
+        "verified_at": "2026-10-24T04:05:47Z"
+      },
+      "scores": []
     }
   ]
 }
