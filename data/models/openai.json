@@ -1,6 +1,6 @@
 {
   "lab": "openai",
-  "updated_at": "2026-10-23T15:15:39Z",
+  "updated_at": "2026-10-24T00:02:36Z",
   "releases": [
     {
       "id": "openai-gpt-1",
@@ -1895,6 +1895,26 @@
         "verified_at": "2026-10-18T00:12:50Z"
       },
       "scores": []
+    },
+    {
+      "id": "openai-gpt-6-astra-cyber",
+      "lab": "openai",
+      "name": "GPT-6 Astra Cyber",
+      "family": "GPT",
+      "date": "2026-10-23",
+      "date_precision": "unknown",
+      "status": "announced",
+      "tier": "flagship",
+      "announcement": {
+        "url": "https://openai.com/index/securing-our-frontier-model-training-environment",
+        "title": "Securing our frontier model training environment",
+        "quote": "We used some of our most capable and aligned models, including our upcoming GPT‑6 Astra Cyber model and an internal frontier model.",
+        "retrieved_at": "2026-10-24T00:02:36Z",
+        "verified": true,
+        "verified_at": "2026-10-24T00:02:36Z"
+      },
+      "scores": [],
+      "notes": "The page describes this as an 'upcoming' model used for red-teaming experiments."
     }
   ]
 }
