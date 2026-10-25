@@ -1,6 +1,6 @@
 {
   "lab": "deepseek",
-  "updated_at": "2026-10-24T04:05:47Z",
+  "updated_at": "2026-10-25T04:52:24Z",
   "releases": [
     {
       "id": "deepseek-llm-67b",
@@ -1285,8 +1285,8 @@
       "lab": "deepseek",
       "name": "DeepSeek-V4.1-Flash-1017",
       "family": "DeepSeek-V4",
-      "date": "2026-10-01",
-      "date_precision": "month",
+      "date": "2026-10-17",
+      "date_precision": "day",
       "status": "released",
       "tier": "small",
       "announcement": {
