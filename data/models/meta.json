@@ -1,6 +1,6 @@
 {
   "lab": "meta",
-  "updated_at": "2026-10-17T00:27:11Z",
+  "updated_at": "2026-10-27T06:00:13Z",
   "releases": [
     {
       "id": "meta-llama-1-65b",
@@ -719,6 +719,46 @@
         "retrieved_at": "2026-10-17T00:27:11Z",
         "verified": true,
         "verified_at": "2026-10-17T00:27:11Z",
+        "via": "r.jina.ai"
+      },
+      "scores": []
+    },
+    {
+      "id": "meta-muse-wonder",
+      "lab": "meta",
+      "name": "Muse Wonder",
+      "family": "Muse Wonder",
+      "date": "2026-10-12",
+      "date_precision": "day",
+      "status": "released",
+      "tier": "flagship",
+      "announcement": {
+        "url": "https://ai.meta.com",
+        "title": "Muse Wonder",
+        "quote": "We’re excited to introduce the Muse Wonder series with Muse Wonder and Muse Wonder Full, our frontier models that deliver state-of-the-art performance on personal and professional agentic tasks.",
+        "retrieved_at": "2026-10-27T06:00:13Z",
+        "verified": true,
+        "verified_at": "2026-10-27T06:00:13Z",
+        "via": "r.jina.ai"
+      },
+      "scores": []
+    },
+    {
+      "id": "meta-muse-wonder-full",
+      "lab": "meta",
+      "name": "Muse Wonder Full",
+      "family": "Muse Wonder",
+      "date": "2026-10-12",
+      "date_precision": "day",
+      "status": "released",
+      "tier": "flagship",
+      "announcement": {
+        "url": "https://ai.meta.com",
+        "title": "Muse Wonder",
+        "quote": "We’re excited to introduce the Muse Wonder series with Muse Wonder and Muse Wonder Full, our frontier models that deliver state-of-the-art performance on personal and professional agentic tasks.",
+        "retrieved_at": "2026-10-27T06:00:13Z",
+        "verified": true,
+        "verified_at": "2026-10-27T06:00:13Z",
         "via": "r.jina.ai"
       },
       "scores": []
