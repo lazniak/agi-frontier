@@ -1,6 +1,6 @@
 {
   "lab": "google",
-  "updated_at": "2026-10-27T06:00:13Z",
+  "updated_at": "2026-10-29T06:57:05Z",
   "releases": [
     {
       "id": "google-palm-2",
@@ -966,6 +966,25 @@
         }
       ],
       "notes": "Available to trusted defenders through the Fairwind Program."
+    },
+    {
+      "id": "google-gemini-4-carbon",
+      "lab": "google",
+      "name": "Gemini 4 Carbon",
+      "family": "Gemini",
+      "date": "2026-10-01",
+      "date_precision": "month",
+      "status": "announced",
+      "tier": "flagship",
+      "announcement": {
+        "url": "https://deepmind.google",
+        "title": "Gemini 4 Carbon",
+        "quote": "Gemini 4 Carbon: Our next frontier model\nOctober 2026 Models",
+        "retrieved_at": "2026-10-29T06:57:05Z",
+        "verified": true,
+        "verified_at": "2026-10-29T06:57:05Z"
+      },
+      "scores": []
     },
     {
       "id": "google-nano-banana-2.1",
