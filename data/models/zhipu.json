@@ -1,6 +1,6 @@
 {
   "lab": "zhipu",
-  "updated_at": "2026-10-12T05:44:11Z",
+  "updated_at": "2026-11-23T20:16:36Z",
   "releases": [
     {
       "id": "zhipu-glm-130b",
@@ -1159,6 +1159,27 @@
         }
       ],
       "notes": "GLM-5.3 is a post-training-only update on the GLM-5.2 base model; the launch post re-reports only coding/agentic/cyber benchmarks and HLE-with-tools, not the general reasoning basket (GPQA, plain HLE, AIME)."
+    },
+    {
+      "id": "zhipu-glm-5.4",
+      "lab": "zhipu",
+      "name": "GLM-5.4",
+      "family": "GLM",
+      "date": "2026-11-23",
+      "date_precision": "day",
+      "status": "released",
+      "tier": "flagship",
+      "announcement": {
+        "url": "https://z.ai/blog/glm-5.4",
+        "title": "GLM-5.4",
+        "quote": "GLM-5.4 is our first flagship model built on the Loop Transformer architecture, reaching intelligence levels comparable to 2T-3T parameter models.",
+        "retrieved_at": "2026-11-23T20:16:36Z",
+        "verified": true,
+        "verified_at": "2026-11-23T20:16:36Z",
+        "via": "r.jina.ai"
+      },
+      "scores": [],
+      "notes": "The page mentions that the model is available via the GLM Coding Plan, ZCode, and Z.ai Chat."
     }
   ]
 }

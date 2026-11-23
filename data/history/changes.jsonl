@@ -1081,3 +1081,4 @@
 {"at":"2026-10-29T06:57:05Z","actor":"worker","lab":"google","release_id":"google-gemini-4-carbon","kind":"release_added","summary":"Gemini 4 Carbon — announced 2026-10-01","source_url":"https://deepmind.google"}
 {"at":"2026-11-01T08:36:58Z","actor":"worker","lab":"moonshot","release_id":"moonshot-kimi-k3.1-pro","kind":"release_added","summary":"Kimi K3.1 Pro — released 2026-10-24","source_url":"https://moonshot.ai"}
 {"at":"2026-11-18T17:29:46Z","actor":"worker","lab":"alibaba","release_id":"alibaba-qwen4-max","kind":"release_added","summary":"Qwen4-Max — released 2026-11-16","source_url":"https://qwen.ai"}
+{"at":"2026-11-23T20:16:36Z","actor":"worker","lab":"zhipu","release_id":"zhipu-glm-5.4","kind":"release_added","summary":"GLM-5.4 — released 2026-11-23","source_url":"https://z.ai/blog/glm-5.4"}
